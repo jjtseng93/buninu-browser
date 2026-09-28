@@ -42,6 +42,12 @@ case as an HTML/CSS fixture. The flex layout in `lib/layout/text-layout.js`
 also follows TermDOM's `resolveFlexibleLengths` rule that growing requires a
 definite main size; no TermDOM source text is copied.
 
+`test/grid.test.js` likewise ports TermDOM's `tests/grid.test.ts` cases for
+track sizing, `repeat()`/`auto-fill`/`auto-fit`, line placement, sparse and
+dense auto-placement, implicit tracks, gaps, and alignment, re-expressed as
+HTML fixtures in a 30px-wide container with 1px characters (TermDOM's 30-cell
+terminal). The grid layout itself is written from the CSS Grid 2 algorithm.
+
 ## Chromium (Blink) references
 
 - Project: Chromium

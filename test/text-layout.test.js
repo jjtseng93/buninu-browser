@@ -340,3 +340,19 @@ test("lays out inline-block atoms on the line and paints decorated inline boxes"
   expect(layout.fragments.find((fragment) => fragment.text === "go")).toMatchObject({ x: 127 });
   window.happyDOM.abort();
 });
+
+test("places outside list markers on the first line's baseline", () => {
+  const { window, layout } = layoutFixture(
+    `<ul><li>one</li><li><p>two</p></li></ul><ol start="3"><li>c</li><li value="9">d</li><li>e</li></ol><ul class="bare"><li>x</li></ul>`,
+    `ul, ol { margin:0; padding-left:40px } p { margin:0 } .bare { list-style:none }`,
+  );
+  const markers = layout.fragments.flatMap((fragment) => fragment.runs).filter((run) => run.type === "marker");
+
+  expect(markers.map((run) => run.text)).toEqual(["• ", "• ", "3. ", "9. ", "5. "]);
+  // Marker end touches the content edge (x = 40); widths are 10px per character.
+  expect(markers.map((run) => run.x)).toEqual([20, 20, 10, 10, 10]);
+  const firstLine = layout.fragments.find((fragment) => fragment.text === "one");
+  const firstMarker = layout.fragments.find((fragment) => fragment.runs[0]?.type === "marker");
+  expect(firstMarker.baseline).toBe(firstLine.baseline);
+  window.happyDOM.abort();
+});

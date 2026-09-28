@@ -166,3 +166,27 @@ test("applies UA margins, root-relative rem, viewport units and inherited line-h
   expect(styles.get(document.documentElement).lineHeight).toBeNull();
   window.happyDOM.abort();
 });
+
+test("parses font-family lists, box-shadow layers and the background shorthand", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <div id="card">x<code id="code">c</code></div><div id="plain">y</div>
+  </body>`);
+  const styles = new StyleEngine().compute(document, [`
+    #card { font-family: "SF Mono", Menlo, monospace; box-shadow: 0 20px 60px #ffb70340, inset 1px 2px red;
+      background: radial-gradient(1200px 500px at 50% -10%, rgba(255,183,3,.16), transparent 60%), linear-gradient(180deg, #111 0%, #222 70%) }
+    #plain { background-color: red; background: #0d1117 }
+  `]);
+  const card = styles.get(document.getElementById("card"));
+
+  expect(card.fontFamily).toEqual(["SF Mono", "Menlo", "monospace"]);
+  expect(styles.get(document.getElementById("code")).fontFamily).toEqual(["monospace"]);
+  expect(card.boxShadow).toEqual([
+    { x: 0, y: 20, blur: 60, spread: 0, color: "rgba(255, 183, 3, 0.2509804)", inset: false },
+    { x: 1, y: 2, blur: 0, spread: 0, color: "rgba(255, 0, 0, 1)", inset: true },
+  ]);
+  // Two gradient layers and no color: the shorthand resets background-color.
+  expect(card.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+  expect(card.backgroundImage.match(/gradient\(/g)).toHaveLength(2);
+  expect(styles.get(document.getElementById("plain"))).toMatchObject({ backgroundColor: "rgba(13, 17, 23, 1)", backgroundImage: null });
+  window.happyDOM.abort();
+});
