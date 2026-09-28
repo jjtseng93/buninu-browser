@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
-import { hitTest, interactiveRegions } from "../lib/input/hit-test.js";
+import { elementBounds, hitTest, interactiveRegions } from "../lib/input/hit-test.js";
 import { layoutText } from "../lib/layout/text-layout.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
 
@@ -20,6 +20,19 @@ test("creates separate clickable regions for links sharing a line", () => {
   window.happyDOM.abort();
 });
 
+test("finds content bounds for fragment navigation targets", () => {
+  const { document, window } = parseHTMLDocument(
+    `<body><pre>before\nbefore\nbefore</pre><section id="target"><h2>Target</h2></section></body>`,
+  );
+  const tree = new RenderTreeBuilder().build(document);
+  const layout = layoutText(tree);
+  const bounds = elementBounds(tree, layout, document.getElementById("target"));
+
+  expect(bounds.top).toBeGreaterThan(12);
+  expect(bounds.height).toBeGreaterThan(0);
+  window.happyDOM.abort();
+});
+
 test("hit testing accounts for viewport scrolling", () => {
   const { document, window } = parseHTMLDocument(
     `<body><pre>line 0\nline 1\nline 2\n<a href="target">target</a></pre></body>`,
@@ -34,4 +47,3 @@ test("hit testing accounts for viewport scrolling", () => {
   expect(hitTest(tree, layout, rect.left + 1, rect.top + 1, scroll, { width: 800, height: 100 })?.element.getAttribute("href")).toBe("target");
   window.happyDOM.abort();
 });
-

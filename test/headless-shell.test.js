@@ -40,6 +40,7 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
         <body data-ready="yes"><a href="/destination">destination</a><br>第一行 😀<br>second &copy;
           <script>document.title = "script ran"</script>
           <pre>${Array.from({ length: 30 }, (_, index) => `line ${index}`).join("\n")}</pre>
+          <h2 id="target">fragment target</h2>
         </body>`, {
         headers: { "Content-Type": "text/html; charset=utf-8" },
       });
@@ -99,6 +100,11 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     expect(endOffset).toBeGreaterThan(100);
     await view.cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "End", code: "End" });
 
+    await view.navigate(`http://127.0.0.1:${fixture.port}/again`);
+    expect(await view.evaluate("scrollY")).toBe(0);
+    await view.navigate(`http://127.0.0.1:${fixture.port}/again#target`);
+    expect(view.url).toBe(`http://127.0.0.1:${fixture.port}/again#target`);
+    expect(await view.evaluate("scrollY")).toBeGreaterThan(0);
     await view.navigate(`http://127.0.0.1:${fixture.port}/again`);
     expect(await view.evaluate("scrollY")).toBe(0);
 
