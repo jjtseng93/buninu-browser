@@ -28,11 +28,12 @@ test("paints box decorations in tree order before inline content", () => {
   );
 
   expect(displayList.items.map((item) => item.op)).toEqual([
-    "fillRect", "strokeRect", "fillRect", "drawText", "drawText",
+    "fillRect", "border", "fillRect", "drawText", "drawText",
   ]);
   const [background, border, code, text] = displayList.items;
-  expect(background).toMatchObject({ rect: { x: 0, y: 0, width: 200, height: 32 }, radius: 6, color: "rgba(17, 17, 17, 1)" });
-  expect(border.rect).toEqual({ x: 1, y: 1, width: 198, height: 30 });
+  expect(background).toMatchObject({ rect: { x: 0, y: 0, width: 200, height: 32 }, radii: { x: 6, y: 6 }, color: "rgba(17, 17, 17, 1)" });
+  expect(border).toMatchObject({ rect: { x: 0, y: 0, width: 200, height: 32 }, widths: [2, 2, 2, 2] });
+  expect(border.colors).toEqual(Array(4).fill("rgba(255, 0, 0, 1)"));
   expect(code).toMatchObject({ rect: { x: 36, width: 10 } });
   expect(text).toMatchObject({ text: "hi ", x: 6, font: { size: 16, weight: 400 }, color: "rgba(0, 255, 0, 1)" });
   expect(Object.isFrozen(displayList.items[0].rect)).toBeTrue();
@@ -76,10 +77,24 @@ test("emits box shadows, gradient layers, rounded images and gradient text", () 
   // Background layers paint bottom-up; the clipped-text gradient is not a box fill.
   expect(ops).toEqual(["fillRect:linear", "fillRect:radial", "drawShadow", "drawImage", "drawText:linear"]);
   const shadow = displayList.items.find((item) => item.op === "drawShadow");
-  expect(shadow).toMatchObject({ rect: { x: 0, y: 20, width: 40, height: 40 }, blur: 60, radius: 8, clip: { y: 0 } });
+  expect(shadow).toMatchObject({ rect: { x: 0, y: 20, width: 40, height: 40 }, blur: 60, radii: { x: 8, y: 8 }, clip: { y: 0 } });
   expect(shadow.color).toBe("rgba(255, 183, 3, 0.2509804)");
-  expect(displayList.items.find((item) => item.op === "drawImage").radius).toBe(8);
+  expect(displayList.items.find((item) => item.op === "drawImage").radii).toEqual({ x: 8, y: 8 });
   const text = displayList.items.find((item) => item.op === "drawText");
   expect(text.gradient.stops.map((stop) => stop.color)).toEqual(["rgba(255, 183, 3, 1)", "rgba(255, 107, 107, 1)"]);
+  window.happyDOM.abort();
+});
+
+test("resolves percentage radii per axis and scales overlapping radii down", () => {
+  const { window, displayList } = displayListFor(
+    `<div class="pill">x</div><div class="huge">y</div>`,
+    `.pill { width:100px; height:40px; background:#111; border-radius:50% }
+     .huge { width:100px; height:40px; background:#222; border-radius:60px }`,
+  );
+  const [pill, huge] = displayList.items.filter((item) => item.op === "fillRect");
+  expect(pill.radii).toEqual({ x: 50, y: 20 });
+  // 60px corners would overlap on a 40px-tall box: scale by 40 / 120.
+  expect(huge.radii.x).toBeCloseTo(20);
+  expect(huge.radii.y).toBeCloseTo(20);
   window.happyDOM.abort();
 });

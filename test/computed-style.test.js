@@ -109,10 +109,31 @@ test("computes the first paint and flex presentation properties", () => {
     alignItems: "center",
     gap: 16,
     textAlign: "center",
-    borderWidth: 2,
-    borderColor: "rgba(255, 0, 0, 1)",
+    borderWidths: [2, 2, 2, 2],
+    borderColors: Array(4).fill("rgba(255, 0, 0, 1)"),
+    borderStyles: Array(4).fill("solid"),
     borderRadius: 8,
   });
+  window.happyDOM.abort();
+});
+
+test("resolves per-side borders, border-style none and currentColor", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <div id="left" style="color:#00f; border:1px solid #111; border-left:3px solid; border-radius:50%">x</div>
+    <div id="none" style="border-width:4px; border-top: thick dashed red">y</div>
+    <div id="sides" style="border-style:solid; border-width:1px 2px; border-color:red currentcolor; border-bottom-width:thin">z</div>
+  </body>`);
+  const styles = new StyleEngine().compute(document);
+  const left = styles.get(document.getElementById("left"));
+
+  expect(left.borderWidths).toEqual([1, 1, 1, 3]);
+  expect(left.borderColors).toEqual(["rgba(17, 17, 17, 1)", "rgba(17, 17, 17, 1)", "rgba(17, 17, 17, 1)", "rgba(0, 0, 255, 1)"]);
+  expect(left.borderRadius).toEqual({ unit: "%", value: 50 });
+  // Only the top side has a style, so the other widths compute to 0.
+  expect(styles.get(document.getElementById("none")).borderWidths).toEqual([5, 0, 0, 0]);
+  const sides = styles.get(document.getElementById("sides"));
+  expect(sides.borderWidths).toEqual([1, 2, 1, 2]);
+  expect(sides.borderColors).toEqual(["rgba(255, 0, 0, 1)", "rgba(0, 0, 0, 1)", "rgba(255, 0, 0, 1)", "rgba(0, 0, 0, 1)"]);
   window.happyDOM.abort();
 });
 
@@ -188,5 +209,43 @@ test("parses font-family lists, box-shadow layers and the background shorthand",
   expect(card.backgroundColor).toBe("rgba(0, 0, 0, 0)");
   expect(card.backgroundImage.match(/gradient\(/g)).toHaveLength(2);
   expect(styles.get(document.getElementById("plain"))).toMatchObject({ backgroundColor: "rgba(13, 17, 23, 1)", backgroundImage: null });
+  window.happyDOM.abort();
+});
+
+test("matches complex selectors with Selectors 4 specificity", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <ul class="list"><li>a</li><li id="b">b</li><li>c</li></ul>
+    <a href="/x" target="_blank">x</a>
+  </body>`);
+  const styles = new StyleEngine().compute(document, [`
+    .list > li:not(:last-child) { color: red }
+    li:first-child + li { color: blue }
+    ul li { color: green }
+    :where(#b) { color: black }
+    a[target="_blank"] { font-weight: 700 }
+    li:hover { color: yellow }
+  `]);
+  const items = [...document.querySelectorAll("li")];
+
+  // (0,2,1) beats (0,1,2) beats (0,0,2); :where() adds nothing; :hover never matches statically.
+  expect(items.map((item) => styles.get(item).color)).toEqual([
+    "rgba(255, 0, 0, 1)", "rgba(255, 0, 0, 1)", "rgba(0, 128, 0, 1)",
+  ]);
+  expect(styles.get(document.querySelector("a")).fontWeight).toBe(700);
+  window.happyDOM.abort();
+});
+
+test("computes ::before/::after styles only when content generates a box", () => {
+  const { document, window } = parseHTMLDocument(`<body><div class="step">a</div><div class="step">b</div></body>`);
+  const styles = new StyleEngine().compute(document, [`
+    .step:not(:last-child)::after { content: "\\2192  next"; color: orange; display: flex }
+    .step:before { content: none }
+    .step::placeholder { color: red }
+  `]);
+  const [first, last] = document.querySelectorAll(".step");
+
+  expect(styles.getPseudo(first, "after")).toMatchObject({ content: "→ next", display: "flex", color: "rgba(255, 165, 0, 1)" });
+  expect(styles.getPseudo(last, "after")).toBeNull();
+  expect(styles.getPseudo(first, "before")).toBeNull();
   window.happyDOM.abort();
 });
