@@ -8,13 +8,17 @@ top of Bun. It is not a plan to mechanically translate Blink's C++ files.
 The intended architecture has these constraints:
 
 - Browser engine code is JavaScript or TypeScript executed by Bun.
-- Page JavaScript is executed by Bun/JavaScriptCore in an in-process realm, or
-  in another Bun process when process separation is useful.
+- Page JavaScript is executed by Bun/JavaScriptCore. Controlled documents may
+  use an in-process realm; arbitrary remote documents use a dedicated Bun
+  renderer subprocess.
 - Rendering uses CanvasKit WebAssembly and its Canvas 2D-compatible API.
 - Bun's built-in networking, streams, workers, IPC, image, storage, and runtime
   facilities should be reused instead of reimplemented.
-- No security sandbox is required. Process separation is optional and exists
-  only for reliability, parallelism, and lifecycle management.
+- A JavaScript realm is not a security sandbox. Bun 1.4.3 exposes `process` and
+  `Bun` inside `ShadowRealm`, and `node:vm` has constructor escapes. Process
+  separation is therefore required for untrusted pages; until an OS/platform
+  sandbox is present, remote script execution must be disabled or explicitly
+  marked unsafe.
 - Native addons are not part of the browser implementation. Existing Bun
   internals and CanvasKit WASM are platform dependencies, not code maintained by
   the browser project.
@@ -196,9 +200,11 @@ Bun also provides:
 - `Cookie` and `CookieMap` parsing primitives
 - bundling, transpilation, module resolution, and single-executable packaging
 
-With no sandbox requirement, a first implementation can run the browser
-controller, page realm, DOM, style, layout, and renderer in one process. Bun
-subprocesses can be introduced later for tab crash isolation or parallelism.
+For controlled content, a first implementation can run the browser controller,
+page realm, DOM, style, layout, and renderer in one process. Arbitrary remote
+content must instead use a Bun subprocess with a minimal environment, controlled
+working directory, typed IPC, deadlines, and kill/restart handling. That process
+boundary improves containment but is not a complete security sandbox by itself.
 
 ### 3.5 XML
 
@@ -609,10 +615,11 @@ The browser must supply:
 - cookies and storage semantics as needed
 - iframe/browsing-context support when introduced
 
-With no sandbox and an MVP that initially omits cross-origin iframes,
-`WindowProxy`, site isolation, and origin-process assignment can be deferred.
-Same-origin and CORS behavior may still be required for website compatibility,
-even when they are not security boundaries.
+For the controlled-content MVP, cross-origin iframes, full `WindowProxy`
+semantics, and origin-process assignment can be deferred. Same-origin and CORS
+behavior is still required for compatibility. Arbitrary remote scripts remain
+disabled or explicitly unsafe until the renderer has a platform security
+sandbox; a Bun subprocess alone does not make origin checks optional.
 
 ### 7.8 Input, forms, editing, and default actions
 
@@ -642,8 +649,9 @@ copied wholesale from Blink.
 
 ## 8. Recommended architecture
 
-Start with one Bun process and keep a document's JS, DOM, style, and layout on
-the same thread so synchronous DOM APIs remain cheap:
+Keep a document's JS, DOM, style, and layout in the same Bun renderer process
+so synchronous DOM APIs remain cheap. The controller may share that process
+for controlled fixtures, but arbitrary remote pages require a subprocess:
 
 ```text
 Bun process
@@ -654,7 +662,7 @@ Bun process
 |   +-- resource/cache coordinator
 |   +-- frame scheduler
 |
-+-- Page realm (node:vm)
++-- Page realm (Bun/JSC; not a security boundary)
 |   +-- Window and Document globals
 |   +-- classic scripts
 |   +-- SourceTextModule graph
@@ -689,7 +697,7 @@ lifecycle messages across IPC.
 
 ## 9. Suggested implementation stages
 
-### Stage 0: vertical feasibility slice
+### Stage 0: vertical feasibility slice and CDP contract
 
 Render one document containing text, an image, block boxes, and flex layout:
 
@@ -705,6 +713,11 @@ fetch HTML
 ```
 
 This validates data structures and ownership before implementing broad APIs.
+
+In the same stage, `../casty` must be able to discover/create a page target,
+navigate it, set viewport and user agent, and receive a placeholder screenshot
+over CDP. Replace the placeholder with CanvasKit output during Stage 1 and add
+screencast frame events as rendering invalidation becomes available.
 
 ### Stage 1: static renderer
 
@@ -749,7 +762,8 @@ This validates data structures and ownership before implementing broad APIs.
 
 ## 10. Estimated scale
 
-These estimates assume Bun 1.4.3, CanvasKit WASM, no sandbox, reuse of available
+These estimates assume Bun 1.4.3, CanvasKit WASM, renderer process isolation
+(with platform sandbox hardening tracked separately), reuse of available
 JS/WASM parsers where appropriate, and deliberate deferral of media, WebRTC,
 complete editing, accessibility, and the full Web API surface.
 

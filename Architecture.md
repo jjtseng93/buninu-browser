@@ -14,7 +14,7 @@
 - **Dropflow** 提供 block／inline／float／文字排版的演算法與測試參考。
 - **TermDOM** 提供 flex／grid／table、選擇器失效、flat-tree、互動與 invalidation 的參考；不能直接沿用其「一格終端字元等於一個 CSS px」的幾何模型。
 - **CanvasKit（Skia WASM）** 負責像素繪製、圖片解碼後呈現、文字與 surface；它不是 layout engine。
-- **QuickJS-WASM** 或獨立低權限 renderer process 執行網站 JavaScript。不可讓不可信頁面直接使用 Happy DOM 的 `node:vm` 路徑。
+- 網站 JavaScript 使用 Bun／JavaScriptCore，但依信任等級分流：受控內容可使用同 process realm；任意遠端內容必須放在獨立、低權限 Bun renderer process。不可把 `node:vm`、`ShadowRealm` 或 Worker 當成安全邊界。
 - **WPT + 自製 screenshot/reftest** 作為驗收標準，而非以「某些網站看起來能跑」判定完成。
 - 參考 Chromium 的分層：Browser、Renderer、Network、DOM/Style、Layout、PrePaint/Paint、DevTools；保留責任邊界，不照搬 Chromium 的全部工程複雜度。
 
@@ -130,7 +130,7 @@ this.constructor.constructor('return process')()
 | TermDOM | flex/grid/table、flat tree、selectors/invalidation、表單與互動測試思路 | 像素精度、網路、JS runtime、圖片 | 移植演算法與測試；輸入改成 RenderNode + float geometry |
 | Dropflow | block/inline/float、line breaking、intrinsic sizing、HarfBuzz shaping、pixel geometry | flex/grid、完整 browser lifecycle | 優先移植 inline/text/block；不要混用其簡化 DOM |
 | CanvasKit | Skia paths、text、image、surface、raster output | CSS cascade、layout、DOM | 實作 DisplayList backend；另做 `<canvas>` adapter |
-| QuickJS-Emscripten | 隔離 runtime/context、interrupt、memory limit、module hook | 免費的 DOM bridge、高效跨 WASM 邊界 | renderer 中執行 page JS；產生 WebIDL bindings 並批次化 bridge |
+| Bun/JSC realm + renderer process | 同 heap 的低成本 DOM access；Bun IPC、timeout、kill、env/cwd/uid/gid 控制 | realm/Worker 本身不是安全 sandbox | 受控內容可同 process；不可信內容以低權限 Bun subprocess 承載 DOM、JS、style、layout |
 | WPT | 跨瀏覽器規範測試與 reftest | 自動告訴你架構怎麼設計 | 建 allowlist/expected-fail dashboard，逐層擴張 |
 | Chromium/Blink | 責任邊界、生命週期、失效模型、測試與安全設計 | 可直接複製到 JS 的小型引擎 | 讀設計與對照原始碼；不要逐行翻譯 C++ |
 
@@ -355,21 +355,24 @@ flowchart LR
 
 - Controller 持有 headless API、process 管理與 policy，不執行 page JS。
 - Renderer 以不同 OS process 運行，降權、限制 filesystem/network/syscall；理想上以 site/origin group 分配。
-- Renderer 內使用 QuickJS-WASM 可再加一層 runtime memory/time isolation；OS sandbox 仍不可省略。
+- Renderer 使用 Bun/JSC，讓 page JS、DOM、style、layout 留在同一 heap，避免同步 DOM API 經過 RPC。
+- `node:vm`、`ShadowRealm` 與 Bun Worker 只提供執行環境隔離；Bun 1.4.3 實測中，`ShadowRealm` 仍可取得 `process` 與 `Bun`，不得標示為 security sandbox。
+- 不可信頁面至少使用 `Bun.spawn()` 建立 renderer subprocess，傳入白名單 env、受控 cwd、專用 IPC、deadline 與 crash/kill recovery；可用時再以 uid/gid 及平台 sandbox 限制 filesystem、network 與 syscall。
+- 在平台 sandbox 完成前，只能承諾 crash/resource isolation，不能宣稱可安全執行任意遠端 JavaScript。
 - Network service 是 renderer 唯一對外通道，執行 allow/deny、SSRF 防護、DNS/IP policy、redirect policy、下載上限。
 - iframe 的跨 origin 關係以 proxy/window handle 表達；不要把另一 renderer 的真實物件直接暴露。
 
-### 10.2 DOM bridge
+### 10.2 DOM 與 JS 邊界
 
-QuickJS-WASM 的最大風險不是功能，而是大量 property access 穿越 WASM 邊界。建議：
+DOM 與 page JS 應共存於同一個 renderer process/JSC heap；browser controller 只交換粗粒度訊息。建議：
 
-- 以 WebIDL 產生 binding，不手寫數百個 class proxy；
-- DOM object 使用 stable integer handle；
-- 常用 getter 可在 renderer 同一 process 直接呼叫 adapter；
-- mutations、query results、event payload 批次化；
-- handle 使用 weak registry + generation，避免 use-after-free；
+- Happy DOM 必須包在 adapter 後面；不要把其內部 class 暴露成 layout 或 IPC 契約；
+- DOM object 在 renderer 內保留 identity；controller 與 CDP 只持有 stable opaque handle；
+- 常用 getter 在 renderer 內直接呼叫，避免細粒度 RPC；
+- navigation、resource、input、frame、lifecycle、screenshot 等訊息才跨 process；
+- remote handle 使用 weak registry + generation，避免 use-after-free；
 - 所有 callback、Promise job、timer 進入統一 scheduler；
-- 每個 task 設 deadline，QuickJS interrupt handler 可終止失控 script。
+- controller 對 navigation/task 設 deadline；超時時終止並重建 renderer process。
 
 ### 10.3 最低安全要求
 
@@ -399,7 +402,7 @@ Scheduler 至少要有 task、microtask、timer、network completion、render op
 
 ## 12. Headless API 與 CDP
 
-先提供穩定的原生 JS API，再包 CDP；不要從第一天追完整 DevTools：
+原生 JS API 與最小 CDP adapter 共用同一套 Browser/Page 核心。CDP 從 Day 1 就要可被 `../casty` 驅動，但不追求完整 DevTools：
 
 ```ts
 const browser = await launch({ sandbox: true });
@@ -421,6 +424,8 @@ CDP 第一批 domain：
 - `Emulation`：viewport、DPR、media、timezone 的可行子集；
 - `Log` / `Console`：診斷。
 
+Day-1 `casty` contract 至少涵蓋 discovery（`/json/version`、`/json/list`、`/json/new`）、browser/page WebSocket、`Target.createTarget`、`Page.enable`、`Page.navigate`、`Emulation.setDeviceMetricsOverride`、`Network.setUserAgentOverride`、`Page.addScriptToEvaluateOnNewDocument`、`Page.captureScreenshot`，以及 screencast start/frame/ack/stop。測試直接取自 `../casty` 的實際 command/event 集合，避免方法雖存在但 transport、session 或事件時序不相容。
+
 所有 wait API 應依 lifecycle/network/scheduler 狀態，不可用固定 sleep。
 
 ## 13. 分階段路線圖與退出標準
@@ -431,8 +436,9 @@ CDP 第一批 domain：
 - 將目前 Happy DOM 測試固定為 regression suite。
 - 定義 ComputedStyle、RenderNode、Fragment、DisplayList schema。
 - 禁止 remote JS 進入 trusted process，加入 constructor-escape 安全測試。
+- 建立 `casty` CDP contract test，先打通 discovery、target/session、navigate 與一張靜態 placeholder screenshot。
 
-**退出標準**：CI 可重現所有本次結果；死鎖測試有 timeout；security test 必須無法取得宿主。
+**退出標準**：CI 可重現所有本次結果；死鎖測試有 timeout；不可信 renderer 無 controller secrets/capabilities；`casty` 能透過 CDP 建立 target、navigation 並收到 placeholder frame。平台 sandbox 未完成時須明確標記 remote script mode 為 unsafe/disabled。
 
 ### Phase 1 — 靜態文件到 PNG（4–6 週）
 
@@ -440,6 +446,7 @@ CDP 第一批 domain：
 - block boxes、background、border、simple inline/text。
 - CanvasKit CPU surface 與 screenshot。
 - 初版 geometry API。
+- `Page.captureScreenshot` 回傳實際 raster 結果，並以 screencast event 在畫面變更時推送 frame。
 
 **退出標準**：20–50 個自製 reftest 穩定；同一輸入 PNG deterministic；無 script 頁面可截圖。
 
@@ -454,7 +461,7 @@ CDP 第一批 domain：
 
 ### Phase 3 — 安全 JavaScript 與正確 lifecycle（6–10 週）
 
-- isolated renderer + QuickJS bindings。
+- Bun renderer subprocess、Happy DOM adapter 與 page realm bootstrap。
 - parser-blocking、async/defer/module、tasks/microtasks/timers。
 - fetch/XHR、DOM events、Mutation/Resize/Intersection observers。
 - 修正 data URL/referrer 與 DOMContentLoaded/load 時序。
@@ -470,10 +477,10 @@ CDP 第一批 domain：
 
 **退出標準**：多 frame 測試、跨 origin 負面測試、cookie/cache test matrix 通過。
 
-### Phase 5 — 可用的自動化產品（4–6 週）
+### Phase 5 — 擴充自動化產品（4–6 週）
 
 - Page/Locator API、waits、screenshots、PDF 初版。
-- CDP 基本 domains。
+- 擴充 CDP domains、remote object lifecycle 與 diagnostics；基本 `casty` contract 已在 Phase 0–1 完成。
 - trace、network log、DOM/layout/display-list dump。
 - process pools、resource quota、deterministic mode。
 
@@ -508,11 +515,11 @@ CDP 第一批 domain：
 |---|---|---|
 | Web 相容面遠大於預估 | 極高 | 嚴格 v1 scope、WPT allowlist、垂直切片交付 |
 | Happy DOM lifecycle 與真瀏覽器不一致 | 高 | adapter 隔離；自有 navigation/parser scheduler；可逐步替換 |
-| QuickJS DOM bridge 太慢 | 高 | generated bindings、同 process、batch、handles、profile before rewrite |
+| Bun realm 暴露宿主能力 | 極高 | 不把 realm/Worker 當 sandbox；不可信頁面置於最小權限 subprocess；平台 sandbox 前預設關閉 remote script |
 | TermDOM 幾何模型不適合像素 | 高 | 只移植演算法/測試；統一 float/fixed CSS px |
 | 文字 shaping/font fallback 複雜 | 高 | 優先 HarfBuzz；建立多語 golden corpus |
 | CanvasKit WASM 體積與記憶體 | 中高 | lazy init、surface reuse、resource cache、budget |
-| node:vm sandbox escape | 極高 | 禁用於遠端頁面；OS process sandbox + QuickJS/resource limits |
+| node:vm/ShadowRealm sandbox escape | 極高 | 禁用於 trusted process 的遠端頁面；Bun subprocess + resource limits + 平台 sandbox |
 | 自建 network stack 漏掉安全政策 | 高 | 集中 Network Service；預設 deny private targets；規則測試 |
 | Fork 多個上游難維護 | 高 | 以 adapter/port 為主；記錄來源 commit、license、修改清單 |
 | 追求 CDP 全相容拖慢核心 | 中 | 先 native API；只做實際需要的 domain/method |
@@ -529,6 +536,8 @@ Happy DOM、TermDOM、Dropflow 等目前檢視到的是寬鬆授權專案，但�
 
 Chromium/Blink 原始碼主要作架構與行為參考；若直接移植程式碼，必須遵守 Chromium/Blink 對應檔案的 BSD/LGPL 或第三方授權，不能只假設整棵 repo 是同一授權。
 
+Happy DOM 以 `vendor/happy-dom` 固定在官方 tag `v20.14.5`（commit `0d4cdbe7442af49d16b49ddf1acf7cc9684ed318`），作為可重現的 DOM/Web API 上游基線。整合原則仍是 adapter-first：引擎程式只依賴本專案定義的介面，不直接散佈對 Happy DOM internal class 的 import。只有確定需要修改 parser/lifecycle hook 時才維護小型 patch queue，並記錄 upstream file、commit、修改原因與對應測試；不要把整份上游改造成不可更新的長期 fork。
+
 ## 17. 第一個可執行 Sprint
 
 建議立刻做以下垂直切片，而不是先寫更多抽象介面：
@@ -543,6 +552,7 @@ Chromium/Blink 原始碼主要作架構與行為參考；若直接移植程式�
 8. 建 20 個 Chromium differential reftest。
 9. 頁面 JS 暫時預設關閉；同時建立 isolated renderer prototype。
 10. 將本次 external script、module、fetch、iframe、data URL、DOMContentLoaded、escape 測試納入 CI。
+11. 以 `../casty` 建立 CDP smoke test：target → navigate → viewport → screenshot/screencast → input。
 
 Sprint demo 應是一個包含外部 CSS、圖片、inline text wrapping 的頁面，能產出 PNG、DOM snapshot、layout tree、display list JSON；第二個 demo 才開啟隔離 JS 修改 DOM 並觸發增量重繪。
 
@@ -559,7 +569,7 @@ Sprint demo 應是一個包含外部 CSS、圖片、inline text wrapping 的頁�
 
 ## 19. 最終建議
 
-最穩健的產品策略不是「用 JavaScript 重寫 Chromium」，而是建立一個針對 automation、server rendering、testing 與受控網頁的現代 headless engine：以 Happy DOM 快速取得 Web API 覆蓋，以 Dropflow/TermDOM 補 layout 演算法，以 CanvasKit 取得可靠 raster，以 QuickJS/OS process 補安全邊界，再用 Chromium 的責任分層和 WPT 約束正確性。
+最穩健的產品策略不是「用 JavaScript 重寫 Chromium」，而是建立一個針對 automation、server rendering、testing 與受控網頁的現代 headless engine：以 Happy DOM 快速取得 Web API 覆蓋，以 Dropflow/TermDOM 補 layout 演算法，以 CanvasKit 取得可靠 raster，以 Bun renderer subprocess 與平台 sandbox 建立權限邊界，再用 Chromium 的責任分層和 WPT 約束正確性。
 
 若團隊只有 1–3 人，先把 v1 鎖在 HTML/CSS/JS automation 與 screenshot；不要承諾完整影音、GPU、DRM。只要 Render Tree、lifecycle、sandbox、testing 四個基礎一開始做對，後續相容性可以迭代；若這四項欠債，功能越多，重寫成本越高。
 

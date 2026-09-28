@@ -1,0 +1,46 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import * as PropertySymbol from '../../../src/PropertySymbol.js';
+import type BrowserWindow from '../../../src/window/BrowserWindow.js';
+import Window from '../../../src/window/Window.js';
+import CSSRuleParser from '../../../src/css/utilities/CSSRuleParser.js';
+import type CSSStyleSheet from '../../../src/css/CSSStyleSheet.js';
+import CSSFontFaceRule from '../../../src/css/rules/CSSFontFaceRule.js';
+import CSSRuleTypeEnum from '../../../src/css/CSSRuleTypeEnum.js';
+
+describe('CSSFontFaceRule', () => {
+	let window: BrowserWindow;
+	let styleSheet: CSSStyleSheet;
+	let cssParser: CSSRuleParser;
+
+	beforeEach(() => {
+		window = new Window();
+		styleSheet = new window.CSSStyleSheet();
+		cssParser = new CSSRuleParser(styleSheet);
+	});
+
+	describe('get type()', () => {
+		it('Returns container rule type', () => {
+			const cssRule = new CSSFontFaceRule(PropertySymbol.illegalConstructor, window, cssParser);
+			expect(cssRule.type).toBe(5);
+			expect(cssRule.type).toBe(CSSRuleTypeEnum.fontFaceRule);
+		});
+	});
+
+	describe('get style()', () => {
+		it('Returns style declaration', () => {
+			const cssRule = new CSSFontFaceRule(PropertySymbol.illegalConstructor, window, cssParser);
+			cssRule[PropertySymbol.cssText] = 'font-family: "Trickster";';
+			expect(cssRule.style).toBe(cssRule.style);
+			expect(cssRule.style.cssText).toBe('font-family: Trickster;');
+			expect(cssRule.style.fontFamily).toBe('Trickster');
+		});
+	});
+
+	describe('get cssText()', () => {
+		it('Returns CSS text', () => {
+			const cssRule = new CSSFontFaceRule(PropertySymbol.illegalConstructor, window, cssParser);
+			cssRule[PropertySymbol.cssText] = 'font-family: "Trickster";';
+			expect(cssRule.cssText).toBe('@font-face { font-family: Trickster; }');
+		});
+	});
+});

@@ -4,6 +4,7 @@
 - This project only uses pure JavaScript +/- WASM.
 - Native bindings are generally not allowed in the headless shell itself
   * In the future when it is wrapped into a full browser on each platform, the frontend should stay as thin wrappers just enough to draw rendered content from the headlesss shell
+  * Specifically, able to work with ../casty through CDP is an important goal
 - Only use Bun FFI to dlopen libc when other methods are clearly not enough
 
 ## Bun
