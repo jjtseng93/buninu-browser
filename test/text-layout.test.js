@@ -82,3 +82,41 @@ test("uses viewport width and block margin, padding, width geometry", () => {
   expect(layout.height).toBe(70);
   window.happyDOM.abort();
 });
+
+test("measures and positions inline runs with their own computed styles", () => {
+  const { document, window } = parseHTMLDocument(
+    `<body><span style="color:red;font-size:30px">aa</span><strong>bb</strong></body>`,
+  );
+  const styles = new StyleEngine().compute(document);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, {
+    x: 0,
+    y: 0,
+    width: 200,
+    measureText: (text, style) => text.length * (style?.fontSize === 30 ? 15 : 10),
+  });
+  const [red, bold] = layout.fragments[0].runs;
+
+  expect(red).toMatchObject({ text: "aa", x: 0, width: 30 });
+  expect(red.style.color).toBe("rgba(255, 0, 0, 1)");
+  expect(bold).toMatchObject({ text: "bb", x: 30, width: 20 });
+  expect(bold.style.fontWeight).toBe(700);
+  window.happyDOM.abort();
+});
+
+test("centers max-width blocks with auto margins", () => {
+  const { document, window } = parseHTMLDocument(
+    `<body><div style="max-width:50%;margin:0 auto">centered</div></body>`,
+  );
+  const styles = new StyleEngine().compute(document);
+  const layout = layoutText(new RenderTreeBuilder().build(document, styles), {
+    x: 0,
+    y: 0,
+    width: 200,
+    measureText: (text) => text.length * 10,
+  });
+
+  expect(layout.boxes[0]).toMatchObject({ x: 50, width: 100 });
+  expect(layout.fragments[0].x).toBe(50);
+  window.happyDOM.abort();
+});

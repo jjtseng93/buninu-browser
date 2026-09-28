@@ -76,3 +76,19 @@ test("external rules cascade through selectors and inherited custom properties",
   });
   window.happyDOM.abort();
 });
+
+test("computes practical relative lengths and constrained widths", () => {
+  const { document, window } = parseHTMLDocument(`<body style="font-size:20px">
+    <div style="font-size:1.5em;line-height:1.6;margin:1rem auto;padding:.5em;max-width:50%">box</div>
+  </body>`);
+  const style = new StyleEngine().compute(document).get(document.querySelector("div"));
+
+  expect(style).toMatchObject({
+    fontSize: 30,
+    lineHeight: 48,
+    margin: [22, "auto", 22, "auto"],
+    padding: [15, 15, 15, 15],
+    maxWidth: { unit: "%", value: 50 },
+  });
+  window.happyDOM.abort();
+});
