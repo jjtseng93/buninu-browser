@@ -63,11 +63,24 @@ test("the compositor answers screenshots and scrolling while the main thread is 
 
 let server;
 let releaseStyles;
+let releaseScript;
 beforeAll(() => {
   server = Bun.serve({
     port: 0,
     async fetch(request) {
       const { pathname } = new URL(request.url);
+      if (pathname === "/slow.js") {
+        await new Promise((resolve) => (releaseScript = resolve));
+        return new Response("document.title = 'slow script ran';", { headers: { "content-type": "text/javascript" } });
+      }
+      if (pathname === "/busy") {
+        // A long page whose scripts change the DOM while a slow script keeps it loading.
+        return new Response(`<!doctype html><title>busy</title><body style="margin:0">${
+          Array.from({ length: 200 }, (_, index) => `<p style="margin:0;height:40px">row ${index}</p>`).join("")
+        }<script>document.body.dataset.touched = "yes";</script><script src="/slow.js"></script></body>`, {
+          headers: { "content-type": "text/html" },
+        });
+      }
       if (pathname === "/slow.css") {
         // Held until the test has looked at the preview.
         await new Promise((resolve) => (releaseStyles = resolve));
@@ -113,6 +126,29 @@ test("a preview is shown while stylesheets load, then the styled page, then scri
     expect(await context.screenshot()).not.toBe(preview);
   } finally {
     releaseStyles?.();
+    browser.close();
+  }
+}, 30_000);
+
+test("scrolling past the painted area repaints there even while scripts keep the page loading", async () => {
+  const browser = await createBrowser({ spareRenderer: false });
+  const { context } = browser;
+  try {
+    await context.resize(400, 300, 1);
+    const blank = await context.screenshot();
+    await context.navigate(`http://127.0.0.1:${server.port}/busy`);
+    expect(releaseScript).toBeFunction();
+    expect(context.lifecycleState()).not.toContain("load");
+    // Far below the first tile: the compositor shows background until the main thread paints there.
+    const { y } = await context.scroll(0, 6000);
+    expect(y).toBe(6000);
+    await Bun.sleep(1500);
+    const shot = await context.screenshot();
+    expect(shot).not.toBe(blank);
+    expect(shot.length).toBeGreaterThan(blank.length * 2);
+    expect(context.lifecycleState()).not.toContain("load");
+  } finally {
+    releaseScript?.();
     browser.close();
   }
 }, 30_000);
