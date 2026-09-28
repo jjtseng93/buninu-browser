@@ -111,3 +111,22 @@ test("computes the first paint and flex presentation properties", () => {
   });
   window.happyDOM.abort();
 });
+
+test("keeps gradient-clipped transparent text visible with a solid fallback", () => {
+  const { document, window } = parseHTMLDocument(`<h1 class="slogan">BUNinu Is Not Unix</h1>`);
+  const styles = new StyleEngine().compute(document, [`
+    :root { --accent: #ffb703; --accent-2: #ff6b6b }
+    .slogan {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  `]);
+  const style = styles.get(document.querySelector("h1"));
+
+  expect(style.backgroundClip).toBe("text");
+  expect(style.backgroundImage).toContain("linear-gradient");
+  expect(style.color).toBe("rgba(255, 183, 3, 1)");
+  window.happyDOM.abort();
+});
