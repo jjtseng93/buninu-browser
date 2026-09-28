@@ -126,7 +126,7 @@ this.constructor.constructor('return process')()
 | 專案 | 應採用 | 不應期待 | 整合方式 |
 |---|---|---|---|
 | Happy DOM | DOM、Window、事件、HTML 元素、fetch、frame/page 雛形、部分 CSSOM/Web API | layout、page painting、安全沙箱 | 初期 authoritative DOM；封裝而非 fork 全部 |
-| parse5 | HTML tokenizer/tree construction、錯誤恢復、序列化 | DOM、JS、CSS、layout | 保留為 HTML parser；補 streaming/parser pause hooks |
+| Happy DOM HTMLParser | 第一階段 HTML tree construction、基本錯誤恢復、序列化 | 完整 WHATWG tokenizer/tree builder、streaming、JS、CSS、layout | 先包在本專案 parser adapter；以測試量化差距，再決定強化或替換 |
 | TermDOM | flex/grid/table、flat tree、selectors/invalidation、表單與互動測試思路 | 像素精度、網路、JS runtime、圖片 | 移植演算法與測試；輸入改成 RenderNode + float geometry |
 | Dropflow | block/inline/float、line breaking、intrinsic sizing、HarfBuzz shaping、pixel geometry | flex/grid、完整 browser lifecycle | 優先移植 inline/text/block；不要混用其簡化 DOM |
 | CanvasKit | Skia paths、text、image、surface、raster output | CSS cascade、layout、DOM | 實作 DisplayList backend；另做 `<canvas>` adapter |
@@ -134,9 +134,12 @@ this.constructor.constructor('return process')()
 | WPT | 跨瀏覽器規範測試與 reftest | 自動告訴你架構怎麼設計 | 建 allowlist/expected-fail dashboard，逐層擴張 |
 | Chromium/Blink | 責任邊界、生命週期、失效模型、測試與安全設計 | 可直接複製到 JS 的小型引擎 | 讀設計與對照原始碼；不要逐行翻譯 C++ |
 
-### 4.1 為何 parse5 重要
+### 4.1 HTML parser 邊界
 
-parse5 是符合 HTML 標準解析規則的 JavaScript parser。它處理的不是一般 XML 式「標籤轉樹」，而是 HTML 的 tokenizer、tree-construction、錯誤恢復、隱含元素與特殊解析模式。Happy DOM 已以它處理 HTML；應繼續使用，但 browser parser 還需要補上：
+目前固定的 Happy DOM `v20.14.5` 使用自己的 `HTMLParser`，並沒有依賴
+parse5。第一階段透過 `lib/happy-dom/parser.js` 建立 authoritative DOM，
+但不能因此宣稱已有完整 WHATWG HTML parsing 相容性。browser parser 後續
+仍需要補上或替換為具備以下能力的實作：
 
 - streaming bytes → encoding decode → tokenizer；
 - parser 遇到 blocking script 的暫停與恢復；

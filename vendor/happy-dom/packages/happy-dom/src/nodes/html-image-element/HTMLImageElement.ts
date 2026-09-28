@@ -4,7 +4,7 @@ import type ICanvasShape from '../../canvas/ICanvasShape.js';
 import ElementEventAttributeUtility from '../element/ElementEventAttributeUtility.js';
 import type Event from '../../event/Event.js';
 import WindowBrowserContext from '../../window/WindowBrowserContext.js';
-import BufferImageSize from 'buffer-image-size';
+import ImageSize from '../../../../../../../lib/happy-dom/image-size-adapter.js';
 import type Response from '../../fetch/Response.js';
 import type Attr from '../attr/Attr.js';
 
@@ -424,15 +424,18 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 			const buffer = Buffer.from(dataUrlMatch[2], 'base64');
 			this[PropertySymbol.complete] = true;
 			this[PropertySymbol.buffer] = buffer;
-			try {
-				const dimensions = BufferImageSize(buffer);
+			this[PropertySymbol.complete] = false;
+			ImageSize(buffer).then((dimensions) => {
 				this[PropertySymbol.naturalHeight] = dimensions.height;
 				this[PropertySymbol.naturalWidth] = dimensions.width;
-			} catch (e) {
+				this[PropertySymbol.complete] = true;
+				this.dispatchEvent(new this[PropertySymbol.window].Event('load'));
+			}).catch(() => {
 				this[PropertySymbol.naturalHeight] = 0;
 				this[PropertySymbol.naturalWidth] = 0;
-			}
-			this.dispatchEvent(new this[PropertySymbol.window].Event('load'));
+				this[PropertySymbol.complete] = true;
+				this.dispatchEvent(new this[PropertySymbol.window].Event('error'));
+			});
 			return true;
 		}
 		return false;
@@ -484,7 +487,7 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 		this[PropertySymbol.buffer] = buffer;
 
 		try {
-			const dimensions = BufferImageSize(buffer);
+			const dimensions = await ImageSize(buffer);
 			this[PropertySymbol.naturalHeight] = dimensions.height;
 			this[PropertySymbol.naturalWidth] = dimensions.width;
 		} catch (e) {

@@ -1,4 +1,4 @@
-import WhatwgMIMEType from 'whatwg-mimetype';
+import WhatwgMIMEType from '../../../../../../lib/happy-dom/mime-type-adapter.js';
 import * as PropertySymbol from '../PropertySymbol.js';
 import ProgressEvent from '../event/events/ProgressEvent.js';
 import DOMExceptionNameEnum from '../exception/DOMExceptionNameEnum.js';

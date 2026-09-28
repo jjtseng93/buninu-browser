@@ -5,7 +5,7 @@ import * as PropertySymbol from '../PropertySymbol.js';
 import WindowBrowserContext from '../window/WindowBrowserContext.js';
 import WebSocketReadyStateEnum from './WebSocketReadyStateEnum.js';
 import Blob from '../file/Blob.js';
-import WS from 'ws';
+import WS from '../../../../../../lib/happy-dom/websocket-adapter.js';
 
 // https://tools.ietf.org/html/rfc7230#section-3.2.6
 const SECURE_PROTOCOL_REGEXP = /^[!#$%&'*+\-.^_`|~\dA-Za-z]+$/;

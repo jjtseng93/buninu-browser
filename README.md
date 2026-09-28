@@ -41,7 +41,7 @@ The planned integration form is intentionally different for each upstream:
 | Component | Role | Source policy |
 |---|---|---|
 | **Happy DOM** | DOM, HTML elements, events, and Web APIs | Vendored at an exact tag; accessed through project-owned adapters, with local changes recorded in [`patches/happy-dom/`](patches/happy-dom/) |
-| **parse5** | Standards-compliant HTML parsing | Exact package dependency; do not vendor separately while Happy DOM supplies the required version |
+| **Happy DOM HTMLParser** | Initial HTML parsing and tree construction | Use through the project parser adapter; keep scripts and subresource loading disabled until the renderer scheduler owns their lifecycle |
 | **Dropflow** | Block, inline, float, and text layout foundations | Vendor an exact commit before porting because derived algorithms and its bundled third-party code need source-level provenance |
 | **TermDOM** | Flex, grid, table, invalidation, and test references | Reference upstream; copy only selected algorithms/tests with per-file attribution when a port is approved |
 | **CanvasKit** | Skia-based WASM rasterization | Pin the official `canvaskit-wasm` release artifacts and integrity; do not vendor the full Skia repository |

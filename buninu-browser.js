@@ -18,25 +18,30 @@ export const runtimeRoot = new URL("./usr/", import.meta.url);
 export const canvasKitRoot = new URL("./usr/lib/canvaskit/", import.meta.url);
 export const fontRoot = new URL("./usr/share/fonts/", import.meta.url);
 
+export { documentText, parseHTMLDocument } from "./lib/happy-dom/parser.js";
+
 export async function main(args = Bun.argv.slice(2)) {
   if (args.includes("--version")) {
     console.log("buninu-browser 0.0.0");
     return 0;
   }
 
-  console.log(`Buninu Browser 0.0.0
+  if (args.includes("--help")) {
+    console.log(`Buninu Browser 0.0.0
 
 Usage: buninu-browser [options]
 
 Options:
   --version  Print the version
-  --help     Print this help
+  --help     Print this help`);
+    return 0;
+  }
 
-The headless browser runtime is not implemented yet.`);
+  const { runHeadlessShell } = await import("./lib/headless-shell.js");
+  await runHeadlessShell(args);
   return 0;
 }
 
 if (import.meta.main) {
   process.exitCode = await main();
 }
-
