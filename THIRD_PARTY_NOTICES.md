@@ -35,6 +35,20 @@ The initial computed-style model and its tests are informed by TermDOM's UA
 stylesheet categories and cascade tests. Buninu Browser retains its own DOM,
 style representation, CSS parser boundary, pixel layout, and implementation.
 
+## Dropflow-derived references
+
+- Project: Dropflow
+- Upstream: https://github.com/chearon/dropflow
+- Commit: `13552695d3446ac68f39952ea89dc69c4499dde2`
+- License: MIT
+- Copyright: Copyright 2024 Caleb Hearon
+- Local license copy: `LICENSES/dropflow.txt`
+
+The initial box-layout separation is informed by Dropflow's distinction between
+the initial containing block, block flow, inline formatting, and painting.
+Buninu Browser retains its own JavaScript data model and CanvasKit renderer;
+Dropflow and its TypeScript/WASM runtime are not distributed dependencies.
+
 ## Standalone graphics runtime
 
 The files below are inherited from the sibling Buninu Linux source tree for a
