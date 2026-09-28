@@ -53,7 +53,13 @@ terminal). The grid layout itself is written from the CSS Grid 2 algorithm.
 - Project: Chromium
 - Upstream: https://chromium.googlesource.com/chromium/src
 - Commit: `2e7327eeeab051c4837bc03a17cbeae763449bcd`
-- License: BSD-3-Clause (Blink files carry their own headers)
+- License: BSD-3-Clause
+- Copyright: Copyright The Chromium Authors (per-file years, e.g. 2012, 2013, 2014, 2024)
+- Local license copy: `LICENSES/chromium.txt`
+
+Only Chromium files under the BSD-3-Clause `LICENSE` are used. Blink files
+under other licenses (for example the LGPL `html.css` user-agent stylesheet)
+are not used; user-agent defaults come from the HTML Standard instead.
 
 `resolveFlexibleLengths` in `lib/layout/text-layout.js` follows the behavior of
 Blink's `third_party/blink/renderer/core/layout/flex/line_flexer.cc`
@@ -68,6 +74,18 @@ behavior; no Chromium source text is copied.
 `sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc` and `syscall_sets.cc`
 (allowlist categories, threads-only `clone`, `clone3` as `ENOSYS`, signals only
 to the own process); the BPF program itself is written in JavaScript.
+
+## WHATWG HTML Standard
+
+- Project: HTML Living Standard
+- Upstream: https://html.spec.whatwg.org/multipage/rendering.html
+- License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+- Copyright: Copyright © WHATWG (Apple, Google, Mozilla, Microsoft)
+
+The user-agent default declarations in `lib/style/computed-style.js`
+(`UA_DECLARATIONS`: body margin, paragraph and heading margins and sizes, list
+indentation, monospace elements) are adapted from the suggested rendering rules
+in the HTML Standard §15.3.
 
 ## Dropflow-derived references
 
