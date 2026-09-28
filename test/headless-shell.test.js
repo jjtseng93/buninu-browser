@@ -103,6 +103,24 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       height: 240,
       format: "png",
     });
+    await view.cdp("Emulation.setDeviceMetricsOverride", {
+      width: 480,
+      height: 240,
+      deviceScaleFactor: 2,
+      mobile: false,
+    });
+    const hidpiScreenshot = await view.screenshot({ encoding: "buffer", format: "png" });
+    expect(await new Bun.Image(hidpiScreenshot).metadata()).toEqual({
+      width: 960,
+      height: 480,
+      format: "png",
+    });
+    await view.cdp("Emulation.setDeviceMetricsOverride", {
+      width: 480,
+      height: 240,
+      deviceScaleFactor: 1,
+      mobile: false,
+    });
 
     await view.navigate(`http://127.0.0.1:${fixture.port}/plain`);
     const plain = await view.screenshot({ encoding: "buffer", format: "png" });
