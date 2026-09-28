@@ -95,7 +95,8 @@ test("computes practical relative lengths and constrained widths", () => {
 
 test("computes the first paint and flex presentation properties", () => {
   const { document, window } = parseHTMLDocument(`<div style="
-    display:flex;flex-direction:column;gap:1rem;text-align:center;
+    display:flex;flex-direction:column;flex-wrap:wrap;gap:1rem;text-align:center;
+    justify-content:space-between;align-items:center;
     border:2px solid #ff0000;border-radius:.5em
   ">box</div>`);
   const style = computeElementStyle(document.querySelector("div"));
@@ -103,6 +104,9 @@ test("computes the first paint and flex presentation properties", () => {
   expect(style).toMatchObject({
     display: "flex",
     flexDirection: "column",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignItems: "center",
     gap: 22,
     textAlign: "center",
     borderWidth: 2,

@@ -143,7 +143,7 @@ test("lays out image replaced elements from intrinsic and HTML dimensions", () =
 
 test("aligns inline content and flattens a basic flex row", () => {
   const { document, window } = parseHTMLDocument(`<body>
-    <nav style="display:flex;text-align:center"><div>one</div><div>two</div></nav>
+    <nav style="display:flex;justify-content:center;gap:20px"><div>one</div><div>two</div></nav>
   </body>`);
   const styles = new StyleEngine().compute(document);
   const layout = layoutText(new RenderTreeBuilder().build(document, styles), {
@@ -154,6 +154,43 @@ test("aligns inline content and flattens a basic flex row", () => {
   });
 
   expect(layout.fragments.map((fragment) => fragment.text)).toEqual(["one two"]);
-  expect(layout.fragments[0].x).toBe(65);
+  expect(layout.fragments[0].x).toBe(60);
+  expect(layout.fragments[0].runs.at(-1).x).toBe(110);
+  window.happyDOM.abort();
+});
+
+test("wraps measured text at word boundaries before hard grapheme breaks", () => {
+  const { document, window } = parseHTMLDocument(`<body>hello world abcdefghij</body>`);
+  const layout = layoutText(new RenderTreeBuilder().build(document), {
+    x: 0,
+    y: 0,
+    width: 70,
+    measureText: (text) => text.length * 10,
+  });
+
+  expect(layout.fragments.map((fragment) => fragment.text)).toEqual([
+    "hello",
+    "world",
+    "abcdefg",
+    "hij",
+  ]);
+  window.happyDOM.abort();
+});
+
+test("distributes remaining flex-row space between direct children", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <nav style="display:flex;justify-content:space-between;gap:10px"><span>left</span><span>right</span></nav>
+  </body>`);
+  const styles = new StyleEngine().compute(document);
+  const layout = layoutText(new RenderTreeBuilder().build(document, styles), {
+    x: 0,
+    y: 0,
+    width: 200,
+    measureText: (text) => text.length * 10,
+  });
+  const runs = layout.fragments[0].runs;
+
+  expect(runs[0]).toMatchObject({ text: "left", x: 0, width: 40 });
+  expect(runs.at(-1)).toMatchObject({ text: "right", x: 150, width: 50 });
   window.happyDOM.abort();
 });
