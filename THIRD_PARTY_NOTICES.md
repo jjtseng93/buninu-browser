@@ -22,6 +22,19 @@ Project-specific behavior belongs in project-owned adapters; every necessary
 upstream-file modification must be recorded in that queue with its reason and
 corresponding test.
 
+## TermDOM-derived references
+
+- Project: TermDOM
+- Upstream: https://github.com/bikeshaving/termdom
+- Commit: `b92f36d5f3d83770f3ea8c38fdeae0a192dc235e`
+- License: MIT
+- Copyright: Copyright (c) 2026 Brian Kim
+- Local license copy: `LICENSES/termdom.txt`
+
+The initial computed-style model and its tests are informed by TermDOM's UA
+stylesheet categories and cascade tests. Buninu Browser retains its own DOM,
+style representation, CSS parser boundary, pixel layout, and implementation.
+
 ## Standalone graphics runtime
 
 The files below are inherited from the sibling Buninu Linux source tree for a

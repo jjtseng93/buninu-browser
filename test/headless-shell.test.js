@@ -30,8 +30,20 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
   const fixture = Bun.serve({
     port: 0,
     fetch(request) {
-      if (new URL(request.url).pathname === "/destination") {
+      const pathname = new URL(request.url).pathname;
+      if (pathname === "/destination") {
         return new Response(`<!doctype html><title>Destination</title><h1>arrived</h1>`, {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        });
+      }
+      if (pathname === "/site.css") {
+        return new Response(`:root{--bg:#0d1117;--text:#e6edf3}html,body{background:var(--bg)}body{color:var(--text)}`, {
+          headers: { "Content-Type": "text/css" },
+        });
+      }
+      if (pathname === "/plain" || pathname === "/styled") {
+        const link = pathname === "/styled" ? `<link rel="stylesheet" href="/site.css">` : "";
+        return new Response(`<!doctype html><head>${link}</head><body><p>same pixels</p></body>`, {
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
       }
@@ -78,6 +90,14 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       height: 240,
       format: "png",
     });
+
+    await view.navigate(`http://127.0.0.1:${fixture.port}/plain`);
+    const plain = await view.screenshot({ encoding: "buffer", format: "png" });
+    await view.navigate(`http://127.0.0.1:${fixture.port}/styled`);
+    expect(await view.evaluate("document.documentElement.outerHTML")).toContain("site.css");
+    const styled = await view.screenshot({ encoding: "buffer", format: "png" });
+    expect(Bun.hash(styled)).not.toBe(Bun.hash(plain));
+    await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     expect(await view.evaluate("scrollY")).toBe(0);
     await view.cdp("Input.dispatchMouseEvent", {
@@ -174,6 +194,7 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       entryId: secondHistory.entries[secondHistory.currentIndex - 1].id,
     });
     expect(await view.evaluate("scrollY")).toBe(100);
+
   } finally {
     view?.close();
     Bun.WebView.closeAll();

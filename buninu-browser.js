@@ -22,6 +22,7 @@ export { parseHTMLDocument } from "./lib/happy-dom/parser.js";
 export { layoutText } from "./lib/layout/text-layout.js";
 export { ScrollViewport } from "./lib/layout/scroll-viewport.js";
 export { elementBounds, hitTest, interactiveRegions } from "./lib/input/hit-test.js";
+export { computeElementStyle, parseDeclarations, StyleEngine } from "./lib/style/computed-style.js";
 export { RenderTreeBuilder, renderTreeText } from "./lib/render-tree/index.js";
 
 export async function main(args = Bun.argv.slice(2)) {
