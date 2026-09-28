@@ -19,6 +19,8 @@ export const canvasKitRoot = new URL("./usr/lib/canvaskit/", import.meta.url);
 export const fontRoot = new URL("./usr/share/fonts/", import.meta.url);
 
 export { parseHTMLDocument } from "./lib/happy-dom/parser.js";
+export { layoutText } from "./lib/layout/text-layout.js";
+export { ScrollViewport } from "./lib/layout/scroll-viewport.js";
 export { RenderTreeBuilder, renderTreeText } from "./lib/render-tree/index.js";
 
 export async function main(args = Bun.argv.slice(2)) {

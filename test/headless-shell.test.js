@@ -34,6 +34,7 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
         <title>Formal parser &amp; CDP</title>
         <body data-ready="yes">第一行 😀<br>second &copy;
           <script>document.title = "script ran"</script>
+          <pre>${Array.from({ length: 30 }, (_, index) => `line ${index}`).join("\n")}</pre>
         </body>`, {
         headers: { "Content-Type": "text/html; charset=utf-8" },
       });
@@ -71,6 +72,30 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       height: 240,
       format: "png",
     });
+
+    expect(await view.evaluate("scrollY")).toBe(0);
+    await view.cdp("Input.dispatchMouseEvent", {
+      type: "mouseWheel",
+      x: 100,
+      y: 100,
+      deltaX: 0,
+      deltaY: 100,
+    });
+    expect(await view.evaluate("scrollY")).toBe(100);
+    const scrolled = await view.screenshot({ encoding: "buffer", format: "png" });
+    expect(Bun.hash(scrolled)).not.toBe(Bun.hash(screenshot));
+
+    await view.cdp("Input.dispatchKeyEvent", {
+      type: "rawKeyDown",
+      key: "End",
+      code: "End",
+    });
+    const endOffset = await view.evaluate("scrollY");
+    expect(endOffset).toBeGreaterThan(100);
+    await view.cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "End", code: "End" });
+
+    await view.navigate(`http://127.0.0.1:${fixture.port}/again`);
+    expect(await view.evaluate("scrollY")).toBe(0);
   } finally {
     view?.close();
     Bun.WebView.closeAll();
