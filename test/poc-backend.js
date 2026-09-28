@@ -4,15 +4,28 @@ import CanvasKitInit from "../usr/lib/canvaskit/canvaskit.js";
 import { CdpServer } from "../lib/cdp-server.js";
 
 const canvasKitDirectory = new URL("../usr/lib/canvaskit/", import.meta.url);
-const fontUrl = new URL("../usr/share/fonts/NotoSansCJK-Regular.ttc", import.meta.url);
+const fontDirectory = new URL("../usr/share/fonts/", import.meta.url);
 const wasmBinary = await Bun.file(new URL("canvaskit.wasm", canvasKitDirectory)).arrayBuffer();
 const CanvasKit = await CanvasKitInit({ wasmBinary });
-const fontData = await Bun.file(fontUrl).arrayBuffer();
-const fontManager = CanvasKit.FontMgr.FromData(fontData);
-const typeface = fontManager?.matchFamilyStyle("Noto Sans CJK TC", {});
+const fontCatalogue = await Bun.file(new URL("fonts.json", fontDirectory)).json();
+const uiFontNames = [
+  fontCatalogue.sets.ui.regular,
+  ...fontCatalogue.sets.ui.fallback,
+];
+const fontBuffers = await Promise.all(uiFontNames.map((name) =>
+  Bun.file(new URL(fontCatalogue.fonts[name].file, fontDirectory)).arrayBuffer()));
+const fontManager = CanvasKit.FontMgr.FromData(...fontBuffers);
+const fontFamilies = uiFontNames.flatMap((name) =>
+  fontCatalogue.fonts[name].families ?? [name]);
+const emojiFontFamilies = [
+  ...fontFamilies.filter((name) => name.includes("Emoji")),
+  ...fontFamilies.filter((name) => !name.includes("Emoji")),
+];
+const graphemes = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+const emojiPresentation = /^\p{Emoji_Presentation}/u;
 
-if (!fontManager || !typeface) {
-  throw new Error("Unable to load the bundled Noto Sans CJK font");
+if (!fontManager) {
+  throw new Error("Unable to load the bundled UI, CJK, and emoji fonts");
 }
 
 const page = {
@@ -75,24 +88,43 @@ function render() {
   const surface = CanvasKit.MakeSurface(width, height);
   if (!surface) throw new Error(`Unable to create a ${width}x${height} CanvasKit surface`);
   const canvas = surface.getCanvas();
-  const paint = new CanvasKit.Paint();
-  const font = new CanvasKit.Font(typeface, 22);
-  paint.setAntiAlias(true);
-  paint.setColor(CanvasKit.BLACK);
   canvas.clear(CanvasKit.WHITE);
-  let y = 34;
+  let y = 12;
   for (const line of wrapText(page.text)) {
     if (y > height) break;
-    canvas.drawText(line, 16, y, paint, font);
-    y += 29;
+    const style = new CanvasKit.ParagraphStyle({
+      textStyle: {
+        color: CanvasKit.BLACK,
+        fontFamilies,
+        fontSize: 22,
+      },
+      maxLines: 1,
+    });
+    const builder = CanvasKit.ParagraphBuilder.Make(style, fontManager);
+    for (const { segment } of graphemes.segment(line || " ")) {
+      const emoji = emojiPresentation.test(segment) || segment.includes("\uFE0F");
+      if (emoji) {
+        builder.pushStyle(CanvasKit.TextStyle({
+          color: CanvasKit.BLACK,
+          fontFamilies: emojiFontFamilies,
+          fontSize: 22,
+        }));
+      }
+      builder.addText(segment);
+      if (emoji) builder.pop();
+    }
+    const paragraph = builder.build();
+    builder.delete();
+    paragraph.layout(Math.max(1, width - 32));
+    canvas.drawParagraph(paragraph, 16, y);
+    paragraph.delete();
+    y += 31;
   }
   surface.flush();
   const image = surface.makeImageSnapshot();
   const bytes = image.encodeToBytes(CanvasKit.ImageFormat.PNG, 100);
   page.png = Buffer.from(bytes).toString("base64");
   image.delete();
-  font.delete();
-  paint.delete();
   surface.delete();
 }
 
@@ -149,11 +181,9 @@ console.error(`DevTools listening on ws://127.0.0.1:${server.port}/devtools/brow
 
 function shutdown() {
   server.stop(true);
-  typeface.delete();
   fontManager.delete();
   process.exit(0);
 }
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
-
