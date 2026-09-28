@@ -49,6 +49,13 @@ the initial containing block, block flow, inline formatting, and painting.
 Buninu Browser retains its own JavaScript data model and CanvasKit renderer;
 Dropflow and its TypeScript/WASM runtime are not distributed dependencies.
 
+`lib/layout/text-layout.js` follows the structure of Dropflow's
+`src/layout-flow.ts` (block containers of blocks versus inlines, anonymous
+block boxes around inline runs, margin collapsing through margin struts). It is
+a clean reimplementation over Buninu's `RenderNode` input; no Dropflow source
+text is copied. Text shaping stays with CanvasKit instead of Dropflow's
+HarfBuzz build.
+
 ## Standalone graphics runtime
 
 The files below are inherited from the sibling Buninu Linux source tree for a
