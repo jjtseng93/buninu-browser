@@ -1,28 +1,38 @@
 # Buninu Browser
 
-**A headless browser engine written in JavaScript for Bun.**
+**Buninu Browser is a browser engine written in JavaScript and WebAssembly for Bun.**
 
-Buninu Browser is an experimental effort to replace Chromium Headless
-Shell in Buninu Linux with a browser engine whose userspace components
-can be inspected, modified, and executed directly as JavaScript and
-WebAssembly.
+Its first frontend is a headless shell intended to replace Chromium Headless
+Shell in Buninu Linux. The engine's userspace components can be inspected,
+modified, and executed directly as JavaScript and WebAssembly.
+
+Future Win32, GTK, Android, and other windowed frontends should remain thin
+platform adapters. They provide a native window and drawing surface, forward
+input, clipboard, and IME events, and present frames produced by the shared
+engine; DOM, JavaScript, navigation, layout, paint, networking, and automation
+remain in the platform-independent core.
 
 Original Buninu Browser code is licensed under the MIT License. Standalone
 graphics and font assets live under [`usr/`](usr/); Buninu Linux packages use
 symlinks to their system copies instead. See [`usr/README.md`](usr/README.md)
 and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
-It implements its own browser lifecycle, rendering pipeline, process
-model, layout integration, and headless interface while building on
-selected open-source implementations of web standards.
+It implements its own browser lifecycle, rendering pipeline, process model,
+layout integration, and automation interface while building on selected
+open-source implementations of web standards.
 
 The first integration target is `../casty`: minimal compatible CDP discovery,
 target lifecycle, navigation, screenshot/screencast, viewport, and input are
 part of the initial vertical slice rather than a later compatibility layer.
 
+The top-level [`buninu-browser.js`](buninu-browser.js) is both the executable
+and public module entry. Its CLI startup is guarded by `import.meta.main`, so
+importing the package does not start a browser process or CDP listener.
+
 > [!WARNING]
 > Buninu Browser is in an early experimental stage and is not yet a
-> general-purpose replacement for Chromium.
+> general-purpose browser engine or replacement for Chromium. The headless
+> shell is the initial frontend; native windowed frontends are planned later.
 
 ## Open-source components
 
@@ -42,4 +52,4 @@ These projects retain their respective licenses and attribution. Material that
 is actually distributed in this repository is recorded in
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md), with license texts under
 [`LICENSES/`](LICENSES/). Buninu Browser maintains its own render tree, browser
-lifecycle, security model, layout integration, display list, and headless API.
+lifecycle, security model, layout integration, display list, and automation API.
