@@ -42,12 +42,16 @@ beforeAll(async () => {
 
 afterAll(() => renderer?.close());
 
-const load = (html, url = "https://page.test/") => renderer.call("loadDocument", {
-  url,
-  source: `<!doctype html><html><head><title>t</title></head><body style="margin:0">${html}</body></html>`,
-  contentType: "text/html",
-  status: 200,
-});
+// loadDocument resolves at the first paint; these tests look at the loaded page.
+const load = async (html, url = "https://page.test/") => {
+  await renderer.call("loadDocument", {
+    url,
+    source: `<!doctype html><html><head><title>t</title></head><body style="margin:0">${html}</body></html>`,
+    contentType: "text/html",
+    status: 200,
+  });
+  await renderer.call("whenLoaded");
+};
 const evaluate = (expression) => renderer.call("evaluate", expression);
 
 test("the renderer reports both sandbox layers", () => {
@@ -295,6 +299,7 @@ test("host mode: page globals that wrap host APIs do not call themselves, and re
       contentType: "text/html",
       status: 200,
     });
+    await host.call("whenLoaded");
     await Bun.sleep(100);
     expect(await host.call("title")).toBe("number,36,1,ok");
     expect(await host.call("evaluate", "document.body.dataset.frame")).toBe("number");

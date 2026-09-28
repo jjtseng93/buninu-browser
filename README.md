@@ -69,6 +69,34 @@ Page JavaScript runs behind three layers:
 `--no-sandbox` is accepted for Chromium compatibility but ignored.
 `--dangerously-allow-host-js` turns the sandbox off for every page.
 
+### Rendering and loading
+
+Each renderer has two threads, following Chromium's main and compositor
+threads:
+
+- The **main thread** runs page scripts, style, layout, and raster.
+- The **compositor thread** is a Worker that keeps the latest raster tile. It
+  answers screenshots and scrolling over its own socket to the controller,
+  so the page stays visible and scrollable while the main thread is busy
+  with a relayout or a long script.
+
+When idle, the main thread rasterizes a tile reaching half a viewport above
+and one viewport below the visible area, so the compositor can scroll
+without waiting. Screenshots are encoded with `Bun.Image`.
+
+Documents load in stages:
+
+1. **Preview.** If stylesheets and images take longer than 300 ms, the
+   document is shown first with only the user-agent defaults and its inline
+   `<style>` sheets.
+2. **Styled page.** When the stylesheets and images arrive, the styled page
+   replaces the preview and keeps the scroll position.
+3. **Scripts.** Scripts run after that.
+
+`Page.navigate` returns at the first paint. `DOMContentLoaded` and `load`
+are reported over CDP when the page reaches them. Every visible change
+pushes a screencast frame.
+
 ### Diagnostics
 
 casty does not show the browser's stderr. Set `BUNINU_LOG=1` to also write
