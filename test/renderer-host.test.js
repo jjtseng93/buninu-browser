@@ -53,7 +53,7 @@ test("fetches only http(s)/data resources on the renderer's behalf", async () =>
   const requested = [];
   const renderer = host({
     fetch: async (url) => {
-      requested.push(url.href);
+      requested.push(new URL(String(url)).href);
       return new Response("body!", { status: 200, headers: { "content-type": "text/css" } });
     },
   });

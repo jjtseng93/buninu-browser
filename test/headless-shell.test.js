@@ -90,8 +90,9 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await view.resize(480, 240);
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
-    expect(view.title).toBe("Formal parser & CDP");
-    expect(await view.evaluate("document.title")).toBe("Formal parser & CDP");
+    // The inline script runs (in the page sandbox) and renames the document.
+    expect(view.title).toBe("script ran");
+    expect(await view.evaluate("document.title")).toBe("script ran");
     expect(await view.evaluate("document.body.innerText")).toContain("第一行 😀\nsecond ©");
     const html = await view.evaluate("document.documentElement.outerHTML");
     expect(html).toContain('data-ready="yes"');
@@ -214,11 +215,11 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     const previous = history.entries[history.currentIndex - 1];
     await view.cdp("Page.navigateToHistoryEntry", { entryId: previous.id });
     for (let attempt = 0; attempt < 20 &&
-      (!view.url.endsWith("/again") || view.title !== "Formal parser & CDP"); attempt++) {
+      (!view.url.endsWith("/again") || view.title !== "script ran"); attempt++) {
       await Bun.sleep(10);
     }
     expect(view.url).toBe(`http://127.0.0.1:${fixture.port}/again`);
-    expect(view.title).toBe("Formal parser & CDP");
+    expect(view.title).toBe("script ran");
 
     await view.cdp("Input.dispatchMouseEvent", {
       type: "mouseWheel", x: 100, y: 100, deltaX: 0, deltaY: 100,

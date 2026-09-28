@@ -50,6 +50,25 @@ The top-level [`buninu-browser.js`](buninu-browser.js) is both the executable
 and public module entry. Its CLI startup is guarded by `import.meta.main`, so
 importing the package does not start a browser process or CDP listener.
 
+### Page sandbox
+
+Page JavaScript runs behind three layers:
+
+1. **SES and bindings.** The renderer calls `lockdown()`, and each document
+   gets its own compartment. That compartment sees only project-owned DOM
+   and Web API bindings, never Bun, `process`, or Happy DOM objects.
+2. **Process isolation.** The controller spawns one renderer per origin with
+   an empty environment, talks to it over IPC, and kills and restarts it if
+   it misses a deadline. Cookies, CORS, redirects, and history stay in the
+   controller. A cross-origin navigation moves to a fresh, pre-warmed
+   process. Isolation is per origin rather than per site because no Public
+   Suffix List is bundled.
+3. **seccomp.** Before lockdown, each renderer installs a syscall allowlist
+   modelled on Chromium's baseline policy.
+
+`--no-sandbox` is accepted for Chromium compatibility but ignored.
+`--dangerously-allow-host-js` turns the sandbox off for every page.
+
 > [!WARNING]
 > Buninu Browser is in an early experimental stage and is not yet a
 > general-purpose browser engine or replacement for Chromium. The headless
@@ -68,7 +87,8 @@ The integration form is intentionally different for each upstream:
 | **Chromium** | Behavioural reference; Linux syscall tables and the renderer seccomp policy structure | Use only BSD-3-Clause files, with attribution; Blink files under other licenses (such as the LGPL `html.css`) are not used |
 | **WHATWG HTML Standard** | User-agent default styles | Adapt the suggested rendering rules (§15.3) with attribution under CC BY 4.0 |
 | **CanvasKit** | Skia-based WASM rasterization and text shaping (SkParagraph with its bundled HarfBuzz) | Pin the official `canvaskit-wasm` release artifacts and integrity; do not vendor the full Skia repository or a separate HarfBuzz |
-| **SES (Hardened JavaScript)** | Planned: first sandbox layer for page scripts (`lockdown()` and compartments) | Pin an exact npm release when it is introduced; keep page globals behind project-owned bindings |
+| **SES (Hardened JavaScript)** | First sandbox layer for page scripts: `lockdown()` and one compartment per document | Vendored unmodified at an exact npm release in [`vendor/ses/`](vendor/ses/); page globals are project-owned bindings, never Happy DOM objects |
+| **Acorn** | JavaScript parser used to give classic scripts browser-style shared globals under SES | Vendored unmodified at an exact npm release in [`vendor/acorn/`](vendor/acorn/) |
 | **Web Platform Tests** | Conformance testing | Use a pinned external checkout or sparse test snapshot; do not place the complete WPT repository in the runtime vendor tree |
 
 These projects retain their respective licenses and attribution. Material that

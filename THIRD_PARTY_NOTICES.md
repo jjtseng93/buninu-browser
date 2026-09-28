@@ -22,6 +22,38 @@ Project-specific behavior belongs in project-owned adapters; every necessary
 upstream-file modification must be recorded in that queue with its reason and
 corresponding test.
 
+## SES (Hardened JavaScript)
+
+- Project: SES, part of Endo
+- Upstream: https://github.com/endojs/endo/tree/master/packages/ses
+- Version: `2.3.0` (npm release, `dist/ses.mjs`)
+- Vendored path: `vendor/ses`
+- License: Apache-2.0
+- Copyright: Copyright Agoric and contributors (see `vendor/ses/LICENSE`)
+- Local license copies: `LICENSES/ses.txt`, plus the licenses SES carries for
+  code it derives from: `LICENSES/ses-aura.txt` (Salesforce Aura),
+  `LICENSES/ses-caja.txt` (Google Caja, Apache-2.0), `LICENSES/ses-corejs.txt`
+  (core-js, MIT), `LICENSES/ses-v8.txt` (V8, BSD-3-Clause)
+
+The renderer calls `lockdown()` and runs page scripts in SES compartments
+(`lib/renderer/page-realm.js`). The bundle is used unmodified; its SHA-256 is
+`1e40a59ccf5e72da8e260dda007a19ebd20304394b1b7288d0aab21733b9cd95`.
+
+## Acorn
+
+- Project: Acorn
+- Upstream: https://github.com/acornjs/acorn
+- Version: `8.18.0` (npm release, `dist/acorn.mjs`)
+- Vendored path: `vendor/acorn`
+- License: MIT
+- Copyright: Copyright (C) 2012-2022 by various contributors (see upstream AUTHORS)
+- Local license copy: `LICENSES/acorn.txt`
+
+`lib/renderer/script-rewrite.js` parses classic scripts with Acorn to lift
+top-level declarations onto the page's global object. The bundle is used
+unmodified; its SHA-256 is
+`953573b8fdab71599749ea5f2b33d3e760c2116178f9423ee7458dbe39d59453`.
+
 ## TermDOM-derived references
 
 - Project: TermDOM

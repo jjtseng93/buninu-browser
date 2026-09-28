@@ -7,7 +7,8 @@ const RESIZED_HEIGHT = 240;
 
 function fixtureHtml(includeScript = true) {
   const script = includeScript
-    ? "<script>document.body.textContent = 'SCRIPT MUST NOT RUN'</script>"
+    // Runs in the page sandbox without changing what is rendered.
+    ? "<script>var sandboxProbe = [typeof process, typeof Bun, typeof require].join('/')</script>"
     : "";
   return `<!doctype html>
     <meta charset="utf-8">
@@ -105,6 +106,8 @@ test("PATH shim launches the formal shell with the Chromium and Bun.WebView cont
     expect(await view.evaluate("document.title")).toBe("POC integration");
     const renderedText = await view.evaluate("document.body.innerText");
     expect(renderedText.split("POC integration")).toHaveLength(2);
+    // Page scripts run, but see none of Bun's host APIs.
+    expect(await view.evaluate("sandboxProbe")).toBe("undefined/undefined/undefined");
 
     await view.cdp("Page.startScreencast", {
       format: "png",
