@@ -194,3 +194,55 @@ test("distributes remaining flex-row space between direct children", () => {
   expect(runs.at(-1)).toMatchObject({ text: "right", x: 150, width: 50 });
   window.happyDOM.abort();
 });
+
+test("places direct flex-column children on separate lines with column gap", () => {
+  const { document, window } = parseHTMLDocument(`<body><div class="prereq-command">
+    <span class="prereq-platform">macOS / Linux</span>
+    <button class="command"><span>$</span><span>curl -fsSL</span><span>Copy</span></button>
+  </div></body>`);
+  const styles = new StyleEngine().compute(document, [`
+    .prereq-command { display:flex; flex-direction:column; gap:6px }
+    .command { display:inline-flex; gap:8px }
+  `]);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, {
+    x: 0,
+    y: 0,
+    width: 400,
+    lineHeight: 20,
+    measureText: (text) => text.length * 10,
+  });
+
+  expect(layout.fragments.map((fragment) => fragment.text)).toEqual([
+    "macOS / Linux",
+    "$ curl -fsSL Copy",
+  ]);
+  expect(layout.fragments.map((fragment) => fragment.y)).toEqual([0, 26]);
+  expect([...tree.nodesById.values()].find((node) => node.tagName === "BUTTON")?.type).toBe("inline-flex");
+  window.happyDOM.abort();
+});
+
+test("keeps block box styles for direct flex-column block children", () => {
+  const { document, window } = parseHTMLDocument(`<body><div class="hero">
+    <h1>title</h1>
+    <p>lede</p>
+  </div></body>`);
+  const styles = new StyleEngine().compute(document, [`
+    .hero { display:flex; flex-direction:column; gap:4px }
+    h1 { margin:0 0 10px } p { margin:0 }
+  `]);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, {
+    x: 0,
+    y: 0,
+    width: 400,
+    lineHeight: 20,
+    measureText: (text) => text.length * 10,
+  });
+
+  expect(layout.fragments.map((fragment) => [fragment.text, fragment.y])).toEqual([
+    ["title", 0],
+    ["lede", 34],
+  ]);
+  window.happyDOM.abort();
+});
