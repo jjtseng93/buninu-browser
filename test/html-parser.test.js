@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { documentText, parseHTMLDocument } from "../lib/happy-dom/parser.js";
+import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
+import { RenderTreeBuilder, renderTreeText } from "../lib/render-tree/index.js";
 
 test("formal parser builds an inert Happy DOM document tree", () => {
   const { document, window } = parseHTMLDocument(`<!doctype html>
@@ -15,9 +16,9 @@ test("formal parser builds an inert Happy DOM document tree", () => {
   expect(document.title).toBe("A & B");
   expect(document.body.dataset.page).toBe("main");
   expect(document.querySelector("#unclosed")?.tagName).toBe("P");
-  expect(documentText(document)).toContain("before\nafter © 中文 😀");
-  expect(documentText(document)).not.toContain("script ran");
-  expect(documentText(document)).not.toContain("color: red");
+  const text = renderTreeText(new RenderTreeBuilder().build(document));
+  expect(text).toContain("before\nafter © 中文 😀");
+  expect(text).not.toContain("script ran");
+  expect(text).not.toContain("color: red");
   window.happyDOM.abort();
 });
-

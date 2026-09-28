@@ -18,7 +18,8 @@ export const runtimeRoot = new URL("./usr/", import.meta.url);
 export const canvasKitRoot = new URL("./usr/lib/canvaskit/", import.meta.url);
 export const fontRoot = new URL("./usr/share/fonts/", import.meta.url);
 
-export { documentText, parseHTMLDocument } from "./lib/happy-dom/parser.js";
+export { parseHTMLDocument } from "./lib/happy-dom/parser.js";
+export { RenderTreeBuilder, renderTreeText } from "./lib/render-tree/index.js";
 
 export async function main(args = Bun.argv.slice(2)) {
   if (args.includes("--version")) {
