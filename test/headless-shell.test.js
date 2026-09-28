@@ -29,10 +29,15 @@ async function readDevToolsUrl(stream, timeout = 15_000) {
 test("top-level shell exposes the parsed document through Bun.WebView", async () => {
   const fixture = Bun.serve({
     port: 0,
-    fetch() {
+    fetch(request) {
+      if (new URL(request.url).pathname === "/destination") {
+        return new Response(`<!doctype html><title>Destination</title><h1>arrived</h1>`, {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        });
+      }
       return new Response(`<!doctype html>
         <title>Formal parser &amp; CDP</title>
-        <body data-ready="yes">第一行 😀<br>second &copy;
+        <body data-ready="yes"><a href="/destination">destination</a><br>第一行 😀<br>second &copy;
           <script>document.title = "script ran"</script>
           <pre>${Array.from({ length: 30 }, (_, index) => `line ${index}`).join("\n")}</pre>
         </body>`, {
@@ -96,6 +101,73 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
 
     await view.navigate(`http://127.0.0.1:${fixture.port}/again`);
     expect(await view.evaluate("scrollY")).toBe(0);
+
+    const hintResult = await view.cdp("Runtime.evaluate", {
+      expression: `(() => {
+        const CLICKABLE = 'a';
+        return 'data-casty-hint-id';
+      })()`,
+      returnByValue: true,
+    });
+    const hints = JSON.parse(hintResult.result.value);
+    expect(hints).toHaveLength(1);
+    expect(hints[0]).toMatchObject({ id: "0", label: "a", type: "click" });
+
+    await view.cdp("Runtime.evaluate", {
+      expression: `(() => { const el = document.getElementById('__casty_hints'); if (el) el.remove(); })()`,
+    });
+    const resolvedHint = await view.cdp("Runtime.evaluate", {
+      expression: `(() => {
+        const el = document.querySelector('[data-casty-hint-id="0"]');
+        if (!el) throw new Error('hint target disappeared');
+      })()`,
+      returnByValue: true,
+    });
+    const click = {
+      x: resolvedHint.result.value.x,
+      y: resolvedHint.result.value.y,
+      button: "left",
+      clickCount: 1,
+    };
+    const beforeMarker = await view.screenshot({ encoding: "buffer", format: "png" });
+    await view.cdp("Runtime.evaluate", {
+      expression: `(async () => {
+        const marker = document.createElement('div');
+        marker.id = '__casty_click_marker';
+        marker.style.cssText = 'left:${click.x}px;top:${click.y}px';
+        setTimeout(() => marker.remove(), 800);
+      })()`,
+    });
+    const withMarker = await view.screenshot({ encoding: "buffer", format: "png" });
+    expect(Bun.hash(withMarker)).not.toBe(Bun.hash(beforeMarker));
+    await view.cdp("Input.dispatchMouseEvent", { type: "mousePressed", ...click, buttons: 1 });
+    await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", ...click, buttons: 0 });
+    for (let attempt = 0; attempt < 20 && !view.url.endsWith("/destination"); attempt++) {
+      await Bun.sleep(10);
+    }
+    expect(view.url).toBe(`http://127.0.0.1:${fixture.port}/destination`);
+    expect(view.title).toBe("Destination");
+
+    const history = await view.cdp("Page.getNavigationHistory");
+    const previous = history.entries[history.currentIndex - 1];
+    await view.cdp("Page.navigateToHistoryEntry", { entryId: previous.id });
+    for (let attempt = 0; attempt < 20 &&
+      (!view.url.endsWith("/again") || view.title !== "Formal parser & CDP"); attempt++) {
+      await Bun.sleep(10);
+    }
+    expect(view.url).toBe(`http://127.0.0.1:${fixture.port}/again`);
+    expect(view.title).toBe("Formal parser & CDP");
+
+    await view.cdp("Input.dispatchMouseEvent", {
+      type: "mouseWheel", x: 100, y: 100, deltaX: 0, deltaY: 100,
+    });
+    expect(await view.evaluate("scrollY")).toBe(100);
+    await view.navigate(`http://127.0.0.1:${fixture.port}/destination`);
+    const secondHistory = await view.cdp("Page.getNavigationHistory");
+    await view.cdp("Page.navigateToHistoryEntry", {
+      entryId: secondHistory.entries[secondHistory.currentIndex - 1].id,
+    });
+    expect(await view.evaluate("scrollY")).toBe(100);
   } finally {
     view?.close();
     Bun.WebView.closeAll();
