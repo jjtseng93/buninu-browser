@@ -6,6 +6,31 @@ Its first frontend is a headless shell intended to replace Chromium Headless
 Shell in Buninu Linux. The engine's userspace components can be inspected,
 modified, and executed directly as JavaScript and WebAssembly.
 
+## Why replace Chromium Headless Shell
+
+Buninu Browser exists to work together with
+[casty](https://github.com/jjtseng93/casty), a terminal browser that renders
+pages by driving a headless browser over the Chrome DevTools Protocol and
+drawing its frames in the terminal. The fork linked here (of
+[sanohiro/casty](https://github.com/sanohiro/casty)) adapts casty to Buninu
+Linux. casty normally launches Chromium Headless Shell; Buninu Browser is
+meant to take that place as a CDP backend written in JavaScript and
+WebAssembly, so casty can run in Bun-only environments such as Buninu Linux
+without a native Chromium binary.
+
+Compatibility with casty is therefore part of the initial vertical slice
+rather than a later layer: CDP discovery, target lifecycle, navigation,
+screenshots and screencast, viewport, and input. Early development and every
+screen test so far have been done in casty itself. The
+[`test/chromium-headless-shell`](test/chromium-headless-shell) shim puts
+Buninu Browser where casty looks for Chromium:
+
+```sh
+PATH="$PWD/test:$PATH" bun ../casty/bin/casty.js buninu.org
+```
+
+## Design
+
 Future Win32, GTK, Android, and other windowed frontends should remain thin
 platform adapters. They provide a native window and drawing surface, forward
 input, clipboard, and IME events, and present frames produced by the shared
@@ -20,10 +45,6 @@ and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 It implements its own browser lifecycle, rendering pipeline, process model,
 layout integration, and automation interface while building on selected
 open-source implementations of web standards.
-
-The first integration target is `../casty`: minimal compatible CDP discovery,
-target lifecycle, navigation, screenshot/screencast, viewport, and input are
-part of the initial vertical slice rather than a later compatibility layer.
 
 The top-level [`buninu-browser.js`](buninu-browser.js) is both the executable
 and public module entry. Its CLI startup is guarded by `import.meta.main`, so
