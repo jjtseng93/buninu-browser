@@ -61,6 +61,14 @@ Blink's `third_party/blink/renderer/core/layout/flex/line_flexer.cc`
 freezing by total violation). It is a JavaScript reimplementation of that
 behavior; no Chromium source text is copied.
 
+`lib/renderer/syscall-numbers.js` is generated from Chromium's
+`sandbox/linux/system_headers/x86_64_linux_syscalls.h` and
+`arm64_linux_syscalls.h` (syscall number tables). The renderer seccomp policy in
+`lib/renderer/seccomp.js` follows the structure of Chromium's
+`sandbox/linux/seccomp-bpf-helpers/baseline_policy.cc` and `syscall_sets.cc`
+(allowlist categories, threads-only `clone`, `clone3` as `ENOSYS`, signals only
+to the own process); the BPF program itself is written in JavaScript.
+
 ## Dropflow-derived references
 
 - Project: Dropflow

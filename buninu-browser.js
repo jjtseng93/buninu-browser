@@ -37,8 +37,11 @@ export async function main(args = Bun.argv.slice(2)) {
 Usage: buninu-browser [options]
 
 Options:
-  --version  Print the version
-  --help     Print this help`);
+  --remote-debugging-port=<port>  CDP port (0 picks a free one; default 9222)
+  --no-sandbox                    Accepted for Chromium compatibility and ignored
+  --dangerously-allow-host-js     Turn the page sandbox off for every page
+  --version                       Print the version
+  --help                          Print this help`);
     return 0;
   }
 
