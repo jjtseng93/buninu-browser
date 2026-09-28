@@ -10,15 +10,14 @@ function fixtureHtml(includeScript = true) {
     ? "<script>document.body.textContent = 'SCRIPT MUST NOT RUN'</script>"
     : "";
   return `<!doctype html>
-    <html>
-      <head><title>POC integration</title></head>
-      <body>
-        Buninu Browser 的第一個整合測試 😀 🎉 ✅ 🏳️‍🌈 🇹🇼<br>
-        This line is deliberately longer than forty columns so wrapping is exercised.
-        <strong>Tags are discarded but their text remains.</strong>
-        ${script}
-      </body>
-    </html>`;
+    <meta charset="utf-8">
+    <title>POC integration</title>
+    <style>title { display: none }</style>
+    <h1>POC integration</h1>
+    Buninu Browser 的第一個整合測試 😀 🎉 ✅ 🏳️‍🌈 🇹🇼<br>
+    This line is deliberately longer than forty columns so wrapping is exercised.
+    <strong>Tags are discarded but their text remains.</strong>
+    ${script}`;
 }
 
 async function readDevToolsUrl(stream, timeout = 15_000) {
@@ -31,7 +30,7 @@ async function readDevToolsUrl(stream, timeout = 15_000) {
       (async () => {
         while (true) {
           const { done, value } = await reader.read();
-          if (done) throw new Error(`POC exited before announcing CDP:\n${output}`);
+          if (done) throw new Error(`Browser exited before announcing CDP:\n${output}`);
           output += decoder.decode(value, { stream: true });
           const match = output.match(/DevTools listening on (ws:\/\/[^\s]+)/);
           if (match) return match[1];
@@ -51,7 +50,7 @@ async function pngMetadata(bytes) {
   return new Bun.Image(bytes).metadata();
 }
 
-test("POC satisfies the Chromium launch and Bun.WebView CDP contract", async () => {
+test("PATH shim launches the formal shell with the Chromium and Bun.WebView contract", async () => {
   const fixture = Bun.serve({
     port: 0,
     fetch(request) {
@@ -104,6 +103,8 @@ test("POC satisfies the Chromium launch and Bun.WebView CDP contract", async () 
     expect(view.url).toBe(`http://127.0.0.1:${fixture.port}/with-script`);
     expect(view.title).toBe("POC integration");
     expect(await view.evaluate("document.title")).toBe("POC integration");
+    const renderedText = await view.evaluate("document.body.innerText");
+    expect(renderedText.split("POC integration")).toHaveLength(2);
 
     await view.cdp("Page.startScreencast", {
       format: "png",

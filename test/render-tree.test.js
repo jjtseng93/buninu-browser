@@ -40,3 +40,13 @@ test("keeps node IDs stable across generations of the same DOM", () => {
   window.happyDOM.abort();
 });
 
+test("never creates boxes for metadata misplaced in body", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <h1>painted once</h1><title>not painted</title><meta name="x">
+  </body>`);
+  const tree = new RenderTreeBuilder().build(document);
+
+  expect(renderTreeText(tree).match(/painted once/g)).toHaveLength(1);
+  expect(renderTreeText(tree)).not.toContain("not painted");
+  window.happyDOM.abort();
+});
