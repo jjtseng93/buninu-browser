@@ -35,6 +35,26 @@ The initial computed-style model and its tests are informed by TermDOM's UA
 stylesheet categories and cascade tests. Buninu Browser retains its own DOM,
 style representation, CSS parser boundary, pixel layout, and implementation.
 
+`test/flex.test.js` ports cases from TermDOM's `tests/flex.test.ts`
+(flex-basis, §9.7 min/max freezing, auto margins, gaps, automatic minimum
+size), keeping TermDOM's hand-derived expected values and re-expressing each
+case as an HTML/CSS fixture. The flex layout in `lib/layout/text-layout.js`
+also follows TermDOM's `resolveFlexibleLengths` rule that growing requires a
+definite main size; no TermDOM source text is copied.
+
+## Chromium (Blink) references
+
+- Project: Chromium
+- Upstream: https://chromium.googlesource.com/chromium/src
+- Commit: `2e7327eeeab051c4837bc03a17cbeae763449bcd`
+- License: BSD-3-Clause (Blink files carry their own headers)
+
+`resolveFlexibleLengths` in `lib/layout/text-layout.js` follows the behavior of
+Blink's `third_party/blink/renderer/core/layout/flex/line_flexer.cc`
+(content-box flex base sizes, early exit when free space has the wrong sign,
+freezing by total violation). It is a JavaScript reimplementation of that
+behavior; no Chromium source text is copied.
+
 ## Dropflow-derived references
 
 - Project: Dropflow

@@ -10,7 +10,7 @@ function boxFor(tree, layout, tagName) {
 
 test("creates positioned immutable line fragments with fixed-column wrapping", () => {
   const { document, window } = parseHTMLDocument(
-    `<body>1234567890ABCDEFGHIJ<br>中文😀abcdef</body>`,
+    `<body style="margin:0">1234567890ABCDEFGHIJ<br>中文😀abcdef</body>`,
   );
   const tree = new RenderTreeBuilder().build(document);
   const layout = layoutText(tree, { columns: 10, x: 4, y: 8, lineHeight: 20 });
@@ -38,7 +38,7 @@ test("creates positioned immutable line fragments with fixed-column wrapping", (
 });
 
 test("uses block boundaries, collapses normal whitespace and preserves preformatted lines", () => {
-  const { document, window } = parseHTMLDocument(`<body>
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">
     <h1>  heading  text </h1>
     <span> inline </span><strong> content </strong>
     <pre>first\n  second</pre>
@@ -55,7 +55,7 @@ test("uses block boundaries, collapses normal whitespace and preserves preformat
 });
 
 test("layout generation follows rebuilt render trees", () => {
-  const { document, window } = parseHTMLDocument(`<body>before</body>`);
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">before</body>`);
   const builder = new RenderTreeBuilder();
   const first = layoutText(builder.build(document));
   document.body.textContent = "after";
@@ -68,7 +68,7 @@ test("layout generation follows rebuilt render trees", () => {
 
 test("uses viewport width and block margin, padding, width geometry", () => {
   const { document, window } = parseHTMLDocument(
-    `<body><div style="margin:10px;padding:5px;width:40px">abcdef</div></body>`,
+    `<body style="margin:0"><div style="margin:10px;padding:5px;width:40px">abcdef</div></body>`,
   );
   const styles = new StyleEngine().compute(document);
   const tree = new RenderTreeBuilder().build(document, styles);
@@ -89,7 +89,7 @@ test("uses viewport width and block margin, padding, width geometry", () => {
 
 test("measures and positions inline runs with their own computed styles", () => {
   const { document, window } = parseHTMLDocument(
-    `<body><span style="color:red;font-size:30px">aa</span><strong>bb</strong></body>`,
+    `<body style="margin:0"><span style="color:red;font-size:30px">aa</span><strong>bb</strong></body>`,
   );
   const styles = new StyleEngine().compute(document);
   const tree = new RenderTreeBuilder().build(document, styles);
@@ -110,7 +110,7 @@ test("measures and positions inline runs with their own computed styles", () => 
 
 test("centers max-width blocks with auto margins", () => {
   const { document, window } = parseHTMLDocument(
-    `<body><div style="max-width:50%;margin:0 auto">centered</div></body>`,
+    `<body style="margin:0"><div style="max-width:50%;margin:0 auto">centered</div></body>`,
   );
   const styles = new StyleEngine().compute(document);
   const tree = new RenderTreeBuilder().build(document, styles);
@@ -127,7 +127,7 @@ test("centers max-width blocks with auto margins", () => {
 });
 
 test("lays out image replaced elements from intrinsic and HTML dimensions", () => {
-  const { document, window } = parseHTMLDocument(`<body>before<img src="pixel.png" width="40">after</body>`);
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">before<img src="pixel.png" width="40">after</body>`);
   const image = document.querySelector("img");
   const resources = new WeakMap([[image, { width: 20, height: 10 }]]);
   const styles = new StyleEngine().compute(document);
@@ -142,12 +142,13 @@ test("lays out image replaced elements from intrinsic and HTML dimensions", () =
 
   expect(imageRun).toMatchObject({ width: 40, height: 20 });
   expect(imageRun.x).toBe(60);
-  expect(layout.fragments[0].height).toBe(31);
+  // line-height: normal; the image sits on the baseline, so the line adds the font descent below it.
+  expect(layout.fragments[0].height).toBeCloseTo(20 + 16 * (1.17 - 0.93));
   window.happyDOM.abort();
 });
 
-test("aligns inline content and flattens a basic flex row", () => {
-  const { document, window } = parseHTMLDocument(`<body>
+test("lays out flex-row items as separate boxes with justify-content and gap", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">
     <nav style="display:flex;justify-content:center;gap:20px"><div>one</div><div>two</div></nav>
   </body>`);
   const styles = new StyleEngine().compute(document);
@@ -158,14 +159,15 @@ test("aligns inline content and flattens a basic flex row", () => {
     measureText: (text) => text.length * 10,
   });
 
-  expect(layout.fragments.map((fragment) => fragment.text)).toEqual(["one two"]);
-  expect(layout.fragments[0].x).toBe(60);
-  expect(layout.fragments[0].runs.at(-1).x).toBe(110);
+  expect(layout.fragments.map((fragment) => [fragment.text, fragment.x, fragment.y])).toEqual([
+    ["one", 60, 0],
+    ["two", 110, 0],
+  ]);
   window.happyDOM.abort();
 });
 
 test("wraps measured text at word boundaries before hard grapheme breaks", () => {
-  const { document, window } = parseHTMLDocument(`<body>hello world abcdefghij</body>`);
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">hello world abcdefghij</body>`);
   const layout = layoutText(new RenderTreeBuilder().build(document), {
     x: 0,
     y: 0,
@@ -183,7 +185,7 @@ test("wraps measured text at word boundaries before hard grapheme breaks", () =>
 });
 
 test("distributes remaining flex-row space between direct children", () => {
-  const { document, window } = parseHTMLDocument(`<body>
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">
     <nav style="display:flex;justify-content:space-between;gap:10px"><span>left</span><span>right</span></nav>
   </body>`);
   const styles = new StyleEngine().compute(document);
@@ -193,7 +195,7 @@ test("distributes remaining flex-row space between direct children", () => {
     width: 200,
     measureText: (text) => text.length * 10,
   });
-  const runs = layout.fragments[0].runs;
+  const runs = layout.fragments.flatMap((fragment) => fragment.runs);
 
   expect(runs[0]).toMatchObject({ text: "left", x: 0, width: 40 });
   expect(runs.at(-1)).toMatchObject({ text: "right", x: 150, width: 50 });
@@ -201,7 +203,7 @@ test("distributes remaining flex-row space between direct children", () => {
 });
 
 test("places direct flex-column children on separate lines with column gap", () => {
-  const { document, window } = parseHTMLDocument(`<body><div class="prereq-command">
+  const { document, window } = parseHTMLDocument(`<body style="margin:0"><div class="prereq-command">
     <span class="prereq-platform">macOS / Linux</span>
     <button class="command"><span>$</span><span>curl -fsSL</span><span>Copy</span></button>
   </div></body>`);
@@ -218,17 +220,19 @@ test("places direct flex-column children on separate lines with column gap", () 
     measureText: (text) => text.length * 10,
   });
 
-  expect(layout.fragments.map((fragment) => fragment.text)).toEqual([
-    "macOS / Linux",
-    "$ curl -fsSL Copy",
+  // The button's spans are flex items of the inline-flex row, 8px apart.
+  expect(layout.fragments.map((fragment) => [fragment.text, fragment.x, fragment.y])).toEqual([
+    ["macOS / Linux", 0, 0],
+    ["$", 0, 26],
+    ["curl -fsSL", 18, 26],
+    ["Copy", 126, 26],
   ]);
-  expect(layout.fragments.map((fragment) => fragment.y)).toEqual([0, 26]);
   expect([...tree.nodesById.values()].find((node) => node.tagName === "BUTTON")?.type).toBe("inline-flex");
   window.happyDOM.abort();
 });
 
 test("keeps block box styles for direct flex-column block children", () => {
-  const { document, window } = parseHTMLDocument(`<body><div class="hero">
+  const { document, window } = parseHTMLDocument(`<body style="margin:0"><div class="hero">
     <h1>title</h1>
     <p>lede</p>
   </div></body>`);
@@ -253,7 +257,7 @@ test("keeps block box styles for direct flex-column block children", () => {
 });
 
 function layoutFixture(html, css = "", width = 400) {
-  const parsed = parseHTMLDocument(`<body>${html}</body>`);
+  const parsed = parseHTMLDocument(`<body style="margin:0">${html}</body>`);
   const styles = new StyleEngine().compute(parsed.document, [css]);
   const tree = new RenderTreeBuilder().build(parsed.document, styles);
   const layout = layoutText(tree, {

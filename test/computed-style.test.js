@@ -86,7 +86,7 @@ test("computes practical relative lengths and constrained widths", () => {
   expect(style).toMatchObject({
     fontSize: 30,
     lineHeight: 48,
-    margin: [22, "auto", 22, "auto"],
+    margin: [16, "auto", 16, "auto"],
     padding: [15, 15, 15, 15],
     maxWidth: { unit: "%", value: 50 },
   });
@@ -107,11 +107,11 @@ test("computes the first paint and flex presentation properties", () => {
     flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 22,
+    gap: 16,
     textAlign: "center",
     borderWidth: 2,
     borderColor: "rgba(255, 0, 0, 1)",
-    borderRadius: 11,
+    borderRadius: 8,
   });
   window.happyDOM.abort();
 });
@@ -132,5 +132,37 @@ test("keeps gradient-clipped transparent text visible with a solid fallback", ()
   expect(style.backgroundClip).toBe("text");
   expect(style.backgroundImage).toContain("linear-gradient");
   expect(style.color).toBe("rgba(255, 183, 3, 1)");
+  window.happyDOM.abort();
+});
+
+test("evaluates @media against the viewport and keeps order across stylesheets", () => {
+  const { document, window } = parseHTMLDocument(`<body><div id="box">x</div></body>`);
+  const sheets = [
+    `#box { color: red } @media (max-width: 640px) { #box { padding: 4px } }
+     @media print { #box { display: none } } @font-face { font-family: x; src: url(x) }`,
+    `#box { color: blue } @media screen and (min-width: 40em) { #box { margin: 0 } }`,
+  ];
+  const wide = new StyleEngine().compute(document, sheets, { width: 800, height: 600 }).get(document.getElementById("box"));
+  const narrow = new StyleEngine().compute(document, sheets, { width: 400, height: 600 }).get(document.getElementById("box"));
+
+  expect(wide).toMatchObject({ color: "rgba(0, 0, 255, 1)", display: "block", padding: [0, 0, 0, 0] });
+  expect(narrow.padding).toEqual([4, 4, 4, 4]);
+  window.happyDOM.abort();
+});
+
+test("applies UA margins, root-relative rem, viewport units and inherited line-height factors", () => {
+  const { document, window } = parseHTMLDocument(`<html style="font-size:20px"><body>
+    <h1 id="title">t</h1><p id="text">p</p><div id="clamp">c</div>
+  </body></html>`);
+  const styles = new StyleEngine().compute(document, [`
+    body { line-height: 1.5 } p { margin-top: 0 } #clamp { font-size: clamp(1rem, 5vw, 3rem) }
+  `], { width: 400, height: 300 });
+
+  expect(styles.get(document.body).margin).toEqual([8, 8, 8, 8]);
+  expect(styles.get(document.getElementById("title"))).toMatchObject({ fontSize: 40, fontWeight: 700, lineHeight: 60 });
+  expect(styles.get(document.getElementById("title")).margin[0]).toBeCloseTo(26.8);
+  expect(styles.get(document.getElementById("text")).margin).toEqual([0, 0, 20, 0]);
+  expect(styles.get(document.getElementById("clamp")).fontSize).toBe(20);
+  expect(styles.get(document.documentElement).lineHeight).toBeNull();
   window.happyDOM.abort();
 });
