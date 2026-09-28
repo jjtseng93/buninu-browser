@@ -120,3 +120,40 @@ test("centers max-width blocks with auto margins", () => {
   expect(layout.fragments[0].x).toBe(50);
   window.happyDOM.abort();
 });
+
+test("lays out image replaced elements from intrinsic and HTML dimensions", () => {
+  const { document, window } = parseHTMLDocument(`<body>before<img src="pixel.png" width="40">after</body>`);
+  const image = document.querySelector("img");
+  const resources = new WeakMap([[image, { width: 20, height: 10 }]]);
+  const styles = new StyleEngine().compute(document);
+  const tree = new RenderTreeBuilder().build(document, styles, resources);
+  const layout = layoutText(tree, {
+    x: 0,
+    y: 0,
+    width: 200,
+    measureText: (text) => text.length * 10,
+  });
+  const imageRun = layout.fragments[0].runs.find((run) => run.type === "image");
+
+  expect(imageRun).toMatchObject({ width: 40, height: 20 });
+  expect(imageRun.x).toBe(60);
+  expect(layout.fragments[0].height).toBe(31);
+  window.happyDOM.abort();
+});
+
+test("aligns inline content and flattens a basic flex row", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <nav style="display:flex;text-align:center"><div>one</div><div>two</div></nav>
+  </body>`);
+  const styles = new StyleEngine().compute(document);
+  const layout = layoutText(new RenderTreeBuilder().build(document, styles), {
+    x: 0,
+    y: 0,
+    width: 200,
+    measureText: (text) => text.length * 10,
+  });
+
+  expect(layout.fragments.map((fragment) => fragment.text)).toEqual(["one two"]);
+  expect(layout.fragments[0].x).toBe(65);
+  window.happyDOM.abort();
+});

@@ -92,3 +92,22 @@ test("computes practical relative lengths and constrained widths", () => {
   });
   window.happyDOM.abort();
 });
+
+test("computes the first paint and flex presentation properties", () => {
+  const { document, window } = parseHTMLDocument(`<div style="
+    display:flex;flex-direction:column;gap:1rem;text-align:center;
+    border:2px solid #ff0000;border-radius:.5em
+  ">box</div>`);
+  const style = computeElementStyle(document.querySelector("div"));
+
+  expect(style).toMatchObject({
+    display: "flex",
+    flexDirection: "column",
+    gap: 22,
+    textAlign: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255, 0, 0, 1)",
+    borderRadius: 11,
+  });
+  window.happyDOM.abort();
+});

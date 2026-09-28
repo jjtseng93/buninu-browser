@@ -27,6 +27,10 @@ async function readDevToolsUrl(stream, timeout = 15_000) {
 }
 
 test("top-level shell exposes the parsed document through Bun.WebView", async () => {
+  const pixelPng = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACAQMAAABIeJ9nAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGUExURf8AAP///0EdNBEAAAABYktHRAH/Ai3eAAAAB3RJTUUH6gkcDhU6l/MKvgAAAAxJREFUCNdjYGBgAAAABAABJzQnCgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyNi0wOS0yOFQxNDoyMTo1OCswMDowMJYWtzsAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjYtMDktMjhUMTQ6MjE6NTgrMDA6MDDnSw+HAAAAKHRFWHRkYXRlOnRpbWVzdGFtcAAyMDI2LTA5LTI4VDE0OjIxOjU4KzAwOjAwsF4uWAAAAABJRU5ErkJggg==",
+    "base64",
+  );
   const fixture = Bun.serve({
     port: 0,
     fetch(request) {
@@ -39,6 +43,15 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       if (pathname === "/site.css") {
         return new Response(`:root{--bg:#0d1117;--text:#e6edf3}html,body{background:var(--bg)}body{color:var(--text)}`, {
           headers: { "Content-Type": "text/css" },
+        });
+      }
+      if (pathname === "/pixel.png") {
+        return new Response(pixelPng, { headers: { "Content-Type": "image/png" } });
+      }
+      if (pathname === "/image" || pathname === "/broken-image") {
+        const src = pathname === "/image" ? "/pixel.png" : "/missing.png";
+        return new Response(`<!doctype html><style>body{background:#222}</style><body><img src="${src}" width="80" height="40"></body>`, {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
         });
       }
       if (pathname === "/plain" || pathname === "/styled") {
@@ -97,6 +110,11 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     expect(await view.evaluate("document.documentElement.outerHTML")).toContain("site.css");
     const styled = await view.screenshot({ encoding: "buffer", format: "png" });
     expect(Bun.hash(styled)).not.toBe(Bun.hash(plain));
+    await view.navigate(`http://127.0.0.1:${fixture.port}/image`);
+    const withImage = await view.screenshot({ encoding: "buffer", format: "png" });
+    await view.navigate(`http://127.0.0.1:${fixture.port}/broken-image`);
+    const withBrokenImage = await view.screenshot({ encoding: "buffer", format: "png" });
+    expect(Bun.hash(withImage)).not.toBe(Bun.hash(withBrokenImage));
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     expect(await view.evaluate("scrollY")).toBe(0);
