@@ -36,16 +36,18 @@ importing the package does not start a browser process or CDP listener.
 
 ## Open-source components
 
-The planned integration form is intentionally different for each upstream:
+The integration form is intentionally different for each upstream:
 
 | Component | Role | Source policy |
 |---|---|---|
-| **Happy DOM** | DOM, HTML elements, events, and Web APIs | Vendored at an exact tag; accessed through project-owned adapters, with local changes recorded in [`patches/happy-dom/`](patches/happy-dom/) |
+| **Happy DOM** | DOM, HTML elements, events, Web APIs, and selector matching | Vendored at an exact tag; accessed through project-owned adapters, with local changes recorded in [`patches/happy-dom/`](patches/happy-dom/) |
 | **Happy DOM HTMLParser** | Initial HTML parsing and tree construction | Use through the project parser adapter; keep scripts and subresource loading disabled until the renderer scheduler owns their lifecycle |
-| **Dropflow** | Block, inline, float, and text layout foundations | Vendor an exact commit before porting because derived algorithms and its bundled third-party code need source-level provenance |
-| **TermDOM** | Flex, grid, table, invalidation, and test references | Reference upstream; copy only selected algorithms/tests with per-file attribution when a port is approved |
-| **CanvasKit** | Skia-based WASM rasterization | Pin the official `canvaskit-wasm` release artifacts and integrity; do not vendor the full Skia repository |
-| **HarfBuzz** | Text shaping | Prefer the implementation already carried by the chosen Dropflow/CanvasKit build; vendor a separate WASM build only if the text-engine boundary requires it |
+| **Dropflow** | Structural reference for block formatting, anonymous boxes, and margin collapsing | Reference only: the layout is a clean reimplementation and no Dropflow source is copied; vendor an exact commit first if code is ever ported |
+| **TermDOM** | Flex, grid, table, and invalidation references; hand-derived test cases | Port selected tests with per-file attribution (flex and grid so far); algorithms are written from the CSS specifications |
+| **Chromium** | Behavioural reference; Linux syscall tables and the renderer seccomp policy structure | Use only BSD-3-Clause files, with attribution; Blink files under other licenses (such as the LGPL `html.css`) are not used |
+| **WHATWG HTML Standard** | User-agent default styles | Adapt the suggested rendering rules (§15.3) with attribution under CC BY 4.0 |
+| **CanvasKit** | Skia-based WASM rasterization and text shaping (SkParagraph with its bundled HarfBuzz) | Pin the official `canvaskit-wasm` release artifacts and integrity; do not vendor the full Skia repository or a separate HarfBuzz |
+| **SES (Hardened JavaScript)** | Planned: first sandbox layer for page scripts (`lockdown()` and compartments) | Pin an exact npm release when it is introduced; keep page globals behind project-owned bindings |
 | **Web Platform Tests** | Conformance testing | Use a pinned external checkout or sparse test snapshot; do not place the complete WPT repository in the runtime vendor tree |
 
 These projects retain their respective licenses and attribution. Material that
