@@ -277,3 +277,31 @@ test("fetch and XMLHttpRequest go through the controller with cookies and CORS",
     done: true,
   });
 });
+
+test("host mode: page globals that wrap host APIs do not call themselves, and rejections are not fatal", async () => {
+  const host = new RendererHost({ timeout: 20_000, args: ["--dangerously-allow-host-js"] });
+  try {
+    await host.start();
+    await host.call("loadDocument", {
+      url: "https://page.test/",
+      source: `<!doctype html><title>t</title><body><script>
+        Promise.reject(new Error("nobody catches this"));
+        document.title = [
+          typeof performance.now(), crypto.randomUUID().length, structuredClone({ a: 1 }).a, atob(btoa("ok")),
+        ].join(",");
+        requestAnimationFrame((time) => { document.body.dataset.frame = typeof time; });
+        console.log("logged from the page");
+      </script></body>`,
+      contentType: "text/html",
+      status: 200,
+    });
+    await Bun.sleep(100);
+    expect(await host.call("title")).toBe("number,36,1,ok");
+    expect(await host.call("evaluate", "document.body.dataset.frame")).toBe("number");
+    const pid = host.pid;
+    expect(await host.call("evaluate", "1 + 1")).toBe(2);
+    expect(host.pid).toBe(pid);
+  } finally {
+    host.close();
+  }
+});

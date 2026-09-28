@@ -69,6 +69,23 @@ Page JavaScript runs behind three layers:
 `--no-sandbox` is accepted for Chromium compatibility but ignored.
 `--dangerously-allow-host-js` turns the sandbox off for every page.
 
+### Diagnostics
+
+casty does not show the browser's stderr. Set `BUNINU_LOG=1` to also write
+it to `buninu-browser.log` in the working directory, or set
+`BUNINU_LOG=<path>` to choose the file. The log includes:
+
+- page errors and page `console` output;
+- per-phase load timings;
+- renderer crashes and watchdog kills.
+
+Renderers cannot open files under seccomp, so the controller collects their
+output and writes the log.
+
+```sh
+BUNINU_LOG=1 PATH="$PWD/test:$PATH" bun ../casty/bin/casty.js github.com
+```
+
 > [!WARNING]
 > Buninu Browser is in an early experimental stage and is not yet a
 > general-purpose browser engine or replacement for Chromium. The headless

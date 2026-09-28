@@ -249,3 +249,50 @@ test("computes ::before/::after styles only when content generates a box", () =>
   expect(styles.getPseudo(first, "before")).toBeNull();
   window.happyDOM.abort();
 });
+
+test("CSS-wide keywords work for every property and one bad declaration does not stop the cascade", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <div id="parent" style="margin: 7px; padding: 3px; flex-grow: 2">
+      <p id="unset" style="margin: unset; padding: initial; color: blue">u</p>
+      <p id="inherit" style="margin: inherit; padding-top: inherit; flex-grow: inherit">i</p>
+      <p id="revert" style="margin: revert">r</p>
+    </div>
+  </body>`);
+  const engine = new StyleEngine().compute(document);
+  expect(engine.get(document.getElementById("unset"))).toMatchObject({
+    margin: [0, 0, 0, 0], padding: [0, 0, 0, 0], color: "rgba(0, 0, 255, 1)",
+  });
+  expect(engine.get(document.getElementById("inherit"))).toMatchObject({
+    margin: [7, 7, 7, 7], padding: [3, 0, 0, 0], flexGrow: 2,
+  });
+  expect(engine.get(document.getElementById("revert")).margin).toEqual([0, 0, 0, 0]);
+  window.happyDOM.abort();
+});
+
+test("indexed rules still match by id, class, type, escapes and complex selectors, in cascade order", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <main id="app" class="md:flex w-1.5 wide">
+      <section class="card"><span class="x">s</span><em>e</em></section>
+    </main>
+  </body>`);
+  const css = `
+    #app { width: 100px }
+    .md\\:flex { display: flex }
+    .w-1\\.5 { min-width: 5px }
+    section.card > span { color: red }
+    :is(.card) em { color: green }
+    [class~="wide"] { max-width: 300px }
+    * + em { font-weight: bold }
+    span { color: blue }
+    .x { font-size: 20px }
+  `;
+  const engine = new StyleEngine().compute(document, [css]);
+  expect(engine.get(document.getElementById("app"))).toMatchObject({
+    width: 100, display: "flex", minWidth: 5, maxWidth: 300,
+  });
+  const span = document.querySelector("span");
+  // `span { color: blue }` comes later with lower specificity: the child combinator rule wins.
+  expect(engine.get(span)).toMatchObject({ color: "rgba(255, 0, 0, 1)", fontSize: 20 });
+  expect(engine.get(document.querySelector("em"))).toMatchObject({ color: "rgba(0, 128, 0, 1)", fontWeight: 700 });
+  window.happyDOM.abort();
+});

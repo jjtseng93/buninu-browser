@@ -42,6 +42,8 @@ test("kills a renderer that misses its deadline and restarts it on the next call
 test("surfaces renderer errors without their stack", async () => {
   const renderer = host();
   await expect(renderer.call("fail")).rejects.toThrow("renderer: Error: page crashed");
+  // An empty error is still a failure, not a successful undefined result.
+  await expect(renderer.call("fail-blank")).rejects.toThrow("renderer: unknown error");
 });
 
 test("ignores forged results and unknown messages from the renderer", async () => {

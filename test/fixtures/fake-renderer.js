@@ -10,6 +10,8 @@ process.on("message", async (message) => {
     case "echo": return process.send({ type: "result", id: message.id, result: { pid: process.pid, argument } });
     case "hang": for (;;) {}
     case "fail": return process.send({ type: "result", id: message.id, error: "Error: page crashed\n    at somewhere" });
+    // SES "safe" error taming leaves errors with an empty stack.
+    case "fail-blank": return process.send({ type: "result", id: message.id, error: "" });
     case "fetch":
       globalThis.pendingCall = message.id;
       return process.send({ type: "fetch", id: 1, url: argument.url, kind: argument.kind });

@@ -41,7 +41,12 @@ Options:
   --no-sandbox                    Accepted for Chromium compatibility and ignored
   --dangerously-allow-host-js     Turn the page sandbox off for every page
   --version                       Print the version
-  --help                          Print this help`);
+  --help                          Print this help
+
+Environment:
+  BUNINU_LOG=1                    Also log to ./buninu-browser.log (page errors,
+                                  console output, timings, renderer crashes)
+  BUNINU_LOG=<path>               Log to that file instead`);
     return 0;
   }
 
