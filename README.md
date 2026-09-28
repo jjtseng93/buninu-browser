@@ -40,7 +40,7 @@ The planned integration form is intentionally different for each upstream:
 
 | Component | Role | Source policy |
 |---|---|---|
-| **Happy DOM** | DOM, HTML elements, events, and Web APIs | Vendored at an exact tag; accessed through a project-owned adapter |
+| **Happy DOM** | DOM, HTML elements, events, and Web APIs | Vendored at an exact tag; accessed through project-owned adapters, with local changes recorded in [`patches/happy-dom/`](patches/happy-dom/) |
 | **parse5** | Standards-compliant HTML parsing | Exact package dependency; do not vendor separately while Happy DOM supplies the required version |
 | **Dropflow** | Block, inline, float, and text layout foundations | Vendor an exact commit before porting because derived algorithms and its bundled third-party code need source-level provenance |
 | **TermDOM** | Flex, grid, table, invalidation, and test references | Reference upstream; copy only selected algorithms/tests with per-file attribution when a port is approved |

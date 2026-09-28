@@ -1,4 +1,9 @@
-import { decodeHTML, decodeHTMLAttribute, decodeXML, escapeText } from 'entities';
+import {
+	decodeHTML,
+	decodeHTMLAttribute,
+	decodeXML,
+	escapeText
+} from '../../../../../../lib/happy-dom/entities-adapter.js';
 
 /**
  * Pre-compiled RegExp patterns for encoding/decoding.

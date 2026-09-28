@@ -1,0 +1,15 @@
+diff --git a/packages/happy-dom/src/utilities/XMLEncodeUtility.ts b/packages/happy-dom/src/utilities/XMLEncodeUtility.ts
+index c2cd7e8..bb7c093 100644
+--- a/packages/happy-dom/src/utilities/XMLEncodeUtility.ts
++++ b/packages/happy-dom/src/utilities/XMLEncodeUtility.ts
+@@ -1,4 +1,9 @@
+-import { decodeHTML, decodeHTMLAttribute, decodeXML, escapeText } from 'entities';
++import {
++	decodeHTML,
++	decodeHTMLAttribute,
++	decodeXML,
++	escapeText
++} from '../../../../../../lib/happy-dom/entities-adapter.js';
+ 
+ /**
+  * Pre-compiled RegExp patterns for encoding/decoding.

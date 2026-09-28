@@ -16,10 +16,11 @@ not become distributed components until their source or artifacts are added.
 - Local license copy: `LICENSES/happy-dom.txt`
 - Upstream license: `vendor/happy-dom/LICENSE`
 
-Happy DOM is currently kept as an unmodified upstream baseline. Buninu Browser
-code must access it through project-owned adapters. If local patches are added,
-their source file, upstream commit, reason, and corresponding tests must be
-recorded here or in an adjacent patch manifest.
+Happy DOM starts from the exact upstream revision above and carries the local
+patch queue documented in [`patches/happy-dom/README.md`](patches/happy-dom/README.md).
+Project-specific behavior belongs in project-owned adapters; every necessary
+upstream-file modification must be recorded in that queue with its reason and
+corresponding test.
 
 ## Standalone graphics runtime
 
