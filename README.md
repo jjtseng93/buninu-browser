@@ -7,6 +7,11 @@ Shell in [Buninu Linux](https://github.com/jjtseng93/buninu-linux). The
 engine's userspace components can be inspected, modified, and executed
 directly as JavaScript and WebAssembly.
 
+> [!WARNING]
+> Buninu Browser is in an early experimental stage and is not yet a
+> general-purpose browser engine or replacement for Chromium. The headless
+> shell is the initial frontend; native windowed frontends are planned later.
+
 ## Usage
 
 ```sh
@@ -249,11 +254,6 @@ output and writes the log.
 ```sh
 BUNINU_LOG=1 CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js github.com
 ```
-
-> [!WARNING]
-> Buninu Browser is in an early experimental stage and is not yet a
-> general-purpose browser engine or replacement for Chromium. The headless
-> shell is the initial frontend; native windowed frontends are planned later.
 
 ## Open-source components
 
