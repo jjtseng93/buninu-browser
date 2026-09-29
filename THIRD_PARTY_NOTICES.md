@@ -107,6 +107,15 @@ behavior; no Chromium source text is copied.
 (allowlist categories, threads-only `clone`, `clone3` as `ENOSYS`, signals only
 to the own process); the BPF program itself is written in JavaScript.
 
+Two performance designs follow BSD-licensed Chromium files; both are
+reimplemented in JavaScript, and no Chromium source text is copied:
+
+- Declaration blocks are parsed on first use (`lib/style/computed-style.js`),
+  after `third_party/blink/renderer/core/css/parser/css_lazy_parsing_state.cc`.
+- A rebuild that yields an unchanged display list reuses the previous raster
+  tile (`lib/renderer/page-renderer.js`), after the display-item reuse in
+  `third_party/blink/renderer/platform/graphics/paint/paint_controller.cc`.
+
 ## WHATWG HTML Standard
 
 - Project: HTML Living Standard

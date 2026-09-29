@@ -23,6 +23,19 @@ afterAll(() => {
   server?.stop(true);
 });
 
+async function exited(pid, timeout = 5000) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    try {
+      process.kill(pid, 0);
+    } catch {
+      return true;
+    }
+    await Bun.sleep(20);
+  }
+  return false;
+}
+
 const loopback = (path) => `http://127.0.0.1:${server.port}${path}`;
 const local = (path) => `http://localhost:${server.port}${path}`;
 
@@ -39,8 +52,8 @@ test("keeps one renderer per origin and swaps on cross-origin navigation", async
   const second = browser.rendererPid;
   expect(second).not.toBe(first);
   expect(await context.title()).toBe("three");
-  // The old origin's process is gone.
-  expect(() => process.kill(first, 0)).toThrow();
+  // The old origin's process is gone (it is signalled; exiting takes a moment).
+  expect(await exited(first)).toBeTrue();
 
   // History back to the first origin gets a fresh process, not the old one.
   await context.goBack();
