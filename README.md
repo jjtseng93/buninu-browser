@@ -97,6 +97,22 @@ Documents load in stages:
 are reported over CDP when the page reaches them. Every visible change
 pushes a screencast frame.
 
+### Mobile presentation
+
+Pages see a desktop browser unless `--mobile` is given. With it, requests
+and `navigator.userAgent` use an Android 16 WebView user agent, and the
+`hover`/`pointer` media features report a touch screen (`hover: none`,
+`pointer: coarse`). User agent overrides sent over CDP are ignored so the
+flag stays in effect under clients that set a desktop user agent, such as
+casty. A viewport wider than 412 CSS pixels, a phone's width, is laid out
+412 pixels wide and scaled up to fill it, so frames keep the size the client
+asked for; input coordinates are scaled back, and pages see the factor as
+`visualViewport.scale`.
+
+```sh
+CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js github.com -- --mobile
+```
+
 ### Diagnostics
 
 casty does not show the browser's stderr. Set `BUNINU_LOG=1` to also write

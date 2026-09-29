@@ -357,3 +357,62 @@ test("places outside list markers on the first line's baseline", () => {
   expect(firstMarker.baseline).toBe(firstLine.baseline);
   window.happyDOM.abort();
 });
+
+test("floats line up left to right, right floats at the line end; flex items do not float", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">
+    <ul style="list-style:none;margin:0;padding:0"><li style="float:left">Fork</li><li style="float:left">Star</li><li style="float:right">Right</li></ul>
+    <div style="display:flex"><span style="float:left">item</span></div></body>`);
+  const styles = new StyleEngine().compute(document);
+  const layout = layoutText(new RenderTreeBuilder().build(document, styles), {
+    x: 0, y: 0, width: 300, measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }),
+  });
+  const placed = layout.fragments.flatMap((fragment) => fragment.runs.filter((run) => run.text?.trim()))
+    .map((run) => [run.text, Math.round(run.x), run.y]);
+  expect(placed).toEqual([["Fork", 0, 0], ["Star", 40, 0], ["Right", 250, 0], ["item", 0, 20]]);
+  expect(styles.get(document.querySelector("span")).float).toBe("none");
+  window.happyDOM.abort();
+});
+
+function layoutOf(html, width = 400) {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">${html}</body>`);
+  const styles = new StyleEngine().compute(document);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, {
+    x: 0, y: 0, width, measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }),
+  });
+  window.happyDOM.abort();
+  const runs = layout.fragments.flatMap((fragment) => fragment.runs.filter((run) => run.text?.trim()));
+  return { layout, runs, at: (text) => runs.find((run) => run.text === text) };
+}
+
+test("tables size columns from their contents, span columns and center cells vertically", () => {
+  const { at } = layoutOf(`<table style="border-spacing:0">
+    <thead><tr><th>Name</th><th>Message</th></tr></thead>
+    <tbody><tr><td>bin</td><td>Windows compatibility</td></tr><tr><td style="height:60px">x</td><td>mid</td></tr>
+    <tr><td colspan="2">wide cell here</td></tr></tbody></table>`);
+  // Column 1 is as wide as "Name" (+1px padding each side), column 2 as the longest message.
+  expect(at("Name")).toMatchObject({ x: 1, y: 1 });
+  expect(at("bin").x).toBe(1);
+  expect(at("Windows compatibility").x).toBe(43);
+  // th is centered in column 2's 210px content box (from x 43): 43 + (210 - 70) / 2.
+  expect(Math.round(at("Message").x)).toBe(113);
+  // A 60px-tall row centres its other cells.
+  expect(at("mid").y).toBe(at("x").y + 20);
+  expect(at("wide cell here").x).toBe(1);
+});
+
+test("table-layout: fixed ignores contents; text-overflow: ellipsis truncates; nowrap never breaks words", () => {
+  const { at } = layoutOf(`<table style="table-layout:fixed;width:200px;border-spacing:0">
+    <tr><td style="width:50px;padding:0">a</td><td style="padding:0">averyveryverylongword</td></tr></table>`);
+  expect(at("averyveryverylongword").x).toBe(50);
+  const { runs } = layoutOf(`<div style="width:80px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;overflow-wrap:anywhere">abcdefghijkl</div>`);
+  expect(runs.map((run) => [run.text, run.x])).toEqual([["abcdefg", 0], ["…", 70]]);
+});
+
+test("an auto grid track is limited by a min-width: 0 item instead of its content", () => {
+  const { layout, at } = layoutOf(`<div style="display:grid;width:100px"><div style="min-width:0;white-space:nowrap;overflow:hidden">abcdefghijklmnop</div></div>`);
+  expect(at("abcdefghijklmnop").x).toBe(0);
+  // The item (second box) is 100px wide, not its 160px content.
+  expect(layout.boxes.map((box) => box.width)).toContain(100);
+  expect(layout.boxes.map((box) => box.width)).not.toContain(160);
+});

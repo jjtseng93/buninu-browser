@@ -310,3 +310,31 @@ test("host mode: page globals that wrap host APIs do not call themselves, and re
     host.close();
   }
 });
+
+test("fragment navigation updates location, fires hashchange, and lets the page scroll", async () => {
+  await load(`
+    <div style="height:1000px"></div><h2 id="plain">plain</h2>
+    <div style="height:1000px"></div><h2 id="custom-target">custom</h2>
+    <div style="height:1000px"></div><h2><a id="user-content-readme">readme</a></h2>
+    <div style="height:2000px"></div>
+    <script>var changes = []; window.addEventListener('hashchange', () => {
+      changes.push(location.hash + ':' + document.URL.split('#')[1]);
+      if (location.hash === '#custom') document.getElementById('custom-target').scrollIntoView();
+    });</script>`);
+  const scrollY = () => evaluate("Math.round(scrollY)");
+  const top = (id) => evaluate(`Math.round(document.getElementById('${id}').getBoundingClientRect().top + scrollY)`);
+
+  // A plain id target is scrolled to by the browser.
+  await renderer.call("showFragment", "https://page.test/#plain");
+  expect(await scrollY()).toBe(await top("plain"));
+  // A listener that maps the fragment scrolls itself.
+  await renderer.call("showFragment", "https://page.test/#custom");
+  expect(await scrollY()).toBe(await top("custom-target"));
+  // No target and no script: rendered Markdown's "user-content-" id.
+  await renderer.call("showFragment", "https://page.test/#readme");
+  expect(await scrollY()).toBe(await top("user-content-readme"));
+  // The same fragment again does not fire hashchange.
+  await renderer.call("showFragment", "https://page.test/#readme");
+  expect(await evaluate("changes.join(',')")).toBe("#plain:plain,#custom:custom,#readme:readme");
+  expect(await evaluate("location.href")).toBe("https://page.test/#readme");
+});

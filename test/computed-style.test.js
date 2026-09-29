@@ -351,3 +351,59 @@ test("custom properties keep their case, take inline style, and var() fallbacks 
   window.happyDOM.abort();
 });
 
+
+test("cascade layers: unlayered beats layered, later layers win, !important reverses", () => {
+  const { document, window } = parseHTMLDocument(`<p id="a" class="x y">t</p><p id="b" class="x">u</p>`);
+  const css = [
+    `@layer base, components;
+     @layer components { .x { display: inline } }
+     @layer base { .x { display: flex; color: red !important } p { margin-top: 5px } }
+     .y { display: block }`,
+    `.x { color: blue !important } @layer base.inner { .x { visibility: hidden } }`,
+  ];
+  const engine = new StyleEngine().compute(document, css);
+  const get = (id) => engine.get(document.getElementById(id));
+  expect(get("a").display).toBe("block");
+  expect(get("b").display).toBe("inline");
+  expect(get("a").color).toBe("rgba(255, 0, 0, 1)");
+  // A layered author rule still beats the user-agent defaults.
+  expect(get("a").margin).toEqual([5, 0, 16, 0]);
+  expect(get("b").visibility).toBe("hidden");
+  window.happyDOM.abort();
+});
+
+test("the font shorthand resets its parts and competes with font-size in the cascade", () => {
+  const { document, window } = parseHTMLDocument(`<h2 id="a" style="font-size:32px;line-height:3">t</h2><h2 id="b">x</h2>
+    <p id="c" style="font:italic small-caps bold 12px/1.5 Georgia, serif">u</p><p id="d" style="font-size:large">v</p>`);
+  const engine = new StyleEngine().compute(document, ["#a, #b { font: 600 1rem/1.5 sans-serif } h2 { font-size: 40px }"]);
+  const get = (id) => engine.get(document.getElementById(id));
+  expect(get("a")).toMatchObject({ fontSize: 32, fontWeight: 600, lineHeightFactor: 3 });
+  expect(get("b")).toMatchObject({ fontSize: 16, fontWeight: 600, lineHeightFactor: 1.5 });
+  expect(get("c")).toMatchObject({ fontSize: 12, fontWeight: 700, fontFamily: ["Georgia", "serif"] });
+  expect(get("d").fontSize).toBe(18);
+  window.happyDOM.abort();
+});
+
+test("calc() sums lengths and percentages; percentages resolve at layout time", () => {
+  const { document, window } = parseHTMLDocument(`<body style="font-size:10px">
+    <div id="a" style="max-width:calc(100% + 32px);width:calc(2em + 3px * 2);min-width:calc((100% - 20px) / 2)"></div>
+    <div id="b" style="width:calc(50% -10px);height:calc(100px - 2 * 1em + calc(4px));max-width:min(100%, 500px)"></div>
+    <div id="c" style="width:calc(10px + 5);max-width:calc(100% * 50%);height:calc(1px / 0);margin-left:calc(10% + 1px)"></div>
+  </body>`);
+  const styles = new StyleEngine().compute(document);
+  const style = (id) => styles.get(document.getElementById(id));
+  expect(style("a")).toMatchObject({
+    maxWidth: { unit: "math", kind: "calc", px: 32, percent: 100 },
+    width: 26,
+    minWidth: { unit: "math", kind: "calc", px: -10, percent: 50 },
+  });
+  // "50% -10px" (no space after the minus) still subtracts
+  expect(style("b")).toMatchObject({
+    width: { unit: "math", kind: "calc", px: -10, percent: 50 },
+    height: 84,
+    maxWidth: { unit: "math", kind: "min" },
+  });
+  // Invalid: length + number, % * %, division by zero, % where no percentages are allowed
+  expect(style("c")).toMatchObject({ width: "auto", maxWidth: "none", height: "auto", margin: [0, 0, 0, 0] });
+  window.happyDOM.abort();
+});

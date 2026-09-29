@@ -140,3 +140,11 @@ test("the automatic minimum size floors shrinking at min-content (§4.5)", () =>
   expect(rigid.rect("#a").width).toBe(150);
   rigid.done();
 });
+
+test("a calc() max-width with a percentage caps a flex item's automatic minimum size", () => {
+  // GitHub's README box: a column flex item holding a wide <pre>, capped at calc(100% + 32px)
+  const { rect, done } = flex(`<div id="root"><div id="a"><div style="overflow:auto"><pre>${"x".repeat(100)}</pre></div></div></div>`,
+    `#root { display:flex; width:200px; padding:0 16px } #a { display:flex; flex-direction:column; flex-grow:1; max-width:calc(100% + 32px); margin:0 -16px }`);
+  expect(rect("#a")).toMatchObject({ left: 0, width: 200 });
+  done();
+});

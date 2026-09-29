@@ -90,3 +90,23 @@ test("positioned boxes paint after in-flow content, ordered by z-index", () => {
   const colors = buildDisplayList(layout).items.filter((item) => item.op === "fillRect").map((item) => item.color);
   expect(colors).toEqual(["rgba(51, 51, 51, 1)", "rgba(34, 34, 34, 1)", "rgba(17, 17, 17, 1)"]);
 });
+
+test("a z-index stacking context paints its auto-positioned descendants after its own background", () => {
+  const { layout } = render(
+    `<header class="h"><nav class="n"><span class="t">Platform</span></nav></header><div class="later">L</div>`,
+    `.h { position:relative; z-index:32; background:#000 }
+     .n { position:relative; background:#111 }
+     .later { position:relative; background:#222 }`,
+  );
+  const items = buildDisplayList(layout).items;
+  const index = (predicate) => items.findIndex(predicate);
+  const header = index((item) => item.op === "fillRect" && item.color === "rgba(0, 0, 0, 1)");
+  const nav = index((item) => item.op === "fillRect" && item.color === "rgba(17, 17, 17, 1)");
+  const text = index((item) => item.op === "drawText" && item.text === "Platform");
+  const later = index((item) => item.op === "fillRect" && item.color === "rgba(34, 34, 34, 1)");
+  // Inside the z-index 32 context: header background, then nav, then text.
+  expect(header).toBeLessThan(nav);
+  expect(nav).toBeLessThan(text);
+  // The z-index auto sibling (z 0) paints before the z 32 context.
+  expect(later).toBeLessThan(header);
+});

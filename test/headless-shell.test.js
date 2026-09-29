@@ -205,7 +205,9 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     expect(Bun.hash(withMarker)).not.toBe(Bun.hash(beforeMarker));
     await view.cdp("Input.dispatchMouseEvent", { type: "mousePressed", ...click, buttons: 1 });
     await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", ...click, buttons: 0 });
-    for (let attempt = 0; attempt < 20 && !view.url.endsWith("/destination"); attempt++) {
+    // The URL changes when the navigation commits; the title follows once the
+    // page reports load, as in Chromium.
+    for (let attempt = 0; attempt < 200 && !(view.url.endsWith("/destination") && view.title === "Destination"); attempt++) {
       await Bun.sleep(10);
     }
     expect(view.url).toBe(`http://127.0.0.1:${fixture.port}/destination`);

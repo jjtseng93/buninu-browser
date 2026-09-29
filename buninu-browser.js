@@ -40,6 +40,9 @@ Options:
   --remote-debugging-port=<port>  CDP port (0 picks a free one; default 9222)
   --no-sandbox                    Accepted for Chromium compatibility and ignored
   --dangerously-allow-host-js     Turn the page sandbox off for every page
+  --mobile                        Present as a phone: mobile user agent and touch media
+                                  features (hover: none, pointer: coarse); user agent
+                                  overrides over CDP are ignored
   --version                       Print the version
   --help                          Print this help
 
