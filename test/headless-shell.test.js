@@ -48,9 +48,13 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       if (pathname === "/pixel.png") {
         return new Response(pixelPng, { headers: { "Content-Type": "image/png" } });
       }
-      if (pathname === "/image" || pathname === "/broken-image") {
-        const src = pathname === "/image" ? "/pixel.png" : "/missing.png";
-        return new Response(`<!doctype html><style>body{background:#222}</style><body><img src="${src}" width="80" height="40"></body>`, {
+      if (["/image", "/broken-image", "/data-image", "/dynamic-data-image"].includes(pathname)) {
+        const dataUrl = `data:image/png;base64,${pixelPng.toString("base64")}`;
+        const src = pathname === "/image" ? "/pixel.png" : pathname === "/data-image" ? dataUrl : "/missing.png";
+        const script = pathname === "/dynamic-data-image"
+          ? `<script>setTimeout(() => { document.querySelector("img").src = ${JSON.stringify(dataUrl)}; }, 10)</script>`
+          : "";
+        return new Response(`<!doctype html><style>body{background:#222}</style><body><img src="${src}" width="80" height="40">${script}</body>`, {
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
       }
@@ -134,6 +138,13 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await view.navigate(`http://127.0.0.1:${fixture.port}/broken-image`);
     const withBrokenImage = await view.screenshot({ encoding: "buffer", format: "png" });
     expect(Bun.hash(withImage)).not.toBe(Bun.hash(withBrokenImage));
+    await view.navigate(`http://127.0.0.1:${fixture.port}/data-image`);
+    const withDataImage = await view.screenshot({ encoding: "buffer", format: "png" });
+    expect(Bun.hash(withDataImage)).toBe(Bun.hash(withImage));
+    await view.navigate(`http://127.0.0.1:${fixture.port}/dynamic-data-image`);
+    await Bun.sleep(150);
+    const withDynamicDataImage = await view.screenshot({ encoding: "buffer", format: "png" });
+    expect(Bun.hash(withDynamicDataImage)).toBe(Bun.hash(withImage));
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     expect(await view.evaluate("scrollY")).toBe(0);
