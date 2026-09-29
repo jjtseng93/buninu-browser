@@ -16,18 +16,18 @@ test("creates positioned immutable line fragments with fixed-column wrapping", (
   const layout = layoutText(tree, { columns: 10, x: 4, y: 8, lineHeight: 20 });
 
   expect(layout.generation).toBe(tree.generation);
+  // A word wider than the line overflows it (overflow-wrap: normal).
   expect(layout.fragments.map((fragment) => fragment.text)).toEqual([
-    "1234567890",
-    "ABCDEFGHIJ",
+    "1234567890ABCDEFGHIJ",
     "中文😀",
     "abcdef",
   ]);
-  expect(layout.fragments.map((fragment) => fragment.y)).toEqual([8, 28, 48, 68]);
+  expect(layout.fragments.map((fragment) => fragment.y)).toEqual([8, 28, 48]);
   expect(layout.fragments[0]).toMatchObject({
     id: `${tree.generation}:0`,
     type: "line",
     x: 4,
-    width: 130,
+    width: 260,
     height: 20,
   });
   expect(layout.fragments[0].nodeIds.length).toBeGreaterThan(0);
@@ -80,10 +80,11 @@ test("uses viewport width and block margin, padding, width geometry", () => {
     measureText: (text) => text.length * 10,
   });
 
-  expect(layout.fragments.map((fragment) => fragment.text)).toEqual(["abcd", "ef"]);
-  expect(layout.fragments.map((fragment) => [fragment.x, fragment.y])).toEqual([[15, 15], [15, 35]]);
-  expect(boxFor(tree, layout, "DIV")).toMatchObject({ x: 10, y: 10, width: 50, height: 50 });
-  expect(layout.height).toBe(70);
+  // "abcdef" is wider than the 40px content box and overflows it.
+  expect(layout.fragments.map((fragment) => fragment.text)).toEqual(["abcdef"]);
+  expect(layout.fragments.map((fragment) => [fragment.x, fragment.y])).toEqual([[15, 15]]);
+  expect(boxFor(tree, layout, "DIV")).toMatchObject({ x: 10, y: 10, width: 50, height: 30 });
+  expect(layout.height).toBe(50);
   window.happyDOM.abort();
 });
 
@@ -166,22 +167,22 @@ test("lays out flex-row items as separate boxes with justify-content and gap", (
   window.happyDOM.abort();
 });
 
-test("wraps measured text at word boundaries before hard grapheme breaks", () => {
-  const { document, window } = parseHTMLDocument(`<body style="margin:0">hello world abcdefghij</body>`);
-  const layout = layoutText(new RenderTreeBuilder().build(document), {
-    x: 0,
-    y: 0,
-    width: 70,
-    measureText: (text) => text.length * 10,
-  });
-
-  expect(layout.fragments.map((fragment) => fragment.text)).toEqual([
-    "hello",
-    "world",
-    "abcdefg",
-    "hij",
-  ]);
-  window.happyDOM.abort();
+test("wraps at word boundaries and breaks inside words only where overflow-wrap or word-break allow", () => {
+  const texts = (style) => {
+    const { document, window } = parseHTMLDocument(`<body style="margin:0;${style}">hello world abcdefghij</body>`);
+    const layout = layoutText(new RenderTreeBuilder().build(document, new StyleEngine().compute(document)), {
+      x: 0,
+      y: 0,
+      width: 70,
+      measureText: (text) => text.length * 10,
+    });
+    window.happyDOM.abort();
+    return layout.fragments.map((fragment) => fragment.text);
+  };
+  expect(texts("")).toEqual(["hello", "world", "abcdefghij"]);
+  expect(texts("overflow-wrap:anywhere")).toEqual(["hello", "world", "abcdefg", "hij"]);
+  expect(texts("word-wrap:break-word")).toEqual(["hello", "world", "abcdefg", "hij"]);
+  expect(texts("word-break:break-all")).toEqual(["hello", "world", "abcdefg", "hij"]);
 });
 
 test("distributes remaining flex-row space between direct children", () => {

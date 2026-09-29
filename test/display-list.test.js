@@ -17,7 +17,7 @@ function displayListFor(html, css, resources = new WeakMap()) {
     measureText: (text) => text.length * 10,
     fontMetrics: () => ({ ascent: 16, height: 20 }),
   });
-  return { document, window, tree, displayList: buildDisplayList(layout) };
+  return { document, window, tree, displayList: buildDisplayList(layout, tree) };
 }
 
 test("paints box decorations in tree order before inline content", () => {
@@ -98,3 +98,31 @@ test("resolves percentage radii per axis and scales overlapping radii down", () 
   expect(huge.radii.y).toBeCloseTo(20);
   window.happyDOM.abort();
 });
+
+test("visibility, opacity and overflow/clip clipping apply to descendants", () => {
+  const { window, displayList } = displayListFor(`
+    <div id="hidden" style="visibility:hidden"><span>gone</span><b style="visibility:visible">shown</b></div>
+    <div style="opacity:0"><p>invisible</p></div>
+    <div style="opacity:0.5"><p style="opacity:0.5">faint</p></div>
+    <div style="overflow:hidden;width:30px;height:20px;white-space:nowrap"><p style="margin:0">clipped</p><p style="margin:0">below</p></div>
+    <div style="position:relative"><div style="overflow:hidden;height:5px"><p style="position:absolute">escapes</p></div></div>
+    <p style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">screen reader only</p>
+    <p style="clip-path:inset(50%)">also sr-only</p>`, "");
+  const texts = displayList.items.filter((item) => item.op === "drawText");
+  const byText = (text) => texts.find((item) => item.text.includes(text));
+  expect(byText("gone")).toBeUndefined();
+  expect(byText("shown")).toBeDefined();
+  expect(byText("invisible")).toBeUndefined();
+  expect(byText("faint").opacity).toBeCloseTo(0.25);
+  expect(byText("clipped").clipRect).toMatchObject({ width: 30, height: 20 });
+  expect(byText("clipped").bounds.width).toBe(30);
+  // Entirely outside the clip: not in the list at all.
+  expect(byText("below")).toBeUndefined();
+  // An absolutely positioned box is not clipped by a non-positioned ancestor
+  // between it and its containing block.
+  expect(byText("escapes").clipRect ?? null).toBeNull();
+  expect(byText("screen reader only")).toBeUndefined();
+  expect(byText("also sr-only")).toBeUndefined();
+  window.happyDOM.abort();
+});
+

@@ -329,3 +329,25 @@ test("the rule index and ancestor filter never drop a matching rule", () => {
   expect(engine.getPseudo(document.querySelector("p"), "before")?.content).toBe("b");
   window.happyDOM.abort();
 });
+
+test("custom properties keep their case, take inline style, and var() fallbacks may nest", () => {
+  const { document, window } = parseHTMLDocument(`<div id="a" style="--paneWidth: var(--wide); --wide: 320px; width: var(--paneWidth)">
+    <p id="b">x</p><p id="c">y</p><p id="d">z</p></div>`);
+  const css = `
+    :root { --borderColor-default: #d1d9e0; --loop: var(--loop) }
+    #a { --paneWidth: 0 }
+    #b { color: var(--borderColor-default); background-color: var(--missing, var(--borderColor-default)) }
+    #c { color: var(--missing, rgba(10, 20, 30, 1)) }
+    #d { color: var(--loop, blue); width: var(--paneWidth) }
+  `;
+  const engine = new StyleEngine().compute(document, [css]);
+  const get = (id) => engine.get(document.getElementById(id));
+  // Inline --paneWidth wins over the stylesheet's value.
+  expect(get("a").width).toBe(320);
+  expect(get("b")).toMatchObject({ color: "rgba(209, 217, 224, 1)", backgroundColor: "rgba(209, 217, 224, 1)" });
+  expect(get("c").color).toBe("rgba(10, 20, 30, 1)");
+  // A property in a reference cycle is invalid, so its fallback applies.
+  expect(get("d")).toMatchObject({ color: "rgba(0, 0, 255, 1)", width: 320 });
+  window.happyDOM.abort();
+});
+
