@@ -1,0 +1,14 @@
+diff --git a/src/js/gpu.js b/src/js/gpu.js
+index 2bb56f8..a9f4dc6 100644
+--- a/src/js/gpu.js
++++ b/src/js/gpu.js
+@@ -51,7 +51,8 @@ async function instantiate(path) {
+     let nodeOpts = {};
+     if (isNode) {
+         const { default: fsMod } = await import('node:fs');
+-        nodeOpts = { wasmBinary: fsMod.readFileSync(new URL(path).pathname.replace(/\.js$/, '.wasm')) };
++        const { fileURLToPath } = await import('node:url');
++        nodeOpts = { wasmBinary: fsMod.readFileSync(fileURLToPath(path).replace(/\.js$/, '.wasm')) };
+     }
+     const { default: factory } = await import(/* @vite-ignore */ path);
+     return factory({

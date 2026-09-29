@@ -1,7 +1,10 @@
 # Vendored wasmpeg CPU 1.0.1
 
-This directory contains the unmodified JavaScript and CPU WebAssembly files
-from the `@wasmpeg/cpu` 1.0.1 npm release. It also keeps the release's LGPL
+This directory contains the JavaScript and CPU WebAssembly files from the
+`@wasmpeg/cpu` 1.0.1 npm release. The WebAssembly and `dist/cpu.js` are
+unmodified; the JavaScript loader carries the local patches recorded in
+[`patches/wasmpeg/`](../../patches/wasmpeg/README.md) (currently one line in
+`src/js/gpu.js`, so the WASM path works on Windows). It also keeps the release's LGPL
 license and FFmpeg notice. Buninu Browser loads only `src/js/index.js` and
 `dist/cpu.js`/`dist/cpu.wasm`; no native media bindings are used.
 
@@ -12,7 +15,8 @@ license files, and build scripts. It is a `git archive` of upstream tag
 `173b41e30f4dd21d15f4e564c3ad26cba5d89d80`.
 The source archive includes FFmpeg's optional GPL files; the shipped CPU
 binary is the upstream LGPL preset and does not link those optional codecs.
-The vendored `src/js` files match that tag byte for byte. Upstream's CPU LGPL
+The vendored `src/js` files match that tag byte for byte apart from those
+patches. Upstream's CPU LGPL
 build command is `PRESET=lgpl TARGET=cpu bash scripts/build.sh`, after setting
 up Emscripten SDK 6.0.8 as described by its build instructions. This repository
 distributes the published binary rather than rebuilding it.

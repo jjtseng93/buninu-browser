@@ -51,7 +51,8 @@ async function instantiate(path) {
     let nodeOpts = {};
     if (isNode) {
         const { default: fsMod } = await import('node:fs');
-        nodeOpts = { wasmBinary: fsMod.readFileSync(new URL(path).pathname.replace(/\.js$/, '.wasm')) };
+        const { fileURLToPath } = await import('node:url');
+        nodeOpts = { wasmBinary: fsMod.readFileSync(fileURLToPath(path).replace(/\.js$/, '.wasm')) };
     }
     const { default: factory } = await import(/* @vite-ignore */ path);
     return factory({

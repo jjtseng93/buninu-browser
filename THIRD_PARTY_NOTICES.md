@@ -68,8 +68,10 @@ unmodified; its SHA-256 is
   `vendor/wasmpeg/source-v1.0.1.tar.gz`, mirrored from
   https://github.com/wasmpeg/wasmpeg/tree/v1.0.1
 
-The JavaScript sources, `cpu.js`, and `cpu.wasm` are copied without modification
-from the published CPU npm package. `cpu.wasm` is a separate file that users
+`cpu.js` and `cpu.wasm` are copied without modification from the published CPU
+npm package. The JavaScript sources are copied from it with the local changes
+recorded in [`patches/wasmpeg/`](patches/wasmpeg/README.md): one line of
+`src/js/gpu.js`, so the WASM path also resolves on Windows. `cpu.wasm` is a separate file that users
 can replace. The exact artifact hashes, source download, and rebuild command
 are in [`vendor/wasmpeg/VENDORING.md`](vendor/wasmpeg/VENDORING.md).
 
