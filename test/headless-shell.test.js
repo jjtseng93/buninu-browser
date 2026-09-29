@@ -56,6 +56,13 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
       }
+      if (pathname === "/prevented-editor") {
+        return new Response(`<!doctype html><textarea id="editor" style="width:180px;height:60px"
+          onkeydown="event.preventDefault(); document.getElementById('result').textContent = event.key"
+          onbeforeinput="Object.defineProperty(event, 'key', {value:event.data}); this.onkeydown(event)">original</textarea><p id="result"></p>`, {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        });
+      }
       if (["/image", "/broken-image", "/data-image", "/dynamic-data-image"].includes(pathname)) {
         const dataUrl = `data:image/png;base64,${pixelPng.toString("base64")}`;
         const src = pathname === "/image" ? "/pixel.png" : pathname === "/data-image" ? dataUrl : "/missing.png";
@@ -159,6 +166,13 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", x: editorRect.x + 10, y: editorRect.y + 10, button: "left", clickCount: 1 });
     await view.cdp("Input.insertText", { text: "hello" });
     expect(await view.evaluate("document.getElementById('result').textContent")).toBe("hello");
+    await view.navigate(`http://127.0.0.1:${fixture.port}/prevented-editor`);
+    const blockedRect = await view.evaluate("document.getElementById('editor').getBoundingClientRect().toJSON()");
+    await view.cdp("Input.dispatchMouseEvent", { type: "mousePressed", x: blockedRect.x + 10, y: blockedRect.y + 10, button: "left", clickCount: 1 });
+    await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", x: blockedRect.x + 10, y: blockedRect.y + 10, button: "left", clickCount: 1 });
+    await view.cdp("Input.insertText", { text: "q" });
+    expect(await view.evaluate("document.getElementById('result').textContent")).toBe("q");
+    expect(await view.evaluate("document.getElementById('editor').value")).toBe("original");
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     expect(await view.evaluate("scrollY")).toBe(0);
