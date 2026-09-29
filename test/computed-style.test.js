@@ -407,3 +407,28 @@ test("calc() sums lengths and percentages; percentages resolve at layout time", 
   expect(style("c")).toMatchObject({ width: "auto", maxWidth: "none", height: "auto", margin: [0, 0, 0, 0] });
   window.happyDOM.abort();
 });
+
+test("links get the UA link style; text decorations propagate to in-flow descendants", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <a id="link" href="javascript:void 0"><span id="inside">x</span><span id="atomic" style="display:inline-block">y</span></a>
+    <a id="anchor" name="n">no href</a>
+    <p id="own" style="text-decoration: line-through red wavy 2px">
+      <em id="nested" style="text-decoration-line: underline overline">z</em>
+      <span id="cleared" style="text-decoration: none">still struck</span></p>
+    <p id="bad" style="text-decoration: underline blue; text-decoration-color: nonsense">b</p>
+    <p id="invalid" style="text-decoration: sparkly">c</p>
+  </body>`);
+  const styles = new StyleEngine().compute(document);
+  const style = (id) => styles.get(document.getElementById(id));
+  expect(style("link")).toMatchObject({ color: "rgba(0, 0, 238, 1)", textDecorations: { lines: ["underline"], color: "rgba(0, 0, 238, 1)" } });
+  expect(style("inside").textDecorations).toEqual({ lines: ["underline"], color: "rgba(0, 0, 238, 1)" });
+  expect(style("atomic").textDecorations).toBeNull();
+  expect(style("anchor")).toMatchObject({ color: "rgba(0, 0, 0, 1)", textDecorations: null });
+  expect(style("own").textDecorations).toEqual({ lines: ["line-through"], color: "rgba(255, 0, 0, 1)" });
+  expect(style("nested").textDecorations).toEqual({ lines: ["line-through", "underline", "overline"], color: "rgba(0, 0, 0, 1)" });
+  // "none" on a descendant does not remove what an ancestor draws.
+  expect(style("cleared").textDecorations).toEqual({ lines: ["line-through"], color: "rgba(255, 0, 0, 1)" });
+  expect(style("bad").textDecorations).toEqual({ lines: ["underline"], color: "rgba(0, 0, 255, 1)" });
+  expect(style("invalid").textDecorations).toBeNull();
+  window.happyDOM.abort();
+});

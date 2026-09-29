@@ -88,6 +88,26 @@ test("scripts change the DOM and the next screenshot shows it", async () => {
   expect(await renderer.call("screenshot")).not.toBe(scripted);
 });
 
+test("fixed CSS marker stays at the same viewport position after scrolling", async () => {
+  await load(`<div style="height:1000px"></div>`);
+  const plain = await renderer.call("screenshot");
+  await evaluate(`(() => {
+    const marker = document.createElement('div');
+    marker.style.cssText = 'position:fixed;left:80px;top:90px;width:14px;height:14px;box-sizing:border-box;'
+      + 'margin-left:-7px;margin-top:-7px;border:2px solid white;'
+      + 'border-radius:50%;background:#f00;z-index:2147483647;pointer-events:none';
+    document.documentElement.appendChild(marker);
+  })()`);
+  const before = await renderer.call("screenshot");
+  expect(before).not.toBe(plain);
+  expect(await renderer.call("scrollTo", 0, 200)).toMatchObject({ y: 200 });
+  const after = await renderer.call("screenshot");
+  expect(after).toBe(before);
+  const bounds = await evaluate(`(() => { const r = document.documentElement.lastElementChild.getBoundingClientRect();
+    return [r.x, r.y, r.width, r.height]; })()`);
+  expect(bounds).toEqual([73, 83, 14, 14]);
+});
+
 test("timers run as tasks and their DOM changes are rendered", async () => {
   await load(`<p id="p">before</p><script>setTimeout(() => { document.getElementById('p').textContent = 'after' }, 20)</script>`);
   await Bun.sleep(150);
@@ -337,4 +357,110 @@ test("fragment navigation updates location, fires hashchange, and lets the page 
   await renderer.call("showFragment", "https://page.test/#readme");
   expect(await evaluate("changes.join(',')")).toBe("#plain:plain,#custom:custom,#readme:readme");
   expect(await evaluate("location.href")).toBe("https://page.test/#readme");
+});
+
+test("WebSocket connects through the controller: text, binary, subprotocol, Origin and close", async () => {
+  const seen = [];
+  const server = Bun.serve({
+    port: 0,
+    fetch(request, server) {
+      seen.push({ origin: request.headers.get("origin"), protocol: request.headers.get("sec-websocket-protocol") });
+      return server.upgrade(request, { headers: { "Sec-WebSocket-Protocol": "chat" } }) ? undefined : new Response("no", { status: 400 });
+    },
+    websocket: {
+      message(socket, message) {
+        socket.send(typeof message === "string" ? `echo:${message}` : message);
+      },
+    },
+  });
+  try {
+    await load(`<script>
+      var log = [];
+      var ws = new WebSocket('ws://127.0.0.1:${server.port}/socket', ['chat']);
+      ws.binaryType = 'arraybuffer';
+      ws.onopen = () => { log.push('open:' + ws.protocol + ':' + ws.readyState); ws.send('hi'); ws.send(new Uint8Array([1, 2, 3])); };
+      ws.addEventListener('message', (event) => {
+        log.push(typeof event.data === 'string' ? event.data : 'bytes:' + [...new Uint8Array(event.data)].join(','));
+        if (log.length === 3) ws.close(1000, 'done');
+      });
+      ws.onclose = (event) => log.push('close:' + event.code + ':' + event.reason + ':' + ws.readyState);
+      var bad = []; for (const u of ['ftp://x/', 'ws://x/#h']) { try { new WebSocket(u) } catch (e) { bad.push(e.name) } }
+    </script>`);
+    for (let i = 0; i < 50 && !String(await evaluate("log.join('|')")).includes("close"); i++) await Bun.sleep(50);
+    expect(await evaluate("log.join('|')")).toBe("open:chat:1|echo:hi|bytes:1,2,3|close:1000:done:3");
+    expect(await evaluate("bad.join(',')")).toBe("SyntaxError,SyntaxError");
+    expect(seen).toEqual([{ origin: "https://page.test", protocol: "chat" }]);
+  } finally {
+    server.stop(true);
+  }
+});
+
+test("an unreachable WebSocket fires error then close 1006", async () => {
+  await load(`<script>var events = []; var ws = new WebSocket('ws://127.0.0.1:1/');
+    ws.onerror = () => events.push('error'); ws.onclose = (e) => events.push('close:' + e.code + ':' + e.wasClean);</script>`);
+  for (let i = 0; i < 50 && !String(await evaluate("events.join()")).includes("close"); i++) await Bun.sleep(50);
+  expect(await evaluate("events.join()")).toBe("error,close:1006:false");
+});
+
+test("javascript: links run in the page unless a listener prevents them", async () => {
+  await load(`
+    <a id="run" href="javascript:ran.push(this === window, decodeURIComponent('%E4%B8%AD'), 'a%20b')" style="display:block;height:40px">run</a>
+    <a id="handled" href="javascript:ran.push('must not run')" style="display:block;height:40px">handled</a>
+    <script>var ran = [];
+      document.addEventListener('click', (event) => {
+        const link = event.target.closest('a');
+        if (link && link.id === 'handled') { event.preventDefault(); ran.push('listener'); }
+      });</script>`);
+  expect(await renderer.call("click", 10, 10)).toBeNull();
+  expect(await renderer.call("click", 10, 50)).toBeNull();
+  await renderer.call("runJavaScriptURL", "javascript:ran.push('typed')");
+  expect(await evaluate("JSON.stringify(ran)")).toBe(JSON.stringify([true, "中", "a b", "listener", "typed"]));
+  expect(await evaluate("location.href")).toBe("https://page.test/");
+});
+
+test("History.prototype can be wrapped; pushState/replaceState move location without navigating", async () => {
+  navigations.length = 0;
+  await load(`<script>var calls = [];
+    const original = History.prototype.pushState;
+    History.prototype.pushState = function (...args) { calls.push('wrapped'); return original.apply(this, args); };
+    history.pushState({ page: 2 }, '', '/two?x=1');
+    history.replaceState(null, '', '#frag');
+    var cross = ''; try { history.pushState(null, '', 'https://elsewhere.test/') } catch (e) { cross = e.name }</script>`);
+  expect(await evaluate("[calls.join(), location.href, history.state, history.length, history instanceof History, cross].join('|')"))
+    .toBe("wrapped,wrapped|https://page.test/two?x=1#frag||2|true|SecurityError");
+  expect(navigations).toEqual([]);
+});
+
+test("Function constructors reached through prototypes work under SES", async () => {
+  await load(`<script type="module">
+    const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+    const f = new AsyncFunction('a', 'b', 'return await Promise.resolve(a + b)');
+    window.moduleResult = [await f(1, 2), f instanceof AsyncFunction, AsyncFunction.name];
+  </script><script>
+    var GeneratorFunction = (function* () {}).constructor;
+    var plain = (function () {}).constructor;
+    var classic = [[...new GeneratorFunction('yield 1; yield 2')()].join(), plain('return typeof window')(),
+      typeof Object.getPrototypeOf(async function* () {}).constructor('yield 1')];
+  </script>`);
+  for (let i = 0; i < 20 && !(await evaluate("typeof moduleResult")).startsWith("object"); i++) await Bun.sleep(25);
+  expect(await evaluate("JSON.stringify([moduleResult, classic])")).toBe(JSON.stringify([[3, true, "AsyncFunction"], ["1,2", "object", "function"]]));
+});
+
+test("UI event constructors, table rows/cells and select options are available", async () => {
+  await load(`<table id="t"><thead><tr><th>h</th></tr></thead><tbody><tr><td>a</td><td id="b">b</td></tr></tbody></table>
+    <select id="s"><option>x</option><option selected>y</option></select><div id="d"></div>
+    <script>var out = [];
+      const t = document.getElementById('t');
+      out.push(t.rows.length, t.tBodies.length, t.rows[1].cells.length, document.getElementById('b').cellIndex, t.rows[1].rowIndex, t.tHead.tagName);
+      const s = document.getElementById('s');
+      out.push(s.options.length, s.selectedIndex, s.selectedOptions[0].textContent);
+      s.selectedIndex = 0; out.push(s.value);
+      out.push(document.getElementById('d').rows === undefined);
+      const d = document.getElementById('d');
+      d.addEventListener('click', (e) => out.push(e.type + ':' + e.clientX + ':' + e.shiftKey + ':' + e.defaultPrevented));
+      const click = new MouseEvent('click', { bubbles: true, cancelable: true, clientX: 5, shiftKey: true, view: window });
+      out.push(d.dispatchEvent(click) && click instanceof MouseEvent);
+      const key = new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', repeat: true });
+      out.push(key.key + ':' + key.code + ':' + key.repeat);</script>`);
+  expect(await evaluate("JSON.stringify(out)")).toBe(JSON.stringify([2, 1, 2, 1, 1, "THEAD", 2, 1, "y", "x", true, "click:5:true:false", true, "Enter:Enter:true"]));
 });

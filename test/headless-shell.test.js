@@ -197,9 +197,44 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       expression: `(async () => {
         const marker = document.createElement('div');
         marker.id = '__casty_click_marker';
-        marker.style.cssText = 'left:${click.x}px;top:${click.y}px';
+        marker.style.cssText = [
+          'position:fixed',
+          'left:' + ${click.x} + 'px',
+          'top:' + ${click.y} + 'px',
+          'width:14px',
+          'height:14px',
+          'margin-left:-7px',
+          'margin-top:-7px',
+          'box-sizing:border-box',
+          'border:2px solid white',
+          'border-radius:50%',
+          'background:#f00',
+          'box-shadow:0 0 0 2px rgba(255,0,0,.45)',
+          'pointer-events:none',
+          'z-index:2147483647',
+        ].join(';');
+        document.documentElement.appendChild(marker);
         setTimeout(() => marker.remove(), 800);
+        await new Promise(resolve => requestAnimationFrame(resolve));
       })()`,
+    });
+    const markerState = await view.cdp("Runtime.evaluate", {
+      expression: `(() => { const marker = document.getElementById('__casty_click_marker'); return marker ? marker.style.cssText : null })()`,
+      returnByValue: true,
+    });
+    expect(markerState.result.value).toContain("background");
+    const markerLayout = await view.cdp("Runtime.evaluate", {
+      expression: `(() => { const e = document.getElementById('__casty_click_marker'); const s = getComputedStyle(e); const r = e.getBoundingClientRect(); return { position:s.position, display:s.display, background:s.backgroundColor, x:r.x, y:r.y, width:r.width, height:r.height } })()`,
+      returnByValue: true,
+    });
+    expect(markerLayout.result.value).toEqual({
+      position: "fixed",
+      display: "block",
+      background: "rgba(255, 0, 0, 1)",
+      x: click.x - 7,
+      y: click.y - 7,
+      width: 14,
+      height: 14,
     });
     const withMarker = await view.screenshot({ encoding: "buffer", format: "png" });
     expect(Bun.hash(withMarker)).not.toBe(Bun.hash(beforeMarker));

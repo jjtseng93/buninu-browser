@@ -1,0 +1,31 @@
+import { expect, test } from "bun:test";
+import { rewriteConstructorReads } from "../lib/renderer/script-rewrite.js";
+
+const rewrite = (source, type) => rewriteConstructorReads(source, type).code;
+
+test("constructor reads go through the helper; writes, delete and optional chains do not", () => {
+  expect(rewrite("var A = Object.getPrototypeOf(async function () {}).constructor;"))
+    .toBe("var A = $buninu$constructor(Object.getPrototypeOf(async function () {}));");
+  // Parentheses around the object stay; nested reads compose.
+  expect(rewrite("x = (async () => {}).constructor.constructor;"))
+    .toBe("x = $buninu$constructor(($buninu$constructor(async () => {})));");
+  // Once a source has the idiom, every read in it goes through the helper.
+  const trigger = " (async () => {}).constructor;";
+  expect(rewrite(`y = a . constructor ['constructor'];${trigger}`))
+    .toBe("y = $buninu$constructor($buninu$constructor(a) ) ; ($buninu$constructor(async () => {}));");
+  // Calls keep the receiver (the helper's second argument).
+  expect(rewrite(`b.constructor(1); new c.constructor();${trigger}`))
+    .toBe("$buninu$constructor(b, true)(1); new $buninu$constructor(c)(); ($buninu$constructor(async () => {}));");
+  const untouched = "a.constructor = 1; a.constructor++; delete a.constructor; for (a.constructor of []); c?.constructor; "
+    + "class K extends B { constructor() { super(); super.constructor } } ({ constructor: 1 });";
+  expect(rewrite(untouched + trigger)).toBe(`${untouched} ($buninu$constructor(async () => {}));`);
+});
+
+test("sources that cannot reach Function constructors are not parsed; bad syntax is left to the engine", () => {
+  expect(rewriteConstructorReads("x.constructor.name")).toEqual({ code: "x.constructor.name", rewritten: false });
+  // this.constructor is common and harmless; alone it does not trigger a parse.
+  expect(rewriteConstructorReads("async function f() { return this.constructor }").rewritten).toBe(false);
+  expect(rewriteConstructorReads("(async () => {}).constructor(")).toEqual({ code: "(async () => {}).constructor(", rewritten: false });
+  expect(rewrite("export const A = (async () => {}).constructor;", "module"))
+    .toBe("export const A = ($buninu$constructor(async () => {}));");
+});

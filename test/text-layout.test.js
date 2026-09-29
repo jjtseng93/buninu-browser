@@ -221,12 +221,13 @@ test("places direct flex-column children on separate lines with column gap", () 
     measureText: (text) => text.length * 10,
   });
 
-  // The button's spans are flex items of the inline-flex row, 8px apart.
+  // The button's spans are flex items of the inline-flex row, 8px apart,
+  // inside the UA button padding (1px 6px) and 1px border.
   expect(layout.fragments.map((fragment) => [fragment.text, fragment.x, fragment.y])).toEqual([
     ["macOS / Linux", 0, 0],
-    ["$", 0, 26],
-    ["curl -fsSL", 18, 26],
-    ["Copy", 126, 26],
+    ["$", 7, 28],
+    ["curl -fsSL", 25, 28],
+    ["Copy", 133, 28],
   ]);
   expect([...tree.nodesById.values()].find((node) => node.tagName === "BUTTON")?.type).toBe("inline-flex");
   window.happyDOM.abort();
