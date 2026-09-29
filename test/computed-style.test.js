@@ -296,3 +296,36 @@ test("indexed rules still match by id, class, type, escapes and complex selector
   expect(engine.get(document.querySelector("em"))).toMatchObject({ color: "rgba(0, 128, 0, 1)", fontWeight: 700 });
   window.happyDOM.abort();
 });
+
+test("the rule index and ancestor filter never drop a matching rule", () => {
+  const { document, window } = parseHTMLDocument(`<html class="dark"><body>
+    <main id="m" data-x="1" class="a"><section class="s"><p class="p" title="t">x</p><span>y</span><em>z</em></section>
+    <ul><li>1</li><li class="last">2</li></ul></main></body></html>`);
+  const css = `
+    :root { color: red }
+    html.dark p { color: blue }
+    [data-x] { width: 10px }
+    [data-x="1"] .p { height: 5px }
+    [title] { font-weight: bold }
+    :is(.p, span) { font-size: 20px }
+    :where(em, .nothing) { min-width: 4px }
+    .s > * { padding: 1px }
+    .a .s + ul li:last-child { color: green }
+    .p ~ em { margin: 2px }
+    main:not(.zzz) span { display: block }
+    [x="a]#m"] { color: pink }
+    .missing-ancestor .p { color: orange }
+    section p::before { content: "b" }
+  `;
+  const engine = new StyleEngine().compute(document, [css]);
+  const get = (selector) => engine.get(document.querySelector(selector));
+  expect(get("html").color).toBe("rgba(255, 0, 0, 1)");
+  expect(get("p")).toMatchObject({ color: "rgba(0, 0, 255, 1)", height: 5, fontWeight: 700, fontSize: 20, padding: [1, 1, 1, 1] });
+  expect(get("main")).toMatchObject({ width: 10, color: "rgba(255, 0, 0, 1)" });
+  expect(get("span")).toMatchObject({ fontSize: 20, display: "block", padding: [1, 1, 1, 1] });
+  expect(get("em")).toMatchObject({ minWidth: 4, margin: [2, 2, 2, 2] });
+  expect(get("li.last").color).toBe("rgba(0, 128, 0, 1)");
+  expect(get("li").color).toBe("rgba(255, 0, 0, 1)");
+  expect(engine.getPseudo(document.querySelector("p"), "before")?.content).toBe("b");
+  window.happyDOM.abort();
+});
