@@ -41,6 +41,11 @@ Original Buninu Browser code is licensed under the MIT License. Standalone
 graphics and font assets live under [`usr/`](usr/); Buninu Linux packages use
 symlinks to their system copies instead. See [`usr/README.md`](usr/README.md)
 and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+Video decoding uses the separately stored `vendor/wasmpeg/dist/cpu.wasm`,
+which contains FFmpeg code under LGPL-2.1-or-later. The MIT license does not
+cover that third-party component. Its license, notice, exact release source,
+build instructions, and replacement path are documented in
+[`vendor/wasmpeg/VENDORING.md`](vendor/wasmpeg/VENDORING.md).
 
 It implements its own browser lifecycle, rendering pipeline, process model,
 layout integration, and automation interface while building on selected
@@ -83,6 +88,12 @@ threads:
 When idle, the main thread rasterizes a tile reaching half a viewport above
 and one viewport below the visible area, so the compositor can scroll
 without waiting. Screenshots are encoded with `Bun.Image`.
+
+`<video>` can decode and display MP4 video frames after a click, with a basic
+play/pause control. Video bytes are fetched through the controller; the
+renderer uses vendored wasmpeg JavaScript and WebAssembly without native
+media bindings. Audio, seeking, and full HTML media controls are not yet
+implemented. No npm install is needed for the decoder.
 
 Documents load in stages:
 
@@ -150,6 +161,7 @@ The integration form is intentionally different for each upstream:
 | **CanvasKit** | Skia-based WASM rasterization and text shaping (SkParagraph with its bundled HarfBuzz) | Pin the official `canvaskit-wasm` release artifacts and integrity; do not vendor the full Skia repository or a separate HarfBuzz |
 | **SES (Hardened JavaScript)** | First sandbox layer for page scripts: `lockdown()` and one compartment per document | Vendored unmodified at an exact npm release in [`vendor/ses/`](vendor/ses/); page globals are project-owned bindings, never Happy DOM objects |
 | **Acorn** | JavaScript parser used to give classic scripts browser-style shared globals under SES | Vendored unmodified at an exact npm release in [`vendor/acorn/`](vendor/acorn/) |
+| **wasmpeg / FFmpeg** | CPU WebAssembly video decoding | Vendored `@wasmpeg/cpu` 1.0.1 under [`vendor/wasmpeg/`](vendor/wasmpeg/), licensed LGPL-2.1-or-later; the WASM remains a separate, replaceable file. See its [`VENDORING.md`](vendor/wasmpeg/VENDORING.md) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) |
 | **Web Platform Tests** | Conformance testing | Use a pinned external checkout or sparse test snapshot; do not place the complete WPT repository in the runtime vendor tree |
 
 These projects retain their respective licenses and attribution. Material that

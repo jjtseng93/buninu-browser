@@ -54,6 +54,36 @@ top-level declarations onto the page's global object. The bundle is used
 unmodified; its SHA-256 is
 `953573b8fdab71599749ea5f2b33d3e760c2116178f9423ee7458dbe39d59453`.
 
+## wasmpeg / FFmpeg
+
+- Project: wasmpeg CPU build, incorporating FFmpeg
+- Upstream: https://github.com/wasmpeg/wasmpeg
+- Version: `@wasmpeg/cpu` 1.0.1, upstream tag `v1.0.1`, commit
+  `173b41e30f4dd21d15f4e564c3ad26cba5d89d80`
+- Vendored path: `vendor/wasmpeg`
+- License: LGPL-2.1-or-later for wasmpeg and its FFmpeg code
+- Local license copies: `vendor/wasmpeg/LICENSE`, `LICENSES/wasmpeg.txt`
+- Upstream notice copy: `vendor/wasmpeg/NOTICE`
+- Corresponding source, including the FFmpeg tree and build scripts:
+  `vendor/wasmpeg/source-v1.0.1.tar.gz`, mirrored from
+  https://github.com/wasmpeg/wasmpeg/tree/v1.0.1
+
+The JavaScript sources, `cpu.js`, and `cpu.wasm` are copied without modification
+from the published CPU npm package. `cpu.wasm` is a separate file that users
+can replace. The exact artifact hashes, source download, and rebuild command
+are in [`vendor/wasmpeg/VENDORING.md`](vendor/wasmpeg/VENDORING.md).
+
+The CPU build also links the Emscripten zlib port. Its binary reports zlib
+1.3.2; zlib is copyright (C) 1995-2026 Jean-loup Gailly and Mark Adler and
+uses the zlib license. The license text is in `LICENSES/zlib.txt`, and its
+source is https://github.com/madler/zlib/tree/v1.3.2 .
+
+The generated `cpu.js`/`cpu.wasm` artifacts also contain Emscripten runtime
+code. Upstream's build instructions pin Emscripten SDK 6.0.8. Emscripten's
+MIT / University of Illinois-NCSA license text (including its embedded
+third-party notices) is in `LICENSES/emscripten.txt`; source:
+https://github.com/emscripten-core/emscripten/tree/6.0.8 .
+
 ## TermDOM-derived references
 
 - Project: TermDOM
@@ -122,11 +152,14 @@ reimplemented in JavaScript, and no Chromium source text is copied:
 - Upstream: https://html.spec.whatwg.org/multipage/rendering.html
 - License: Creative Commons Attribution 4.0 International (CC BY 4.0)
 - Copyright: Copyright © WHATWG (Apple, Google, Mozilla, Microsoft)
+- License text: `LICENSES/CC-BY-4.0.txt`
+- License URL: https://creativecommons.org/licenses/by/4.0/
 
 The user-agent default declarations in `lib/style/computed-style.js`
 (`UA_DECLARATIONS`: body margin, paragraph and heading margins and sizes, list
 indentation, monospace elements) are adapted from the suggested rendering rules
-in the HTML Standard §15.3.
+in the HTML Standard §15.3; this is a modified implementation rather than a
+verbatim copy of that section.
 
 ## Dropflow-derived references
 
@@ -163,6 +196,28 @@ must be symlinks to the system copies instead, as documented in `usr/README.md`.
 | `usr/share/fonts/NotoColorEmoji.ttf`, `NotoColorEmojiFlags.ttf` | Noto Color Emoji 2.047 from Android system fonts | SIL Open Font License 1.1 |
 | `usr/share/fonts/NotoSansSymbols-Regular-Subsetted.ttf`, `NotoSansSymbols-Regular-Subsetted2.ttf` | Android Noto Sans Symbols subsets | SIL Open Font License 1.1 |
 | `usr/share/fonts/Roboto-Regular.ttf` | Roboto 3.005 from Android system fonts | Apache-2.0; `LICENSES/Apache-2.0.txt` |
+
+CanvasKit's WASM also incorporates third-party code. Its published npm
+tarball supplies only Skia's top-level license, so the following license
+texts are included separately based on the components identified in the
+binary and CanvasKit's upstream build configuration:
+
+| Component | License text | Source |
+|---|---|---|
+| HarfBuzz text shaping | `LICENSES/harfbuzz.txt` (Old MIT) | https://github.com/harfbuzz/harfbuzz |
+| ICU Unicode data and processing (binary reports ICU 74) | `LICENSES/icu.txt` (Unicode License v3) | https://github.com/unicode-org/icu |
+| FreeType fonts | `LICENSES/freetype.txt` (FreeType License) | https://gitlab.freedesktop.org/freetype/freetype |
+| libpng | `LICENSES/libpng.txt` (PNG Reference Library License) | https://github.com/pnggroup/libpng |
+| libjpeg-turbo / IJG JPEG | `LICENSES/libjpeg-turbo.txt`, `LICENSES/libjpeg-ijg.txt` (BSD-style and IJG terms) | https://github.com/libjpeg-turbo/libjpeg-turbo |
+| libwebp | `LICENSES/libwebp.txt` (BSD-3-Clause) | https://github.com/webmproject/libwebp |
+| Wuffs image decoding | `LICENSES/wuffs.txt` (MIT or Apache-2.0) | https://github.com/google/wuffs |
+| WOFF2 fonts | `LICENSES/woff2.txt` (MIT) | https://github.com/google/woff2 |
+| zlib | `LICENSES/zlib.txt` (zlib) | https://github.com/madler/zlib |
+| Emscripten-generated runtime | `LICENSES/emscripten.txt` (MIT or University of Illinois/NCSA) | https://github.com/emscripten-core/emscripten |
+
+The exact revisions of these libraries in the inherited CanvasKit binary
+have not been independently reconstructed; the top-level artifact is the
+official `canvaskit-wasm` 0.41.1 release.
 
 The source asset directory also retains the license files next to the fonts and
 CanvasKit artifacts. Versions and provenance above mirror

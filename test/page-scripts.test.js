@@ -30,6 +30,13 @@ beforeAll(async () => {
           headers: target.searchParams.has("allow") ? { "access-control-allow-origin": "*" } : {},
         });
       }
+      if (target.hostname === "api.github.com") {
+        return new Response(JSON.stringify(target.pathname.endsWith("/compare/HEAD...fork:main")
+          ? { ahead_by: 37, behind_by: 0 }
+          : { default_branch: "main" }), { headers: { "content-type": "application/json" } });
+      }
+      if (target.pathname === "/video.mp4") return new Response(Bun.file(new URL("./fixtures/video.mp4", import.meta.url)),
+        { headers: { "content-type": "video/mp4" } });
       const body = scripts.get(target.href);
       return body === undefined
         ? new Response("missing", { status: 404 })
@@ -119,6 +126,52 @@ test("focused text controls accept CDP text and fire input events", async () => 
   expect(await evaluate("document.getElementById('editor').value")).toBe("hell");
   await renderer.call("press", "!", { code: "Digit1", modifiers: 8 });
   expect(await evaluate("document.getElementById('editor').value")).toBe("hell!");
+});
+
+test("template content can be cloned and typed arrays are available", async () => {
+  await load(`<template id="card"><span>from template</span></template><div id="mount"></div>
+    <script>document.getElementById('mount').appendChild(document.getElementById('card').content.cloneNode(true));
+      document.getElementById('mount').dataset.number = new Float64Array([1.5])[0];</script>`);
+  expect(await evaluate("document.getElementById('mount').textContent")).toBe("from template");
+  expect(await evaluate("document.getElementById('mount').dataset.number")).toBe("1.5");
+});
+
+test("a GitHub fork branch placeholder shows the live comparison", async () => {
+  const embedded = JSON.stringify({ payload: {
+    codeViewLayoutRoute: { repo: { isFork: true, ownerLogin: "fork" } },
+    sidebarAbout: { repo: { parentRepo: { ownerLogin: "upstream", name: "repo" } } },
+    codeViewRepoRoute: { refInfo: { refType: "branch", name: "main" } },
+  } });
+  await load(`<div data-testid="branch-info-bar"><div class="Skeleton">&nbsp;</div></div>
+    <script type="application/json" data-target="react-app.embeddedData">${embedded}</script>`, "https://github.com/fork/repo");
+  for (let attempt = 0; attempt < 20; attempt++) {
+    if ((await evaluate("document.querySelector('[data-testid=branch-info-bar]').textContent")).includes("37 commits")) break;
+    await Bun.sleep(10);
+  }
+  expect(await evaluate("document.querySelector('[data-testid=branch-info-bar]').textContent"))
+    .toBe("This branch is 37 commits ahead of upstream/repo:main.");
+});
+
+test("a video plays frames and pauses when clicked", async () => {
+  await load(`<video src="/video.mp4" controls width="160" height="120"></video>`);
+  const bounds = await evaluate("document.querySelector('video').getBoundingClientRect().toJSON()");
+  const x = bounds.x + bounds.width / 2;
+  const y = bounds.y + bounds.height / 2;
+  const before = await renderer.call("screenshot");
+  expect(await evaluate("document.querySelector('video').paused")).toBeTrue();
+  await renderer.call("click", x, y);
+  expect(await evaluate("document.querySelector('video').paused")).toBeFalse();
+  const started = await renderer.call("screenshot");
+  await Bun.sleep(300);
+  const during = await renderer.call("screenshot");
+  expect(during).not.toBe(before);
+  expect(during).not.toBe(started);
+  expect(await evaluate("document.querySelector('video').currentTime > 0")).toBeTrue();
+  await renderer.call("click", x, y);
+  expect(await evaluate("document.querySelector('video').paused")).toBeTrue();
+  const paused = await renderer.call("screenshot");
+  await Bun.sleep(350);
+  expect(await renderer.call("screenshot")).toBe(paused);
 });
 
 test("fixed CSS marker stays at the same viewport position after scrolling", async () => {
