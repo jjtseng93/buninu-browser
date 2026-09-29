@@ -3,8 +3,117 @@
 **Buninu Browser is a browser engine written in JavaScript and WebAssembly for Bun.**
 
 Its first frontend is a headless shell intended to replace Chromium Headless
-Shell in Buninu Linux. The engine's userspace components can be inspected,
-modified, and executed directly as JavaScript and WebAssembly.
+Shell in [Buninu Linux](https://github.com/jjtseng93/buninu-linux). The
+engine's userspace components can be inspected, modified, and executed
+directly as JavaScript and WebAssembly.
+
+## Usage
+
+```sh
+# Install bun if you haven't
+npm i -g bun
+
+# Open casty's home page
+npx buninu-browser
+
+# Open a URL
+npx buninu-browser github.com
+
+# Arguments after -- go to the
+# browser engine; --mobile presents
+# it as a phone (mobile user agent,
+# phone-width layout)
+npx buninu-browser github.com \
+  -- --mobile
+
+# The engine alone, as a CDP
+# endpoint for any client
+npx buninu-browser --headless \
+  --remote-debugging-port=9222
+```
+
+The first run downloads this package
+(about 50 MB: fonts, CanvasKit and
+the video decoder), then the terminal
+frontend
+[`@drxiaozhi/casty`](https://www.npmjs.com/package/@drxiaozhi/casty)
+([source on GitHub](https://github.com/jjtseng93/casty)).
+npx asks before each install.
+
+The launcher sets `CASTY_BROWSER` to
+this package's `buninu-browser.js`
+and starts casty with `npx` when npx
+and Bun are both installed, otherwise
+with `bunx`, or `bun x`.
+
+The first argument picks a frontend;
+the rest is passed on:
+
+- `--casty`, or anything else: casty
+  in the terminal (the default; every
+  argument goes to casty)
+- `--headless`: the engine alone, as
+  a CDP endpoint
+- `--win32`, `--gtk`, `--appkit`,
+  `--qt`: native windowed frontends
+  (reserved, not implemented yet)
+- `--help`/`-h`, `--version`/`-V`,
+  `--readme`: this launcher's help,
+  version and backend details, and
+  this README
+
+casty's and the engine's options:
+`--casty --help`, `--headless --help`.
+
+### Requirements
+
+- [Bun](https://bun.sh) 1.4.2 or
+  later on `PATH`, also with npx:
+  the engine and casty run on Bun.
+- For casty, a terminal with the
+  [Kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/)
+  (kitty, Ghostty, WezTerm, Konsole):
+  casty draws pages as images.
+  `--headless` needs no terminal.
+
+### Updating
+
+npx keeps what it installed; remove
+the cached copies and the next start
+installs the latest versions (asking
+first). npx caches each package spec
+separately, so running
+`npx buninu-browser@latest` installs
+another copy instead of updating the
+one `npx buninu-browser` runs.
+
+```sh
+# List what npx installed: a key,
+# then the package it holds
+npm cache npx ls
+#   03ebb78f79e8ceae: buninu-browser
+#   0a9f496dd562f3e1: @drxiaozhi/casty
+
+# Remove both (npm 11 or later).
+# A key is a hash of the package
+# name, so these are the same on
+# every machine
+npm cache npx rm 03ebb78f79e8ceae \
+  0a9f496dd562f3e1
+
+# Or remove everything npx cached,
+# other tools' packages too
+npm cache npx rm --force
+
+# When casty runs through bunx or
+# bun x
+bun pm cache rm
+```
+
+With an older npm, delete the npx
+cache directory: `~/.npm/_npx`
+(Windows:
+`%LocalAppData%\npm-cache\_npx`).
 
 ## Why replace Chromium Headless Shell
 
@@ -21,45 +130,13 @@ without a native Chromium binary.
 Compatibility with casty is therefore part of the initial vertical slice
 rather than a later layer: CDP discovery, target lifecycle, navigation,
 screenshots and screencast, viewport, and input. Early development and every
-screen test so far have been done in casty itself. The
-[`test/chromium-headless-shell`](test/chromium-headless-shell) shim puts
-Buninu Browser where casty looks for Chromium:
+screen test so far have been done in casty itself. casty launches the
+browser named by `CASTY_BROWSER` before looking for Chromium, so a checkout
+of this repository runs next to a casty checkout with:
 
 ```sh
-PATH="$PWD/test:$PATH" bun ../casty/bin/casty.js buninu.org
+CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js buninu.org
 ```
-
-The package entry runs casty with Buninu Browser as its browser (it sets
-`CASTY_BROWSER` and starts casty with `npx` when npx and Bun are both
-installed, otherwise with `bunx`, or `bun x`). Its first argument
-chooses a frontend, and the remaining arguments are passed to it:
-
-| First argument | Frontend |
-|---|---|
-| `--casty`, or anything else | casty, in the terminal (the default; every argument goes to casty) |
-| `--headless` | the engine alone, as a CDP endpoint |
-| `--win32`, `--gtk`, `--appkit`, `--qt` | native windowed frontends (reserved, not implemented yet) |
-| `--help`/`-h`, `--version`/`-V`, `--readme` | this launcher's help, version and backend details, and README |
-
-casty's and the engine's own options are listed by `--casty --help` and
-`--headless --help`.
-
-```sh
-npx buninu-browser github.com -- --mobile
-npx buninu-browser --headless --remote-debugging-port=9222
-```
-
-Requirements:
-
-- [Bun](https://bun.sh) 1.4.2 or later on `PATH`, also when starting it
-  with npx: the engine and casty both run on Bun.
-- For the default casty frontend, a terminal with the
-  [Kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/)
-  (such as kitty, Ghostty, WezTerm or Konsole); casty draws the page as
-  images. `--headless` needs no terminal support.
-- The package is about 50 MB (fonts, CanvasKit and the video decoder), which
-  npx downloads on first use; casty is installed separately on first use and
-  asks before installing.
 
 ## Design
 
@@ -170,7 +247,7 @@ Renderers cannot open files under seccomp, so the controller collects their
 output and writes the log.
 
 ```sh
-BUNINU_LOG=1 PATH="$PWD/test:$PATH" bun ../casty/bin/casty.js github.com
+BUNINU_LOG=1 CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js github.com
 ```
 
 > [!WARNING]

@@ -148,3 +148,67 @@ test("preflights non-simple requests and strips forbidden headers", async () => 
   }, document)).rejects.toThrow("does not allow method DELETE");
   await expect(network.pageFetch({ url: "file:///etc/passwd" }, document)).rejects.toThrow("cannot load file:");
 });
+
+/** Opens a page WebSocket and resolves with how it ended. */
+function socketOutcome(socket) {
+  return new Promise((resolve) => {
+    socket.addEventListener("open", () => {
+      resolve("open");
+      socket.close();
+    });
+    socket.addEventListener("close", (event) => resolve(`closed ${event.code}`));
+  });
+}
+
+test("page WebSockets always send an Origin, null for opaque documents", async () => {
+  const origins = [];
+  const echo = Bun.serve({
+    port: 0,
+    fetch(request, server) {
+      origins.push(request.headers.get("origin"));
+      return server.upgrade(request) ? undefined : new Response("no", { status: 400 });
+    },
+    websocket: { message() {} },
+  });
+  try {
+    const network = new NetworkService({ fetch: async () => new Response("") });
+    for (const documentUrl of ["https://page.test/a", "data:text/html,x", "about:blank"]) {
+      expect(await socketOutcome(network.webSocket(`ws://127.0.0.1:${echo.port}/`, [], documentUrl))).toBe("open");
+    }
+    expect(origins).toEqual(["https://page.test", "null", "null"]);
+  } finally {
+    echo.stop(true);
+  }
+});
+
+test("a page cannot open the CDP endpoint, even from a data: or about:blank document", async () => {
+  const { CdpServer } = await import("../lib/cdp-server.js");
+  const cdp = new CdpServer({}).listen(0, "127.0.0.1");
+  try {
+    const network = new NetworkService({ fetch: async () => new Response("") });
+    const url = `ws://127.0.0.1:${cdp.port}/devtools/browser/cdp-server`;
+    for (const documentUrl of ["https://evil.test/", "data:text/html,x", "about:blank"]) {
+      expect(await socketOutcome(network.webSocket(url, [], documentUrl))).toBe("closed 1002");
+    }
+    // A client without an Origin (casty, Playwright) still connects.
+    expect(await socketOutcome(new WebSocket(url))).toBe("open");
+  } finally {
+    cdp.stop(true);
+  }
+});
+
+test("/json/new opens a target on PUT only", async () => {
+  const { CdpServer } = await import("../lib/cdp-server.js");
+  const cdp = new CdpServer({}).listen(0, "127.0.0.1");
+  try {
+    const base = `http://127.0.0.1:${cdp.port}`;
+    const get = await fetch(`${base}/json/new?about:blank`);
+    expect(get.status).toBe(405);
+    expect(await (await fetch(`${base}/json/list`)).json()).toEqual([]);
+    const put = await fetch(`${base}/json/new?about:blank`, { method: "PUT" });
+    expect(put.status).toBe(200);
+    expect((await put.json()).webSocketDebuggerUrl).toContain("/devtools/page/");
+  } finally {
+    cdp.stop(true);
+  }
+});
