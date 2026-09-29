@@ -3,12 +3,9 @@
   "version": "0.0.1",
   "description": "Buninu Browser is a browser engine written in JavaScript and WebAssembly for Bun.",
   "type": "module",
-  "main": "./buninu-browser.js",
-  "exports": {
-    ".": "./buninu-browser.js"
-  },
+  "main": "./index.js",
   "bin": {
-    "buninu-browser": "./buninu-browser.js"
+    "buninu-browser": "./index.js"
   },
   "license": "MIT",
   "engines": {

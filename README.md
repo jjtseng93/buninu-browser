@@ -29,6 +29,21 @@ Buninu Browser where casty looks for Chromium:
 PATH="$PWD/test:$PATH" bun ../casty/bin/casty.js buninu.org
 ```
 
+The package entry runs casty with Buninu Browser as its browser (it sets
+`CASTY_BROWSER` and starts casty with `bunx`, or `bun x`). Its first argument
+chooses a frontend, and the remaining arguments are passed to it:
+
+| First argument | Frontend |
+|---|---|
+| `--casty`, or anything else | casty, in the terminal (the default; every argument goes to casty) |
+| `--headless` | the engine alone, as a CDP endpoint |
+| `--win32`, `--gtk`, `--appkit`, `--qt` | native windowed frontends (reserved, not implemented yet) |
+
+```sh
+bunx buninu-browser github.com -- --mobile
+bunx buninu-browser --headless --remote-debugging-port=9222
+```
+
 ## Design
 
 Future Win32, GTK, Android, and other windowed frontends should remain thin
