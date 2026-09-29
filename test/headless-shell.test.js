@@ -48,6 +48,14 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       if (pathname === "/pixel.png") {
         return new Response(pixelPng, { headers: { "Content-Type": "image/png" } });
       }
+      if (pathname === "/editor") {
+        return new Response(`<!doctype html><textarea id="editor" style="width:180px;height:60px"></textarea><p id="result"></p>
+          <script>document.getElementById('editor').addEventListener('input', () => {
+            document.getElementById('result').textContent = document.getElementById('editor').value;
+          })</script>`, {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        });
+      }
       if (["/image", "/broken-image", "/data-image", "/dynamic-data-image"].includes(pathname)) {
         const dataUrl = `data:image/png;base64,${pixelPng.toString("base64")}`;
         const src = pathname === "/image" ? "/pixel.png" : pathname === "/data-image" ? dataUrl : "/missing.png";
@@ -145,6 +153,12 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await Bun.sleep(150);
     const withDynamicDataImage = await view.screenshot({ encoding: "buffer", format: "png" });
     expect(Bun.hash(withDynamicDataImage)).toBe(Bun.hash(withImage));
+    await view.navigate(`http://127.0.0.1:${fixture.port}/editor`);
+    const editorRect = await view.evaluate("document.getElementById('editor').getBoundingClientRect().toJSON()");
+    await view.cdp("Input.dispatchMouseEvent", { type: "mousePressed", x: editorRect.x + 10, y: editorRect.y + 10, button: "left", clickCount: 1 });
+    await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", x: editorRect.x + 10, y: editorRect.y + 10, button: "left", clickCount: 1 });
+    await view.cdp("Input.insertText", { text: "hello" });
+    expect(await view.evaluate("document.getElementById('result').textContent")).toBe("hello");
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     expect(await view.evaluate("scrollY")).toBe(0);

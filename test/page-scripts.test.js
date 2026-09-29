@@ -88,6 +88,39 @@ test("scripts change the DOM and the next screenshot shows it", async () => {
   expect(await renderer.call("screenshot")).not.toBe(scripted);
 });
 
+test("clicking a text area focuses it and sends keyboard events to it", async () => {
+  await load(`<textarea id="controls" style="width:180px;height:60px">Focus me</textarea><p id="result">waiting</p>
+    <script>document.getElementById('controls').addEventListener('keydown', event => {
+      event.preventDefault(); document.getElementById('result').textContent = event.key + (event.ctrlKey ? ':ctrl' : '');
+    });</script>`);
+  expect(await evaluate("document.activeElement.tagName")).toBe("BODY");
+  const rect = await evaluate("document.getElementById('controls').getBoundingClientRect().toJSON() ");
+  await renderer.call("click", rect.x + 10, rect.y + 10);
+  expect(await evaluate("document.activeElement.id")).toBe("controls");
+  await renderer.call("press", "ArrowRight");
+  expect(await evaluate("document.getElementById('result').textContent")).toBe("ArrowRight");
+  await renderer.call("press", "r", { code: "KeyR", modifiers: 2 });
+  expect(await evaluate("document.getElementById('result').textContent")).toBe("r:ctrl");
+  await evaluate("document.getElementById('controls').blur()");
+  expect(await evaluate("document.activeElement.tagName")).toBe("BODY");
+});
+
+test("focused text controls accept CDP text and fire input events", async () => {
+  await load(`<textarea id="editor" style="width:180px;height:60px"></textarea><p id="result"></p>
+    <script>document.getElementById('editor').addEventListener('input', event => {
+      document.getElementById('result').textContent = event.target.value;
+    });</script>`);
+  const rect = await evaluate("document.getElementById('editor').getBoundingClientRect().toJSON()");
+  await renderer.call("click", rect.x + 10, rect.y + 10);
+  await renderer.call("type", "hello");
+  expect(await evaluate("document.getElementById('editor').value")).toBe("hello");
+  expect(await evaluate("document.getElementById('result').textContent")).toBe("hello");
+  await renderer.call("press", "Backspace");
+  expect(await evaluate("document.getElementById('editor').value")).toBe("hell");
+  await renderer.call("press", "!", { code: "Digit1", modifiers: 8 });
+  expect(await evaluate("document.getElementById('editor').value")).toBe("hell!");
+});
+
 test("fixed CSS marker stays at the same viewport position after scrolling", async () => {
   await load(`<div style="height:1000px"></div>`);
   const plain = await renderer.call("screenshot");
