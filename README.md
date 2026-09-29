@@ -30,7 +30,8 @@ PATH="$PWD/test:$PATH" bun ../casty/bin/casty.js buninu.org
 ```
 
 The package entry runs casty with Buninu Browser as its browser (it sets
-`CASTY_BROWSER` and starts casty with `bunx`, or `bun x`). Its first argument
+`CASTY_BROWSER` and starts casty with `npx` when npx and Bun are both
+installed, otherwise with `bunx`, or `bun x`). Its first argument
 chooses a frontend, and the remaining arguments are passed to it:
 
 | First argument | Frontend |
@@ -38,11 +39,27 @@ chooses a frontend, and the remaining arguments are passed to it:
 | `--casty`, or anything else | casty, in the terminal (the default; every argument goes to casty) |
 | `--headless` | the engine alone, as a CDP endpoint |
 | `--win32`, `--gtk`, `--appkit`, `--qt` | native windowed frontends (reserved, not implemented yet) |
+| `--help`/`-h`, `--version`/`-V`, `--readme` | this launcher's help, version and backend details, and README |
+
+casty's and the engine's own options are listed by `--casty --help` and
+`--headless --help`.
 
 ```sh
-bunx buninu-browser github.com -- --mobile
-bunx buninu-browser --headless --remote-debugging-port=9222
+npx buninu-browser github.com -- --mobile
+npx buninu-browser --headless --remote-debugging-port=9222
 ```
+
+Requirements:
+
+- [Bun](https://bun.sh) 1.4.2 or later on `PATH`, also when starting it
+  with npx: the engine and casty both run on Bun.
+- For the default casty frontend, a terminal with the
+  [Kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/)
+  (such as kitty, Ghostty, WezTerm or Konsole); casty draws the page as
+  images. `--headless` needs no terminal support.
+- The package is about 50 MB (fonts, CanvasKit and the video decoder), which
+  npx downloads on first use; casty is installed separately on first use and
+  asks before installing.
 
 ## Design
 

@@ -6,6 +6,7 @@
  * Keep import-time behavior side-effect free. CLI startup belongs behind the
  * import.meta.main guard so tests and embedders can import the same file.
  */
+import packageInfo from "./package.json" with { type: "json" };
 
 export {
   CdpServer,
@@ -26,13 +27,14 @@ export { computeElementStyle, parseDeclarations, StyleEngine } from "./lib/style
 export { RenderTreeBuilder, renderTreeText } from "./lib/render-tree/index.js";
 
 export async function main(args = Bun.argv.slice(2)) {
-  if (args.includes("--version")) {
-    console.log("buninu-browser 0.0.0");
+  const has = (...names) => names.some((name) => args.includes(name));
+  if (has("--version", "-V", "-version")) {
+    console.log(`buninu-browser ${packageInfo.version}`);
     return 0;
   }
 
-  if (args.includes("--help")) {
-    console.log(`Buninu Browser 0.0.0
+  if (has("--help", "-h", "-help")) {
+    console.log(`Buninu Browser ${packageInfo.version}
 
 Usage: buninu-browser [options]
 
@@ -43,8 +45,8 @@ Options:
   --mobile                        Present as a phone: mobile user agent and touch media
                                   features (hover: none, pointer: coarse); user agent
                                   overrides over CDP are ignored
-  --version                       Print the version
-  --help                          Print this help
+  --version, -V                   Print the version
+  --help, -h                      Print this help
 
 Environment:
   BUNINU_LOG=1                    Also log to ./buninu-browser.log (page errors,
