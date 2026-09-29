@@ -83,14 +83,15 @@ casty's and the engine's options:
 
 ### Updating
 
-npx keeps what it installed; remove
-the cached copies and the next start
-installs the latest versions (asking
-first). npx caches each package spec
-separately, so running
-`npx buninu-browser@latest` installs
-another copy instead of updating the
-one `npx buninu-browser` runs.
+npx checks the registry on each start
+and installs a newer buninu-browser
+or casty by itself; only the first
+install asks. casty prints its
+version on the last line when it
+exits.
+
+To reinstall from scratch, remove
+the cached copies:
 
 ```sh
 # npm 11 or later.

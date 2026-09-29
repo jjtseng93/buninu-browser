@@ -31,9 +31,7 @@ import packageInfo from "./package.json" with { type: "json" };
 
 export * from "./buninu-browser.js";
 
-// The package's executable is "casty", not its scoped name, so it is named explicitly.
 const CASTY_PACKAGE = "@drxiaozhi/casty";
-const CASTY = ["-p", CASTY_PACKAGE, "casty"];
 const ENGINE = join(import.meta.dir, "buninu-browser.js");
 const RESERVED_FRONTENDS = new Set(["--win32", "--gtk", "--appkit", "--qt"]);
 const INFORMATION = new Map([
@@ -60,10 +58,11 @@ export function castyCommand(args, which = Bun.which) {
   const npx = which("npx");
   const bun = which("bun");
   // npx asks before installing casty (on purpose); --loglevel=error keeps npm
-  // notices off casty's screen.
+  // notices off casty's screen. Its executable is "casty", not the scoped
+  // package name, so npx is told which one to run.
   if (npx && bun) return [npx, "--loglevel=error", "-p", CASTY_PACKAGE, "--", "casty", ...args];
   const bunx = which("bunx");
-  return bunx ? [bunx, ...CASTY, ...args] : [bun ?? process.argv0, "x", ...CASTY, ...args];
+  return bunx ? [bunx, CASTY_PACKAGE, ...args] : [bun ?? process.argv0, "x", CASTY_PACKAGE, ...args];
 }
 
 export function usage(name = packageInfo.name) {
@@ -102,7 +101,6 @@ Examples:
 }
 
 function printVersion() {
-  const casty = castyCommand([]);
   console.log(`${packageInfo.name}:`, packageInfo.description);
   console.log("  Made by: Dr. John (醫者小智)");
   console.log("");
@@ -110,7 +108,7 @@ function printVersion() {
   console.log("Runtime:", `Bun ${Bun.version}`);
   console.log("Platform:", `${process.platform}-${process.arch}`);
   console.log("Engine:", ENGINE);
-  console.log("casty launcher:", casty.slice(0, casty.indexOf("casty") + 1).join(" "));
+  console.log("casty launcher:", castyCommand([]).join(" "));
   console.log("Frontends: casty (default), headless; reserved: win32, gtk, appkit, qt");
 }
 

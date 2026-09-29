@@ -17,7 +17,7 @@ test("the first argument picks the frontend; anything else goes to casty whole",
 });
 
 test("casty runs with npx when npx and bun exist, else bunx, else bun x", () => {
-  const casty = ["-p", "@drxiaozhi/casty", "casty"];
+  const casty = ["@drxiaozhi/casty"];
   const all = (name) => `/bin/${name}`;
   expect(castyCommand(["a", "--", "--mobile"], all))
     .toEqual(["/bin/npx", "--loglevel=error", "-p", "@drxiaozhi/casty", "--", "casty", "a", "--", "--mobile"]);
