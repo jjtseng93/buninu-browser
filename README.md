@@ -15,7 +15,7 @@ directly as JavaScript and WebAssembly.
 ## Usage
 
 ```sh
-# Install bun if you haven't
+# Install Bun if you don't have it
 npm i -g bun
 
 # Open casty's home page
@@ -93,16 +93,16 @@ another copy instead of updating the
 one `npx buninu-browser` runs.
 
 ```sh
+# npm 11 or later.
 # List what npx installed: a key,
 # then the package it holds
 npm cache npx ls
 #   03ebb78f79e8ceae: buninu-browser
 #   0a9f496dd562f3e1: @drxiaozhi/casty
 
-# Remove both (npm 11 or later).
-# A key is a hash of the package
-# name, so these are the same on
-# every machine
+# Remove both. A key is a hash of
+# the package name, so these are
+# the same on every machine
 npm cache npx rm 03ebb78f79e8ceae \
   0a9f496dd562f3e1
 
@@ -165,9 +165,11 @@ It implements its own browser lifecycle, rendering pipeline, process model,
 layout integration, and automation interface while building on selected
 open-source implementations of web standards.
 
-The top-level [`buninu-browser.js`](buninu-browser.js) is both the executable
-and public module entry. Its CLI startup is guarded by `import.meta.main`, so
-importing the package does not start a browser process or CDP listener.
+The package entry [`index.js`](index.js) is the `npx buninu-browser`
+launcher and re-exports the engine's API. The engine itself is
+[`buninu-browser.js`](buninu-browser.js), which `--headless` runs. Both keep
+their command lines behind `import.meta.main`, so importing the package does
+not start a browser process or CDP listener.
 
 ### Page sandbox
 

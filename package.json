@@ -2,10 +2,35 @@
   "name": "buninu-browser",
   "version": "0.0.1",
   "description": "Buninu Browser is a browser engine written in JavaScript and WebAssembly for Bun.",
+  "keywords": [
+    "buninu",
+    "buninu-linux",
+    "browser",
+    "browser-engine",
+    "headless-browser",
+    "bun",
+    "javascript",
+    "webassembly",
+    "wasm",
+    "cdp",
+    "chrome-devtools-protocol",
+    "casty",
+    "terminal",
+    "tty",
+    "kitty"
+  ],
   "type": "module",
   "main": "./index.js",
   "bin": {
     "buninu-browser": "./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jjtseng93/buninu-browser.git"
+  },
+  "homepage": "https://github.com/jjtseng93/buninu-browser#readme",
+  "bugs": {
+    "url": "https://github.com/jjtseng93/buninu-browser/issues"
   },
   "license": "MIT",
   "engines": {
