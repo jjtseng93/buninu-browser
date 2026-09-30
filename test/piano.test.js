@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { PIANO_KEYS, PIANO_DO, pianoNote, pianoTone } from "../lib/audio/piano.js";
+import { PIANO_KEYS, PIANO_DO, pianoNote, pianoTone, PianoMixer } from "../lib/audio/piano.js";
 
 test("piano keyboard mapping is editable in one table", () => {
   expect(Object.keys(PIANO_KEYS)).toHaveLength(61);
@@ -36,4 +36,30 @@ test("piano tone is 48 kHz mono PCM with a nonzero, decaying sound", () => {
   let lowPeak = 0;
   for (let i = 1000; i < 2000; i++) lowPeak = Math.max(lowPeak, Math.abs(lowView.getInt16(i * 2, true)));
   expect(lowPeak).toBeGreaterThan(peak(1000, 2000));
+});
+
+test("piano mixer keeps notes continuous across requests and limits chords", () => {
+  const one = new PianoMixer();
+  one.trigger(69);
+  const first = one.render(4096);
+  const second = one.render(4096);
+  const reference = pianoTone(69);
+  expect(first.byteLength).toBe(4096);
+  expect(second.byteLength).toBe(4096);
+  const combined = new Uint8Array(8192);
+  combined.set(first);
+  combined.set(second, 4096);
+  expect(combined.some((value) => value !== 0)).toBe(true);
+  const uninterrupted = new PianoMixer();
+  uninterrupted.trigger(69);
+  expect(combined).toEqual(uninterrupted.render(8192));
+  expect(reference.byteLength).toBeGreaterThan(combined.byteLength);
+  const chord = new PianoMixer();
+  for (const note of [69, 73, 76, 81]) chord.trigger(note);
+  const pcm = chord.render(8192);
+  const view = new DataView(pcm.buffer);
+  let peak = 0;
+  for (let i = 0; i < pcm.byteLength; i += 2) peak = Math.max(peak, Math.abs(view.getInt16(i, true)));
+  expect(peak).toBeGreaterThan(1000);
+  expect(peak).toBeLessThan(32767);
 });
