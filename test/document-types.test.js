@@ -25,22 +25,22 @@ test("bunmsh serve's formats get its preview under a Pretty-print checkbox, chec
   const toml = show("https://x.test/Cargo.toml", "application/toml", 'name = "buninu"\n').source;
   expect(toml).toContain('<input type="checkbox" id="pretty-print" checked> Pretty-print');
   expect(toml).toContain('<a class="download" href="https://x.test/Cargo.toml" download>Download</a>');
-  expect(toml).toContain("<title>Cargo.toml — bun.toml.parse</title>");
-  expect(toml).toContain("(bun.toml.parse)");
+  expect(toml).toContain("<title>Cargo.toml — Bun.TOML.parse</title>");
+  expect(toml).toContain("(Bun.TOML.parse)");
   expect(toml).toContain('<span class="json-statement">&quot;name&quot;:</span> <span class="json-string">&quot;buninu&quot;</span>');
   expect(toml).toContain('<pre id="raw" hidden>name = &quot;buninu&quot;');
   // The extension decides first, as in serve.js (it sends octet-stream for .jsonc and .jsonl).
-  expect(show("https://x.test/a.jsonc", "application/octet-stream", '{ "a": 1, // c\n}').source).toContain("(bun.jsonc.parse)");
-  expect(show("https://x.test/l.ndjson", "application/octet-stream", '{"a":1}\n').source).toContain("(bun.jsonl.parse)");
+  expect(show("https://x.test/a.jsonc", "application/octet-stream", '{ "a": 1, // c\n}').source).toContain("(Bun.JSONC.parse)");
+  expect(show("https://x.test/l.ndjson", "application/octet-stream", '{"a":1}\n').source).toContain("(Bun.JSONL.parse)");
   expect(show("https://x.test/c.yml", "text/yaml", "a: [1, true]").source).toContain('<span class="json-constant">true</span>');
-  expect(show("https://x.test/f.xml", "application/xml", '<a x="1"><b>hi</b></a>').source).toContain("(bun.xml.parse)");
+  expect(show("https://x.test/f.xml", "application/xml", '<a x="1"><b>hi</b></a>').source).toContain("(Bun.XML.parse)");
   // Markdown is rendered by Bun.markdown.html with headings.
   const md = show("https://x.test/README.md", "text/markdown", "# Title\n\n- item").source;
-  expect(md).toContain("(bun.markdown.html)");
+  expect(md).toContain("(Bun.markdown.html)");
   expect(md).toContain('<div id="formatted"><h1 id="title"><a href="#title">Title</a></h1>');
   expect(md).toContain('<pre id="raw" hidden># Title');
   // Without a known extension, the Content-Type names the format.
-  expect(show("https://x.test/api", "application/vnd.api+json", '{"x":null}').source).toContain("(json.parse)");
+  expect(show("https://x.test/api", "application/vnd.api+json", '{"x":null}').source).toContain("(JSON.parse)");
   expect(show("https://x.test/doc", "text/markdown", "*a*").source).toContain("<em>a</em>");
   // What cannot be parsed is shown as serve.js reports it, with the text below.
   const bad = show("https://x.test/b.json", "application/json", "{nope").source;
