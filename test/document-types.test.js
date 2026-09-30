@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { displayDocument, highlightJson, parseContentType } from "../lib/document-types.js";
+import { audioDemoDocument, displayDocument, highlightJson, parseContentType } from "../lib/document-types.js";
 
 const bytes = (text) => new TextEncoder().encode(text);
 const show = (url, contentType, body) => displayDocument({ url, contentType, body: typeof body === "string" ? bytes(body) : body });
@@ -72,6 +72,17 @@ test("video and audio get a media document playing the URL itself", () => {
   expect(audio).toContain('id="buninu-piano-input"');
   expect(video).not.toContain('id="buninu-piano-input"');
   expect(show("https://x.test/tone.wav", "audio/wav", new Uint8Array(3)).source).not.toContain('id="buninu-piano-input"');
+});
+
+test("about:audio has a CSS piano and a focused-play input", () => {
+  const demo = audioDemoDocument();
+  expect(demo.contentType).toBe("text/html");
+  expect(demo.source).toContain('<div class="keyboard"');
+  expect(demo.source.match(/class="white-key"/g)).toHaveLength(8);
+  expect(demo.source.match(/class="black-key"/g)).toHaveLength(5);
+  expect(demo.source).toContain('class="black-key" data-piano-note="73"');
+  expect(demo.source).toContain('id="buninu-piano-input"');
+  expect(demo.source).toContain('Play Piano · 彈鋼琴 · ピアノを弾く');
 });
 
 test("content type parsing and JSON highlighting", () => {

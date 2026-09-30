@@ -112,6 +112,20 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
       height: 240,
     });
     await view.resize(480, 240);
+    await view.resize(480, 500);
+    await view.navigate("about:audio");
+    expect(view.url).toBe("about:audio");
+    expect(await view.evaluate("document.getElementById('buninu-piano-input').placeholder"))
+      .toBe("Play Piano · 彈鋼琴 · ピアノを弾く");
+    const blackWidths = await view.evaluate("[...document.querySelectorAll('.black-key')].map(key => key.getBoundingClientRect().width)");
+    expect(new Set(blackWidths).size).toBe(1);
+    const demoKey = await view.evaluate("document.querySelector('[data-piano-note=\"69\"]').getBoundingClientRect().toJSON()");
+    await view.cdp("Input.dispatchMouseEvent", { type: "mousePressed", x: demoKey.x + demoKey.width / 2,
+      y: demoKey.y + demoKey.height - 15, button: "left", clickCount: 1 });
+    await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", x: demoKey.x + demoKey.width / 2,
+      y: demoKey.y + demoKey.height - 15, button: "left", clickCount: 1 });
+    expect(await view.evaluate("document.activeElement.id")).toBe("buninu-piano-input");
+    await view.resize(480, 240);
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     // The inline script runs (in the page sandbox) and renames the document.

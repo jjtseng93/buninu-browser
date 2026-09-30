@@ -54,6 +54,17 @@ test("left+right and top+bottom stretch an absolute box, percentages use the con
   expect(box(".half")).toMatchObject({ x: 50, y: 50 });
 });
 
+test("absolute percentage width uses the full containing block after a left inset", () => {
+  const { box } = render(
+    `<div class="frame"><div class="first"></div><div class="second"></div></div>`,
+    `.frame { position:relative; width:200px; height:100px }
+     .first, .second { position:absolute; top:0; width:10%; height:20px }
+     .first { left:10% } .second { left:70% }`,
+  );
+  expect(box(".first")).toEqual({ x: 20, y: 0, width: 20, height: 20 });
+  expect(box(".second")).toEqual({ x: 140, y: 0, width: 20, height: 20 });
+});
+
 test("relative offsets and translate move a box and its content without affecting siblings", () => {
   const { box, layout } = render(
     `<div class="moved">text</div><div class="next">after</div><div class="centered"></div>`,
