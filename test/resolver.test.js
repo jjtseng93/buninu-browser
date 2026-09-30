@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { fetchResolved, HostResolver } from "../lib/network/resolver.js";
+import { fetchResolved, HostResolver, isLocalhostName } from "../lib/network/resolver.js";
 
 const lookupFrom = (table, calls = []) => async (name, { family }) => {
   calls.push(`${name}/${family}`);
@@ -48,4 +48,15 @@ test("connects to the address with the host name in Host and TLS, falling back o
   expect(seen[0].url).toBe("http://[::1]/");
   const failing = async () => { throw Object.assign(new Error("bad cert"), { code: "ERR_TLS_CERT_ALTNAME_INVALID" }); };
   await expect(fetchResolved(failing, resolver, "https://a.test/", {})).rejects.toThrow("bad cert");
+});
+
+test("localhost names are loopback without a lookup (no /etc/hosts needed)", async () => {
+  const resolver = new HostResolver({ lookup: async () => { throw Object.assign(new Error("no hosts"), { code: "ENOTFOUND" }); } });
+  const loopback = [{ address: "127.0.0.1", family: 4 }, { address: "::1", family: 6 }];
+  for (const name of ["localhost", "LocalHost", "localhost.", "app.localhost", "a.b.localhost."]) {
+    expect(await resolver.addresses(name)).toEqual(loopback);
+  }
+  for (const name of ["localhost.com", "notlocalhost", "localhost..", "my-localhost"]) {
+    expect(isLocalhostName(name)).toBe(false);
+  }
 });

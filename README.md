@@ -22,7 +22,7 @@ npm i -g bun
 npx buninu-browser
 
 # Open a URL
-npx buninu-browser github.com
+npx buninu-browser buninu.org
 
 # Arguments after -- go to the
 # browser engine; --mobile presents
