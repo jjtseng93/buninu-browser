@@ -34,3 +34,53 @@ test.skipIf(!serverRunning)("plays a stream through the PulseAudio server on 127
 test("connecting without a server fails with an error, not a hang", async () => {
   await expect(PulseClient.connect({ port: 1 })).rejects.toThrow();
 });
+
+test("audio is sent in whole frames, so stereo channels never swap", async () => {
+  // A minimal server: replies to every command, grants odd-sized requests, records audio frame sizes.
+  const sizes = [];
+  const { createServer } = await import("node:net");
+  const server = createServer((socket) => {
+    let buffer = Buffer.alloc(0);
+    const reply = (tag, extra = []) => {
+      const body = Buffer.from([0x4c, 0, 0, 0, 2, 0x4c, ...u32(tag), ...extra]);
+      socket.write(Buffer.concat([header(body.length, 0xffffffff), body]));
+    };
+    socket.on("data", (chunk) => {
+      buffer = Buffer.concat([buffer, chunk]);
+      while (buffer.length >= 20 && buffer.length >= 20 + buffer.readUInt32BE(0)) {
+        const length = buffer.readUInt32BE(0);
+        const channel = buffer.readUInt32BE(4);
+        const body = buffer.subarray(20, 20 + length);
+        buffer = buffer.subarray(20 + length);
+        if (channel !== 0xffffffff) {
+          sizes.push(length);
+          continue;
+        }
+        const command = body.readUInt32BE(1);
+        const tag = body.readUInt32BE(6);
+        if (command === 3) reply(tag, [0x4c, ...u32(1), 0x4c, ...u32(1), 0x4c, ...u32(9003)]); // odd request, enough for a 40 ms packet
+        else reply(tag);
+      }
+    });
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const client = await PulseClient.connect({ port: server.address().port });
+  const stream = await client.openPlayback({ rate: 48000, channels: 2 });
+  stream.write(new Uint8Array(4 * 4000));
+  await Bun.sleep(100);
+  expect(sizes.length).toBeGreaterThan(0);
+  expect(sizes.every((size) => size % 4 === 0)).toBeTrue();
+  client.close();
+  server.close();
+});
+
+function u32(value) {
+  return [(value >>> 24) & 255, (value >>> 16) & 255, (value >>> 8) & 255, value & 255];
+}
+
+function header(length, channel) {
+  const out = Buffer.alloc(20);
+  out.writeUInt32BE(length, 0);
+  out.writeUInt32BE(channel, 4);
+  return out;
+}
