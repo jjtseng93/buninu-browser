@@ -387,6 +387,7 @@ test("page-inserted scripts run; innerHTML scripts do not; on* handlers fire", a
     const external = document.createElement('script');
     external.src = '/dynamic.js';
     external.onload = () => log.push('external onload');
+    external.onerror = () => log.push('external onerror');
     document.head.appendChild(external);
     const inline = document.createElement('script');
     inline.textContent = "log.push('inline ran during insertion')";

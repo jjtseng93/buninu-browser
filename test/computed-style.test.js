@@ -43,6 +43,15 @@ test("inline declarations validate values and preserve important priority", () =
   window.happyDOM.abort();
 });
 
+test("light-dark colors follow the element's color scheme", () => {
+  const { document, window } = parseHTMLDocument(`<div id="light" style="color-scheme: light dark; background: light-dark(#eee, #222)"><span id="child" style="color: light-dark(black, white)">text</span></div><div id="dark" style="background-color: light-dark(#eee, #222); color-scheme: only dark"></div>`);
+  const engine = new StyleEngine().compute(document);
+  expect(engine.get(document.getElementById("light")).backgroundColor).toBe("rgba(238, 238, 238, 1)");
+  expect(engine.get(document.getElementById("child")).color).toBe("rgba(0, 0, 0, 1)");
+  expect(engine.get(document.getElementById("dark")).backgroundColor).toBe("rgba(34, 34, 34, 1)");
+  window.happyDOM.abort();
+});
+
 test("display none removes a subtree and inline white-space reaches layout input", () => {
   const { document, window } = parseHTMLDocument(`<body>
     <div style="display:none">hidden</div>

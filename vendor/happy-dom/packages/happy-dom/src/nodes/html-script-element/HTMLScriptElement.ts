@@ -566,16 +566,7 @@ export default class HTMLScriptElement extends HTMLElement {
 			browserSettings &&
 			(browserSettings.disableJavaScriptFileLoading || !browserSettings.enableJavaScriptEvaluation)
 		) {
-			if (browserSettings.handleDisabledFileLoadingAsSuccess) {
-				this.dispatchEvent(new Event('load'));
-			} else {
-				const error = new window.DOMException(
-					`Failed to load module "${url}". JavaScript file loading is disabled.`,
-					DOMExceptionNameEnum.notSupportedError
-				);
-				browserFrame.page.console.error(error);
-				this.dispatchEvent(new Event('error'));
-			}
+			// The renderer owns script fetching and dispatches load/error after execution.
 			return;
 		}
 
@@ -647,16 +638,7 @@ export default class HTMLScriptElement extends HTMLElement {
 			browserSettings &&
 			(browserSettings.disableJavaScriptFileLoading || !browserSettings.enableJavaScriptEvaluation)
 		) {
-			if (browserSettings.handleDisabledFileLoadingAsSuccess) {
-				this.dispatchEvent(new Event('load'));
-			} else {
-				const error = new window.DOMException(
-					`Failed to load script "${absoluteURL}". JavaScript file loading is disabled.`,
-					DOMExceptionNameEnum.notSupportedError
-				);
-				browserFrame.page.console.error(error);
-				this.dispatchEvent(new Event('error'));
-			}
+			// The renderer owns script fetching and dispatches load/error after execution.
 			return;
 		}
 
