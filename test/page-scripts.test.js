@@ -550,3 +550,16 @@ test("UI event constructors, table rows/cells and select options are available",
       out.push(key.key + ':' + key.code + ':' + key.repeat);</script>`);
   expect(await evaluate("JSON.stringify(out)")).toBe(JSON.stringify([2, 1, 2, 1, 1, "THEAD", 2, 1, "y", "x", true, "click:5:true:false", true, "Enter:Enter:true"]));
 });
+
+test("labels and unchecked checkboxes are clickable; each click toggles once, as in Chromium", async () => {
+  await load(`<label id="l" style="display:block"><input type="checkbox" id="c"> Label text</label>
+    <script>var changes = 0; document.getElementById('c').addEventListener('change', () => changes++);</script>`);
+  const rect = async (id) => JSON.parse(await evaluate(`JSON.stringify(document.getElementById('${id}').getBoundingClientRect())`));
+  const box = await rect("c");
+  // The unchecked box has no text; it is hit over its whole box.
+  await renderer.call("click", box.left + box.width / 2, box.top + box.height / 2);
+  expect(await evaluate("[document.getElementById('c').checked, changes].join()")).toBe("true,1");
+  const label = await rect("l");
+  await renderer.call("click", label.left + label.width - 5, label.top + label.height / 2);
+  expect(await evaluate("[document.getElementById('c').checked, changes].join()")).toBe("false,2");
+});

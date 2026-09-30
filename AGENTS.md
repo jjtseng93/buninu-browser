@@ -7,6 +7,14 @@
   * Specifically, able to work with ../casty through CDP is an important goal
 - Only use Bun FFI to dlopen libc when other methods are clearly not enough
 
+## Viewing files
+- No file is unviewable: every response the browser navigates to must show something, never a "cannot be shown" page
+  * HTML is shown as itself; images and video/audio get a generated page like Chromium's standalone image and media documents
+  * The formats bunmsh `serve` previews (md, json, json5, jsonc, jsonl, ndjson, yaml, yml, toml, xml) get its preview under a "Pretty-print" checkbox, checked by default; unchecked shows the raw text
+  * Everything else, binary included, is shown as text
+  * Large files must not stall the renderer: past a size limit only their start is shown (and previews fall back to the text), with a bar at the top that says so and points to `download`
+  * See `lib/document-types.js`; `download` still saves the response's original bytes
+
 ## Bun
 - Bun doesn't have `bun --check`
 - Bun has many built-in functions; use/check them first before implementing your own

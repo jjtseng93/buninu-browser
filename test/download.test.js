@@ -39,9 +39,9 @@ test("the current document's raw bytes stay available for Page.getResourceConten
 test("CDP Page.getResourceContent returns the bytes base64-encoded", async () => {
   const { CdpServer } = await import("../lib/cdp-server.js");
   const body = new Uint8Array([0, 1, 2, 255]);
-  const cdp = new CdpServer({ resourceContent: (url) => url === "https://x.test/f" ? { body } : null }).listen(0, "127.0.0.1");
+  const cdp = new CdpServer({ resourceContent: (url) => url === "https://x.test/f" ? { body, contentType: "image/png" } : null }).listen(0, "127.0.0.1");
   try {
-    const target = await (await fetch(`http://127.0.0.1:${cdp.port}/json/new?about:blank`, { method: "PUT" })).json();
+    const target = await (await fetch(`http://127.0.0.1:${cdp.port}/json/new?https://x.test/f`, { method: "PUT" })).json();
     const socket = new WebSocket(target.webSocketDebuggerUrl);
     await new Promise((resolve) => socket.addEventListener("open", resolve));
     const call = (id, method, params) => new Promise((resolve) => {
@@ -51,6 +51,8 @@ test("CDP Page.getResourceContent returns the bytes base64-encoded", async () =>
       });
       socket.send(JSON.stringify({ id, method, params }));
     });
+    // The frame reports the document's own type, not the HTML shown for it.
+    expect((await call(0, "Page.getFrameTree", {})).result.frameTree.frame).toMatchObject({ url: "https://x.test/f", mimeType: "image/png" });
     expect((await call(1, "Page.getResourceContent", { frameId: target.id, url: "https://x.test/f" })).result)
       .toEqual({ content: "AAEC/w==", base64Encoded: true });
     expect((await call(2, "Page.getResourceContent", { frameId: target.id, url: "https://x.test/g" })).error?.message)

@@ -148,3 +148,14 @@ test("a calc() max-width with a percentage caps a flex item's automatic minimum 
   expect(rect("#a")).toMatchObject({ left: 0, width: 200 });
   done();
 });
+
+test("justify-content distributes a column container's extra height (min-height taller than the items)", () => {
+  const cases = { center: [40, 50], "flex-end": [80, 90], "space-between": [0, 90], "space-evenly": [26.666, 63.333], normal: [0, 10] };
+  for (const [justify, [first, second]] of Object.entries(cases)) {
+    const { rect, done } = flex(`<div id="root"><div id="a"></div><div id="b"></div></div>`,
+      `#root { display:flex; flex-direction:column; min-height:100px; justify-content:${justify} } #a, #b { height:10px }`);
+    expect(rect("#a").top).toBeCloseTo(first, 2);
+    expect(rect("#b").top).toBeCloseTo(second, 2);
+    done();
+  }
+});
