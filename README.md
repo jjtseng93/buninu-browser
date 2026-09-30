@@ -35,7 +35,17 @@ npx buninu-browser github.com \
 # endpoint for any client
 npx buninu-browser --headless \
   --remote-debugging-port=9222
+
+# capture a page and exit
+npx buninu-browser --headless --screenshot=page.png \
+  --window-size=1280,800 https://example.com
 ```
+
+Screenshot mode waits for the page's `load` event before capture. For content
+that appears later, add `--screenshot-wait=1000` (real milliseconds). The output
+format follows the filename extension: PNG, JPEG, or WebP. Chromium's
+`--virtual-time-budget` is not implemented; a real-time delay does not advance
+page timers the same way.
 
 The first run downloads this package
 (about 50 MB: fonts, CanvasKit and

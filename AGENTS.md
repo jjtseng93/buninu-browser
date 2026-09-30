@@ -15,6 +15,11 @@
   * Large files must not stall the renderer: past a size limit only their start is shown (and previews fall back to the text), with a bar at the top that says so and points to `download`
   * See `lib/document-types.js`; `download` still saves the response's original bytes
 
+## Screenshots
+- Use the headless CLI to inspect rendered pages: `bun index.js --headless --screenshot=/tmp/page.png --window-size=1280,800 URL` (or `bun buninu-browser.js ...`). It writes the image and exits; inspect it with the image viewer.
+- Capture waits for the page's `load` event. For content that appears later, add `--screenshot-wait=1000` to wait real milliseconds after load. This is not Chromium's virtual time budget.
+- `.png`, `.jpg`/`.jpeg`, and `.webp` filename extensions select the output format.
+
 ## Bun
 - Bun doesn't have `bun --check`
 - Bun has many built-in functions; use/check them first before implementing your own

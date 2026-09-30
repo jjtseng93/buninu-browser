@@ -36,7 +36,7 @@ export async function main(args = Bun.argv.slice(2)) {
   if (has("--help", "-h", "-help")) {
     console.log(`Buninu Browser ${packageInfo.version}
 
-Usage: buninu-browser [options]
+Usage: buninu-browser [options] [URL]
 
 Options:
   --remote-debugging-port=<port>  CDP port (0 picks a free one; default 9222)
@@ -45,6 +45,9 @@ Options:
   --mobile                        Present as a phone: mobile user agent and touch media
                                   features (hover: none, pointer: coarse); user agent
                                   overrides over CDP are ignored
+  --screenshot[=FILE]             Capture one PNG and exit (default screenshot.png)
+  --window-size=WIDTH,HEIGHT      Viewport size for the screenshot (default 800,600)
+  --screenshot-wait=MILLISECONDS  Wait after page load before capturing
   --version, -V                   Print the version
   --help, -h                      Print this help
 
@@ -56,7 +59,12 @@ Environment:
   }
 
   const { runHeadlessShell } = await import("./lib/headless-shell.js");
-  await runHeadlessShell(args);
+  if (args.some((arg) => arg === "--screenshot" || arg.startsWith("--screenshot="))) {
+    const { runScreenshot } = await import("./lib/screenshot-cli.js");
+    await runScreenshot(args);
+  } else {
+    await runHeadlessShell(args);
+  }
   return 0;
 }
 
