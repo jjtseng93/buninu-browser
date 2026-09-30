@@ -8108,6 +8108,8 @@ const methods = {
    * is accepted.
    */
   '%SetPrototype%': '*',
+  // Page scripts may assign an own toString method to a RegExp instance.
+  '%RegExpPrototype%': { toString: true },
 };$h͏_once.severeEnablements(severeEnablements);
 })()
 ,

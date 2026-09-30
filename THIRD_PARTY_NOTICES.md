@@ -36,8 +36,11 @@ corresponding test.
   (core-js, MIT), `LICENSES/ses-v8.txt` (V8, BSD-3-Clause)
 
 The renderer calls `lockdown()` and runs page scripts in SES compartments
-(`lib/renderer/page-realm.js`). The bundle is used unmodified; its SHA-256 is
+(`lib/renderer/page-realm.js`). The upstream bundle's SHA-256 is
 `1e40a59ccf5e72da8e260dda007a19ebd20304394b1b7288d0aab21733b9cd95`.
+The local change allowing a `RegExp` instance to override its own `toString`
+is recorded in [`patches/ses/`](patches/ses/README.md). The patched bundle's
+SHA-256 is `2f6c0043af15b4f7a7b04bfae02ce266a32f92b1089c956697c6f7b439b063bf`.
 
 ## Acorn
 

@@ -49,6 +49,25 @@ test("hit testing accounts for viewport scrolling", () => {
   window.happyDOM.abort();
 });
 
+test("an overlapping broad text region does not steal a form control's click", () => {
+  const { document, window } = parseHTMLDocument(`<button id="button">+</button><textarea id="field"></textarea>`);
+  const button = document.getElementById("button");
+  const field = document.getElementById("field");
+  const tree = { nodesById: new Map([
+    [1, { domNode: button, style: {} }],
+    [2, { domNode: field, style: {} }],
+  ]) };
+  const layout = {
+    fragments: [{ y: 0, height: 40, runs: [{ nodeId: 1, x: 0, width: 500 }] }],
+    boxes: [
+      { nodeId: 1, x: 0, y: 0, width: 40, height: 40 },
+      { nodeId: 2, x: 50, y: 0, width: 400, height: 40 },
+    ],
+  };
+  expect(hitTest(tree, layout, 100, 20, { x: 0, y: 0 }, { width: 500, height: 100 })?.element).toBe(field);
+  window.happyDOM.abort();
+});
+
 test("hidden and pointer-events: none boxes let clicks through, but their opted-in descendants take them", () => {
   const { document, window } = parseHTMLDocument(
     `<body>

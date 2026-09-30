@@ -1,0 +1,13 @@
+diff --git a/dist/ses.mjs b/dist/ses.mjs
+index c10f41b..8bda46b 100644
+--- a/dist/ses.mjs
++++ b/dist/ses.mjs
+@@ -8108,6 +8108,8 @@ const methods = {
+    * is accepted.
+    */
+   '%SetPrototype%': '*',
++  // Page scripts may assign an own toString method to a RegExp instance.
++  '%RegExpPrototype%': { toString: true },
+ };$h͏_once.severeEnablements(severeEnablements);
+ })()
+ ,

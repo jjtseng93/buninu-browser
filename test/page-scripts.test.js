@@ -412,6 +412,48 @@ test("page-inserted scripts run; innerHTML scripts do not; on* handlers fire", a
   ].join(" | "));
 });
 
+test("a GET form submitted by page script navigates with its field values", async () => {
+  navigations.length = 0;
+  await load(`<form action="/search?old=1"><textarea name="q"></textarea><input type="hidden" name="source" value="home"></form>
+    <script>document.querySelector('textarea').value = 'two words'; document.forms[0].submit()</script>`);
+  expect(navigations).toEqual(["https://page.test/search?q=two+words&source=home"]);
+});
+
+test("a search textarea can be focused across its form and submitted with Enter", async () => {
+  navigations.length = 0;
+  await load(`<form role="search" action="/search" style="width:300px;height:50px">
+    <textarea name="q" inputmode="search" style="width:100px;height:25px"></textarea>
+    <input type="hidden" name="source" value="home"></form>`);
+  const rect = await evaluate(`document.querySelector('form').getBoundingClientRect().toJSON()`);
+  await renderer.call("click", rect.x + 200, rect.y + 15);
+  expect(await evaluate("document.activeElement.tagName")).toBe("TEXTAREA");
+  await renderer.call("type", "two words");
+  await renderer.call("press", "Enter", { code: "Enter" });
+  expect(navigations).toEqual(["https://page.test/search?q=two+words&source=home"]);
+
+  navigations.length = 0;
+  await load(`<form action="/note"><textarea name="body"></textarea></form>`);
+  const plain = await evaluate(`document.querySelector('textarea').getBoundingClientRect().toJSON()`);
+  await renderer.call("click", plain.x + 5, plain.y + 5);
+  await renderer.call("press", "Enter", { code: "Enter" });
+  expect(await evaluate("document.querySelector('textarea').value")).toBe("\n");
+  expect(navigations).toEqual([]);
+});
+
+test("styles inside noscript do not apply while page scripting is enabled", async () => {
+  await load(`<noscript><style>p { display: none }</style></noscript><p id="visible">visible</p>`);
+  expect(await evaluate(`getComputedStyle(document.getElementById("visible")).display`)).toBe("block");
+});
+
+test("page RegExp instances can override their own toString without changing the intrinsic", async () => {
+  await load(`<script>
+    const pattern = /demo/;
+    pattern.toString = () => "custom";
+    window.regexpOverride = [pattern.toString(), (/other/).toString()];
+  </script>`);
+  expect(await evaluate("regexpOverride")).toEqual(["custom", "/other/"]);
+});
+
 test("ES modules: graphs, live exports, JSON, import.meta, dynamic import, TLA, cycles, import maps", async () => {
   const base = "https://page.test/modules/";
   scripts.set(`${base}math.js`, `
