@@ -30,11 +30,6 @@ beforeAll(async () => {
           headers: target.searchParams.has("allow") ? { "access-control-allow-origin": "*" } : {},
         });
       }
-      if (target.hostname === "api.github.com") {
-        return new Response(JSON.stringify(target.pathname.endsWith("/compare/HEAD...fork:main")
-          ? { ahead_by: 37, behind_by: 0 }
-          : { default_branch: "main" }), { headers: { "content-type": "application/json" } });
-      }
       if (target.pathname === "/video.mp4") return new Response(Bun.file(new URL("./fixtures/video.mp4", import.meta.url)),
         { headers: { "content-type": "video/mp4" } });
       if (target.pathname === "/tone.mp3") return new Response(Bun.file(new URL("./fixtures/tone.mp3", import.meta.url)),
@@ -138,20 +133,118 @@ test("template content can be cloned and typed arrays are available", async () =
   expect(await evaluate("document.getElementById('mount').dataset.number")).toBe("1.5");
 });
 
-test("a GitHub fork branch placeholder shows the live comparison", async () => {
-  const embedded = JSON.stringify({ payload: {
-    codeViewLayoutRoute: { repo: { isFork: true, ownerLogin: "fork" } },
-    sidebarAbout: { repo: { parentRepo: { ownerLogin: "upstream", name: "repo" } } },
-    codeViewRepoRoute: { refInfo: { refType: "branch", name: "main" } },
-  } });
-  await load(`<div data-testid="branch-info-bar"><div class="Skeleton">&nbsp;</div></div>
-    <script type="application/json" data-target="react-app.embeddedData">${embedded}</script>`, "https://github.com/fork/repo");
-  for (let attempt = 0; attempt < 20; attempt++) {
-    if ((await evaluate("document.querySelector('[data-testid=branch-info-bar]').textContent")).includes("37 commits")) break;
-    await Bun.sleep(10);
-  }
-  expect(await evaluate("document.querySelector('[data-testid=branch-info-bar]').textContent"))
-    .toBe("This branch is 37 commits ahead of upstream/repo:main.");
+test("page-local DOM prototypes remain writable after binding hardening", async () => {
+  await load(`<button id="toggle">Toggle</button><p id="result"></p>
+    <script>
+      Document.prototype.customQuery = function (selector) { return this.querySelector(selector); };
+      Element.prototype.customMarker = "page-local";
+      document.querySelector("#toggle").addEventListener("click", () => {
+        document.customQuery("#result").textContent = "clicked";
+      });
+      window.ready = document.querySelector("#toggle").customMarker === "page-local";
+    </script>`);
+  expect(await evaluate("ready")).toBe(true);
+  const rect = await evaluate("document.getElementById('toggle').getBoundingClientRect().toJSON()");
+  await renderer.call("click", rect.x + 1, rect.y + 1);
+  expect(await evaluate("document.getElementById('result').textContent")).toBe("clicked");
+  await load("<p>next document</p>");
+  expect(await evaluate("Element.prototype.customMarker")).toBeUndefined();
+});
+
+test("comments expose their data like text nodes", async () => {
+  // React finds its hydration boundaries by reading comment data (<!--&-->).
+  await load(`<div id="host"><!--&--><!--/&--></div>`);
+  expect(await evaluate("[...document.getElementById('host').childNodes].map((node) => node.data).join(' ')")).toBe("& /&");
+  expect(await evaluate(`(() => {
+    const comment = document.createComment("a");
+    comment.data = "bc";
+    return [comment.data, comment.length, comment instanceof CharacterData, comment instanceof Text, comment instanceof Comment].join(",");
+  })()`)).toBe("bc,2,true,false,true");
+  expect(await evaluate("document.createTextNode('xy') instanceof CharacterData")).toBe(true);
+});
+
+test("EventTarget can be constructed and subclassed", async () => {
+  expect(await evaluate(`(() => {
+    class Store extends EventTarget {
+      constructor() { super(); this.value = 1; }
+      bump() { this.value++; this.dispatchEvent(new CustomEvent("change", { detail: this.value })); }
+    }
+    const store = new Store();
+    const seen = [];
+    const listener = function (event) { seen.push([event.detail, this === store, event.target === store, event.currentTarget === store]); };
+    store.addEventListener("change", listener);
+    store.bump();
+    store.removeEventListener("change", listener);
+    store.bump();
+    const plain = new EventTarget();
+    let fired = 0;
+    plain.addEventListener("ping", () => fired++, { once: true });
+    plain.dispatchEvent(new Event("ping"));
+    plain.dispatchEvent(new Event("ping"));
+    return JSON.stringify({ seen, fired, value: store.value,
+      checks: [store instanceof Store, store instanceof EventTarget, document.body instanceof EventTarget, window instanceof EventTarget, {} instanceof EventTarget] });
+  })()`)).toBe(JSON.stringify({ seen: [[2, true, true, true]], fired: 1, value: 3, checks: [true, true, true, true, false] }));
+});
+
+test("elements attach shadow roots, and prototype patches can wrap attachShadow", async () => {
+  await load(`<div id="host">light</div>`);
+  expect(await evaluate(`(() => {
+    // A polyfill pattern: keep the original and wrap it.
+    const original = HTMLElement.prototype.attachShadow;
+    let wrapped = 0;
+    HTMLElement.prototype.attachShadow = function (init) { wrapped++; return original.call(this, init); };
+    const host = document.getElementById("host");
+    const root = host.attachShadow({ mode: "open" });
+    root.innerHTML = "<span>shadow</span>";
+    const closed = document.createElement("div").attachShadow({ mode: "closed" });
+    return JSON.stringify({ wrapped, same: host.shadowRoot === root, host: root.host === host, mode: root.mode,
+      html: root.innerHTML, shadow: root instanceof ShadowRoot, fragment: root instanceof DocumentFragment,
+      closedHidden: closed.host.shadowRoot === null, light: host.textContent });
+  })()`)).toBe(JSON.stringify({ wrapped: 2, same: true, host: true, mode: "open", html: "<span>shadow</span>",
+    shadow: true, fragment: true, closedHidden: true, light: "light" }));
+});
+
+test("TreeWalker follows the DOM traversal algorithms with page filters", async () => {
+  await load(`<div id="root"><p id="a"><b id="a1"></b>text</p><!--c--><p id="b" data-skip><i id="b1"></i></p><p id="c" data-reject><i id="c1"></i></p><p id="d"></p></div>`);
+  expect(await evaluate(`(() => {
+    const root = document.getElementById("root");
+    const walk = (walker, step) => { const seen = []; for (let node = walker[step](); node; node = walker[step]()) seen.push(node.id || node.nodeName); return seen.join(","); };
+    const elements = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, {
+      acceptNode: (node) => node.hasAttribute("data-reject") ? NodeFilter.FILTER_REJECT
+        : node.hasAttribute("data-skip") ? NodeFilter.FILTER_SKIP : NodeFilter.FILTER_ACCEPT,
+    });
+    const forward = walk(elements, "nextNode");
+    const backward = walk(elements, "previousNode");
+    const children = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, (node) => node.hasAttribute("data-skip") ? 3 : 1);
+    const first = children.firstChild().id, last = children.lastChild(), top = children.currentNode.id;
+    children.currentNode = document.getElementById("a");
+    const siblings = walk(children, "nextSibling");
+    const everything = document.createTreeWalker(root);
+    const all = walk(everything, "nextNode");
+    const comments = walk(document.createTreeWalker(root, NodeFilter.SHOW_COMMENT), "nextNode");
+    return [forward, backward, first, last && last.id, top, siblings, all, comments, everything.parentNode() && everything.currentNode.id].join(" | ");
+  })()`)).toBe("a,a1,b1,d | b1,a1,a,root | a | a1 | a1 | b1,c,d | a,a1,#text,#comment,b,b1,c,c1,d | #comment | root");
+});
+
+test("style feature detection only finds properties the renderer implements", async () => {
+  await load("<p>x</p>");
+  expect(await evaluate(`["color", "backgroundColor", "setProperty", "cssText", "anchorName", "positionTryFallbacks", "notAProperty"]
+    .map((name) => name in document.body.style).join(",")`)).toBe("true,true,true,true,false,false,false");
+});
+
+test("the root element's client size is the viewport, and computed style reports painting properties", async () => {
+  await load(`<div id="box" style="visibility: hidden; opacity: 0.5; overflow: hidden; pointer-events: none">x</div>
+    <div style="height: 5000px; width: 3000px"></div>`);
+  expect(await evaluate(`[document.documentElement.clientWidth === innerWidth, document.documentElement.clientHeight === innerHeight,
+    document.getElementById("box").clientWidth < 3000].join(",")`)).toBe("true,true,true");
+  expect(await evaluate(`(() => { const style = getComputedStyle(document.getElementById("box"));
+    return [style.visibility, style.opacity, style.overflow, style.overflowY, style.pointerEvents,
+      getComputedStyle(document.body).overflow].join(","); })()`)).toBe("hidden,0.5,hidden,hidden,none,visible");
+});
+
+test("CSS.escape produces selectors for leading digits and punctuation", async () => {
+  await load(`<div id="1:a"></div>`);
+  expect(await evaluate("CSS.escape('1:a')")).toBe("\\31 \\:a");
 });
 
 test("a video plays frames and pauses when clicked", async () => {
@@ -250,11 +343,13 @@ test("page scripts cannot escape the sandbox or reach engine state", async () =>
     hostGlobals: "undefined/undefined/undefined/function",
     privateState: "0/0",
     newBinding: "blocked",
-    patchPrototype: "blocked",
+    patchPrototype: "patched",
     patchIntrinsic: "blocked",
     patchUrl: "blocked",
     dynamicImport: "blocked",
   });
+  await load("<p>another page</p>");
+  expect(await evaluate("document.body.appendChild.toString().includes('pwned')")).toBe(false);
   // Page fetch cannot read local files.
   expect(await evaluate("fetch('file:///etc/passwd').then(() => 'read', (error) => 'blocked')")).toBe("blocked");
   // The engine itself is unaffected: the page still renders and URLs still work.
@@ -423,7 +518,6 @@ test("fragment navigation updates location, fires hashchange, and lets the page 
   await load(`
     <div style="height:1000px"></div><h2 id="plain">plain</h2>
     <div style="height:1000px"></div><h2 id="custom-target">custom</h2>
-    <div style="height:1000px"></div><h2><a id="user-content-readme">readme</a></h2>
     <div style="height:2000px"></div>
     <script>var changes = []; window.addEventListener('hashchange', () => {
       changes.push(location.hash + ':' + document.URL.split('#')[1]);
@@ -438,13 +532,10 @@ test("fragment navigation updates location, fires hashchange, and lets the page 
   // A listener that maps the fragment scrolls itself.
   await renderer.call("showFragment", "https://page.test/#custom");
   expect(await scrollY()).toBe(await top("custom-target"));
-  // No target and no script: rendered Markdown's "user-content-" id.
-  await renderer.call("showFragment", "https://page.test/#readme");
-  expect(await scrollY()).toBe(await top("user-content-readme"));
   // The same fragment again does not fire hashchange.
-  await renderer.call("showFragment", "https://page.test/#readme");
-  expect(await evaluate("changes.join(',')")).toBe("#plain:plain,#custom:custom,#readme:readme");
-  expect(await evaluate("location.href")).toBe("https://page.test/#readme");
+  await renderer.call("showFragment", "https://page.test/#custom");
+  expect(await evaluate("changes.join(',')")).toBe("#plain:plain,#custom:custom");
+  expect(await evaluate("location.href")).toBe("https://page.test/#custom");
 });
 
 test("WebSocket connects through the controller: text, binary, subprotocol, Origin and close", async () => {

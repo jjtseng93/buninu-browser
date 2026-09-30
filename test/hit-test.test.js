@@ -3,6 +3,7 @@ import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
 import { elementBounds, hitTest, interactiveRegions } from "../lib/input/hit-test.js";
 import { layoutText } from "../lib/layout/text-layout.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
+import { StyleEngine } from "../lib/style/computed-style.js";
 
 test("creates separate clickable regions for links sharing a line", () => {
   const { document, window } = parseHTMLDocument(
@@ -45,5 +46,22 @@ test("hit testing accounts for viewport scrolling", () => {
   expect(regions).toHaveLength(1);
   const rect = regions[0].rects[0];
   expect(hitTest(tree, layout, rect.left + 1, rect.top + 1, scroll, { width: 800, height: 100 })?.element.getAttribute("href")).toBe("target");
+  window.happyDOM.abort();
+});
+
+test("hidden and pointer-events: none boxes let clicks through, but their opted-in descendants take them", () => {
+  const { document, window } = parseHTMLDocument(
+    `<body>
+      <div class="menu"><a href="through">through</a> <a class="open" href="open">open</a></div>
+      <div style="visibility: hidden"><a href="hidden">hidden</a> <button>ghost</button>
+        <a style="visibility: visible" href="shown">shown</a></div>
+      <a href="plain">plain</a>
+    </body>`,
+  );
+  const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document, [`.menu { pointer-events: none } .menu .open { pointer-events: auto }`]));
+  const layout = layoutText(tree);
+  const regions = interactiveRegions(tree, layout, { x: 0, y: 0 }, { width: 800, height: 600 });
+
+  expect(regions.map((region) => region.element.getAttribute("href") ?? region.element.tagName)).toEqual(["open", "shown", "plain"]);
   window.happyDOM.abort();
 });
