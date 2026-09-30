@@ -46,6 +46,16 @@ test.skipIf(!serverRunning)("plays a stream through the PulseAudio server on 127
   client.close();
 });
 
+test.skipIf(!serverRunning)("opens independent playback streams at different sample rates", async () => {
+  const client = await PulseClient.connect();
+  const first = await client.openPlayback({ rate: 48000, channels: 1, name: "first" });
+  const second = await client.openPlayback({ rate: 44100, channels: 2, name: "second" });
+  expect(first.index).not.toBe(second.index);
+  await second.close();
+  await first.close();
+  client.close();
+});
+
 test("connecting without a server fails with an error, not a hang", async () => {
   await expect(PulseClient.connect({ port: 1 })).rejects.toThrow();
 });
@@ -53,6 +63,10 @@ test("connecting without a server fails with an error, not a hang", async () => 
 test("audio is sent in whole frames, so stereo channels never swap", async () => {
   // A minimal server: replies to every command, grants odd-sized requests, records audio frame sizes.
   const sizes = [];
+  const offsets = [];
+  const flags = [];
+  const bufferAttributes = [];
+  let nextStreamIndex = 1;
   const { createServer } = await import("node:net");
   const server = createServer((socket) => {
     let buffer = Buffer.alloc(0);
@@ -65,15 +79,25 @@ test("audio is sent in whole frames, so stereo channels never swap", async () =>
       while (buffer.length >= 20 && buffer.length >= 20 + buffer.readUInt32BE(0)) {
         const length = buffer.readUInt32BE(0);
         const channel = buffer.readUInt32BE(4);
+        const offset = buffer.readBigInt64BE(8);
+        const flag = buffer.readUInt32BE(16);
         const body = buffer.subarray(20, 20 + length);
         buffer = buffer.subarray(20 + length);
         if (channel !== 0xffffffff) {
           sizes.push(length);
+          offsets.push(offset);
+          flags.push(flag);
           continue;
         }
         const command = body.readUInt32BE(1);
         const tag = body.readUInt32BE(6);
-        if (command === 3) reply(tag, [0x4c, ...u32(1), 0x4c, ...u32(1), 0x4c, ...u32(9003)]); // odd request, enough for a 40 ms packet
+        if (command === 3) {
+          const nameEnd = body.indexOf(0, 11);
+          const channelCount = body[nameEnd + 3];
+          const attrs = nameEnd + 1 + 7 + 2 + channelCount + 5 + 1 + 5 + 1;
+          bufferAttributes.push([0, 1, 2].map((index) => body.readUInt32BE(attrs + index * 5 + 1)));
+          reply(tag, [0x4c, ...u32(nextStreamIndex++), 0x4c, ...u32(1), 0x4c, ...u32(96003)]); // odd request, enough for several packets
+        }
         else reply(tag);
       }
     });
@@ -81,10 +105,15 @@ test("audio is sent in whole frames, so stereo channels never swap", async () =>
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
   const client = await PulseClient.connect({ port: server.address().port });
   const stream = await client.openPlayback({ rate: 48000, channels: 2 });
-  stream.write(new Uint8Array(4 * 4000));
+  stream.write(new Uint8Array(4 * 24000));
   await Bun.sleep(100);
-  expect(sizes.length).toBeGreaterThan(0);
+  expect(sizes.length).toBeGreaterThan(1);
   expect(sizes.every((size) => size % 4 === 0)).toBeTrue();
+  expect(offsets.every((offset) => offset === 0n)).toBeTrue();
+  expect(flags.every((flag) => flag === 0)).toBeTrue();
+  expect(bufferAttributes[0]).toEqual([76800, 15360, 7680]); // 400/80/40 ms at 48 kHz stereo
+  await client.openPlayback({ rate: 48000, channels: 1, leadSeconds: 0.12 });
+  expect(bufferAttributes[1]).toEqual([15360, 3840, 3840]); // 160/40/40 ms at 48 kHz mono
   client.close();
   server.close();
 });
