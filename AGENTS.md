@@ -7,6 +7,10 @@
   * Specifically, able to work with ../casty through CDP is an important goal
 - Only use Bun FFI to dlopen libc when other methods are clearly not enough
 
+## Implementing the browser
+- Do not treat any website specially when refining browser features like layout css js. Fix the actual problem that all websites can benefit from.
+- If you don't know how to fix a specific bug, look at ../chromium implementation but don't copy LGPL code.
+
 ## Viewing files
 - No file is unviewable: every response the browser navigates to must show something, never a "cannot be shown" page
   * HTML is shown as itself; images and video/audio get a generated page like Chromium's standalone image and media documents
