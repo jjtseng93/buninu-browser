@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { connect } from "node:net";
 import { floatToS16, PulseClient } from "../lib/audio/pulse-client.js";
+import { splitSamples } from "../lib/audio/pcm.js";
 
 // The playback test needs a PulseAudio native-protocol server (jspulse, or a
 // daemon with module-native-protocol-tcp) on 127.0.0.1:4713; without one it is skipped.
@@ -18,6 +19,20 @@ const serverRunning = await new Promise((resolve) => {
 test("floatToS16 clamps and scales interleaved samples to s16le", () => {
   const bytes = floatToS16(new Float32Array([0, 1, -1, 2, 0.5]));
   expect([...new Int16Array(bytes.buffer)]).toEqual([0, 32767, -32768, 32767, 16384]);
+});
+
+test("small audio requests consume only whole frames and preserve the remainder", () => {
+  const original = Float32Array.from({ length: 2048 }, (_, index) => index / 2048);
+  let pending = original;
+  const sent = [];
+  for (const bytes of [4, 80, 3840, 172]) {
+    const [part, rest] = splitSamples(pending, 2, bytes);
+    expect(part.length * 2).toBeLessThanOrEqual(bytes);
+    expect(part.length % 2).toBe(0);
+    sent.push(part);
+    pending = rest;
+  }
+  expect([...sent.flatMap((part) => [...part]), ...pending]).toEqual([...original]);
 });
 
 test.skipIf(!serverRunning)("plays a stream through the PulseAudio server on 127.0.0.1:4713", async () => {
