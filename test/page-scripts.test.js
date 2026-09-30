@@ -307,6 +307,23 @@ test("clicks reach page listeners; preventDefault cancels link navigation", asyn
   expect(await evaluate("clicks.join(',')")).toBe("click:kept:true,inline");
 });
 
+test("fragment links navigate at once: later handlers see the new location, popstate fires, history grows", async () => {
+  await load(`<a href="#b" style="display:block;height:40px">b</a><div style="height:900px"></div>
+    <h2 id="b">b</h2><div style="height:900px"></div>
+    <script>var seen = [];
+      document.addEventListener('click', () => setTimeout(() => seen.push('timer ' + location.hash), 0));
+      addEventListener('popstate', (event) => seen.push('popstate ' + location.hash + ' ' + event.state));
+      addEventListener('hashchange', (event) => seen.push('hashchange ' + event.newURL.split('#')[1]));</script>`);
+  const clicked = await renderer.call("click", 3, 10);
+  expect(clicked).toEqual({ url: "https://page.test/#b", fragmentFrom: { x: 0, y: 0 } });
+  await Bun.sleep(50);
+  expect(await evaluate("seen.join(',')")).toBe("popstate #b null,timer #b,hashchange b");
+  expect(await evaluate(`[location.hash, history.length, history.state,
+    Math.round(scrollY) === Math.round(document.getElementById('b').getBoundingClientRect().top + scrollY)].join('|')`)).toBe("#b|2||true");
+  // Setting location.hash is a fragment navigation too: it reads back at once.
+  expect(await evaluate("(() => { location.hash = 'c'; return location.hash + ' ' + history.length })()")).toBe("#c 3");
+});
+
 test("location assignment asks the controller to navigate", async () => {
   navigations.length = 0;
   await load(`<script>setTimeout(() => { location.href = '/elsewhere?x=1' }, 0)</script>`);
