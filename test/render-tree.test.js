@@ -101,3 +101,17 @@ test("form controls render their live value, placeholder, selection and checked 
   expect(renderTreeText(tree)).toContain("bold label");
   window.happyDOM.abort();
 });
+
+test("audio with controls is a 300x32 player painted from its state; without controls it is not rendered", async () => {
+  const { StyleEngine } = await import("../lib/style/computed-style.js");
+  const { document, window } = parseHTMLDocument(`<body><audio id="a" controls src="t.mp3">fallback</audio><audio id="b" src="t.mp3"></audio></body>`);
+  const engine = new StyleEngine().compute(document);
+  const state = { audio: true, playing: false };
+  const tree = new RenderTreeBuilder().build(document, engine, new Map([[document.getElementById("a"), state]]));
+  const node = (id) => [...tree.nodesById.values()].find((candidate) => candidate.domNode.id === id && !candidate.pseudo);
+  expect(node("a")).toMatchObject({ type: "image", tagName: "AUDIO", widthAttribute: 300, heightAttribute: 32 });
+  expect(node("a").resource).toBe(state);
+  expect(node("b")).toBeUndefined();
+  expect(renderTreeText(tree)).not.toContain("fallback");
+  window.happyDOM.abort();
+});

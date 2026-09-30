@@ -148,6 +148,15 @@ reimplemented in JavaScript, and no Chromium source text is copied:
   tile (`lib/renderer/page-renderer.js`), after the display-item reuse in
   `third_party/blink/renderer/platform/graphics/paint/paint_controller.cc`.
 
+## PulseAudio native protocol (independent implementation)
+
+`lib/audio/pulse-client.js` is the client side of the PulseAudio native
+protocol (protocol version 8: command packets as tagstructs, audio frames with
+a 20-byte header), written for this project from the protocol's documented
+wire format. It contains no source code from PulseAudio or from jspulse, both
+of which are LGPL-licensed; jspulse was used only as a separate server process
+to test against, never imported by this repository's code or tests.
+
 ## WHATWG HTML Standard
 
 - Project: HTML Living Standard

@@ -241,6 +241,21 @@ asked for; input coordinates are scaled back, and pages see the factor as
 CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js github.com -- --mobile
 ```
 
+### Video and audio
+
+`<video>` and `<audio>` share one pipeline; an `<audio controls>` is a
+300x32 control bar with no picture. Clicking plays or pauses, clicking the
+progress track seeks, and page script has `play()`, `pause()`,
+`currentTime` (settable), `duration`, `paused`, `ended` and the matching
+events. wasmpeg decodes what its LGPL build supports (H.264, HEVC, VP8/VP9,
+MPEG-4, Theora, MPEG-1/2; MP3, AAC, FLAC, Vorbis, Opus, WAV).
+
+Sound, a video's included, plays through a PulseAudio native-protocol server
+on `127.0.0.1:4713`, such as [jspulse](https://github.com/jjtseng93/jspulse)
+(`npx @drxiaozhi/jspulse`); without one, video plays silently. The controller
+holds the connection, since renderers cannot open sockets, and paces the
+stream to real time, so pausing stops the sound within half a second.
+
 ### Diagnostics
 
 casty does not show the browser's stderr. Set `BUNINU_LOG=1` to also write

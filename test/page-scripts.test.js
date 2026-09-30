@@ -37,6 +37,8 @@ beforeAll(async () => {
       }
       if (target.pathname === "/video.mp4") return new Response(Bun.file(new URL("./fixtures/video.mp4", import.meta.url)),
         { headers: { "content-type": "video/mp4" } });
+      if (target.pathname === "/tone.mp3") return new Response(Bun.file(new URL("./fixtures/tone.mp3", import.meta.url)),
+        { headers: { "content-type": "audio/mpeg" } });
       const body = scripts.get(target.href);
       return body === undefined
         ? new Response("missing", { status: 404 })
@@ -563,3 +565,58 @@ test("labels and unchecked checkboxes are clickable; each click toggles once, as
   await renderer.call("click", label.left + label.width - 5, label.top + label.height / 2);
   expect(await evaluate("[document.getElementById('c').checked, changes].join()")).toBe("false,2");
 });
+
+test("media elements share the HTMLMediaElement API: seek, play, pause, end, replay, events", async () => {
+  await load(`<video id="v" src="/video.mp4" width="160" height="120"></video><audio id="a" controls src="/tone.mp3"></audio>
+    <script>var events = [], v = document.getElementById("v"), a = document.getElementById("a");
+      for (const id of ["v", "a"]) for (const type of ["loadedmetadata", "seeked", "play", "pause", "ended"]) {
+        document.getElementById(id).addEventListener(type, () => events.push(id + ":" + type));
+      }</script>`);
+  const until = async (expression, ms = 3000) => {
+    for (const end = Date.now() + ms; Date.now() < end; await Bun.sleep(25)) if (await evaluate(expression)) return true;
+    return false;
+  };
+  expect(await evaluate("[v.paused, v.ended, v.currentTime, Number.isNaN(v.duration), a.paused]")).toEqual([true, false, 0, true, true]);
+
+  await evaluate("v.currentTime = 0.5; a.currentTime = 0.4");
+  expect(await until("events.includes('v:seeked') && events.includes('a:seeked')")).toBeTrue();
+  expect(await evaluate("[v.duration, Math.round(v.currentTime * 10), a.duration, Math.round(a.currentTime * 10), v.paused, a.paused]"))
+    .toEqual([1, 5, 1, 4, true, true]);
+
+  await evaluate("v.play()");
+  expect(await until("!v.paused && v.currentTime > 0.55")).toBeTrue();
+  await evaluate("v.pause()");
+  expect(await evaluate("v.paused")).toBeTrue();
+
+  // Playing to the end, then play starts over.
+  await evaluate("v.currentTime = 0.9; v.play()");
+  expect(await until("v.ended && v.paused")).toBeTrue();
+  await evaluate("v.play()");
+  expect(await until("!v.paused && !v.ended && v.currentTime < 0.5")).toBeTrue();
+  await evaluate("v.pause()");
+  const seen = await evaluate("events.join()");
+  for (const event of ["v:loadedmetadata", "a:loadedmetadata", "v:play", "v:pause", "v:ended"]) expect(seen).toContain(event);
+
+  // Audio plays through a PulseAudio server on 127.0.0.1:4713 when one runs (this makes a short tone).
+  if (await pulseServerRunning()) {
+    await evaluate("a.currentTime = 0; a.play()");
+    expect(await until("!a.paused && a.currentTime > 0.2")).toBeTrue();
+    await evaluate("a.pause()");
+    expect(await evaluate("a.paused")).toBeTrue();
+    await evaluate("a.currentTime = 0.8; a.play()");
+    expect(await until("a.ended && a.paused")).toBeTrue();
+  }
+});
+
+function pulseServerRunning() {
+  return new Promise((resolve) => {
+    const socket = require("node:net").connect({ host: "127.0.0.1", port: 4713 });
+    const done = (running) => {
+      socket.destroy();
+      resolve(running);
+    };
+    socket.once("connect", () => done(true));
+    socket.once("error", () => done(false));
+    setTimeout(() => done(false), 1000);
+  });
+}
