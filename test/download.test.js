@@ -1,5 +1,10 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { createBrowser } from "../lib/headless-shell.js";
+import { isAttachment, suggestedFilename } from "../lib/download.js";
+import { downloadsDirectory } from "../lib/download-directory.js";
 
 // Big5 for 中文, which a UTF-8 decode would mangle: the download must be the bytes as sent.
 const BIG5 = new Uint8Array([0x3c, 0x70, 0x3e, 0xa4, 0xa4, 0xa4, 0xe5, 0x3c, 0x2f, 0x70, 0x3e]);
@@ -7,11 +12,94 @@ let server;
 beforeAll(() => {
   server = Bun.serve({
     port: 0,
-    fetch: (request) => new URL(request.url).pathname === "/page"
-      ? new Response(BIG5, { headers: { "content-type": "text/html; charset=big5" } })
-      : Response.redirect("/page"),
+    fetch: (request) => {
+      const path = new URL(request.url).pathname;
+      if (path === "/page") return new Response(BIG5, { headers: { "content-type": "text/html; charset=big5" } });
+      if (path === "/links") return new Response('<a id="explicit" href="/plain" download="chosen.txt">explicit</a>'
+        + '<a id="attachment" href="/attachment">attachment</a>'
+        + '<a id="data" href="data:text/plain,hello%20data" download="data.txt">data</a>'
+        + '<a id="blob" download="blob.txt">blob</a>'
+        + '<script>document.getElementById("blob").href = URL.createObjectURL(new Blob(["blob bytes"]));</script>',
+      { headers: { "content-type": "text/html" } });
+      if (path === "/plain") return new Response("original bytes", { headers: { "content-type": "text/plain" } });
+      if (path === "/attachment") return new Response("photo bytes", { headers: {
+        "content-type": "image/jpeg", "content-disposition": 'attachment; filename="photo.jpg"',
+      } });
+      if (path === "/preview.json") return new Response('{"a":1}\n', { headers: { "content-type": "application/json" } });
+      return Response.redirect("/page");
+    },
   });
 });
+
+test("download names from headers and attributes are safe", () => {
+  expect(isAttachment('attachment; filename="x.jpg"')).toBeTrue();
+  expect(isAttachment('inline; filename="x.jpg"')).toBeFalse();
+  expect(suggestedFilename("https://x.test/a", "attachment; filename*=UTF-8''%E4%B8%AD%E6%96%87.jpg")).toBe("中文.jpg");
+  expect(suggestedFilename("https://x.test/a", "", "../escape.txt")).toBe("escape.txt");
+});
+
+test("download directory follows macOS defaults and relocated Windows folders", () => {
+  expect(downloadsDirectory({ platform: "darwin", home: "/Users/Ada" })).toBe("/Users/Ada/Downloads");
+  expect(downloadsDirectory({ platform: "win32", home: "C:\\Users\\Ada", queryWindows: () => "D:\\資料\\下載" }))
+    .toBe("D:\\資料\\下載");
+  expect(downloadsDirectory({ platform: "win32", home: "C:\\Users\\Ada", queryWindows: () => null }))
+    .toBe("C:\\Users\\Ada\\Downloads");
+});
+
+test("clicked downloads save files and leave the current page in place", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "buninu-download-"));
+  const browser = await createBrowser({ spareRenderer: false });
+  const events = [];
+  browser.context.setDownloadBehavior({ behavior: "allow", downloadPath: dir, eventsEnabled: true });
+  browser.context.onDownload((event, params) => events.push({ event, ...params }));
+  const origin = `http://127.0.0.1:${server.port}`;
+  const click = async (selector) => {
+    const bounds = await browser.context.evaluate(`JSON.stringify(document.querySelector('${selector}').getBoundingClientRect())`);
+    const rect = JSON.parse(bounds);
+    await browser.context.click(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  };
+  try {
+    await browser.context.navigate(`${origin}/links`);
+    await click("#explicit");
+    expect(readFileSync(join(dir, "chosen.txt"), "utf8")).toBe("original bytes");
+    expect(browser.context.resourceContent()?.url).toBe(`${origin}/links`);
+    await click("#explicit");
+    expect(readFileSync(join(dir, "chosen (2).txt"), "utf8")).toBe("original bytes");
+    await browser.context.evaluate("document.getElementById('explicit').click()");
+    for (let attempt = 0; attempt < 30; attempt++) {
+      try { if (readFileSync(join(dir, "chosen (3).txt"), "utf8") === "original bytes") break; } catch {}
+      await Bun.sleep(20);
+    }
+    expect(readFileSync(join(dir, "chosen (3).txt"), "utf8")).toBe("original bytes");
+    await click("#attachment");
+    expect(readFileSync(join(dir, "photo.jpg"), "utf8")).toBe("photo bytes");
+    expect(browser.context.resourceContent()?.url).toBe(`${origin}/links`);
+    await click("#data");
+    expect(readFileSync(join(dir, "data.txt"), "utf8")).toBe("hello data");
+    await browser.context.evaluate("document.getElementById('blob').click()");
+    for (let attempt = 0; attempt < 30; attempt++) {
+      try { if (readFileSync(join(dir, "blob.txt"), "utf8") === "blob bytes") break; } catch {}
+      await Bun.sleep(20);
+    }
+    expect(readFileSync(join(dir, "blob.txt"), "utf8")).toBe("blob bytes");
+    await browser.context.navigate(`${origin}/preview.json`);
+    const positions = JSON.parse(await browser.context.evaluate(`JSON.stringify({
+      pretty: document.getElementById('pretty-print').getBoundingClientRect().right,
+      download: document.querySelector('.download').getBoundingClientRect().left,
+      right: document.querySelector('.download').getBoundingClientRect().right
+    })`));
+    expect(positions.download).toBeGreaterThan(positions.pretty);
+    expect(positions.right).toBeGreaterThan(700);
+    await click(".download");
+    expect(readFileSync(join(dir, "preview.json"), "utf8")).toBe('{"a":1}\n');
+    expect(browser.context.resourceContent()?.url).toBe(`${origin}/preview.json`);
+    expect(events.filter((item) => item.event === "willBegin")).toHaveLength(7);
+    expect(events.filter((item) => item.event === "progress" && item.state === "completed")).toHaveLength(7);
+  } finally {
+    browser.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+}, 30_000);
 afterAll(() => server?.stop(true));
 
 test("the current document's raw bytes stay available for Page.getResourceContent", async () => {
@@ -62,3 +150,43 @@ test("CDP Page.getResourceContent returns the bytes base64-encoded", async () =>
     cdp.stop(true);
   }
 });
+
+test("CDP download behavior controls the directory and emits completion events", async () => {
+  const { CdpServer } = await import("../lib/cdp-server.js");
+  const dir = mkdtempSync(join(tmpdir(), "buninu-cdp-download-"));
+  const browser = await createBrowser({ spareRenderer: false });
+  const cdp = CdpServer.create(browser.context).listen(0, "127.0.0.1");
+  const socket = new WebSocket(`ws://127.0.0.1:${cdp.port}/devtools/browser/cdp-server`);
+  const events = [];
+  try {
+    await new Promise((resolve) => socket.addEventListener("open", resolve, { once: true }));
+    socket.addEventListener("message", ({ data }) => {
+      const message = JSON.parse(data);
+      if (message.method?.startsWith("Browser.download")) events.push(message);
+    });
+    const configured = new Promise((resolve) => socket.addEventListener("message", ({ data }) => {
+      if (JSON.parse(data).id === 1) resolve();
+    }));
+    socket.send(JSON.stringify({ id: 1, method: "Browser.setDownloadBehavior", params: {
+      behavior: "allowAndName", downloadPath: dir, eventsEnabled: true,
+    } }));
+    await configured;
+    await browser.context.navigate(`http://127.0.0.1:${server.port}/links`);
+    const rect = JSON.parse(await browser.context.evaluate("JSON.stringify(document.getElementById('attachment').getBoundingClientRect())"));
+    await browser.context.click(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    await Bun.sleep(30);
+    expect(readFileSync(join(dir, events[0].params.guid), "utf8")).toBe("photo bytes");
+    expect(events.map((item) => item.method)).toEqual([
+      "Browser.downloadWillBegin", "Browser.downloadProgress", "Browser.downloadProgress",
+    ]);
+    expect(events[0].params.suggestedFilename).toBe("photo.jpg");
+    expect(events[1].params.state).toBe("inProgress");
+    expect(events[2].params.state).toBe("completed");
+    expect(events[2].params.filePath).toBe(join(dir, events[0].params.guid));
+  } finally {
+    socket.close();
+    cdp.stop(true);
+    browser.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+}, 30_000);

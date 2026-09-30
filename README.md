@@ -206,11 +206,20 @@ When idle, the main thread rasterizes a tile reaching half a viewport above
 and one viewport below the visible area, so the compositor can scroll
 without waiting. Screenshots are encoded with `Bun.Image`.
 
-`<video>` can decode and display MP4 video frames after a click, with a basic
-play/pause control. Video bytes are fetched through the controller; the
-renderer uses vendored wasmpeg JavaScript and WebAssembly without native
-media bindings. Audio, seeking, and full HTML media controls are not yet
-implemented. No npm install is needed for the decoder.
+`<video>` can decode and display MP4 video frames with basic playback and
+seeking. Video bytes are fetched through the controller; the renderer uses
+vendored wasmpeg JavaScript and WebAssembly without native media bindings.
+Audio plays through a PulseAudio server on 127.0.0.1:4713, such as jspulse.
+No npm install is needed for the decoder.
+
+Clicked `a download` links (including `data:` and `blob:` URLs up to 64 MB) and responses with `Content-Disposition: attachment`
+save to the user's Downloads folder by default (including a relocated Windows
+Downloads folder); the directory is created when needed. A CDP
+client can set the directory with `Browser.setDownloadBehavior` and receive
+`Browser.downloadWillBegin` and `Browser.downloadProgress` events. Standalone
+text and structured-document previews have a Download button at the top right
+that saves the original response bytes. As in Chromium, `allowAndName` saves
+the file under its download GUID; `allow` keeps the suggested filename.
 
 Documents load in stages:
 

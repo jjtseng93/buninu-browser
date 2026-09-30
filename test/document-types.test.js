@@ -24,6 +24,7 @@ test("images are shown alone: SVG inline, others as a data: URL", () => {
 test("bunmsh serve's formats get its preview under a Pretty-print checkbox, checked", () => {
   const toml = show("https://x.test/Cargo.toml", "application/toml", 'name = "buninu"\n').source;
   expect(toml).toContain('<input type="checkbox" id="pretty-print" checked> Pretty-print');
+  expect(toml).toContain('<a class="download" href="https://x.test/Cargo.toml" download>Download</a>');
   expect(toml).toContain("<title>Cargo.toml — bun.toml.parse</title>");
   expect(toml).toContain("(bun.toml.parse)");
   expect(toml).toContain('<span class="json-statement">&quot;name&quot;:</span> <span class="json-string">&quot;buninu&quot;</span>');
@@ -82,10 +83,11 @@ test("large files show their start with a bar pointing to download; large previe
   const { DISPLAY_LIMIT, PRETTY_LIMIT } = await import("../lib/document-types.js");
   const big = "x".repeat(DISPLAY_LIMIT + 10);
   const text = show("https://x.test/big.txt", "text/plain", big).source;
-  expect(text).toContain(`<div class="bar">Large file (256 KB); showing the first 256 KB. The whole file: casty's <code>download</code>`);
+  expect(text).toContain(`Large file (256 KB); showing the first 256 KB. The whole file: casty's <code>download</code>`);
+  expect(text).toContain('<a class="download" href="https://x.test/big.txt" download>Download</a>');
   expect(text).toContain(`<pre>${"x".repeat(DISPLAY_LIMIT)}</pre>`);
-  // A small file has no bar.
-  expect(show("https://x.test/a.txt", "text/plain", "hi").source).not.toContain('class="bar"');
+  // A small file still offers a download button.
+  expect(show("https://x.test/a.txt", "text/plain", "hi").source).toContain('href="https://x.test/a.txt" download');
   const json = JSON.stringify(Array.from({ length: PRETTY_LIMIT / 4 }, (_, i) => i));
   expect(json.length).toBeGreaterThan(PRETTY_LIMIT);
   const preview = show("https://x.test/big.json", "application/json", json).source;
