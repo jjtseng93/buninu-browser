@@ -69,6 +69,9 @@ test("video and audio get a media document playing the URL itself", () => {
   expect(video).toContain("clip.mp4 (video/mp4, 10 bytes). Click the video to play.");
   const audio = show("https://x.test/tone.mp3", "audio/mpeg", new Uint8Array(3)).source;
   expect(audio).toContain('<audio controls src="https://x.test/tone.mp3"></audio><p class="note">tone.mp3 (audio/mpeg, 3 bytes). Click to play;');
+  expect(audio).toContain('id="buninu-piano-input"');
+  expect(video).not.toContain('id="buninu-piano-input"');
+  expect(show("https://x.test/tone.wav", "audio/wav", new Uint8Array(3)).source).not.toContain('id="buninu-piano-input"');
 });
 
 test("content type parsing and JSON highlighting", () => {

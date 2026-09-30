@@ -63,6 +63,11 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
       }
+      if (pathname === "/piano-input") {
+        return new Response('<!doctype html><input id="buninu-piano-input" type="text">', {
+          headers: { "Content-Type": "text/html; charset=utf-8" },
+        });
+      }
       if (["/image", "/broken-image", "/data-image", "/dynamic-data-image"].includes(pathname)) {
         const dataUrl = `data:image/png;base64,${pixelPng.toString("base64")}`;
         const src = pathname === "/image" ? "/pixel.png" : pathname === "/data-image" ? dataUrl : "/missing.png";
@@ -173,6 +178,14 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await view.cdp("Input.insertText", { text: "q" });
     expect(await view.evaluate("document.getElementById('result').textContent")).toBe("q");
     expect(await view.evaluate("document.getElementById('editor').value")).toBe("original");
+    await view.navigate(`http://127.0.0.1:${fixture.port}/piano-input`);
+    const pianoRect = await view.evaluate("document.getElementById('buninu-piano-input').getBoundingClientRect().toJSON()");
+    await view.cdp("Input.dispatchMouseEvent", { type: "mousePressed", x: pianoRect.x + 10, y: pianoRect.y + 10, button: "left", clickCount: 1 });
+    await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", x: pianoRect.x + 10, y: pianoRect.y + 10, button: "left", clickCount: 1 });
+    await view.cdp("Input.insertText", { text: "j" });
+    await view.cdp("Input.dispatchKeyEvent", { type: "rawKeyDown", key: "k", code: "KeyK" });
+    await view.cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "k", code: "KeyK" });
+    expect(await view.evaluate("document.getElementById('buninu-piano-input').value")).toBe("");
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     expect(await view.evaluate("scrollY")).toBe(0);
