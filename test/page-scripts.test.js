@@ -413,6 +413,11 @@ test("childNodes, children and getElementsBy* are live collections", async () =>
     hostTags: "B,I,U", spread: 4, item: 3, missing: null, named: null }));
 });
 
+test("the shown document is visible", async () => {
+  await load("<p>x</p>");
+  expect(await evaluate("[document.visibilityState, document.hidden].join()")).toBe("visible,false");
+});
+
 test("performance.timing follows the document lifecycle", async () => {
   await load(`<script>var atParse = JSON.stringify([performance.timing.navigationStart > 0,
     performance.timing.domInteractive, performance.timing.loadEventEnd]);
