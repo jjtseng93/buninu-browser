@@ -368,6 +368,66 @@ test("fragment links navigate at once: later handlers see the new location, pops
   expect(await evaluate("(() => { location.hash = 'c'; return location.hash + ' ' + history.length })()")).toBe("#c 3");
 });
 
+test("insertAdjacentHTML keeps the order of the inserted nodes at every position", async () => {
+  await load(`<div id="host"><b id="ref">ref</b></div>`);
+  expect(await evaluate(`(() => {
+    const ref = document.getElementById("ref");
+    ref.insertAdjacentHTML("afterend", "<i>1</i><i>2</i>");
+    ref.insertAdjacentHTML("beforebegin", "<u>1</u><u>2</u>");
+    ref.insertAdjacentHTML("afterbegin", "<s>1</s><s>2</s>");
+    ref.insertAdjacentHTML("beforeend", "<em>1</em><em>2</em>");
+    return document.getElementById("host").innerHTML;
+  })()`)).toBe("<u>1</u><u>2</u><b id=\"ref\"><s>1</s><s>2</s>ref<em>1</em><em>2</em></b><i>1</i><i>2</i>");
+});
+
+test("style sheets that scripts add, change or remove apply to the page", async () => {
+  await load(`<p id="p">text</p><script>
+    document.body.insertAdjacentHTML("afterbegin", "<style id=s>#p { display: none }</style>");
+  </script>`);
+  const height = () => evaluate("document.getElementById('p').getBoundingClientRect().height");
+  expect(await height()).toBe(0);
+  await evaluate("document.getElementById('s').textContent = '#p { padding: 10px }'");
+  expect(await height()).toBeGreaterThan(20);
+  await evaluate("document.getElementById('s').remove()");
+  expect(await height()).toBeLessThan(25);
+});
+
+test("childNodes, children and getElementsBy* are live collections", async () => {
+  await load(`<div id="host"></div>`);
+  expect(await evaluate(`(() => {
+    const host = document.getElementById("host");
+    const source = document.createElement("div");
+    source.innerHTML = "<b>1</b>text<i class=x>2</i><u class=x>3</u>";
+    const nodes = source.childNodes, tags = source.getElementsByTagName("*"), named = source.getElementsByClassName("x");
+    const before = [nodes.length, source.children.length, tags.length, named.length, nodes === source.childNodes];
+    // Moving nodes out empties the live list, so this loop ends.
+    const fragment = document.createDocumentFragment();
+    let moves = 0;
+    while (nodes.length && moves < 10) { fragment.appendChild(nodes[0]); moves++; }
+    host.appendChild(fragment);
+    return JSON.stringify({ before, moves, after: [nodes.length, tags.length, named.length],
+      hostTags: Array.prototype.map.call(host.children, (element) => element.tagName).join(),
+      spread: [...host.childNodes].length, item: host.childNodes.item(1).nodeType, missing: host.childNodes.item(9),
+      named: host.children.namedItem("nope") });
+  })()`)).toBe(JSON.stringify({ before: [4, 3, 3, 2, true], moves: 4, after: [0, 0, 0],
+    hostTags: "B,I,U", spread: 4, item: 3, missing: null, named: null }));
+});
+
+test("performance.timing follows the document lifecycle", async () => {
+  await load(`<script>var atParse = JSON.stringify([performance.timing.navigationStart > 0,
+    performance.timing.domInteractive, performance.timing.loadEventEnd]);
+    var atLoad; addEventListener("load", () => { atLoad = [performance.timing.loadEventStart > 0, performance.timing.loadEventEnd]; });</script>`);
+  await Bun.sleep(50);
+  expect(await evaluate("atParse")).toBe("[true,0,0]");
+  expect(await evaluate(`(() => { const t = performance.timing;
+    return JSON.stringify([atLoad, t.navigationStart === Math.round(performance.timeOrigin),
+      t.fetchStart <= t.responseEnd && t.responseEnd <= t.domLoading && t.domLoading <= t.domInteractive
+      && t.domInteractive <= t.domContentLoadedEventStart && t.domContentLoadedEventEnd <= t.domComplete
+      && t.domComplete <= t.loadEventStart && t.loadEventStart <= t.loadEventEnd,
+      performance.navigation.type, Object.keys(t.toJSON()).length]); })()`))
+    .toBe(JSON.stringify([[true, 0], true, true, 0, 21]));
+});
+
 test("location assignment asks the controller to navigate", async () => {
   navigations.length = 0;
   await load(`<script>setTimeout(() => { location.href = '/elsewhere?x=1' }, 0)</script>`);

@@ -417,3 +417,25 @@ test("an auto grid track is limited by a min-width: 0 item instead of its conten
   expect(layout.boxes.map((box) => box.width)).toContain(100);
   expect(layout.boxes.map((box) => box.width)).not.toContain(160);
 });
+
+test("a grid body stacks items sharing an area and aligns its content with place-*", () => {
+  const { document, window } = parseHTMLDocument(`<body><i id="icon" style="display:block;width:40px;height:40px"></i>
+    <p id="a">one</p><p id="b">two two</p><p id="c">three</p></body>`);
+  const styles = new StyleEngine().compute(document, [`
+    body { margin:0; display:grid; min-height:300px; place-content:center; place-items:center }
+    p { margin:0; grid-area:2/1 }
+  `]);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, {
+    x: 0, y: 0, width: 400, measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }),
+  });
+  const boxOf = (id) => layout.boxes.find((box) => tree.nodesById.get(box.nodeId)?.domNode?.id === id);
+  const [icon, a, b, c] = ["icon", "a", "b", "c"].map(boxOf);
+  // One shared row for the paragraphs, centered in 300px under the 40px icon row.
+  expect([a.y, b.y, c.y]).toEqual([a.y, a.y, a.y]);
+  expect(icon.y).toBe((300 - 40 - 20) / 2);
+  expect(a.y).toBe(icon.y + 40);
+  // place-items: center centers each item in the 70px-wide column ("two two").
+  expect([icon.x, a.x, b.x]).toEqual([180, 185, 165]);
+  window.happyDOM.abort();
+});

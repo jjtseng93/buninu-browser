@@ -706,12 +706,9 @@ export default class Element
 	 * @param text HTML string to insert.
 	 */
 	public insertAdjacentHTML(position: InsertAdjacentPosition, text: string): void {
-		const childNodes = new HTMLParser(this[PropertySymbol.window]).parse(text)[
-			PropertySymbol.nodeArray
-		];
-		while (childNodes.length) {
-			this.insertAdjacentElement(position, childNodes[0]);
-		}
+		// Insert the parsed fragment as a whole: inserting its nodes one at a
+		// time at "afterbegin" or "afterend" reversed their order.
+		this.insertAdjacentElement(position, new HTMLParser(this[PropertySymbol.window]).parse(text));
 	}
 
 	/**
