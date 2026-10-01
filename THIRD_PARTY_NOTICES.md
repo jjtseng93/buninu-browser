@@ -226,12 +226,22 @@ binary and CanvasKit's upstream build configuration:
 | libwebp | `LICENSES/libwebp.txt` (BSD-3-Clause) | https://github.com/webmproject/libwebp |
 | Wuffs image decoding | `LICENSES/wuffs.txt` (MIT or Apache-2.0) | https://github.com/google/wuffs |
 | WOFF2 fonts | `LICENSES/woff2.txt` (MIT) | https://github.com/google/woff2 |
+| Brotli compression used by WOFF2 | `LICENSES/brotli.txt` (MIT) | https://github.com/google/brotli |
 | zlib | `LICENSES/zlib.txt` (zlib) | https://github.com/madler/zlib |
 | Emscripten-generated runtime | `LICENSES/emscripten.txt` (MIT or University of Illinois/NCSA) | https://github.com/emscripten-core/emscripten |
 
-The exact revisions of these libraries in the inherited CanvasKit binary
-have not been independently reconstructed; the top-level artifact is the
-official `canvaskit-wasm` 0.41.1 release.
+The top-level artifact is the official `canvaskit-wasm` 0.41.1 release,
+corresponding to Skia commit `3c68f3ffd7c9bc781494cdb85e718ff1e6f49d84`.
+That release's `DEPS` pins Brotli at
+`6d03dfbedda1615c4cba1211f8d81735575209c8`. The exact revisions of the
+remaining embedded libraries have not been independently reconstructed.
+
+## Project-generated test media
+
+`test/fixtures/tone.mp3` and `test/fixtures/video.mp4` are one-second synthetic
+fixtures generated for this project's audio and video tests. They contain no
+third-party creative content. Their container metadata identifies FFmpeg's
+Lavf/Lavc encoders; FFmpeg itself is not distributed in these fixture files.
 
 The source asset directory also retains the license files next to the fonts and
 CanvasKit artifacts. Versions and provenance above mirror
