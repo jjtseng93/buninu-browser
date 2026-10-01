@@ -373,7 +373,10 @@ export default class QuerySelector {
 			);
 		}
 
-		const cachedResult = element[PropertySymbol.cache].matches.get(selector);
+		// A :has() match depends on the whole subtree, which no affected-cache
+		// registration covers, so it is not cached.
+		const cacheable = !selector.includes(':has(');
+		const cachedResult = cacheable ? element[PropertySymbol.cache].matches.get(selector) : null;
 
 		if (cachedResult) {
 			if (cachedResult.result !== null) {
@@ -386,9 +389,11 @@ export default class QuerySelector {
 			result: { match: null }
 		};
 
-		element[PropertySymbol.cache].matches.set(selector, cachedItem);
+		if (cacheable) {
+			element[PropertySymbol.cache].matches.set(selector, cachedItem);
+		}
 
-		if (element[PropertySymbol.isConnected]) {
+		if (cacheable && element[PropertySymbol.isConnected]) {
 			// Document is affected for the ":target" selector
 			(element[PropertySymbol.ownerDocument] || element)[PropertySymbol.affectsCache].push(
 				cachedItem
@@ -460,6 +465,13 @@ export default class QuerySelector {
 
 		if (!selectorItem) {
 			return null;
+		}
+
+		// Structural pseudo-classes and sibling combinators read the parent's
+		// child list, whose changes are reported on the parent.
+		const parent = element.parentNode;
+		if (parent) {
+			this.affectsCache(<Element>parent, cachedItem);
 		}
 
 		const result = selectorItem.match(scope, element, ignoreErrors);

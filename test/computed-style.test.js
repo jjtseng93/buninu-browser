@@ -454,3 +454,33 @@ test("the font shorthand allows spaces around the line-height slash", () => {
     window.happyDOM.abort();
   }
 });
+
+test("incremental restyles of changed subtrees and added sheets equal a full restyle", () => {
+  const { document, window } = parseHTMLDocument(`<body><div id="a" class="x"><p>one</p><p>two</p></div><div id="b"><span>s</span></div></body>`);
+  const sheets = [".x p { color: red } .y p { color: blue; font-size: 20px } #b span { font-weight: 700 }"];
+  const engine = new StyleEngine().compute(document, sheets);
+  const same = (label) => {
+    const reference = new StyleEngine().compute(document, engine.sheets ?? sheets);
+    for (const element of document.querySelectorAll("*")) {
+      expect([label, JSON.stringify(engine.get(element))]).toEqual([label, JSON.stringify(reference.get(element))]);
+    }
+  };
+  // An attribute change: only #a's subtree.
+  document.getElementById("a").className = "y";
+  engine.compute(document, sheets, {}, new Set([document.getElementById("a")]));
+  expect([engine.incremental, engine.restyled]).toEqual([true, 3]);
+  same("class change");
+  // Inserted elements: their parent's subtree.
+  const b = document.getElementById("b");
+  b.insertAdjacentHTML("beforeend", "<span>t</span><p>u</p>");
+  engine.compute(document, sheets, {}, new Set([b]));
+  expect(engine.restyled).toBe(4);
+  same("insertion");
+  // An added sheet restyles what its rules match, nothing else.
+  const more = [...sheets, "span { color: green }"];
+  engine.compute(document, more, {}, new Set());
+  expect([engine.incremental, engine.restyled]).toEqual([true, 2]); // the two spans
+  engine.sheets = more;
+  same("added sheet");
+  window.happyDOM.abort();
+});

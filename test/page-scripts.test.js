@@ -553,6 +553,31 @@ test("a search textarea can be focused across its form and submitted with Enter"
   expect(navigations).toEqual([]);
 });
 
+test("restyles follow :has() and structural matches of inserted subtrees after later changes", async () => {
+  await load(`<style>.box:has(img) { display: none } li:first-child + li span { display: none }</style>
+    <div id="host"></div><ul id="list"><li>a</li></ul>`);
+  // Inserted, styled, then changed inside: the inserted elements' matches
+  // are what the next change is compared with.
+  expect(await evaluate(`(() => {
+    const host = document.getElementById("host");
+    const template = document.createElement("template");
+    template.innerHTML = '<div class="box" id="box"><p><img></p></div>';
+    host.append(template.content); // built detached, inserted whole
+    const before = getComputedStyle(document.getElementById("box")).display;
+    document.querySelector("#box img").remove();
+    return before + "," + getComputedStyle(document.getElementById("box")).display;
+  })()`)).toBe("none,block");
+  expect(await evaluate(`(() => {
+    const list = document.getElementById("list");
+    list.insertAdjacentHTML("beforeend", '<li><span id="s">b</span></li>');
+    const before = getComputedStyle(document.getElementById("s")).display;
+    list.prepend(document.createElement("li"));
+    list.firstElementChild.remove();
+    list.firstElementChild.remove();
+    return before + "," + getComputedStyle(document.getElementById("s")).display;
+  })()`)).toBe("none,inline");
+});
+
 test("styles inside noscript do not apply while page scripting is enabled", async () => {
   await load(`<noscript><style>p { display: none }</style></noscript><p id="visible">visible</p>`);
   expect(await evaluate(`getComputedStyle(document.getElementById("visible")).display`)).toBe("block");
