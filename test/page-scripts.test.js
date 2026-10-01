@@ -79,6 +79,32 @@ test("classic scripts share globals, load in order and fire DOMContentLoaded the
   expect(await evaluate("document.readyState")).toBe("complete");
 });
 
+test("parser-blocking head scripts run before document.body exists", async () => {
+  await load(`<head><script>window.bodyDuringHead = document.body</script></head><body><p>ready</p></body>`);
+  expect(await evaluate("bodyDuringHead === null")).toBe(true);
+  expect(await evaluate("document.body.textContent")).toBe("ready");
+});
+
+test("anchors expose parsed hyperlink URL components", async () => {
+  await load(`<a id="link" href="/path?q=one#part"></a>`);
+  expect(await evaluate(`(() => { const a = document.getElementById("link"); return [
+    a.href, a.origin, a.protocol, a.host, a.hostname, a.port, a.pathname, a.search, a.hash
+  ] })()`)).toEqual([
+    "https://page.test/path?q=one#part", "https://page.test", "https:", "page.test", "page.test", "",
+    "/path", "?q=one", "#part",
+  ]);
+  await evaluate(`document.getElementById("link").hostname = "other.test"`);
+  expect(await evaluate(`document.getElementById("link").href`)).toBe("https://other.test/path?q=one#part");
+});
+
+test("getAttributeNode exposes a live Attr view", async () => {
+  await load(`<form id="search" onsubmit="return false"></form>`);
+  expect(await evaluate(`(() => { const form = document.getElementById("search"); const attr = form.getAttributeNode("onsubmit");
+    const before = [attr.name, attr.value, attr.nodeType, attr.ownerElement === form, attr.specified];
+    attr.value = "return true"; return [...before, form.getAttribute("onsubmit"), form.getAttributeNode("missing")]; })()`))
+    .toEqual(["onsubmit", "return false", 2, true, true, "return true", null]);
+});
+
 test("scripts change the DOM and the next screenshot shows it", async () => {
   await load(`<div id="box" style="height:20px"></div>
     <script>document.getElementById('box').style.background = 'rgb(255, 0, 0)';
@@ -131,6 +157,19 @@ test("template content can be cloned and typed arrays are available", async () =
       document.getElementById('mount').dataset.number = new Float64Array([1.5])[0];</script>`);
   expect(await evaluate("document.getElementById('mount').textContent")).toBe("from template");
   expect(await evaluate("document.getElementById('mount').dataset.number")).toBe("1.5");
+});
+
+test("DOM collection interfaces expose iterable array-compatible prototypes", async () => {
+  await load(`<p>one</p><p>two</p>`);
+  expect(await evaluate("typeof NodeList.prototype.forEach")).toBe("function");
+  expect(await evaluate("typeof HTMLCollection.prototype.item")).toBe("undefined");
+  expect(await evaluate("[...document.querySelectorAll('p')].map(p => p.textContent).join(',')")).toBe("one,two");
+});
+
+test("an unfocused page exposes an empty Selection", async () => {
+  await load(`<p>text</p>`);
+  expect(await evaluate("[getSelection().type, getSelection().rangeCount, getSelection().toString()].join(',')"))
+    .toBe("None,0,");
 });
 
 test("page-local DOM prototypes remain writable after binding hardening", async () => {
@@ -230,6 +269,11 @@ test("style feature detection only finds properties the renderer implements", as
   await load("<p>x</p>");
   expect(await evaluate(`["color", "backgroundColor", "setProperty", "cssText", "anchorName", "positionTryFallbacks", "notAProperty"]
     .map((name) => name in document.body.style).join(",")`)).toBe("true,true,true,true,false,false,false");
+  expect(await evaluate(`[
+    CSS.supports("color", "red"),
+    CSS.supports("animation-timeline", "scroll()"),
+    CSS.supports("(display: grid)")
+  ].join(",")`)).toBe("true,false,false");
 });
 
 test("the root element's client size is the viewport, and computed style reports painting properties", async () => {
@@ -350,7 +394,7 @@ test("page scripts cannot escape the sandbox or reach engine state", async () =>
     attempt('patchPrototype', () => { Object.getPrototypeOf(document.body).appendChild = () => 'pwned'; return 'patched'; });
     attempt('patchIntrinsic', () => { Array.prototype.includes = () => true; return 'patched'; });
     attempt('patchUrl', () => { URL.prototype.toString = () => 'pwned'; return 'patched'; });
-    attempt('dynamicImport', () => eval('import("node:fs")'));
+    attempt('dynamicImport', () => { const pending = eval('import("node:fs")'); pending.catch(() => {}); return pending instanceof Promise ? 'promise' : 'wrong'; });
   </script>`);
   const probes = await evaluate("JSON.stringify(probes)");
   expect(JSON.parse(probes)).toEqual({
@@ -363,7 +407,7 @@ test("page scripts cannot escape the sandbox or reach engine state", async () =>
     patchPrototype: "patched",
     patchIntrinsic: "blocked",
     patchUrl: "blocked",
-    dynamicImport: "blocked",
+    dynamicImport: "promise",
   });
   await load("<p>another page</p>");
   expect(await evaluate("document.body.appendChild.toString().includes('pwned')")).toBe(false);
@@ -399,6 +443,9 @@ test("page-inserted scripts run; innerHTML scripts do not; on* handlers fire", a
     inFragment.textContent = "log.push('fragment script ran')";
     fragment.appendChild(inFragment);
     document.body.appendChild(fragment);
+    const blobScript = document.createElement('script');
+    blobScript.src = URL.createObjectURL(new Blob(["log.push('blob script ran')"], { type: 'text/javascript' }));
+    document.head.appendChild(blobScript);
   </script>`);
   await Bun.sleep(100);
   expect(await evaluate("log.join(' | ')")).toBe([
@@ -406,6 +453,7 @@ test("page-inserted scripts run; innerHTML scripts do not; on* handlers fire", a
     "after inline insertion",
     "fragment script ran",
     // A script inserted during loading delays the window load event.
+    "blob script ran",
     "external ran:true",
     "external onload",
     "window.onload",
