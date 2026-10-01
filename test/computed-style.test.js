@@ -441,3 +441,16 @@ test("links get the UA link style; text decorations propagate to in-flow descend
   expect(style("invalid").textDecorations).toBeNull();
   window.happyDOM.abort();
 });
+
+test("the font shorthand allows spaces around the line-height slash", () => {
+  for (const font of ['14px / 1.5 "Mona Sans VF", sans-serif', '14px/ 1.5 "Mona Sans VF", sans-serif',
+    '14px /1.5 "Mona Sans VF", sans-serif', '14px/1.5 "Mona Sans VF", sans-serif']) {
+    const { document, window } = parseHTMLDocument(`<p style='font: ${font}'><span>x</span></p>`);
+    const engine = new StyleEngine().compute(document);
+    for (const element of [document.querySelector("p"), document.querySelector("span")]) {
+      const style = engine.get(element);
+      expect([style.fontSize, style.lineHeight, style.fontFamily]).toEqual([14, 21, ["Mona Sans VF", "sans-serif"]]);
+    }
+    window.happyDOM.abort();
+  }
+});
