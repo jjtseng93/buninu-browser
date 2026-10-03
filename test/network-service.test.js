@@ -149,6 +149,37 @@ test("preflights non-simple requests and strips forbidden headers", async () => 
   await expect(network.pageFetch({ url: "file:///etc/passwd" }, document)).rejects.toThrow("cannot load file:");
 });
 
+test("coalesces identical subresources, caches fresh bodies, and revalidates ETags", async () => {
+  let freshRequests = 0;
+  let validatedRequests = 0;
+  const network = new NetworkService({ fetch: async (input, init = {}) => {
+    const url = new URL(typeof input === "string" ? input : input.url);
+    const headers = new Headers(init.headers ?? input.headers);
+    if (url.pathname === "/fresh") {
+      freshRequests++;
+      await Bun.sleep(10);
+      return new Response("fresh", { headers: { "cache-control": "public, max-age=60" } });
+    }
+    validatedRequests++;
+    if (headers.get("if-none-match") === '"v1"') return new Response(null, { status: 304 });
+    return new Response("validated", { headers: { "cache-control": "no-cache", etag: '"v1"' } });
+  } });
+  const document = "https://page.test/";
+  const [left, right] = await Promise.all([
+    network.subresource("https://asset.test/fresh", document),
+    network.subresource("https://asset.test/fresh", document),
+  ]);
+  expect([new TextDecoder().decode(left.body), new TextDecoder().decode(right.body), freshRequests])
+    .toEqual(["fresh", "fresh", 1]);
+  await network.subresource("https://asset.test/fresh", document);
+  expect(freshRequests).toBe(1);
+
+  const first = await network.subresource("https://asset.test/revalidate", document);
+  const second = await network.subresource("https://asset.test/revalidate", document);
+  expect([new TextDecoder().decode(first.body), new TextDecoder().decode(second.body), validatedRequests])
+    .toEqual(["validated", "validated", 2]);
+});
+
 /** Opens a page WebSocket and resolves with how it ended. */
 function socketOutcome(socket) {
   return new Promise((resolve) => {

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
-import { RenderTreeBuilder, renderTreeText } from "../lib/render-tree/index.js";
+import { RenderTreeBuilder, renderTreeText, sameLayoutInput } from "../lib/render-tree/index.js";
 
 test("builds an engine-owned tree and excludes non-rendered DOM nodes", () => {
   const { document, window } = parseHTMLDocument(`<body>
@@ -113,5 +113,26 @@ test("audio with controls is a 300x32 player painted from its state; without con
   expect(node("a").resource).toBe(state);
   expect(node("b")).toBeUndefined();
   expect(renderTreeText(tree)).not.toContain("fallback");
+  window.happyDOM.abort();
+});
+
+test("detects whether a rebuilt tree changes layout input", async () => {
+  const { StyleEngine } = await import("../lib/style/computed-style.js");
+  const { document, window } = parseHTMLDocument(`<body><p>visible</p><script>old</script></body>`);
+  const builder = new RenderTreeBuilder();
+  const styles = new StyleEngine().compute(document);
+  const first = builder.build(document, styles);
+  const firstParagraph = first.root.children[0];
+
+  document.querySelector("script").textContent = "new metadata";
+  const metadataOnly = builder.build(document, styles);
+  expect(sameLayoutInput(first.root, metadataOnly.root)).toBe(true);
+  expect(metadataOnly.root).toBe(first.root);
+  expect(metadataOnly.root.children[0]).toBe(firstParagraph);
+
+  document.querySelector("p").textContent = "different visible text";
+  const visibleChange = builder.build(document, styles);
+  expect(sameLayoutInput(metadataOnly.root, visibleChange.root)).toBe(false);
+  expect(visibleChange.root.children[0]).not.toBe(firstParagraph);
   window.happyDOM.abort();
 });
