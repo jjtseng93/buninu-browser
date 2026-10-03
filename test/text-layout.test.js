@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
-import { layoutText } from "../lib/layout/text-layout.js";
+import { LayoutEngine, layoutText } from "../lib/layout/text-layout.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
 import { StyleEngine } from "../lib/style/computed-style.js";
 
@@ -437,5 +437,24 @@ test("a grid body stacks items sharing an area and aligns its content with place
   expect(a.y).toBe(icon.y + 40);
   // place-items: center centers each item in the 70px-wide column ("two two").
   expect([icon.x, a.x, b.x]).toEqual([180, 185, 165]);
+  window.happyDOM.abort();
+});
+
+test("retained block results match a clean layout after a sibling changes", () => {
+  const { document, window } = parseHTMLDocument(`<body><section><p>unchanged subtree</p></section><section id="edit">short</section></body>`);
+  const styles = new StyleEngine().compute(document);
+  const builder = new RenderTreeBuilder();
+  const engine = new LayoutEngine({
+    measureText: (text) => text.length * 10,
+    fontMetrics: () => ({ ascent: 16, height: 20 }),
+  });
+  const options = { x: 0, y: 0, width: 240, measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }) };
+  engine.layout(builder.build(document, styles), options);
+
+  document.getElementById("edit").textContent = "a changed sibling which wraps onto another line";
+  const tree = builder.build(document, styles);
+  const retained = engine.layout(tree, options);
+  const clean = layoutText(tree, options);
+  expect(retained).toEqual(clean);
   window.happyDOM.abort();
 });

@@ -455,6 +455,22 @@ test("the font shorthand allows spaces around the line-height slash", () => {
   }
 });
 
+test("incremental restyling retains equal computed-style identities", () => {
+  const { document, window } = parseHTMLDocument(`<body><div><span>same</span></div></body>`);
+  const div = document.querySelector("div");
+  const span = document.querySelector("span");
+  const engine = new StyleEngine().compute(document, [".active { color: red }"]);
+  const before = [engine.get(div), engine.get(span)];
+  // Visiting this subtree is conservative: the class changes, but neither
+  // element's final values change.
+  div.className = "unmatched";
+  engine.compute(document, [".active { color: red }"], {}, new Set([div]));
+  expect([engine.get(div), engine.get(span)]).toEqual(before);
+  expect(engine.get(div)).toBe(before[0]);
+  expect(engine.get(span)).toBe(before[1]);
+  window.happyDOM.abort();
+});
+
 test("incremental restyles of changed subtrees and added sheets equal a full restyle", () => {
   const { document, window } = parseHTMLDocument(`<body><div id="a" class="x"><p>one</p><p>two</p></div><div id="b"><span>s</span></div></body>`);
   const sheets = [".x p { color: red } .y p { color: blue; font-size: 20px } #b span { font-weight: 700 }"];
