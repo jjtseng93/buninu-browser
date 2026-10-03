@@ -22,13 +22,16 @@ test("the CLI writes controller and renderer output to the log file", async () =
     });
     const reader = child.stderr.getReader();
     let seen = "";
-    while (!seen.includes("DevTools listening")) {
+    // The endpoint opens first; the sandbox line follows once the first renderer is up.
+    while (!seen.includes("renderer sandbox:")) {
       const { value, done } = await reader.read();
       if (done) break;
       seen += new TextDecoder().decode(value);
     }
     child.kill();
     await child.exited;
+    expect(seen.indexOf("DevTools listening")).toBeGreaterThan(-1);
+    expect(seen.indexOf("DevTools listening")).toBeLessThan(seen.indexOf("renderer sandbox:"));
     const log = await Bun.file(`${dir}/${DEFAULT_LOG_FILE}`).text();
     expect(log).toContain("[log] started pid");
     expect(log).toContain("renderer sandbox: seccomp");

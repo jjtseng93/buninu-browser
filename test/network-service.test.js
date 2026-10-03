@@ -180,6 +180,42 @@ test("coalesces identical subresources, caches fresh bodies, and revalidates ETa
     .toEqual(["validated", "validated", 2]);
 });
 
+test("at most six requests per host are in flight; waiting stylesheets go before scripts", async () => {
+  let active = 0;
+  let peak = 0;
+  const started = [];
+  const gates = [];
+  const network = new NetworkService({ fetch: async (input) => {
+    const url = new URL(typeof input === "string" ? input : input.url);
+    started.push(url.host + url.pathname);
+    if (url.host === "slow.test") {
+      active++;
+      peak = Math.max(peak, active);
+      await new Promise((resolve) => gates.push(resolve));
+      active--;
+    }
+    return new Response("x", { headers: { "cache-control": "no-store" } });
+  } });
+  const document = "https://page.test/";
+  const scripts = Array.from({ length: 8 }, (_, index) => network.subresource(`https://slow.test/s${index}.js`, document, "script"));
+  await Bun.sleep(5);
+  const stylesheet = network.subresource("https://slow.test/late.css", document, "stylesheet");
+  // Another host is not held up by this one's queue.
+  await network.subresource("https://other.test/free.js", document, "script");
+  expect(started.filter((entry) => entry.startsWith("slow.test"))).toHaveLength(6);
+  gates.shift()();
+  await Bun.sleep(5);
+  // The freed slot went to the stylesheet that came after the waiting scripts.
+  expect(started.at(-1)).toBe("slow.test/late.css");
+  while (active || gates.length) {
+    gates.shift()?.();
+    await Bun.sleep(1);
+  }
+  await Promise.all([...scripts, stylesheet]);
+  expect(peak).toBe(6);
+  expect(started.filter((entry) => entry.startsWith("slow.test"))).toHaveLength(9);
+});
+
 /** Opens a page WebSocket and resolves with how it ended. */
 function socketOutcome(socket) {
   return new Promise((resolve) => {

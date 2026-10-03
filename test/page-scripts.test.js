@@ -7,6 +7,8 @@ import { RendererHost } from "../lib/renderer/host.js";
  */
 const scripts = new Map();
 const navigations = [];
+// Every resource request with its time, for the preload test.
+const requests = [];
 let renderer;
 
 beforeAll(async () => {
@@ -15,6 +17,11 @@ beforeAll(async () => {
     onNavigate: (url) => navigations.push(url),
     fetch: async (url, init = {}) => {
       const target = new URL(String(url));
+      requests.push({ url: target.href, at: performance.now() });
+      if (target.pathname === "/slow.css") {
+        await Bun.sleep(400);
+        return new Response("body { color: red }", { headers: { "content-type": "text/css" } });
+      }
       const headers = new Headers(init.headers);
       if (target.pathname === "/api/echo") {
         return new Response(JSON.stringify({
@@ -929,3 +936,25 @@ function pulseServerRunning() {
     setTimeout(() => done(false), 1000);
   });
 }
+
+test("scripts and module preloads are fetched while the stylesheets load, each once", async () => {
+  const base = "https://page.test/preload/";
+  scripts.set(`${base}main.js`, "import { value } from './dep.js'; window.preloaded = value;");
+  scripts.set(`${base}dep.js`, "export const value = 'dep';");
+  scripts.set(`${base}classic.js`, "window.classic = 'ran';");
+  scripts.set(`${base}skipped.js`, "window.skipped = 'ran';");
+  requests.length = 0;
+  const started = performance.now();
+  await load(`<link rel="stylesheet" href="/slow.css"><link rel="modulepreload" href="/preload/dep.js">
+    <script type="module" src="/preload/main.js"></script><script src="/preload/classic.js"></script>
+    <script nomodule src="/preload/skipped.js"></script>`);
+  expect(await evaluate("[window.preloaded, window.classic, window.skipped].join()")).toBe("dep,ran,");
+  const times = (path) => requests.filter((request) => request.url === `https://page.test${path}`).map((request) => request.at - started);
+  // Requested before the 400 ms stylesheet arrived, not after it.
+  for (const path of ["/preload/main.js", "/preload/dep.js", "/preload/classic.js"]) {
+    expect(times(path).length).toBe(1);
+    expect(times(path)[0]).toBeLessThan(times("/slow.css")[0] + 300);
+  }
+  expect(times("/preload/skipped.js")).toEqual([]);
+});
+

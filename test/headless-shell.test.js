@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { createBrowser } from "../lib/headless-shell.js";
 
 async function readDevToolsUrl(stream, timeout = 15_000) {
   const reader = stream.getReader();
@@ -341,5 +342,33 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     browser.kill();
     fixture.stop(true);
     await browser.exited;
+  }
+}, 30_000);
+
+test("a client may set up and navigate before the first renderer is up", async () => {
+  let fetched = 0;
+  const site = Bun.serve({ port: 0, fetch() {
+    fetched++;
+    return new Response("<!doctype html><title>early</title><p>x</p>", { headers: { "content-type": "text/html" } });
+  } });
+  const browser = await createBrowser({ spareRenderer: false, waitForRenderer: false });
+  let ready = false;
+  browser.ready.then(() => { ready = true; });
+  try {
+    // Viewport and user agent are recorded at once, not after the renderer starts.
+    await browser.context.resize(321, 234, 1);
+    await browser.context.setUserAgent("EarlyAgent/1");
+    expect(ready).toBe(false);
+    // The document is fetched meanwhile; it commits once the renderer is up.
+    const navigation = browser.context.navigate(`http://127.0.0.1:${site.port}/`);
+    while (!fetched) await Bun.sleep(5);
+    expect(ready).toBe(false);
+    await navigation;
+    expect(fetched).toBe(1);
+    expect(await browser.context.title()).toBe("early");
+    expect(await browser.context.evaluate("innerWidth + 'x' + innerHeight + ' ' + navigator.userAgent")).toBe("321x234 EarlyAgent/1");
+  } finally {
+    browser.close();
+    site.stop(true);
   }
 }, 30_000);
