@@ -458,3 +458,52 @@ test("retained block results match a clean layout after a sibling changes", () =
   expect(retained).toEqual(clean);
   window.happyDOM.abort();
 });
+
+/** A layout with paint layers as ranks: replays renumber layers, keeping their order. */
+function rankedLayout(layout) {
+  const orders = new Set([0]);
+  for (const entry of [...layout.boxes, ...layout.fragments]) {
+    for (let layer = entry.layer; layer; layer = layer.parent) orders.add(layer.order);
+  }
+  const rank = new Map([...orders].sort((a, b) => a - b).map((order, index) => [order, index]));
+  const layer = (value) => value && { rank: rank.get(value.order), z: value.z, context: value.context, parent: value.parent ? rank.get(value.parent.order) : null };
+  return {
+    height: layout.height,
+    boxes: layout.boxes.map((box) => ({ ...box, layer: layer(box.layer) })),
+    fragments: layout.fragments.map(({ id, ...fragment }) => ({ ...fragment, layer: layer(fragment.layer) })),
+  };
+}
+
+function retainedAndClean(html, change) {
+  const { document, window } = parseHTMLDocument(html);
+  const styles = new StyleEngine().compute(document);
+  const builder = new RenderTreeBuilder();
+  const measure = { measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }) };
+  const engine = new LayoutEngine(measure);
+  const options = { x: 0, y: 0, width: 240, viewportHeight: 300, ...measure };
+  engine.layout(builder.build(document, styles), options);
+  change(document);
+  const tree = builder.build(document, styles);
+  const result = { retained: engine.layout(tree, options), clean: layoutText(tree, options), document };
+  window.happyDOM.abort();
+  return result;
+}
+
+test("positioned boxes inside a retained block are replayed in their paint layers", () => {
+  const { retained, clean } = retainedAndClean(`<body><p id="edit">short</p>
+    <section><div style="position:relative;z-index:2">raised <span style="position:relative">inner</span></div>
+    <div style="position:relative">auto</div><p style="position:absolute;top:5px;z-index:-1">behind</p></section></body>`,
+  (document) => { document.getElementById("edit").textContent = "a longer paragraph that wraps onto two lines"; });
+  expect(rankedLayout(retained)).toEqual(rankedLayout(clean));
+  // The section moved down with the wrapped paragraph, and its layers came along.
+  expect(new Set(retained.boxes.map((box) => box.layer.order)).size).toBe(new Set(clean.boxes.map((box) => box.layer.order)).size);
+});
+
+test("an out-of-flow box keeps its static position when the block around its placeholder is replayed", () => {
+  // The absolute box's containing block is the positioned div; its placeholder is in the section,
+  // which is replayed (moved down) after the paragraph above it grows.
+  const { retained, clean } = retainedAndClean(`<body><div style="position:relative"><p id="edit">short</p>
+    <section><p>above</p><div style="position:absolute">static</div><p>below</p></section></div></body>`,
+  (document) => { document.getElementById("edit").textContent = "a longer paragraph that wraps onto two lines"; });
+  expect(rankedLayout(retained)).toEqual(rankedLayout(clean));
+});
