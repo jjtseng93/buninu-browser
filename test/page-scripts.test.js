@@ -392,6 +392,26 @@ test("style sheets that scripts add, change or remove apply to the page", async 
   expect(await height()).toBeLessThan(25);
 });
 
+test("DOM records and live form state take their distinct style invalidation paths", async () => {
+  await load(`<style>
+    .on .child { color: red }
+    input:checked + span { display: none }
+  </style>
+  <div id="parent"><span class="child">child</span></div>
+  <input id="box" type="checkbox"><span id="after">after</span>`);
+  expect(await evaluate(`(() => {
+    const parent = document.getElementById("parent");
+    const child = parent.querySelector(".child");
+    parent.className = "on";
+    void child.offsetWidth;
+    const color = getComputedStyle(child).color;
+    const box = document.getElementById("box");
+    box.checked = true;
+    void document.getElementById("after").offsetWidth;
+    return color + "/" + getComputedStyle(document.getElementById("after")).display;
+  })()`)).toBe("rgba(255, 0, 0, 1)/none");
+});
+
 test("childNodes, children and getElementsBy* are live collections", async () => {
   await load(`<div id="host"></div>`);
   expect(await evaluate(`(() => {
