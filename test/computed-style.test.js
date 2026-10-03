@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
 import { RenderTreeBuilder, renderTreeText } from "../lib/render-tree/index.js";
-import { computeElementStyle, parseDeclarations, StyleEngine } from "../lib/style/computed-style.js";
+import { computeElementStyle, matchSelectors, parseDeclarations, StyleEngine } from "../lib/style/computed-style.js";
 
 test("computes the initial UA and inherited style subset", () => {
   const { document, window } = parseHTMLDocument(`<body>
@@ -378,6 +378,50 @@ test("cascade layers: unlayered beats layered, later layers win, !important reve
   // A layered author rule still beats the user-agent defaults.
   expect(get("a").margin).toEqual([5, 0, 16, 0]);
   expect(get("b").visibility).toBe("hidden");
+  window.happyDOM.abort();
+});
+
+test("sheets parsed once keep layer order and cascade when the sheet list changes or repeats", () => {
+  const { document, window } = parseHTMLDocument(`<p id="a" class="x">t</p><p id="b" class="y">u</p>`);
+  const base = `@layer one, two; @layer two { .x { color: blue } } @layer one { .x { color: red; display: flex } }`;
+  const anonymous = `@layer { .y { color: green !important } } .y { display: inline }`;
+  const later = `@layer three { .x { display: block } } .y { color: black }`;
+  const lists = [
+    [base, later],
+    [base, later, base], // a repeated sheet: its earlier copy still declares the layers first
+    [later, base],
+    [anonymous, later, anonymous], // anonymous layers: both copies count under !important
+    [later, `@layer two { .x { display: grid } }`, base],
+  ];
+  const engine = new StyleEngine();
+  for (const sheets of lists) {
+    engine.compute(document, sheets, {}, new Set([document.body]), null);
+    const fresh = new StyleEngine().compute(document, sheets.map((sheet) => `${sheet} `));
+    for (const id of ["a", "b"]) expect(engine.get(document.getElementById(id))).toEqual(fresh.get(document.getElementById(id)));
+  }
+  engine.compute(document, [base, later, base]);
+  expect(engine.get(document.getElementById("a")).color).toBe("rgba(0, 0, 255, 1)");
+  expect(engine.get(document.getElementById("a")).display).toBe("block");
+  window.happyDOM.abort();
+});
+
+test("matchSelectors finds what querySelectorAll finds, in one walk", () => {
+  const { document, window } = parseHTMLDocument(`<main><ul><li class="a">1</li><li id="i">2</li><li class="a b">3</li></ul>
+    <p>x</p><p class="a"><span>y</span></p><div><span hidden>z</span></div></main>`);
+  const selectors = ["li:first-child", ".a + li", "li ~ .b", "p:has(span)", ":is(ul, div) > *", "#i", "[hidden]", "*", ":root", "main span", "1x", "li:nth-child(2n+1)"];
+  // Elements compared as sets of document positions (deep equality of DOM
+  // nodes is slow, and querySelectorAll() may list an element twice).
+  const all = [...document.querySelectorAll("*")];
+  const positions = (elements) => [...new Set(elements)].map((element) => all.indexOf(element)).sort((x, y) => x - y);
+  const matched = matchSelectors(document, selectors);
+  for (const selector of selectors) {
+    let expected = null;
+    try { expected = positions(document.querySelectorAll(selector)); } catch {}
+    expect(matched.has(selector) ? positions(matched.get(selector)) : null).toEqual(expected);
+  }
+  // From an element: its descendants and the element itself.
+  const ul = document.querySelector("ul");
+  expect(positions(matchSelectors(ul, [":is(ul, li)"]).get(":is(ul, li)"))).toEqual(positions([ul, ...ul.children]));
   window.happyDOM.abort();
 });
 
