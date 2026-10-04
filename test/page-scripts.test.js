@@ -958,3 +958,33 @@ test("scripts and module preloads are fetched while the stylesheets load, each o
   expect(times("/preload/skipped.js")).toEqual([]);
 });
 
+
+test("an error status shows the page the server sent, scripts included; an empty one gets a note", async () => {
+  await renderer.call("loadDocument", {
+    url: "https://page.test/limited",
+    source: `<!doctype html><title>check</title><body><form id="f"><p>unusual traffic</p></form><script>document.title = "ran";</script></body>`,
+    contentType: "text/html",
+    status: 429,
+    statusText: "Too Many Requests",
+  });
+  await renderer.call("whenLoaded");
+  expect(await evaluate("[document.title, !!document.getElementById('f'), document.body.innerText.includes('HTTP 429')].join()"))
+    .toBe("ran,true,false");
+  await renderer.call("loadDocument", { url: "https://page.test/gone", source: "", contentType: "text/html", status: 404, statusText: "Not Found" });
+  await renderer.call("whenLoaded");
+  expect(await evaluate("document.body.textContent")).toBe("HTTP 404 Not Found");
+});
+
+test("meta.content is the reflected attribute; template.content stays the fragment", async () => {
+  await load(`<template id="t"><b>x</b></template><script>
+    "use strict";
+    const meta = document.createElement("meta");
+    meta.httpEquiv = "origin-trial";
+    meta.content = "token";
+    const other = document.createElement("div");
+    other.content = 5;
+    window.metaResult = [meta.getAttribute("content"), meta.content, other.content,
+      document.getElementById("t").content.firstChild.nodeName].join();
+  </script>`);
+  expect(await evaluate("metaResult")).toBe("token,token,5,B");
+});
