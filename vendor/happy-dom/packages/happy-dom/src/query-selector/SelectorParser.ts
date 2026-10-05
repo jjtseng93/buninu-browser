@@ -12,10 +12,11 @@ import type { TGlobalMatchFunction } from './TGlobalMatchFunction.js';
 /**
  * Selector group RegExp.
  *
- * Group 1: Combinator (" ", ",", "+", ">", "̣~")
- * Group 2: Parentheses or brackets.
+ * Group 1: An escaped character (e.g. "\:", "\31 "), skipped.
+ * Group 2: Combinator (" ", ",", "+", ">", "̣~")
+ * Group 3: Parentheses, brackets or quotes.
  */
-const SELECTOR_GROUP_REGEXP = /(\s*[\s,+>~]\s*)|([\[\]\(\)"'])/g;
+const SELECTOR_GROUP_REGEXP = /(\\[0-9a-fA-F]{1,6}\s?|\\[\s\S])|(\s*[\s,+>~]\s*)|([\[\]\(\)"'])/g;
 
 /**
  * Selector RegExp.
@@ -45,7 +46,7 @@ const SELECTOR_GROUP_REGEXP = /(\s*[\s,+>~]\s*)|([\[\]\(\)"'])/g;
  * Group 23: Pseudo element (e.g. "::after", "::-webkit-inner-spin-button").
  */
 const SELECTOR_REGEXP =
-	/(\*)|([a-zA-Z0-9\u00A0-\uFFFF-]+)|#(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\.(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\[(([a-zA-Z0-9-_]|\\.)+)\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*("([^"]*)"|'([^']*)')\s*(s|i){0,1}\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*(([a-zA-Z0-9\u00A0-\uFFFF_¤£-]|\\.)+)\]|:([a-zA-Z-]+)\s*\(.+\)|:([a-zA-Z-]+)|::([a-zA-Z-]+)/g;
+	/(\*)|((?:[a-zA-Z0-9\u00A0-\uFFFF-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|#(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\.(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\[(([a-zA-Z0-9-_]|\\.)+)\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*("([^"]*)"|'([^']*)')\s*(s|i){0,1}\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*(([a-zA-Z0-9\u00A0-\uFFFF_¤£-]|\\.)+)\]|:([a-zA-Z-]+)\s*\(.+\)|:([a-zA-Z-]+)|::([a-zA-Z-]+)/g;
 
 /**
  * Selector pseudo RegExp.
@@ -187,6 +188,11 @@ export default class SelectorParser {
 
 		while ((match = regExp.exec(selector))) {
 			if (match[1]) {
+				// An escaped character (CSS Syntax §4.3.7) is part of the selector it is in,
+				// never a combinator, bracket or quote.
+				continue;
+			}
+			if (match[2]) {
 				// Matches combinator (" ", ",", "+", ">", "̣~")
 				// We should ignore combinators that are inside parentheses, brackets or apostrophes
 
@@ -198,7 +204,7 @@ export default class SelectorParser {
 				) {
 					const childSelector = selector.substring(lastIndex, match.index).trim();
 
-					switch (match[1].trim()) {
+					switch (match[2].trim()) {
 						case ',':
 							selectorItem = this.getSelectorGroupItem(childSelector, combinator);
 							if (!selectorItem) {
@@ -262,7 +268,7 @@ export default class SelectorParser {
 			} else {
 				// Matches parentheses or brackets.
 
-				switch (match[2]) {
+				switch (match[3]) {
 					case '(':
 						if (depth.singleApostrophe === 0 && depth.doubleApostrophe === 0) {
 							depth.parentheses++;
@@ -365,7 +371,7 @@ export default class SelectorParser {
 			} else if (match[2]) {
 				// Matches tag name, e.g. "div"
 
-				selectorItem.tagName = match[2].toUpperCase();
+				selectorItem.tagName = SelectorParser.cssUnescape(match[2]).toUpperCase();
 			} else if (match[3]) {
 				// Matches ID, e.g. "#id"
 

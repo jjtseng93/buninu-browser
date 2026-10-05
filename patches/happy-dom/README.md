@@ -21,6 +21,8 @@ git -C vendor/happy-dom apply --check ../../patches/happy-dom/0004-insert-adjace
 git -C vendor/happy-dom apply ../../patches/happy-dom/0004-insert-adjacent-html-in-order.patch
 git -C vendor/happy-dom apply --check ../../patches/happy-dom/0005-invalidate-matches-on-structure-changes.patch
 git -C vendor/happy-dom apply ../../patches/happy-dom/0005-invalidate-matches-on-structure-changes.patch
+git -C vendor/happy-dom apply --check ../../patches/happy-dom/0006-parse-css-escapes-in-selectors.patch
+git -C vendor/happy-dom apply ../../patches/happy-dom/0006-parse-css-escapes-in-selectors.patch
 ```
 
 For the already-patched vendored tree, verify that the recorded patch can be
@@ -32,6 +34,7 @@ git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0002-use
 git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0003-defer-script-events-to-renderer.patch
 git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0004-insert-adjacent-html-in-order.patch
 git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0005-invalidate-matches-on-structure-changes.patch
+git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0006-parse-css-escapes-in-selectors.patch
 ```
 
 ## Patch manifest
@@ -43,6 +46,29 @@ git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0005-inv
 | `0003-defer-script-events-to-renderer.patch` | `packages/happy-dom/src/nodes/html-script-element/HTMLScriptElement.ts` | Suppress Happy DOM's synthetic load/error event when its own script loader is disabled; the renderer fetches and executes scripts and dispatches the real outcome itself. | `bun test test/page-scripts.test.js` (`page-inserted scripts run; innerHTML scripts do not; on* handlers fire`) |
 | `0004-insert-adjacent-html-in-order.patch` | `packages/happy-dom/src/nodes/element/Element.ts` | `insertAdjacentHTML` inserted the parsed nodes one at a time, which reversed their order at `afterbegin` and `afterend`; insert the parsed fragment as a whole. | `bun test test/page-scripts.test.js` (`insertAdjacentHTML keeps the order of the inserted nodes at every position`) |
 | `0005-invalidate-matches-on-structure-changes.patch` | `packages/happy-dom/src/query-selector/QuerySelector.ts` | `Element.matches()` cached results that were invalidated only by changes to the elements the matcher visited, so structural pseudo-classes and sibling combinators stayed stale after a child list change, and `:has()` after any change in the subtree; register the parent of every visited element, and do not cache `:has()` matches. | `bun test test/happy-dom-matches.test.js` |
+| `0006-parse-css-escapes-in-selectors.patch` | `packages/happy-dom/src/query-selector/SelectorParser.ts` | The group scan treated a comma, space, quote, or parenthesis that belonged to a CSS escape (`\,`, `\31 `, `\"`, `\(`) as a combinator or grouping character, and a type selector stopped at the first backslash, so `\64 iv` and `my\-el` did not parse. Escapes are consumed first (CSS Syntax §4.3.7) and a type selector is unescaped with the existing `cssUnescape` before it is uppercased. Identifiers, classes, and attribute values already accepted a backslash; this patch does not change how those are decoded. | `bun test test/page-scripts.test.js -t "selectors with CSS escapes"` |
+
+### `0006` against upstream `SelectorParser.ts`
+
+Upstream `v20.14.5` splits a selector with `SELECTOR_GROUP_REGEXP`. Its groups
+are a combinator (` `, `,`, `+`, `>`, `~`) and a grouping character (`(`, `)`,
+`[`, `]`, `"` or `'`). A backslash is not special there, so the character after
+it is what the scan sees. The type-selector alternative is
+`[a-zA-Z0-9\u00A0-\uFFFF-]+`, which also stops at `\`.
+
+| Selector | Upstream | With `0006` |
+|---|---|---|
+| `style\=\"\"` | each `"` changes the quote depth, then the type selector stops at `\`, so the selector is rejected | both escapes stay in one type selector; `cssUnescape` yields `style=""` |
+| `.x\,y > span` | the comma starts another selector in the list | `\,` stays in the class; `>` is still the child combinator |
+| `\64 iv` | the space after the hex escape is a descendant combinator, and `\` is not a type-selector character | `\64 ` is one escape (U+0064), so the type is `div` |
+| `my\-el` | the type selector matches `my` and then fails on `\-el` | the type is `my-el` |
+
+The patched group expression matches an escape first
+(`\[0-9a-fA-F]{1,6}\s?` or `\[\s\S]`) and skips it. Combinators and grouping
+characters move to groups 2 and 3. A type selector may contain the same
+escapes and is passed through `cssUnescape`, the helper upstream already uses
+for attribute values, before `toUpperCase()`. Classes and ids still drop a
+backslash with `replace(/\\/g, '')`; hex escapes in those are unchanged.
 
 Keep each local Happy DOM change in a separate numbered patch and add it to
 this table with its reason and focused test. When updating Happy DOM, regenerate
