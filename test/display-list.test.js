@@ -178,3 +178,24 @@ test("transform: scale paints and hit-tests a box and its contents about its ori
   expect(hitTarget(displayList, 10, 10, { x: 0, y: 0 })).not.toBe(fill.nodeId);
   expect(hitTarget(displayList, 30, 30, { x: 0, y: 0 })).toBe(fill.nodeId);
 });
+
+test("a scroll container moves its content by its scroll offset and reports how far the content reaches", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0"><div id="box"><p>a</p><p>b</p><p>c</p></div></body>`);
+  const styles = new StyleEngine().compute(document, [`#box { height:40px; overflow:auto; background:#123 } p { margin:0; height:20px }`]);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, {
+    x: 0, y: 0, width: 200, lineHeight: 20, measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }),
+  });
+  const box = document.getElementById("box");
+  const displayList = buildDisplayList(layout, tree, null, null, (element) => element === box ? { x: 0, y: 15 } : null);
+  window.happyDOM.abort();
+  const background = displayList.items.find((item) => item.op === "fillRect");
+  // The container itself stays; its text moves up by the offset, clipped to it.
+  expect(background.transform).toBeUndefined();
+  const second = displayList.items.find((item) => item.op === "drawText" && item.text === "b");
+  expect(second.transform).toEqual({ a: 1, d: 1, e: 0, f: -15 });
+  expect(second.clipRect).toEqual({ x: 0, y: 0, width: 200, height: 40 });
+  const boxId = [...tree.nodesById.values()].find((node) => node.domNode === box).id;
+  expect(displayList.scrollers.get(boxId)).toMatchObject({ bottom: 60 });
+  expect(hitTarget(displayList, 5, 10, { x: 0, y: 0 })).toBe(second.nodeId);
+});

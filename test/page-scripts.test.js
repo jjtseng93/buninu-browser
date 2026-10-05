@@ -6,6 +6,11 @@ import { RendererHost } from "../lib/renderer/host.js";
  * because lockdown() would freeze the test runner's own realm.
  */
 const scripts = new Map();
+// A 2x3 red PNG.
+const RED_2X3_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAIAAAA2iEnWAAAAEElEQVR4nGP4z8AARAwoFABE0AX7pM/egAAAAABJRU5ErkJggg==",
+  "base64",
+);
 // HTML documents (iframes), by URL.
 const pages = new Map();
 const navigations = [];
@@ -41,6 +46,7 @@ beforeAll(async () => {
       }
       if (target.pathname === "/video.mp4") return new Response(Bun.file(new URL("./fixtures/video.mp4", import.meta.url)),
         { headers: { "content-type": "video/mp4" } });
+      if (target.pathname === "/red-2x3.png") return new Response(RED_2X3_PNG, { headers: { "content-type": "image/png" } });
       // 30s: it cannot reach its end while a test clicks it, however slow the run.
       if (target.pathname === "/long-video.mp4") return new Response(Bun.file(new URL("./fixtures/long-video.mp4", import.meta.url)),
         { headers: { "content-type": "video/mp4" } });
@@ -116,6 +122,16 @@ test("getAttributeNode exposes a live Attr view", async () => {
     const before = [attr.name, attr.value, attr.nodeType, attr.ownerElement === form, attr.specified];
     attr.value = "return true"; return [...before, form.getAttribute("onsubmit"), form.getAttributeNode("missing")]; })()`))
     .toEqual(["onsubmit", "return false", 2, true, true, "return true", null]);
+});
+
+test("element.attributes is a live NamedNodeMap by index and by name", async () => {
+  await load(`<img id="pic" src="a.png" alt="x">`);
+  expect(await evaluate(`(() => { const img = document.getElementById("pic"); const map = img.attributes;
+    const before = [map.length, map[0].name, map.src.value, map.getNamedItem("alt").value, map.item(9), map.missing === undefined,
+      [...map].map((attribute) => attribute.name).join(), map === img.attributes, "src" in map];
+    img.setAttribute("title", "t"); map.removeNamedItem("alt");
+    return [...before, map.length, Array.from(map, (attribute) => attribute.name + "=" + attribute.value).join()]; })()`))
+    .toEqual([3, "id", "a.png", "x", null, true, "id,src,alt", true, true, 3, "id=pic,src=a.png,title=t"]);
 });
 
 test("scripts change the DOM and the next screenshot shows it", async () => {
@@ -1101,4 +1117,63 @@ test("a click inside an iframe goes to the element under it in the frame's docum
   await waitFor(`document.getElementById("frame").contentWindow.clicked`);
   await renderer.call("click", 70, 60);
   expect(await evaluate(`document.getElementById("frame").contentWindow.clicked`)).toEqual([[20, 20]]);
+});
+
+test("images a script inserts and measures at once still load", async () => {
+  await load(`<div id="host"></div><script>
+    const img = document.createElement("img");
+    img.src = "/red-2x3.png";
+    document.getElementById("host").appendChild(img);
+    // Reading geometry lays the page out before any frame does.
+    window.firstWidth = img.getBoundingClientRect().width;
+  </script>`);
+  await waitFor(`document.querySelector("img").getBoundingClientRect().width === 2`);
+  expect(await evaluate(`[document.querySelector("img").getBoundingClientRect().height, firstWidth !== 2]`)).toEqual([3, true]);
+});
+
+test("scroll containers scroll by wheel and script, move their content and hit-test where it shows", async () => {
+  await load(`<div id="box" style="width:200px;height:100px;overflow-y:auto;border:2px solid black">${
+    Array.from({ length: 10 }, (_, index) => `<p id="p${index}" style="margin:0;height:30px" onclick="window.hit = this.id">row ${index}</p>`).join("")
+  }</div><div id="still" style="height:40px;overflow:hidden"><p style="margin:0;height:80px">hidden overflow</p></div><script>
+    window.$ = (id) => document.getElementById(id);
+    window.scrolls = 0;
+    $("box").addEventListener("scroll", () => scrolls++);
+  </script>`);
+  expect(await evaluate(`[$("box").scrollTop, $("box").scrollHeight, $("box").clientHeight, $("p3").getBoundingClientRect().top]`))
+    .toEqual([0, 300, 100, 92]);
+  // The wheel over the container scrolls it, not the page: nothing is left over.
+  expect(await renderer.call("wheel", 50, 50, 0, 75)).toEqual({ x: 0, y: 0 });
+  await waitFor("window.scrolls > 0");
+  expect(await evaluate(`[$("box").scrollTop, $("p3").getBoundingClientRect().top]`)).toEqual([75, 17]);
+  await renderer.call("click", 50, 20);
+  expect(await evaluate("window.hit")).toBe("p3");
+  // Scripts scroll it too, clamped; overflow: hidden scrolls only by script.
+  expect(await evaluate(`($("box").scrollTop = 1000, $("box").scrollTop)`)).toBe(200);
+  expect(await evaluate(`$("p1").scrollIntoView(), [$("box").scrollTop, $("p1").getBoundingClientRect().top]`)).toEqual([30, 2]);
+  const still = await evaluate(`$("still").getBoundingClientRect().toJSON()`);
+  expect(await renderer.call("wheel", 50, still.y + 10, 0, 20)).toEqual({ x: 0, y: 20 });
+  expect(await evaluate(`($("still").scrollTop = 25, $("still").scrollTop)`)).toBe(25);
+  // What the container cannot take goes on to the page (scroll chaining).
+  await evaluate(`$("box").scrollTop = 190`);
+  expect(await renderer.call("wheel", 50, 50, 0, 30)).toEqual({ x: 0, y: 20 });
+  expect(await evaluate(`$("box").scrollTop`)).toBe(200);
+  // A wheel listener that cancels the event keeps it where it is.
+  await evaluate(`$("box").scrollTop = 30; $("box").addEventListener("wheel", (event) => event.preventDefault())`);
+  expect(await renderer.call("wheel", 50, 50, 0, 30)).toEqual({ x: 0, y: 0 });
+  expect(await evaluate(`$("box").scrollTop`)).toBe(30);
+});
+
+test("the wheel over an iframe scrolls its document first, unless scrolling=no, then what is around it", async () => {
+  pages.set("https://page.test/tall.html", `<!doctype html><body style="margin:0"><div style="height:400px">tall</div></body>`);
+  await load(`<div id="outer" style="width:220px;height:100px;overflow:auto">
+    <iframe id="fixed" scrolling="no" src="tall.html" style="display:block;width:200px;height:150px;border:0"></iframe>
+    <iframe id="free" src="tall.html" style="display:block;width:200px;height:150px;border:0"></iframe>
+  </div><script>window.$ = (id) => document.getElementById(id);</script>`);
+  await waitFor(`$("free").contentDocument?.body?.textContent === "tall" && $("fixed").contentDocument?.body?.textContent === "tall"`);
+  // Over the scrolling=no frame: its document stays, the container scrolls.
+  expect(await renderer.call("wheel", 50, 20, 0, 60)).toEqual({ x: 0, y: 0 });
+  expect(await evaluate(`[$("outer").scrollTop, $("fixed").contentWindow.scrollY]`)).toEqual([60, 0]);
+  // Over the other frame (now at 90..240): its document scrolls first.
+  expect(await renderer.call("wheel", 50, 95, 0, 30)).toEqual({ x: 0, y: 0 });
+  expect(await evaluate(`[$("outer").scrollTop, $("free").contentWindow.scrollY]`)).toEqual([60, 30]);
 });
