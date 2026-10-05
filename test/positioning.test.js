@@ -173,3 +173,28 @@ test("a float shrinks to fit its contents' min-width and sits at the top of its 
   expect(box(".right")).toMatchObject({ x: 300 - 8 - 120, y: 8, width: 120 });
   expect(box(".left")).toMatchObject({ x: 6, y: 6 });
 });
+
+test("a column flex item with a main-axis auto margin is still centered across", () => {
+  const { box } = render(
+    `<div class="column"><div class="item"></div></div>`,
+    `.column { display:flex; flex-direction:column; align-items:center; width:400px }
+     .item { margin-top:auto; width:100px; height:20px }`,
+  );
+  expect(box(".item")).toMatchObject({ x: 150, width: 100 });
+});
+
+test("an svg without width and height fills its container and keeps its viewBox's ratio", () => {
+  const { run } = render(
+    `<div class="icon"><svg id="plain" viewBox="0 -960 960 960"><path d="M0 0h10v10z"/></svg></div>
+     <div class="icon"><svg id="lower" viewbox="0 0 24 12"></svg></div>
+     <div class="icon"><svg id="sized" width="10" height="5" viewBox="0 0 24 24"></svg></div>
+     <div class="icon"><svg id="bare"></svg></div>`,
+    `.icon { width:24px }`,
+  );
+  // 100% of the 24px container; height by the viewBox (a lowercase viewbox too).
+  expect(run("#plain")).toMatchObject({ width: 24, height: 24 });
+  expect(run("#lower")).toMatchObject({ width: 24, height: 12 });
+  // Its own attributes win; with nothing at all it is 150px high.
+  expect(run("#sized")).toMatchObject({ width: 10, height: 5 });
+  expect(run("#bare")).toMatchObject({ width: 24, height: 150 });
+});

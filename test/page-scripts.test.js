@@ -134,6 +134,13 @@ test("element.attributes is a live NamedNodeMap by index and by name", async () 
     .toEqual([3, "id", "a.png", "x", null, true, "id,src,alt", true, true, 3, "id=pic,src=a.png,title=t"]);
 });
 
+test("document.elementFromPoint finds the topmost element painted there", async () => {
+  await load(`<div id="under" style="height:60px"><span id="text">text</span></div>
+    <div id="over" style="position:absolute;top:0;left:100px;width:50px;height:50px"></div>`);
+  expect(await evaluate(`[document.elementFromPoint(5, 5)?.id, document.elementFromPoint(110, 10)?.id,
+    document.elementFromPoint(300, 30)?.id, document.elementFromPoint(-1, 5)]`)).toEqual(["text", "over", "under", null]);
+});
+
 test("scripts change the DOM and the next screenshot shows it", async () => {
   await load(`<div id="box" style="height:20px"></div>
     <script>document.getElementById('box').style.background = 'rgb(255, 0, 0)';
