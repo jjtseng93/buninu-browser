@@ -6,8 +6,11 @@ const hosts = [];
 afterEach(() => {
   for (const host of hosts.splice(0)) host.close();
 });
+// The watchdog deadline: long enough for a fresh renderer to answer while
+// test files run in parallel, short enough to see a hang killed.
+const TIMEOUT = 4000;
 function host(options = {}) {
-  const created = new RendererHost({ entry, timeout: 1500, ...options });
+  const created = new RendererHost({ entry, timeout: TIMEOUT, ...options });
   hosts.push(created);
   return created;
 }
@@ -32,7 +35,7 @@ test("kills a renderer that misses its deadline and restarts it on the next call
   const firstPid = renderer.pid;
   const started = performance.now();
   await expect(renderer.call("hang")).rejects.toThrow("timed out");
-  expect(performance.now() - started).toBeLessThan(5000);
+  expect(performance.now() - started).toBeLessThan(TIMEOUT + 3000);
   const after = await renderer.call("echo", "next");
   expect(after.pid).not.toBe(firstPid);
   expect(after.argument).toBe("next");

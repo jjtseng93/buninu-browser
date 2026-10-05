@@ -106,7 +106,9 @@ test("a preview is shown while stylesheets load, then the styled page, then scri
   try {
     await context.resize(320, 200, 1);
     await context.navigate(`http://127.0.0.1:${server.port}/`);
-    // navigate returned at the first paint: the stylesheet is still pending.
+    // navigate returned at the first paint: the stylesheet is still pending
+    // (held by the server; under load its request may only now be arriving).
+    for (const deadline = Date.now() + 10_000; !releaseStyles && Date.now() < deadline;) await Bun.sleep(20);
     expect(releaseStyles).toBeFunction();
     expect(events).toEqual([]);
     expect(context.lifecycleState()).toEqual([]);

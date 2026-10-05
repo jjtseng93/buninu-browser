@@ -41,6 +41,9 @@ beforeAll(async () => {
       }
       if (target.pathname === "/video.mp4") return new Response(Bun.file(new URL("./fixtures/video.mp4", import.meta.url)),
         { headers: { "content-type": "video/mp4" } });
+      // 30s: it cannot reach its end while a test clicks it, however slow the run.
+      if (target.pathname === "/long-video.mp4") return new Response(Bun.file(new URL("./fixtures/long-video.mp4", import.meta.url)),
+        { headers: { "content-type": "video/mp4" } });
       if (target.pathname === "/tone.mp3") return new Response(Bun.file(new URL("./fixtures/tone.mp3", import.meta.url)),
         { headers: { "content-type": "audio/mpeg" } });
       if (pages.has(target.href)) return new Response(pages.get(target.href), { headers: { "content-type": "text/html" } });
@@ -302,7 +305,7 @@ test("CSS.escape produces selectors for leading digits and punctuation", async (
 });
 
 test("a video plays frames and pauses when clicked", async () => {
-  await load(`<video src="/video.mp4" controls width="160" height="120"></video>`);
+  await load(`<video src="/long-video.mp4" controls width="160" height="120"></video>`);
   const bounds = await evaluate("document.querySelector('video').getBoundingClientRect().toJSON()");
   const x = bounds.x + bounds.width / 2;
   const y = bounds.y + bounds.height / 2;
@@ -311,8 +314,12 @@ test("a video plays frames and pauses when clicked", async () => {
   await renderer.call("click", x, y);
   expect(await evaluate("document.querySelector('video').paused")).toBeFalse();
   const started = await renderer.call("screenshot");
-  await Bun.sleep(300);
-  const during = await renderer.call("screenshot");
+  // A later frame, however slowly frames come under load.
+  let during = started;
+  for (const deadline = Date.now() + 3000; during === started && Date.now() < deadline;) {
+    await Bun.sleep(100);
+    during = await renderer.call("screenshot");
+  }
   expect(during).not.toBe(before);
   expect(during).not.toBe(started);
   expect(await evaluate("document.querySelector('video').currentTime > 0")).toBeTrue();

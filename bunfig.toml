@@ -1,2 +1,3 @@
 [test]
 pathIgnorePatterns = ["vendor/**"]
+preload = ["./test/setup.js"]

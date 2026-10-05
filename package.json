@@ -32,6 +32,9 @@
   "bugs": {
     "url": "https://github.com/jjtseng93/buninu-browser/issues"
   },
+  "scripts": {
+    "test": "bun test --parallel"
+  },
   "license": "MIT",
   "engines": {
     "bun": ">=1.4.2"
