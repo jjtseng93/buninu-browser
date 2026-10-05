@@ -6,6 +6,8 @@ import { RendererHost } from "../lib/renderer/host.js";
  * because lockdown() would freeze the test runner's own realm.
  */
 const scripts = new Map();
+// HTML documents (iframes), by URL.
+const pages = new Map();
 const navigations = [];
 // Every resource request with its time, for the preload test.
 const requests = [];
@@ -41,6 +43,7 @@ beforeAll(async () => {
         { headers: { "content-type": "video/mp4" } });
       if (target.pathname === "/tone.mp3") return new Response(Bun.file(new URL("./fixtures/tone.mp3", import.meta.url)),
         { headers: { "content-type": "audio/mpeg" } });
+      if (pages.has(target.href)) return new Response(pages.get(target.href), { headers: { "content-type": "text/html" } });
       const body = scripts.get(target.href);
       return body === undefined
         ? new Response("missing", { status: 404 })
@@ -987,4 +990,108 @@ test("meta.content is the reflected attribute; template.content stays the fragme
       document.getElementById("t").content.firstChild.nodeName].join();
   </script>`);
   expect(await evaluate("metaResult")).toBe("token,token,5,B");
+});
+
+const waitFor = async (expression, timeout = 5000) => {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    const value = await evaluate(expression);
+    if (value) return value;
+    await Bun.sleep(50);
+  }
+  throw new Error(`timed out waiting for ${expression}`);
+};
+
+test("same-origin iframes: documents, contentWindow, names, postMessage with source and origin", async () => {
+  pages.set("https://page.test/child.html", `<!doctype html><body><p id="inner">child</p><script>
+    window.addEventListener("message", (event) => {
+      event.source.postMessage({ echo: event.data, fromParent: event.source === parent, origin: event.origin }, "*");
+    });
+  </script></body>`);
+  await load(`<iframe id="frame" name="kid" src="child.html" style="width:200px;height:100px"></iframe><script>
+    window.replies = [];
+    window.addEventListener("message", (event) => replies.push({ data: event.data, fromChild: event.source === frames.kid,
+      origin: event.origin }));
+    document.getElementById("frame").addEventListener("load", () => {
+      window.frameLoaded = true;
+      frames.kid.postMessage("hello", "https://page.test");
+      frames.kid.postMessage("never", "https://other.test");
+    });
+  </script>`);
+  await waitFor("window.replies.length > 0");
+  expect(await evaluate("frames.length")).toBe(1);
+  expect(await evaluate(`document.getElementById("frame").contentDocument.getElementById("inner").textContent`)).toBe("child");
+  expect(await evaluate(`document.getElementById("frame").contentWindow.parent === window`)).toBe(true);
+  await Bun.sleep(100);
+  // The message for another origin is not delivered.
+  expect(await evaluate("replies")).toEqual([{
+    data: { echo: "hello", fromParent: true, origin: "https://page.test" }, fromChild: true, origin: "https://page.test",
+  }]);
+});
+
+test("an inserted iframe has its about:blank window at once and fires load once", async () => {
+  await load(`<p>blank</p><script>
+    const frame = document.createElement("iframe");
+    document.body.appendChild(frame);
+    const win = frame.contentWindow;
+    window.result = [win.JSON.parse('{"a":1}').a, !!win.document.body, frame.contentDocument === win.document];
+    window.loads = 0;
+    frame.addEventListener("load", () => { loads++; window.sameWindow = frame.contentWindow === win; });
+  </script>`);
+  expect(await evaluate("result")).toEqual([1, true, true]);
+  await waitFor("window.loads > 0");
+  await Bun.sleep(100);
+  expect(await evaluate("[loads, sameWindow]")).toEqual([1, true]);
+});
+
+test("MessageChannel ports and dedicated workers with importScripts and transfers", async () => {
+  scripts.set("https://page.test/helper.js", "self.double = (n) => n * 2;");
+  scripts.set("https://page.test/worker.js", `importScripts("helper.js");
+    onmessage = (event) => {
+      const [port] = event.ports;
+      port.postMessage({ doubled: double(event.data.n), bytes: event.data.buffer.byteLength });
+    };`);
+  await load(`<script>
+    window.got = null;
+    const channel = new MessageChannel();
+    channel.port1.onmessage = (event) => { window.got = event.data; };
+    const worker = new Worker("worker.js");
+    const buffer = new ArrayBuffer(8);
+    worker.postMessage({ n: 21, buffer }, [channel.port2, buffer]);
+    window.detached = buffer.byteLength;
+  </script>`);
+  await waitFor("window.got");
+  expect(await evaluate("[got, detached]")).toEqual([{ doubled: 42, bytes: 8 }, 0]);
+});
+
+test("sloppy-mode this is the global object, also through the Function constructor", async () => {
+  await load(`<script>
+    window.viaFunction = Function("return this")() === window;
+    window.viaCall = (function () { return this; })() === window;
+    window.strict = (function () { "use strict"; return this; })() === undefined;
+  </script>`);
+  expect(await evaluate("[viaFunction, viaCall, strict]")).toEqual([true, true, true]);
+});
+
+test("a click sends pointer and mouse events to the element under it, then focuses its focusable ancestor", async () => {
+  await load(`<div id="tile" tabindex="0" style="width:100px;height:60px"><span id="label">tile</span></div><script>
+    window.events = [];
+    for (const type of ["pointerdown", "mousedown", "focus", "pointerup", "mouseup", "click"]) {
+      document.getElementById("tile").addEventListener(type, (event) => events.push(type + ":" + event.target.id), true);
+    }
+  </script>`);
+  await renderer.call("click", 80, 30);
+  expect(await evaluate("events")).toEqual(["pointerdown:tile", "mousedown:tile", "focus:tile", "pointerup:tile", "mouseup:tile", "click:tile"]);
+  expect(await evaluate("document.activeElement.id")).toBe("tile");
+});
+
+test("a click inside an iframe goes to the element under it in the frame's document", async () => {
+  pages.set("https://page.test/cells.html", `<!doctype html><body style="margin:0"><div id="cell" style="width:100px;height:100px"></div><script>
+    window.clicked = [];
+    document.getElementById("cell").addEventListener("click", (event) => clicked.push([event.clientX, event.clientY]));
+  </script></body>`);
+  await load(`<iframe id="frame" src="cells.html" style="position:absolute;left:50px;top:40px;width:200px;height:150px;border:0"></iframe>`);
+  await waitFor(`document.getElementById("frame").contentWindow.clicked`);
+  await renderer.call("click", 70, 60);
+  expect(await evaluate(`document.getElementById("frame").contentWindow.clicked`)).toEqual([[20, 20]]);
 });

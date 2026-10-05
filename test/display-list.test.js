@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
 import { layoutText } from "../lib/layout/text-layout.js";
-import { buildDisplayList, visibleItems } from "../lib/paint/display-list.js";
+import { buildDisplayList, hitTarget, visibleItems } from "../lib/paint/display-list.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
 import { StyleEngine } from "../lib/style/computed-style.js";
 
@@ -126,3 +126,55 @@ test("visibility, opacity and overflow/clip clipping apply to descendants", () =
   window.happyDOM.abort();
 });
 
+
+function backgroundList(html, css, resources) {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">${html}</body>`);
+  const styles = new StyleEngine().compute(document, [css]);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, {
+    x: 0, y: 0, width: 200, lineHeight: 20, measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }),
+  });
+  const displayList = buildDisplayList(layout, tree, null, (url) => resources[url] ?? null);
+  window.happyDOM.abort();
+  return displayList;
+}
+
+test("background images are sized, positioned and repeated in the padding box, painted in the border box", () => {
+  const icon = { width: 48, height: 24, image: {} };
+  const items = backgroundList(
+    `<div class="a"></div><div class="b"></div><div class="c"></div><div class="missing"></div>`,
+    `div { height:60px; width:100px }
+     .a { background: url(icon.png) no-repeat center / 32px; border: 2px solid black }
+     .b { background-image: url(icon.png); background-size: cover; background-repeat: repeat-x }
+     .c { background: url(icon.png) no-repeat right 5px bottom 10px }
+     .missing { background: url(none.png) }`,
+    { "icon.png": icon },
+  ).items.filter((item) => item.op === "drawBackgroundImage");
+  // The image that has not arrived paints nothing.
+  expect(items).toHaveLength(3);
+  const [a, b, c] = items;
+  // 32px wide keeps the 2:1 ratio, centered in the 100x60 padding box inside the border.
+  expect(a).toMatchObject({ tile: { x: 2 + 34, y: 2 + 22, width: 32, height: 16 }, repeatX: false, repeatY: false });
+  expect(a.bounds).toEqual({ x: 36, y: 24, width: 32, height: 16 });
+  // cover: scaled to fill both sides; repeat-x spans the box horizontally only.
+  expect(b).toMatchObject({ tile: { x: 0, y: 64, width: 120, height: 60 }, repeatX: true, repeatY: false });
+  expect(b.bounds).toEqual({ x: 0, y: 64, width: 100, height: 60 });
+  // Edge offsets: 5px from the right, 10px from the bottom.
+  expect(c.tile).toEqual({ x: 100 - 5 - 48, y: 124 + 60 - 10 - 24, width: 48, height: 24 });
+});
+
+test("transform: scale paints and hit-tests a box and its contents about its origin", () => {
+  const displayList = backgroundList(
+    `<div class="tile"><span>x</span></div>`,
+    `.tile { width:100px; height:100px; background:#123; transform: scale(.5); overflow: hidden }`,
+    {},
+  );
+  const fill = displayList.items.find((item) => item.op === "fillRect");
+  expect(fill.transform).toEqual({ a: 0.5, d: 0.5, e: 25, f: 25 });
+  expect(fill.bounds).toEqual({ x: 25, y: 25, width: 50, height: 50 });
+  // Its overflow clip shrinks with it.
+  const text = displayList.items.find((item) => item.op === "drawText");
+  expect(text.clipRect).toEqual({ x: 25, y: 25, width: 50, height: 50 });
+  expect(hitTarget(displayList, 10, 10, { x: 0, y: 0 })).not.toBe(fill.nodeId);
+  expect(hitTarget(displayList, 30, 30, { x: 0, y: 0 })).toBe(fill.nodeId);
+});

@@ -1,7 +1,9 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
 import { RenderTreeBuilder, renderTreeText } from "../lib/render-tree/index.js";
-import { computeElementStyle, matchSelectors, parseDeclarations, StyleEngine } from "../lib/style/computed-style.js";
+import {
+  absolutizeStyleSheetUrls, computeElementStyle, matchSelectors, parseDeclarations, StyleEngine,
+} from "../lib/style/computed-style.js";
 
 test("computes the initial UA and inherited style subset", () => {
   const { document, window } = parseHTMLDocument(`<body>
@@ -543,4 +545,39 @@ test("incremental restyles of changed subtrees and added sheets equal a full res
   engine.sheets = more;
   same("added sheet");
   window.happyDOM.abort();
+});
+
+test("background shorthand and longhands keep image layers with their position, size and repeat", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <div id="short" style="background: url(icon.png) no-repeat center / 32px 16px, linear-gradient(red, blue) #fff"></div>
+    <div id="long" style="background: url('a.png'); background-size: cover; background-position: right 4px top; background-repeat: repeat-x"></div>
+    <div id="color" style="background: url(x.png); background: #000"></div>
+    <div id="invalid" style="background: url(x.png) bogus-token"></div>
+  </body>`);
+  const engine = new StyleEngine().compute(document);
+  const style = (id) => engine.get(document.getElementById(id));
+  expect(style("short")).toMatchObject({
+    backgroundImage: "url(icon.png), linear-gradient(red, blue)",
+    backgroundPosition: "center, 0% 0%",
+    backgroundSize: "32px 16px, auto",
+    backgroundRepeat: "no-repeat, repeat",
+    backgroundColor: "rgba(255, 255, 255, 1)",
+  });
+  expect(style("long")).toMatchObject({
+    backgroundImage: "url('a.png')", backgroundSize: "cover", backgroundPosition: "right 4px top", backgroundRepeat: "repeat-x",
+  });
+  // A later shorthand resets the image layers.
+  expect(style("color")).toMatchObject({ backgroundImage: null, backgroundColor: "rgba(0, 0, 0, 1)" });
+  // An invalid shorthand is dropped as a whole.
+  expect(style("invalid")).toMatchObject({ backgroundImage: null, backgroundColor: "rgba(0, 0, 0, 0)" });
+  window.happyDOM.abort();
+});
+
+test("a linked style sheet's url()s resolve against the sheet", () => {
+  expect(absolutizeStyleSheetUrls(
+    `a { background: url(img/a.png) } b { background: url("../b.png") } c { background: url(data:image/png;base64,AA) }
+     d { background: url(https://cdn.test/d.png) } e { mask: url(#m) }`,
+    "https://site.test/css/main.css",
+  )).toBe(`a { background: url(https://site.test/css/img/a.png) } b { background: url("https://site.test/b.png") } c { background: url(data:image/png;base64,AA) }
+     d { background: url(https://cdn.test/d.png) } e { mask: url(#m) }`);
 });

@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
-import { elementBounds, hitTest, interactiveRegions } from "../lib/input/hit-test.js";
+import { elementAtPoint, elementBounds, hitTest, interactiveRegions } from "../lib/input/hit-test.js";
+import { buildDisplayList } from "../lib/paint/display-list.js";
 import { layoutText } from "../lib/layout/text-layout.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
 import { StyleEngine } from "../lib/style/computed-style.js";
@@ -82,5 +83,28 @@ test("hidden and pointer-events: none boxes let clicks through, but their opted-
   const regions = interactiveRegions(tree, layout, { x: 0, y: 0 }, { width: 800, height: 600 });
 
   expect(regions.map((region) => region.element.getAttribute("href") ?? region.element.tagName)).toEqual(["open", "shown", "plain"]);
+  window.happyDOM.abort();
+});
+
+test("pointer events target the topmost element painted at a point, whatever its tag", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">
+    <table><tr><td id="cell" style="width:100px;height:50px"><span id="label">tile</span></td></tr></table>
+    <div id="under" style="height:40px"></div>
+    <div id="over" style="position:absolute;top:60px;left:0;width:50px;height:20px"></div>
+    <div id="ghost" style="position:absolute;top:60px;left:50px;width:50px;height:20px;pointer-events:none"></div>
+  </body>`);
+  const styles = new StyleEngine().compute(document);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const layout = layoutText(tree, { x: 0, y: 0, width: 400, lineHeight: 20, measureText: (text) => text.length * 10, fontMetrics: () => ({ ascent: 16, height: 20 }) });
+  const displayList = buildDisplayList(layout, tree);
+  const at = (x, y) => elementAtPoint(tree, displayList, x, y, { x: 0, y: 0 })?.id ?? null;
+  const label = layout.fragments.flatMap((fragment) => fragment.runs.map((run) => ({ run, fragment })))
+    .find(({ run }) => tree.nodesById.get(run.nodeId)?.domNode?.parentElement?.id === "label");
+  // Text hits its element; the rest of the cell hits the cell.
+  expect(at(label.run.x + 1, label.fragment.y + 1)).toBe("label");
+  expect(at(label.run.x + label.run.width + 20, label.fragment.y + 1)).toBe("cell");
+  // A positioned box paints over the in-flow one; pointer-events:none passes through.
+  expect(at(10, 65)).toBe("over");
+  expect(at(60, 65)).toBe("under");
   window.happyDOM.abort();
 });

@@ -26,8 +26,21 @@ function render(html, css) {
     });
     return found && { x: found.x, y: found.y, width: found.width, height: found.height };
   };
+  // The first line run of an element (an image) or of its text.
+  const run = (selector) => {
+    const element = document.querySelector(selector);
+    for (const fragment of layout.fragments) {
+      for (const candidate of fragment.runs) {
+        const node = tree.nodesById.get(candidate.nodeId)?.domNode;
+        if (node === element || node?.parentElement === element) {
+          return { x: candidate.x, y: candidate.y, width: candidate.width, height: candidate.height };
+        }
+      }
+    }
+    return null;
+  };
   window.happyDOM.abort();
-  return { layout, tree, box };
+  return { layout, tree, box, run };
 }
 
 test("absolute boxes leave the flow and resolve insets against the positioned ancestor's padding box", () => {
@@ -120,4 +133,43 @@ test("a z-index stacking context paints its auto-positioned descendants after it
   expect(nav).toBeLessThan(text);
   // The z-index auto sibling (z 0) paints before the z 32 context.
   expect(later).toBeLessThan(header);
+});
+
+test("relative offsets resolve percentages against the containing block, for blocks and inline boxes", () => {
+  const { box, run } = render(
+    `<div class="frame"><div class="moved"></div><p><span class="up">text</span> <img class="tile" width="20" height="20"></p></div>`,
+    `.frame { width:200px; height:100px }
+     .moved { position:relative; left:-25%; top:10%; height:10px }
+     p { margin:0 }
+     .up { position:relative; left:-10px; top:-5px }
+     .tile { position:relative; left:-100%; top:0% }`,
+  );
+  // Percentages of the 200x100 containing block.
+  expect(box(".moved")).toMatchObject({ x: -50, y: 10 });
+  // The span's text moves with it; the image by a whole containing-block width.
+  expect(run(".up")).toMatchObject({ x: -10 });
+  expect(run(".tile").x).toBe(50 - 200);
+});
+
+test("an inline image sized in percentages takes its line space from the containing block", () => {
+  const { run } = render(
+    `<div class="wrapper"><img class="big"></div>`,
+    `.wrapper { width:100px; height:100px; text-align:center; overflow:hidden }
+     .big { width:300%; height:300% }`,
+  );
+  // 300px wide: the line overflows, so it starts at the left instead of being centered.
+  expect(run(".big")).toMatchObject({ x: 0, width: 300, height: 300 });
+});
+
+test("a float shrinks to fit its contents' min-width and sits at the top of its line", () => {
+  const { box } = render(
+    `<div class="footer"><div class="left"></div><div class="right"><span class="button">Go</span></div></div>`,
+    `.footer { width:300px; height:60px }
+     .left { float:left; width:50px; height:48px; margin:6px }
+     .right { float:right; margin:8px }
+     .button { display:inline-block; min-width:100px; padding:0 10px; height:40px }`,
+  );
+  // min-width 100 plus padding: 120 wide, against the right edge less its margin.
+  expect(box(".right")).toMatchObject({ x: 300 - 8 - 120, y: 8, width: 120 });
+  expect(box(".left")).toMatchObject({ x: 6, y: 6 });
 });
