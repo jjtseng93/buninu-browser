@@ -1,5 +1,5 @@
 diff --git a/packages/happy-dom/src/query-selector/SelectorParser.ts b/packages/happy-dom/src/query-selector/SelectorParser.ts
-index 60cc951..2290208 100644
+index 60cc951..62cf4b9 100644
 --- a/packages/happy-dom/src/query-selector/SelectorParser.ts
 +++ b/packages/happy-dom/src/query-selector/SelectorParser.ts
 @@ -12,10 +12,11 @@ import type { TGlobalMatchFunction } from './TGlobalMatchFunction.js';
@@ -22,11 +22,23 @@ index 60cc951..2290208 100644
   */
  const SELECTOR_REGEXP =
 -	/(\*)|([a-zA-Z0-9\u00A0-\uFFFF-]+)|#(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\.(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\[(([a-zA-Z0-9-_]|\\.)+)\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*("([^"]*)"|'([^']*)')\s*(s|i){0,1}\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*(([a-zA-Z0-9\u00A0-\uFFFF_¤£-]|\\.)+)\]|:([a-zA-Z-]+)\s*\(.+\)|:([a-zA-Z-]+)|::([a-zA-Z-]+)/g;
-+	/(\*)|((?:[a-zA-Z0-9\u00A0-\uFFFF-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|#(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\.(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\[(([a-zA-Z0-9-_]|\\.)+)\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*("([^"]*)"|'([^']*)')\s*(s|i){0,1}\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*(([a-zA-Z0-9\u00A0-\uFFFF_¤£-]|\\.)+)\]|:([a-zA-Z-]+)\s*\(.+\)|:([a-zA-Z-]+)|::([a-zA-Z-]+)/g;
++	/(\*)|((?:[a-zA-Z0-9\u00A0-\uFFFF-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|#(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|\.(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|\[(([a-zA-Z0-9-_]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\]|\[(([a-zA-Z0-9-_]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\s*([~|^$*]{0,1})\s*=\s*("((?:[^"\\]|\\[\s\S])*)"|'((?:[^'\\]|\\[\s\S])*)')\s*(s|i){0,1}\]|\[(([a-zA-Z0-9-_]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\s*([~|^$*]{0,1})\s*=\s*(([a-zA-Z0-9\u00A0-\uFFFF_¤£-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\]|:([a-zA-Z-]+)\s*\(.+\)|:([a-zA-Z-]+)|::([a-zA-Z-]+)/g;
  
  /**
   * Selector pseudo RegExp.
-@@ -187,6 +188,11 @@ export default class SelectorParser {
+@@ -55,11 +56,6 @@ const SELECTOR_REGEXP =
+  */
+ const SELECTOR_PSEUDO_REGEXP = /:([a-zA-Z-]+)|([()])/g;
+ 
+-/**
+- * Escaped Character RegExp.
+- */
+-const ESCAPED_CHARACTER_REGEXP = /\\/g;
+-
+ /**
+  * CSS Escape RegExp.
+  *
+@@ -187,6 +183,11 @@ export default class SelectorParser {
  
  		while ((match = regExp.exec(selector))) {
  			if (match[1]) {
@@ -38,7 +50,7 @@ index 60cc951..2290208 100644
  				// Matches combinator (" ", ",", "+", ">", "̣~")
  				// We should ignore combinators that are inside parentheses, brackets or apostrophes
  
-@@ -198,7 +204,7 @@ export default class SelectorParser {
+@@ -198,7 +199,7 @@ export default class SelectorParser {
  				) {
  					const childSelector = selector.substring(lastIndex, match.index).trim();
  
@@ -47,7 +59,7 @@ index 60cc951..2290208 100644
  						case ',':
  							selectorItem = this.getSelectorGroupItem(childSelector, combinator);
  							if (!selectorItem) {
-@@ -262,7 +268,7 @@ export default class SelectorParser {
+@@ -262,7 +263,7 @@ export default class SelectorParser {
  			} else {
  				// Matches parentheses or brackets.
  
@@ -56,7 +68,7 @@ index 60cc951..2290208 100644
  					case '(':
  						if (depth.singleApostrophe === 0 && depth.doubleApostrophe === 0) {
  							depth.parentheses++;
-@@ -365,7 +371,7 @@ export default class SelectorParser {
+@@ -365,22 +366,22 @@ export default class SelectorParser {
  			} else if (match[2]) {
  				// Matches tag name, e.g. "div"
  
@@ -65,3 +77,39 @@ index 60cc951..2290208 100644
  			} else if (match[3]) {
  				// Matches ID, e.g. "#id"
  
+-				selectorItem.id = match[3].replace(ESCAPED_CHARACTER_REGEXP, '');
++				selectorItem.id = SelectorParser.cssUnescape(match[3]);
+ 			} else if (match[5]) {
+ 				// Matches class names, e.g. ".class1"
+ 
+ 				selectorItem.classNames = selectorItem.classNames || [];
+-				selectorItem.classNames.push(match[5].replace(ESCAPED_CHARACTER_REGEXP, ''));
++				selectorItem.classNames.push(SelectorParser.cssUnescape(match[5]));
+ 			} else if (match[7]) {
+ 				// Matches attributes without value, e.g. [attr]
+ 
+ 				selectorItem.attributes = selectorItem.attributes || [];
+ 				selectorItem.attributes.push({
+-					name: match[7].replace(ESCAPED_CHARACTER_REGEXP, ''),
++					name: SelectorParser.cssUnescape(match[7]),
+ 					operator: null,
+ 					value: null,
+ 					modifier: null,
+@@ -393,7 +394,7 @@ export default class SelectorParser {
+ 				const unescapedValue = SelectorParser.cssUnescape(value);
+ 				selectorItem.attributes = selectorItem.attributes || [];
+ 				selectorItem.attributes.push({
+-					name: match[9].replace(ESCAPED_CHARACTER_REGEXP, ''),
++					name: SelectorParser.cssUnescape(match[9]),
+ 					operator: match[11] || null,
+ 					value: unescapedValue,
+ 					modifier: <'s'>match[15] || null,
+@@ -409,7 +410,7 @@ export default class SelectorParser {
+ 				const unescapedValue = SelectorParser.cssUnescape(match[19]);
+ 				selectorItem.attributes = selectorItem.attributes || [];
+ 				selectorItem.attributes.push({
+-					name: match[16].replace(ESCAPED_CHARACTER_REGEXP, ''),
++					name: SelectorParser.cssUnescape(match[16]),
+ 					operator: match[18] || null,
+ 					value: unescapedValue,
+ 					modifier: null,

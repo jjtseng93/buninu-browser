@@ -46,7 +46,7 @@ const SELECTOR_GROUP_REGEXP = /(\\[0-9a-fA-F]{1,6}\s?|\\[\s\S])|(\s*[\s,+>~]\s*)
  * Group 23: Pseudo element (e.g. "::after", "::-webkit-inner-spin-button").
  */
 const SELECTOR_REGEXP =
-	/(\*)|((?:[a-zA-Z0-9\u00A0-\uFFFF-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|#(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\.(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\.)+)|\[(([a-zA-Z0-9-_]|\\.)+)\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*("([^"]*)"|'([^']*)')\s*(s|i){0,1}\]|\[(([a-zA-Z0-9-_]|\\.)+)\s*([~|^$*]{0,1})\s*=\s*(([a-zA-Z0-9\u00A0-\uFFFF_¤£-]|\\.)+)\]|:([a-zA-Z-]+)\s*\(.+\)|:([a-zA-Z-]+)|::([a-zA-Z-]+)/g;
+	/(\*)|((?:[a-zA-Z0-9\u00A0-\uFFFF-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|#(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|\.(([a-zA-Z0-9\u00A0-\uFFFF_-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)|\[(([a-zA-Z0-9-_]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\]|\[(([a-zA-Z0-9-_]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\s*([~|^$*]{0,1})\s*=\s*("((?:[^"\\]|\\[\s\S])*)"|'((?:[^'\\]|\\[\s\S])*)')\s*(s|i){0,1}\]|\[(([a-zA-Z0-9-_]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\s*([~|^$*]{0,1})\s*=\s*(([a-zA-Z0-9\u00A0-\uFFFF_¤£-]|\\[0-9a-fA-F]{1,6}\s?|\\.)+)\]|:([a-zA-Z-]+)\s*\(.+\)|:([a-zA-Z-]+)|::([a-zA-Z-]+)/g;
 
 /**
  * Selector pseudo RegExp.
@@ -55,11 +55,6 @@ const SELECTOR_REGEXP =
  * Group 2: Parentheses or brackets.
  */
 const SELECTOR_PSEUDO_REGEXP = /:([a-zA-Z-]+)|([()])/g;
-
-/**
- * Escaped Character RegExp.
- */
-const ESCAPED_CHARACTER_REGEXP = /\\/g;
 
 /**
  * CSS Escape RegExp.
@@ -375,18 +370,18 @@ export default class SelectorParser {
 			} else if (match[3]) {
 				// Matches ID, e.g. "#id"
 
-				selectorItem.id = match[3].replace(ESCAPED_CHARACTER_REGEXP, '');
+				selectorItem.id = SelectorParser.cssUnescape(match[3]);
 			} else if (match[5]) {
 				// Matches class names, e.g. ".class1"
 
 				selectorItem.classNames = selectorItem.classNames || [];
-				selectorItem.classNames.push(match[5].replace(ESCAPED_CHARACTER_REGEXP, ''));
+				selectorItem.classNames.push(SelectorParser.cssUnescape(match[5]));
 			} else if (match[7]) {
 				// Matches attributes without value, e.g. [attr]
 
 				selectorItem.attributes = selectorItem.attributes || [];
 				selectorItem.attributes.push({
-					name: match[7].replace(ESCAPED_CHARACTER_REGEXP, ''),
+					name: SelectorParser.cssUnescape(match[7]),
 					operator: null,
 					value: null,
 					modifier: null,
@@ -399,7 +394,7 @@ export default class SelectorParser {
 				const unescapedValue = SelectorParser.cssUnescape(value);
 				selectorItem.attributes = selectorItem.attributes || [];
 				selectorItem.attributes.push({
-					name: match[9].replace(ESCAPED_CHARACTER_REGEXP, ''),
+					name: SelectorParser.cssUnescape(match[9]),
 					operator: match[11] || null,
 					value: unescapedValue,
 					modifier: <'s'>match[15] || null,
@@ -415,7 +410,7 @@ export default class SelectorParser {
 				const unescapedValue = SelectorParser.cssUnescape(match[19]);
 				selectorItem.attributes = selectorItem.attributes || [];
 				selectorItem.attributes.push({
-					name: match[16].replace(ESCAPED_CHARACTER_REGEXP, ''),
+					name: SelectorParser.cssUnescape(match[16]),
 					operator: match[18] || null,
 					value: unescapedValue,
 					modifier: null,

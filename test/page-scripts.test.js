@@ -1232,3 +1232,49 @@ test("the wheel over an iframe scrolls its document first, unless scrolling=no, 
   expect(await renderer.call("wheel", 50, 95, 0, 30)).toEqual({ x: 0, y: 0 });
   expect(await evaluate(`[$("outer").scrollTop, $("free").contentWindow.scrollY]`)).toEqual([60, 30]);
 });
+
+test("compareDocumentPosition, document.styleSheets and user timing with PerformanceObserver", async () => {
+  await load(`<style>p { color: red }</style><link rel="stylesheet" href="/missing.css" media="print">
+    <div id="outer"><p id="first">a</p><p id="second">b</p></div><script>
+    window.$ = (id) => document.getElementById(id);
+    window.observed = [];
+    new PerformanceObserver((list) => observed.push(...list.getEntries().map((entry) => entry.entryType + ":" + entry.name)))
+      .observe({ entryTypes: ["mark", "measure"] });
+    performance.mark("start");
+    performance.mark("end");
+    performance.measure("span", "start", "end");
+  </script>`);
+  expect(await evaluate(`[
+    $("first").compareDocumentPosition($("second")), $("second").compareDocumentPosition($("first")),
+    $("outer").compareDocumentPosition($("first")), $("first").compareDocumentPosition($("outer")),
+    Node.DOCUMENT_POSITION_FOLLOWING, $("first").DOCUMENT_POSITION_CONTAINED_BY,
+  ]`)).toEqual([4, 2, 20, 10, 4, 16]);
+  expect(await evaluate(`[document.styleSheets.length, document.styleSheets[0].href, document.styleSheets[1].href,
+    document.styleSheets.item(1).media.mediaText, document.styleSheets[0].ownerNode.tagName]`))
+    .toEqual([2, null, "https://page.test/missing.css", "print", "STYLE"]);
+  await waitFor("window.observed.length === 3");
+  expect(await evaluate(`[observed, performance.getEntriesByType("measure").length, PerformanceObserver.supportedEntryTypes]`))
+    .toEqual([["mark:start", "mark:end", "measure:span"], 1, ["mark", "measure"]]);
+  expect(await evaluate(`performance.clearMarks(), performance.clearMeasures("span"), performance.getEntries().length`)).toBe(0);
+});
+
+test("selectors with CSS escapes parse, in type selectors and around combinators too", async () => {
+  await load(`<div id="a:b" class="x,y 1x"><span class="p(q)" data-k='a"b'>1</span><p id="123">2</p></div><my-el>3</my-el>`);
+  const selectors = [String.raw`style\=\"\"`, String.raw`#a\:b`, String.raw`.x\,y > span`, String.raw`.p\(q\)`,
+    String.raw`my\-el`, String.raw`\64 iv`,
+    // CSS.escape() output for names starting with a digit, and an escaped quote in a value.
+    String.raw`#\31 23`, String.raw`.\31 x p`, String.raw`[data-k="a\"b"]`, String.raw`[d\61 ta-k]`];
+  expect(await evaluate(`${JSON.stringify(selectors)}.map((selector) => document.querySelectorAll(selector).length)`))
+    .toEqual([0, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+});
+
+test("the page scrolls over content that overflows a 100vh layout, not over clipped or fixed content", async () => {
+  await load(`<div style="height:100vh;display:flex;flex-direction:column">
+      <header style="height:50px">top</header><main style="height:2000px;flex-shrink:0">tall</main>
+      <footer id="end" style="height:40px;flex-shrink:0">end</footer></div>
+    <div style="height:20px;overflow:hidden"><div style="height:9000px">clipped</div></div>
+    <div style="position:fixed;top:0;height:20000px;width:10px"></div>`);
+  // 50 + 2000 + 40 of overflowing content: the footer can be scrolled to; clipped and fixed boxes add nothing.
+  expect(await evaluate(`(scrollTo(0, 99999), [scrollY, Math.round(document.getElementById("end").getBoundingClientRect().bottom)])`))
+    .toEqual([2090 - 300, 300]);
+});

@@ -19,6 +19,8 @@ const DATA_URL_REGEX = /^\s*data:([^,]+)?,(.*)/;
 export default class HTMLImageElement extends HTMLElement implements ICanvasShape {
 	public [PropertySymbol.tagName] = 'IMG';
 	public [PropertySymbol.complete] = true;
+	// Bumped whenever src changes: an image decoded for an earlier src is dropped.
+	#loadGeneration = 0;
 	public [PropertySymbol.naturalHeight] = 0;
 	public [PropertySymbol.naturalWidth] = 0;
 	public [PropertySymbol.loading] = 'auto';
@@ -357,6 +359,7 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 		super[PropertySymbol.onSetAttribute](attribute, replacedAttribute);
 
 		if (attribute[PropertySymbol.name] === 'src') {
+			const generation = ++this.#loadGeneration;
 			const url = this.#parseUrl(attribute[PropertySymbol.value]);
 
 			if (!url) {
@@ -367,13 +370,13 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 				return;
 			}
 
-			if (this.#loadDataUrl(url)) {
+			if (this.#loadDataUrl(url, generation)) {
 				return;
 			}
 
 			const settings = new WindowBrowserContext(this[PropertySymbol.window]).getSettings();
 			if (settings?.enableImageFileLoading) {
-				this.#loadUrlSource(this.src);
+				this.#loadUrlSource(this.src, generation);
 			}
 		}
 	}
@@ -385,6 +388,7 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 		super[PropertySymbol.onRemoveAttribute](removedAttribute);
 
 		if (removedAttribute[PropertySymbol.name] === 'src') {
+			this.#loadGeneration++;
 			this[PropertySymbol.complete] = true;
 			this[PropertySymbol.naturalHeight] = 0;
 			this[PropertySymbol.naturalWidth] = 0;
@@ -415,27 +419,37 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 	 * Loads the image from the given data URL.
 	 *
 	 * @param src Source.
+	 * @param generation The load this is (see #loadGeneration).
 	 * @returns True if the image was loaded, false otherwise.
 	 */
-	#loadDataUrl(src: string): boolean {
+	#loadDataUrl(src: string, generation: number): boolean {
 		const dataUrlMatch = src.match(DATA_URL_REGEX);
 
 		if (dataUrlMatch) {
 			const buffer = Buffer.from(dataUrlMatch[2], 'base64');
-			this[PropertySymbol.complete] = true;
 			this[PropertySymbol.buffer] = buffer;
 			this[PropertySymbol.complete] = false;
-			ImageSize(buffer).then((dimensions) => {
-				this[PropertySymbol.naturalHeight] = dimensions.height;
-				this[PropertySymbol.naturalWidth] = dimensions.width;
-				this[PropertySymbol.complete] = true;
-				this.dispatchEvent(new this[PropertySymbol.window].Event('load'));
-			}).catch(() => {
-				this[PropertySymbol.naturalHeight] = 0;
-				this[PropertySymbol.naturalWidth] = 0;
-				this[PropertySymbol.complete] = true;
-				this.dispatchEvent(new this[PropertySymbol.window].Event('error'));
-			});
+			// The size is read asynchronously; a src set meanwhile wins.
+			ImageSize(buffer).then(
+				(dimensions) => {
+					if (generation !== this.#loadGeneration) {
+						return;
+					}
+					this[PropertySymbol.naturalHeight] = dimensions.height;
+					this[PropertySymbol.naturalWidth] = dimensions.width;
+					this[PropertySymbol.complete] = true;
+					this.dispatchEvent(new this[PropertySymbol.window].Event('load'));
+				},
+				() => {
+					if (generation !== this.#loadGeneration) {
+						return;
+					}
+					this[PropertySymbol.naturalHeight] = 0;
+					this[PropertySymbol.naturalWidth] = 0;
+					this[PropertySymbol.complete] = true;
+					this.dispatchEvent(new this[PropertySymbol.window].Event('error'));
+				}
+			);
 			return true;
 		}
 		return false;
@@ -445,8 +459,9 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 	 * Loads the image from the given source.
 	 *
 	 * @param src Source.
+	 * @param generation The load this is (see #loadGeneration).
 	 */
-	async #loadUrlSource(src: string): Promise<void> {
+	async #loadUrlSource(src: string, generation: number): Promise<void> {
 		this[PropertySymbol.complete] = false;
 		this[PropertySymbol.naturalHeight] = 0;
 		this[PropertySymbol.naturalWidth] = 0;
@@ -458,6 +473,10 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 			response = await this[PropertySymbol.window].fetch(src);
 		} catch (e) {
 			error = <Error>e;
+		}
+
+		if (generation !== this.#loadGeneration) {
+			return;
 		}
 
 		if (error || !response?.ok) {
@@ -478,23 +497,34 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 		try {
 			buffer = await response.buffer();
 		} catch (e) {
+			if (generation !== this.#loadGeneration) {
+				return;
+			}
 			this[PropertySymbol.complete] = true;
 			this.dispatchEvent(new this[PropertySymbol.window].Event('error'));
 			return;
 		}
 
-		this[PropertySymbol.complete] = true;
-		this[PropertySymbol.buffer] = buffer;
-
-		try {
-			const dimensions = await ImageSize(buffer);
-			this[PropertySymbol.naturalHeight] = dimensions.height;
-			this[PropertySymbol.naturalWidth] = dimensions.width;
-		} catch (e) {
-			this[PropertySymbol.naturalHeight] = 0;
-			this[PropertySymbol.naturalWidth] = 0;
+		if (generation !== this.#loadGeneration) {
+			return;
 		}
 
+		this[PropertySymbol.buffer] = buffer;
+
+		let dimensions = { width: 0, height: 0 };
+		try {
+			dimensions = await ImageSize(buffer);
+		} catch (e) {
+			// Undecodable: no natural size.
+		}
+
+		if (generation !== this.#loadGeneration) {
+			return;
+		}
+
+		this[PropertySymbol.naturalHeight] = dimensions.height;
+		this[PropertySymbol.naturalWidth] = dimensions.width;
+		this[PropertySymbol.complete] = true;
 		this.dispatchEvent(new this[PropertySymbol.window].Event('load'));
 	}
 }
