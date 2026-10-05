@@ -643,6 +643,26 @@ test("styles inside noscript do not apply while page scripting is enabled", asyn
   expect(await evaluate(`getComputedStyle(document.getElementById("visible")).display`)).toBe("block");
 });
 
+test("pages can wrap Promise methods without modifying another realm", async () => {
+  await load(`<script>
+    window.promiseCalls = 0;
+    const original = Promise.prototype.then;
+    Promise.prototype.then = function (...args) { promiseCalls++; return original.apply(this, args); };
+    Promise.prototype.catch = function (reject) { return this.then(undefined, reject); };
+    Promise.prototype.finally = function (done) { return this.then(value => { done(); return value; }); };
+    window.promiseResult = null;
+    Promise.resolve(42).finally(() => {}).then(value => { promiseResult = value; });
+  </script>`);
+  await waitFor("promiseResult === 42");
+  expect(await evaluate("promiseCalls")).toBeGreaterThanOrEqual(2);
+  expect(await evaluate("Promise.resolve(0) instanceof Promise")).toBe(true);
+  expect(await evaluate("(async () => 1)() instanceof Promise")).toBe(true);
+  expect(await evaluate("(() => { class Child extends Promise {} return [new Child(r => r()) instanceof Child, Promise.resolve() instanceof Child]; })()")).toEqual([true, false]);
+  await load(`<script>window.promiseResult = null; Promise.all([Promise.resolve(7)]).then(v => promiseResult = v[0]);</script>`);
+  await waitFor("promiseResult === 7");
+  expect(await evaluate("typeof promiseCalls")).toBe("undefined");
+});
+
 test("page RegExp instances can override their own toString without changing the intrinsic", async () => {
   await load(`<script>
     const pattern = /demo/;
@@ -1057,6 +1077,34 @@ test("same-origin iframes: documents, contentWindow, names, postMessage with sou
   expect(await evaluate("replies")).toEqual([{
     data: { echo: "hello", fromParent: true, origin: "https://page.test" }, fromChild: true, origin: "https://page.test",
   }]);
+});
+
+test("iframe messages retain their sender through promises and await", async () => {
+  pages.set("https://page.test/async-child.html", `<!doctype html><script>
+    addEventListener("message", async (event) => {
+      window.fromParent = event.source === parent;
+      await Promise.resolve();
+      parent.postMessage("await reply", "*");
+      Promise.resolve().then(() => parent.postMessage("then reply", "*"));
+    });
+  </script>`);
+  await load(`<iframe id="frame" src="async-child.html"></iframe><script>
+    window.asyncReplies = [];
+    addEventListener("message", event => asyncReplies.push({
+      data: event.data, fromChild: event.source === document.getElementById("frame").contentWindow,
+      origin: event.origin
+    }));
+    document.getElementById("frame").addEventListener("load", async () => {
+      await Promise.resolve();
+      document.getElementById("frame").contentWindow.postMessage("start", "*");
+    });
+  </script>`);
+  await waitFor("window.asyncReplies.length === 2");
+  expect(await evaluate("asyncReplies")).toEqual([
+    { data: "await reply", fromChild: true, origin: "https://page.test" },
+    { data: "then reply", fromChild: true, origin: "https://page.test" },
+  ]);
+  expect(await evaluate('document.getElementById("frame").contentWindow.fromParent')).toBe(true);
 });
 
 test("an inserted iframe has its about:blank window at once and fires load once", async () => {

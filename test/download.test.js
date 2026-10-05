@@ -151,6 +151,41 @@ test("CDP Page.getResourceContent returns the bytes base64-encoded", async () =>
   }
 });
 
+test("CDP downloads the committed document after a navigation outside CDP", async () => {
+  const { CdpServer } = await import("../lib/cdp-server.js");
+  const browser = await createBrowser({ spareRenderer: false });
+  const cdp = CdpServer.create(browser.context).listen(0, "127.0.0.1");
+  let socket;
+  try {
+    const target = await (await fetch(`http://127.0.0.1:${cdp.port}/json/new?about:blank`, { method: "PUT" })).json();
+    socket = new WebSocket(target.webSocketDebuggerUrl);
+    await new Promise(resolve => socket.addEventListener("open", resolve, { once: true }));
+    let nextId = 0;
+    const call = (method, params = {}) => new Promise(resolve => {
+      const id = ++nextId;
+      const listener = ({ data }) => {
+        const message = JSON.parse(data);
+        if (message.id !== id) return;
+        socket.removeEventListener("message", listener);
+        resolve(message);
+      };
+      socket.addEventListener("message", listener);
+      socket.send(JSON.stringify({ id, method, params }));
+    });
+    await browser.context.navigate(`http://127.0.0.1:${server.port}/start`);
+    const { result: { frameTree } } = await call("Page.getFrameTree");
+    expect(frameTree.frame.url).toBe(`http://127.0.0.1:${server.port}/page`);
+    expect(frameTree.frame.mimeType).toBe("text/html");
+    const result = await call("Page.getResourceContent", { frameId: frameTree.frame.id, url: frameTree.frame.url });
+    expect(result.error).toBeUndefined();
+    expect(Buffer.from(result.result.content, "base64")).toEqual(Buffer.from(BIG5));
+  } finally {
+    socket?.close();
+    cdp.stop(true);
+    browser.close();
+  }
+});
+
 test("CDP download behavior controls the directory and emits completion events", async () => {
   const { CdpServer } = await import("../lib/cdp-server.js");
   const dir = mkdtempSync(join(tmpdir(), "buninu-cdp-download-"));
