@@ -18,6 +18,7 @@ const navigations = [];
 const requests = [];
 let renderer;
 let dripFinished = false;
+let dripAudioFinished = false;
 
 beforeAll(async () => {
   renderer = new RendererHost({
@@ -53,6 +54,26 @@ beforeAll(async () => {
         { headers: { "content-type": "video/mp4" } });
       if (target.pathname === "/tone.mp3") return new Response(Bun.file(new URL("./fixtures/tone.mp3", import.meta.url)),
         { headers: { "content-type": "audio/mpeg" } });
+      if (target.pathname === "/drip-tone.mp3") {
+        const tone = new Uint8Array(await Bun.file(new URL("./fixtures/tone.mp3", import.meta.url)).bytes());
+        const bytes = new Uint8Array(tone.byteLength * 8);
+        for (let index = 0; index < 8; index++) bytes.set(tone, index * tone.byteLength);
+        let offset = 0;
+        const stream = new ReadableStream({
+          async pull(controller) {
+            if (!offset) {
+              controller.enqueue(bytes.subarray(0, tone.byteLength));
+              offset = tone.byteLength;
+              return;
+            }
+            await Bun.sleep(300);
+            controller.enqueue(bytes.subarray(offset));
+            controller.close();
+            dripAudioFinished = true;
+          },
+        });
+        return new Response(stream, { headers: { "content-type": "audio/mpeg" } });
+      }
       // First 8 KiB immediately, the rest after a pause, so a test can see
       // playback begin before the body has finished.
       if (target.pathname === "/drip-video.mp4") {
@@ -1100,6 +1121,16 @@ test("a video probe is not limited by the number of network chunks", async () =>
   await evaluate("document.getElementById('v').play()");
   expect(await waitFor(`(() => { const v = document.getElementById('v');
     return !v.paused && v.error === null && v.readyState >= 1 && v.currentTime > 0; })()`)).toBe(true);
+});
+
+test("a progressive MP3 updates its duration when the rest of the body arrives", async () => {
+  dripAudioFinished = false;
+  await load(`<audio id="a" src="/drip-tone.mp3"></audio>`);
+  await evaluate("document.getElementById('a').play()");
+  const initial = await evaluate("document.getElementById('a').duration");
+  expect(dripAudioFinished).toBe(false);
+  expect(await waitFor("document.getElementById('a').duration > " + initial, 3000)).toBe(true);
+  expect(dripAudioFinished).toBe(true);
 });
 
 test("an unsupported video exposes an error instead of silently stopping", async () => {
