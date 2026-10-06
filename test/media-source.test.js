@@ -74,13 +74,16 @@ test("SourceBuffer.abort is harmless while idle and cancels a pending append", (
 test("removing an old buffered prefix releases append quota", () => {
   const context = scope({ appendQuota: 10 });
   const { source, buffer } = openBuffer(context);
-  buffer.appendBuffer(new Uint8Array(10));
+  buffer.appendBuffer(box("mdat", new Uint8Array(2)));
   context.flush();
   source.noteBuffered(10);
 
   expect(() => buffer.appendBuffer(new Uint8Array(1))).toThrow("SourceBuffer is full");
   buffer.remove(0, 5);
   context.flush();
+  expect(buffer.buffered.length).toBe(1);
+  expect(buffer.buffered.start(0)).toBe(5);
+  expect(buffer.buffered.end(0)).toBe(10);
   expect(() => buffer.appendBuffer(new Uint8Array(5))).not.toThrow();
   context.flush();
   expect(buffer.updating).toBe(false);
@@ -101,6 +104,23 @@ test("fragmented MP4 buffered end follows appended segments, not presentation du
   }
   expect(buffer.buffered.length).toBe(1);
   expect(buffer.buffered.end(0)).toBe(10);
+});
+
+test("WebM buffered end follows Cluster timecodes, not presentation duration", () => {
+  const context = scope();
+  const source = new context.media.MediaSource();
+  source.attach("blob:https://page.test/audio");
+  context.flush();
+  const buffer = source.addSourceBuffer('audio/webm; codecs="opus"');
+  // Cluster timecode 0, one SimpleBlock at +1000 ms, with a dummy payload.
+  buffer.appendBuffer(Uint8Array.from([
+    0x1f, 0x43, 0xb6, 0x75, 0x8a,
+    0xe7, 0x81, 0x00,
+    0xa3, 0x85, 0x81, 0x03, 0xe8, 0x00, 0x00,
+  ]));
+  context.flush();
+  source.noteBuffered(700);
+  expect(buffer.buffered.end(0)).toBeCloseTo(1.02, 5);
 });
 
 test("a media element reports the intersection of separate audio and video buffers", () => {
