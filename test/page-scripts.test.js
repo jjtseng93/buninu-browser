@@ -75,6 +75,24 @@ beforeAll(async () => {
         });
         return new Response(stream, { headers: { "content-type": "video/mp4" } });
       }
+      // More than forty small chunks before a decodable prefix. This catches
+      // arbitrary probe-attempt limits without delaying the test.
+      if (target.pathname === "/many-chunk-video.mp4") {
+        const bytes = new Uint8Array(await Bun.file(new URL("./fixtures/video.mp4", import.meta.url)).bytes());
+        let offset = 0;
+        const stream = new ReadableStream({
+          pull(controller) {
+            const length = offset < 128 ? 1 : bytes.byteLength - offset;
+            controller.enqueue(bytes.subarray(offset, offset + length));
+            offset += length;
+            if (offset >= bytes.byteLength) controller.close();
+          },
+        });
+        return new Response(stream, { headers: { "content-type": "video/mp4" } });
+      }
+      if (target.pathname === "/invalid-video.mp4") {
+        return new Response("not a media container", { headers: { "content-type": "video/mp4" } });
+      }
       if (pages.has(target.href)) return new Response(pages.get(target.href), { headers: { "content-type": "text/html" } });
       const body = scripts.get(target.href);
       return body === undefined
@@ -1075,6 +1093,25 @@ test("a video starts from a prefix while the rest of the file is still downloadi
   const deadline = Date.now() + 4000;
   while (!dripFinished && Date.now() < deadline) await Bun.sleep(50);
   expect(dripFinished).toBe(true);
+});
+
+test("a video probe is not limited by the number of network chunks", async () => {
+  await load(`<video id="v" src="/many-chunk-video.mp4" width="160" height="120"></video>`);
+  await evaluate("document.getElementById('v').play()");
+  expect(await waitFor(`(() => { const v = document.getElementById('v');
+    return !v.paused && v.error === null && v.readyState >= 1 && v.currentTime > 0; })()`)).toBe(true);
+});
+
+test("an unsupported video exposes an error instead of silently stopping", async () => {
+  await load(`<video id="v" src="/invalid-video.mp4"></video>`);
+  await evaluate(`(() => { const v = document.getElementById("v");
+    window.mediaFailed = false;
+    v.addEventListener("error", () => { window.mediaFailed = true; });
+    v.play();
+  })()`);
+  expect(await waitFor("window.mediaFailed === true")).toBe(true);
+  expect(await evaluate(`(() => { const v = document.getElementById("v");
+    return v.paused && v.error?.code === 4 && v.networkState === 3; })()`)).toBe(true);
 });
 
 test("MediaSource appends a file in parts and the element can play it", async () => {
