@@ -207,6 +207,28 @@ test("anchors expose parsed hyperlink URL components", async () => {
   expect(await evaluate(`document.getElementById("link").href`)).toBe("https://other.test/path?q=one#part");
 });
 
+test("form.elements is a live named collection of form controls", async () => {
+  await load(`<form id="form"><input name="query"><button id="send">go</button></form>`);
+  expect(await evaluate(`(() => { const form = document.getElementById('form'); return [
+    form.elements.length, form.elements.namedItem('query') === form.elements[0],
+    form.elements.namedItem('send') === document.getElementById('send')
+  ]; })()`)).toEqual([2, true, true]);
+  await evaluate(`document.getElementById('form').appendChild(document.createElement('select'))`);
+  expect(await evaluate("document.getElementById('form').elements.length")).toBe(3);
+});
+
+test("constructable CSSStyleSheet supports feature checks and basic rule mutation", async () => {
+  await load(`<p>cssom</p>`);
+  expect(await evaluate(`(async () => {
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync('p { color: red }');
+    const inserted = sheet.insertRule('b { display: block }');
+    const same = await sheet.replace('i { color: blue }');
+    return [sheet instanceof CSSStyleSheet, sheet.cssRules[0] instanceof CSSStyleRule,
+      inserted, same === sheet, sheet.cssRules[0].cssText, typeof CSSGroupingRule];
+  })()`)).toEqual([true, true, 1, true, "i { color: blue }", "function"]);
+});
+
 test("getAttributeNode exposes a live Attr view", async () => {
   await load(`<form id="search" onsubmit="return false"></form>`);
   expect(await evaluate(`(() => { const form = document.getElementById("search"); const attr = form.getAttributeNode("onsubmit");

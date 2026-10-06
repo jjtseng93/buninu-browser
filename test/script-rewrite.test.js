@@ -1,7 +1,15 @@
 import { expect, test } from "bun:test";
-import { rewriteConstructorReads } from "../lib/renderer/script-rewrite.js";
+import { escapeSesHtmlComments, rewriteConstructorReads } from "../lib/renderer/script-rewrite.js";
 
 const rewrite = (source, type) => rewriteConstructorReads(source, type).code;
+
+test("HTML comment markers in JavaScript values are escaped without changing them", () => {
+  const source = 'const a = "<!-- start -->"; const b = /-->/g; const c = `<!-- ${1} -->`;';
+  const escaped = escapeSesHtmlComments(source);
+  expect(escaped).not.toContain("<!--");
+  expect(escaped).not.toContain("-->");
+  expect(Function(`${escaped}; return [a, b.test('-->'), c]`)()).toEqual(["<!-- start -->", true, "<!-- 1 -->"]);
+});
 
 test("constructor reads go through the helper; writes, delete and optional chains do not", () => {
   expect(rewrite("var A = Object.getPrototypeOf(async function () {}).constructor;"))
