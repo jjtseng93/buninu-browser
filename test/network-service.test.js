@@ -26,6 +26,8 @@ beforeAll(() => {
           });
         case "/home":
           return new Response("home");
+        case "/moved":
+          return new Response("moved here", { status: 301, headers: { location: "/home", ...cors() } });
         case "/app/deep/set":
           return new Response("ok", { headers: [["set-cookie", "scoped=1"]] });
         case "/api/simple":
@@ -63,6 +65,18 @@ test("follows redirects by hand and stores cookies on every hop", async () => {
   // HttpOnly cookies are hidden from document.cookie; Set-Cookie never reaches pages.
   expect(network.documentCookie(local("/"))).toBe("theme=dark; strict=1; none=1");
   expect(response.headers.some(([name]) => name === "set-cookie")).toBeFalse();
+});
+
+test("a manual redirect gives the page an opaque-redirect response", async () => {
+  seen = [];
+  const network = new NetworkService();
+  const same = await network.pageFetch({ url: local("/moved"), redirect: "manual" }, local("/"));
+  expect(same).toMatchObject({ type: "opaqueredirect", status: 0, url: "", headers: [] });
+  expect(same.body.byteLength).toBe(0);
+  // Cross-origin: the redirect still passes the CORS check.
+  const cross = await network.pageFetch({ url: local(`/moved?allow=${encodeURIComponent(loopback(""))}`), redirect: "manual" }, loopback("/"));
+  expect(cross).toMatchObject({ type: "opaqueredirect", status: 0 });
+  expect(seen.map((entry) => entry.path)).toEqual(["/moved", "/moved"]);
 });
 
 test("applies the default path and SameSite to cross-site requests", async () => {

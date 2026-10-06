@@ -14,11 +14,22 @@ test("constructor reads go through the helper; writes, delete and optional chain
   expect(rewrite(`y = a . constructor ['constructor'];${trigger}`))
     .toBe("y = $buninu$constructor($buninu$constructor(a) ) ; ($buninu$constructor(async () => {}));");
   // Calls keep the receiver (the helper's second argument).
-  expect(rewrite(`b.constructor(1); new c.constructor();${trigger}`))
-    .toBe("$buninu$constructor(b, true)(1); new $buninu$constructor(c)(); ($buninu$constructor(async () => {}));");
+  // A constructed one is parenthesized so `new` applies to the result.
+  expect(rewrite(`b.constructor(1); new c.constructor(); new d.constructor;${trigger}`))
+    .toBe("$buninu$constructor(b, true)(1); new ($buninu$constructor(c))(); new ($buninu$constructor(d)); ($buninu$constructor(async () => {}));");
   const untouched = "a.constructor = 1; a.constructor++; delete a.constructor; for (a.constructor of []); c?.constructor; "
     + "class K extends B { constructor() { super(); super.constructor } } ({ constructor: 1 });";
   expect(rewrite(untouched + trigger)).toBe(`${untouched} ($buninu$constructor(async () => {}));`);
+});
+
+test("new on a rewritten constructor read constructs the object's constructor", () => {
+  const code = rewrite("class Point { constructor(x) { this.x = x; } } const p = new Point(1);"
+    + " result = new p.constructor(2); (async () => {}).constructor;");
+  const run = new Function("$buninu$constructor", `let result; ${code} return result;`);
+  const result = run((object) => object.constructor);
+  expect(result).toBeObject();
+  expect(result.constructor.name).toBe("Point");
+  expect(result.x).toBe(2);
 });
 
 test("sources that cannot reach Function constructors are not parsed; bad syntax is left to the engine", () => {
