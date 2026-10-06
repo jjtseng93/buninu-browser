@@ -1254,6 +1254,31 @@ test("a video plays while its audio SourceBuffer is not decodable yet", async ()
     return !v.paused && v.error === null && v.currentTime > 0 && v.videoWidth > 0; })()`)).toBe(true);
 });
 
+test("initial MSE playback waits briefly for a separate audio segment", async () => {
+  await load(`<video id="v" width="160" height="120"></video>`);
+  await evaluate(`(() => {
+    const video = document.getElementById("v");
+    video.addEventListener("play", () => { window.startedAt = performance.now(); });
+    const source = new MediaSource();
+    video.src = URL.createObjectURL(source);
+    source.addEventListener("sourceopen", async () => {
+      const bytes = new Uint8Array(await (await fetch("/video.mp4")).arrayBuffer());
+      const picture = source.addSourceBuffer('video/mp4; codecs="avc1.4d401e"');
+      const sound = source.addSourceBuffer('audio/mp4; codecs="mp4a.40.2"');
+      picture.addEventListener("updateend", () => video.play(), { once: true });
+      picture.appendBuffer(bytes);
+      sound.appendBuffer(bytes.subarray(0, 16));
+      setTimeout(() => {
+        window.audioAppendedAt = performance.now();
+        sound.appendBuffer(bytes.subarray(16));
+      }, 250);
+    });
+  })()`);
+  expect(await waitFor("Boolean(window.startedAt && window.audioAppendedAt)", 3000)).toBe(true);
+  expect(await evaluate("window.startedAt >= window.audioAppendedAt")).toBe(true);
+  expect(await waitFor("document.getElementById('v').currentTime > 0.1", 3000)).toBe(true);
+});
+
 const waitFor = async (expression, timeout = 5000) => {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
