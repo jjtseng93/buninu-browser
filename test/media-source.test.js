@@ -22,6 +22,38 @@ function openBuffer(context) {
   return { source, buffer: source.addSourceBuffer('video/mp4; codecs="avc1.4d401e"') };
 }
 
+function box(type, ...parts) {
+  const size = 8 + parts.reduce((sum, part) => sum + part.byteLength, 0);
+  const bytes = new Uint8Array(size);
+  const view = new DataView(bytes.buffer);
+  view.setUint32(0, size);
+  for (let index = 0; index < 4; index++) bytes[4 + index] = type.charCodeAt(index);
+  let offset = 8;
+  for (const part of parts) {
+    bytes.set(part, offset);
+    offset += part.byteLength;
+  }
+  return bytes;
+}
+
+function fragmentedMp4Pieces() {
+  const mdhd = new Uint8Array(20);
+  new DataView(mdhd.buffer).setUint32(12, 1000);
+  const init = box("moov", box("trak", box("mdia", box("mdhd", mdhd))));
+  const segment = (base) => {
+    const tfhd = new Uint8Array(12);
+    tfhd[3] = 8; // default_sample_duration_present
+    new DataView(tfhd.buffer).setUint32(4, 1);
+    new DataView(tfhd.buffer).setUint32(8, 1000);
+    const tfdt = new Uint8Array(8);
+    new DataView(tfdt.buffer).setUint32(4, base);
+    const trun = new Uint8Array(8);
+    new DataView(trun.buffer).setUint32(4, 5);
+    return box("moof", box("traf", box("tfhd", tfhd), box("tfdt", tfdt), box("trun", trun)));
+  };
+  return [init, segment(0), segment(5000)];
+}
+
 test("SourceBuffer.abort is harmless while idle and cancels a pending append", () => {
   const context = scope();
   const { buffer } = openBuffer(context);
@@ -52,4 +84,30 @@ test("removing an old buffered prefix releases append quota", () => {
   expect(() => buffer.appendBuffer(new Uint8Array(5))).not.toThrow();
   context.flush();
   expect(buffer.updating).toBe(false);
+});
+
+test("fragmented MP4 buffered end follows appended segments, not presentation duration", () => {
+  const context = scope();
+  const { source, buffer } = openBuffer(context);
+  const [init, first, second] = fragmentedMp4Pieces();
+  buffer.appendBuffer(init);
+  context.flush();
+  // Probing an init segment can expose the full presentation duration before
+  // the first media fragment supplies the actual buffered timeline.
+  source.noteBuffered(700);
+  for (const bytes of [first, second]) {
+    buffer.appendBuffer(bytes);
+    context.flush();
+  }
+  expect(buffer.buffered.length).toBe(1);
+  expect(buffer.buffered.end(0)).toBe(10);
+});
+
+test("a media element reports the intersection of separate audio and video buffers", () => {
+  const context = scope();
+  const { source, buffer: video } = openBuffer(context);
+  const audio = source.addSourceBuffer('audio/webm; codecs="opus"');
+  video.noteEnd(5);
+  audio.noteEnd(8);
+  expect(source.bufferedEnd()).toBe(5);
 });

@@ -1169,6 +1169,33 @@ test("MediaSource appends a file in parts and the element can play it", async ()
   expect(await evaluate("Math.round(document.getElementById('v').duration)")).toBe(1);
 });
 
+test("MediaSource consumes an append that arrived before the decoder stalled", async () => {
+  await load(`<video id="v" width="160" height="120"></video>`);
+  await evaluate(`(() => {
+    const video = document.getElementById("v");
+    const source = new MediaSource();
+    window.ms = source;
+    video.src = URL.createObjectURL(source);
+    source.addEventListener("sourceopen", async () => {
+      const bytes = new Uint8Array(await (await fetch("/video.mp4")).arrayBuffer());
+      const buffer = source.addSourceBuffer('video/mp4; codecs="avc1.4d401e, mp4a.40.2"');
+      const middle = bytes.length >> 1;
+      let append = 0;
+      buffer.addEventListener("updateend", () => {
+        append += 1;
+        if (append === 1) {
+          video.play();
+          buffer.appendBuffer(bytes.subarray(middle));
+        }
+      });
+      buffer.appendBuffer(bytes.subarray(0, middle));
+    });
+  })()`);
+  // Deliberately leave the MediaSource open. Playback must reopen from the
+  // already-appended second generation rather than wait for a third append.
+  expect(await waitFor("document.getElementById('v').currentTime > 0.75", 4000)).toBe(true);
+});
+
 test("a video plays while its audio SourceBuffer is not decodable yet", async () => {
   await load(`<video id="v" width="160" height="120"></video>`);
   await evaluate(`(() => {
