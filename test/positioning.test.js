@@ -67,6 +67,23 @@ test("left+right and top+bottom stretch an absolute box, percentages use the con
   expect(box(".half")).toMatchObject({ x: 50, y: 50 });
 });
 
+test("a percentage height fills a containing block whose height is definite", () => {
+  const { box } = render(
+    `<div class="frame"><div class="mid"><div class="fill"></div></div></div>`,
+    `.frame { height:200px } .mid { height:50% } .fill { height:100%; background:black }`,
+  );
+  expect(box(".mid").height).toBe(100);
+  expect(box(".fill").height).toBe(100);
+});
+
+test("a percentage height of an auto-sized parent stays the content height", () => {
+  const { box } = render(
+    `<div class="frame"><div class="fill">x</div></div>`,
+    `.fill { height:100% }`,
+  );
+  expect(box(".fill").height).toBe(20);
+});
+
 test("absolute percentage width uses the full containing block after a left inset", () => {
   const { box } = render(
     `<div class="frame"><div class="first"></div><div class="second"></div></div>`,

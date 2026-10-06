@@ -17,6 +17,7 @@ const navigations = [];
 // Every resource request with its time, for the preload test.
 const requests = [];
 let renderer;
+let dripFinished = false;
 
 beforeAll(async () => {
   renderer = new RendererHost({
@@ -52,6 +53,28 @@ beforeAll(async () => {
         { headers: { "content-type": "video/mp4" } });
       if (target.pathname === "/tone.mp3") return new Response(Bun.file(new URL("./fixtures/tone.mp3", import.meta.url)),
         { headers: { "content-type": "audio/mpeg" } });
+      // First 8 KiB immediately, the rest after a pause, so a test can see
+      // playback begin before the body has finished.
+      if (target.pathname === "/drip-video.mp4") {
+        const bytes = new Uint8Array(await Bun.file(new URL("./fixtures/long-video.mp4", import.meta.url)).bytes());
+        const head = bytes.subarray(0, 8192);
+        const rest = bytes.subarray(8192);
+        let sentHead = false;
+        const stream = new ReadableStream({
+          async pull(controller) {
+            if (!sentHead) {
+              sentHead = true;
+              controller.enqueue(head);
+              return;
+            }
+            await Bun.sleep(1500);
+            controller.enqueue(rest);
+            controller.close();
+            dripFinished = true;
+          },
+        });
+        return new Response(stream, { headers: { "content-type": "video/mp4" } });
+      }
       if (pages.has(target.href)) return new Response(pages.get(target.href), { headers: { "content-type": "text/html" } });
       const body = scripts.get(target.href);
       return body === undefined
@@ -1042,6 +1065,100 @@ test("meta.content is the reflected attribute; template.content stays the fragme
   expect(await evaluate("metaResult")).toBe("token,token,5,B");
 });
 
+test("a video starts from a prefix while the rest of the file is still downloading", async () => {
+  dripFinished = false;
+  await load(`<video id="v" src="/drip-video.mp4" width="160" height="120"></video>`);
+  await evaluate("document.getElementById('v').play()");
+  expect(dripFinished).toBe(false);
+  expect(await evaluate(`(() => { const v = document.getElementById('v');
+    return !v.paused && v.readyState >= 1 && v.currentTime > 0 && v.networkState === 2; })()`)).toBe(true);
+  const deadline = Date.now() + 4000;
+  while (!dripFinished && Date.now() < deadline) await Bun.sleep(50);
+  expect(dripFinished).toBe(true);
+});
+
+test("MediaSource appends a file in parts and the element can play it", async () => {
+  await load(`<video id="v" width="160" height="120"></video>`);
+  expect(await evaluate(`(() => {
+    try {
+      new MediaSource().addSourceBuffer('video/mp4; codecs="avc1.4d401e"');
+      return "no-throw";
+    } catch (error) {
+      return error.name;
+    }
+  })()`)).toBe("InvalidStateError");
+  expect(await evaluate(`[
+    MediaSource.isTypeSupported('video/mp4; codecs="avc1.4d401e"'),
+    MediaSource.isTypeSupported('audio/mp4; codecs="mp4a.40.2"'),
+    MediaSource.isTypeSupported('video/mp4; codecs="avc1.4d401e, mp4a.40.2"'),
+    MediaSource.isTypeSupported("video/mp4"),
+    MediaSource.isTypeSupported("video/x-unknown"),
+    HTMLMediaElement.HAVE_METADATA,
+    HTMLMediaElement.HAVE_NOTHING
+  ].join()`)).toBe("true,true,true,false,false,1,0");
+  await evaluate(`(() => {
+    const video = document.getElementById("v");
+    const source = new MediaSource();
+    window.ms = source;
+    window.mse = {};
+    video.src = URL.createObjectURL(source);
+    source.addEventListener("sourceopen", () => { window.mse.open = source.readyState; });
+  })()`);
+  await waitFor("window.mse.open === 'open'");
+  await evaluate(`(async () => {
+    const bytes = new Uint8Array(await (await fetch("/video.mp4")).arrayBuffer());
+    const buffer = window.ms.addSourceBuffer('video/mp4; codecs="avc1.4d401e, mp4a.40.2"');
+    const middle = bytes.length >> 1;
+    let updates = 0;
+    buffer.appendBuffer(bytes.subarray(0, middle));
+    buffer.addEventListener("updateend", () => {
+      updates += 1;
+      window.mse.updates = updates;
+      window.mse.ready = document.getElementById("v").readyState;
+      if (updates === 1) {
+        document.getElementById("v").play();
+        buffer.appendBuffer(bytes.subarray(middle));
+      } else {
+        window.mse.buffered = buffer.buffered.length ? buffer.buffered.end(0) : 0;
+        window.ms.endOfStream();
+        window.mse.ended = window.ms.readyState;
+      }
+    });
+  })()`);
+  await waitFor("window.mse.updates === 2 && window.mse.ended === 'ended'");
+  expect(await waitFor("document.getElementById('v').readyState >= 1")).toBe(true);
+  expect(await evaluate("window.mse.buffered > 0")).toBe(true);
+  expect(await waitFor("(() => { const v = document.getElementById('v'); return !v.paused && v.currentTime > 0; })()")).toBe(true);
+  expect(await evaluate("Math.round(document.getElementById('v').duration)")).toBe(1);
+});
+
+test("a video plays while its audio SourceBuffer is not decodable yet", async () => {
+  await load(`<video id="v" width="160" height="120"></video>`);
+  await evaluate(`(() => {
+    const video = document.getElementById("v");
+    const source = new MediaSource();
+    window.ms = source;
+    window.mse = {};
+    video.src = URL.createObjectURL(source);
+    source.addEventListener("sourceopen", () => { window.mse.open = source.readyState; });
+  })()`);
+  await waitFor("window.mse.open === 'open'");
+  await evaluate(`(async () => {
+    const bytes = new Uint8Array(await (await fetch("/video.mp4")).arrayBuffer());
+    const picture = window.ms.addSourceBuffer('video/mp4; codecs="avc1.4d401e"');
+    const sound = window.ms.addSourceBuffer('audio/mp4; codecs="mp4a.40.2"');
+    picture.addEventListener("updateend", () => {
+      window.mse.videoUpdated = true;
+      document.getElementById("v").play();
+    });
+    picture.appendBuffer(bytes);
+    sound.appendBuffer(bytes.subarray(0, 32));
+  })()`);
+  await waitFor("window.mse.videoUpdated === true");
+  expect(await waitFor(`(() => { const v = document.getElementById('v');
+    return !v.paused && v.error === null && v.currentTime > 0 && v.videoWidth > 0; })()`)).toBe(true);
+});
+
 const waitFor = async (expression, timeout = 5000) => {
   const deadline = Date.now() + timeout;
   while (Date.now() < deadline) {
@@ -1266,6 +1383,37 @@ test("selectors with CSS escapes parse, in type selectors and around combinators
     String.raw`#\31 23`, String.raw`.\31 x p`, String.raw`[data-k="a\"b"]`, String.raw`[d\61 ta-k]`];
   expect(await evaluate(`${JSON.stringify(selectors)}.map((selector) => document.querySelectorAll(selector).length)`))
     .toEqual([0, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+});
+
+test("a canvas 2d context samples colours through CanvasKit", async () => {
+  await load("");
+  expect(await evaluate(`(() => {
+    const canvas = document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+    canvas.width = canvas.height = 1;
+    const context = canvas.getContext("2d");
+    const sample = (color) => {
+      context.fillStyle = "#000";
+      context.fillStyle = color;
+      const first = context.fillStyle;
+      context.fillStyle = "#fff";
+      context.fillStyle = color;
+      if (first !== context.fillStyle) return null;
+      context.fillRect(0, 0, 1, 1);
+      const data = [...context.getImageData(0, 0, 1, 1).data];
+      context.clearRect(0, 0, 1, 1);
+      return data;
+    };
+    return {
+      onDiv: "getContext" in document.createElement("div"),
+      same: canvas.getContext("2d") === context,
+      webgl: canvas.getContext("webgl"),
+      size: [document.createElement("canvas").width, document.createElement("canvas").height],
+      red: sample("red"),
+      bad: sample("not-a-color"),
+    };
+  })()`)).toEqual({
+    onDiv: false, same: true, webgl: null, size: [300, 150], red: [255, 0, 0, 255], bad: [0, 0, 0, 255],
+  });
 });
 
 test("the page scrolls over content that overflows a 100vh layout, not over clipped or fixed content", async () => {
