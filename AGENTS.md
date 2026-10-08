@@ -6,6 +6,7 @@
   * In the future when it is wrapped into a full browser on each platform, the frontend should stay as thin wrappers just enough to draw rendered content from the headlesss shell
   * Specifically, able to work with ../casty through CDP is an important goal
 - Working with casty requires setting the env CASTY_BROWSER to the absolute path of buninu-browser.js
+  * Then start casty by `bun ../casty/index.js [URL]`. If no URL is specified it starts casty's homepage.
 - Enable logs by BUNINU_LOG
 - Only use Bun FFI to dlopen libc when other methods are clearly not enough
 - Read README.md and `bun index.js --help` for a general understanding
