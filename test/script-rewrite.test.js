@@ -1,7 +1,11 @@
 import { expect, test } from "bun:test";
-import { escapeSesHtmlComments, rewriteConstructorReads } from "../lib/renderer/script-rewrite.js";
+import {
+  escapeSesHtmlComments, prepareDirectEvalSource, restoreSourceText, rewriteClassicScript, rewriteConstructorReads,
+  rewriteDirectEval,
+} from "../lib/renderer/script-rewrite.js";
 
-const rewrite = (source, type) => rewriteConstructorReads(source, type).code;
+// The comment each constructor rewrite leaves for restoreSourceText.
+const rewrite = (source, type) => rewriteConstructorReads(source, type).code.replace(/\/\*\$buninu\$ctor:[^*]*\*\//g, "");
 
 test("HTML comment markers in JavaScript values are escaped without changing them", () => {
   const source = 'const a = "<!-- start -->"; const b = /-->/g; const c = `<!-- ${1} -->`;';
@@ -47,4 +51,29 @@ test("sources that cannot reach Function constructors are not parsed; bad syntax
   expect(rewriteConstructorReads("(async () => {}).constructor(")).toEqual({ code: "(async () => {}).constructor(", rewritten: false });
   expect(rewrite("export const A = (async () => {}).constructor;", "module"))
     .toBe("export const A = ($buninu$constructor(async () => {}));");
+});
+
+test("every rewrite of a function's text is undone for Function.prototype.toString", () => {
+  const functions = [
+    "function f(n) { var t = this; for (; n-->0;) eval(\"n\" + t); return (async () => {}).constructor; }",
+    "function g() { return [eval(eval(\"x\")), new (Object.getPrototypeOf(function* () {})).constructor(\"yield 1\"), \"<!-- -->\"]; }",
+    "function h() { \"use strict\"; return [this, eval(\"1\"), a.b().constructor(2)]; }",
+  ];
+  for (const text of functions) {
+    const classic = rewriteClassicScript(rewriteConstructorReads(rewriteDirectEval(text).code).code);
+    const code = escapeSesHtmlComments(classic.code);
+    // The function's own text in the rewritten program (after the prologue).
+    const own = code.slice(code.indexOf("function ", code.indexOf("=")));
+    expect(restoreSourceText(own.slice(0, own.lastIndexOf("}") + 1))).toBe(text);
+  }
+  expect(restoreSourceText(prepareDirectEvalSource("(function () { return this; })", [], false).code))
+    .toBe("(function () { return this; })");
+});
+
+test("only parsed, non-strict programs are reported as sloppy-mode code", () => {
+  expect(rewriteClassicScript("var a = this;")).toMatchObject({ parsed: true, strict: false });
+  expect(rewriteClassicScript("'use strict'; var a = 1;")).toMatchObject({ parsed: true, strict: true });
+  expect(rewriteClassicScript("var = ;")).toMatchObject({ parsed: false });
+  // A sloppy program's own `this` and its functions' go through the helper.
+  expect(rewriteClassicScript("x = this; function f() { return this; }").code).not.toMatch(/[^(]this[^)]/);
 });

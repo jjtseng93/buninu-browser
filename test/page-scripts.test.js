@@ -620,6 +620,23 @@ test("geometry APIs read the real layout", async () => {
   expect(await evaluate("document.getElementById('box').offsetWidth + 'x' + innerWidth")).toBe("120x400");
 });
 
+test("offsetParent is the nearest positioned ancestor, and offsets are measured from its padding edge", async () => {
+  await load(`<div id="outer" style="margin-left:20px;padding:5px">
+    <div id="toggle" style="position:relative;border:3px solid;padding:8px;width:200px;overflow:hidden">
+      <div id="tab" style="width:50px;height:10px"></div>
+      <div id="selection" style="position:absolute;left:0;top:0;width:100%;height:4px"></div>
+    </div></div>`);
+  expect(JSON.parse(await evaluate(`JSON.stringify((() => {
+    const tab = document.getElementById("tab"), toggle = document.getElementById("toggle");
+    return [tab.offsetParent === toggle, tab.offsetLeft, tab.offsetTop, toggle.offsetParent === document.body,
+      document.body.offsetParent, toggle.scrollWidth, toggle.clientWidth];
+  })())`))).toEqual([
+    // An absolutely positioned child as wide as the padding box does not
+    // add the end padding again: nothing overflows.
+    true, 8, 8, true, null, 216, 216,
+  ]);
+});
+
 test("page scripts cannot escape the sandbox or reach engine state", async () => {
   await load(`<p id="p">x</p><script>
     var probes = {};
@@ -630,8 +647,10 @@ test("page scripts cannot escape the sandbox or reach engine state", async () =>
     attempt('privateState', () => Object.getOwnPropertySymbols(document).length + '/' + Object.getOwnPropertyNames(document).length);
     attempt('newBinding', () => new document.constructor());
     attempt('patchPrototype', () => { Object.getPrototypeOf(document.body).appendChild = () => 'pwned'; return 'patched'; });
-    attempt('patchIntrinsic', () => { Array.prototype.includes = () => true; return 'patched'; });
-    attempt('patchUrl', () => { URL.prototype.toString = () => 'pwned'; return 'patched'; });
+    // Classic scripts are sloppy-mode code: assigning to a frozen property
+    // fails silently, as in browsers. What matters is that nothing changed.
+    attempt('patchIntrinsic', () => { Array.prototype.includes = () => true; return [].includes(1) ? 'patched' : 'blocked'; });
+    attempt('patchUrl', () => { URL.prototype.toString = () => 'pwned'; return String(new URL('https://a.test/')) === 'pwned' ? 'patched' : 'blocked'; });
     attempt('dynamicImport', () => { const pending = eval('import("node:fs")'); pending.catch(() => {}); return pending instanceof Promise ? 'promise' : 'wrong'; });
   </script>`);
   const probes = await evaluate("JSON.stringify(probes)");
@@ -873,6 +892,116 @@ test("fetch and XMLHttpRequest go through the controller with cookies and CORS",
     crossAllowed: "cross",
     xhr: "1234:200:GET",
     done: true,
+  });
+});
+
+test("fetch(request) uses the Request's internal state, not properties script defined on it", async () => {
+  await load(`<script>
+    window.network = {};
+    (async () => {
+      // Players check that fetch is not patched this way: the request still
+      // fetches its own data: URL whatever its own properties now say.
+      const request = new Request('data:application/json;base64,' + btoa(JSON.stringify({ ok: 42 })));
+      Object.defineProperty(request, 'url', { get: () => 'https://page.test/api/echo' });
+      Object.defineProperty(request, 'method', { get: () => 'POST' });
+      Object.defineProperty(request, 'bodyUsed', { get: () => true });
+      Object.defineProperty(request, 'mode', { get: () => 'same-origin' });
+      network.shadowed = (await (await fetch(request)).json()).ok;
+      const used = new Request('/api/echo', { method: 'POST', body: 'abc' });
+      await used.text();
+      network.used = await fetch(used).then(() => 'fetched', (error) => error.name);
+      network.stringType = (await (await fetch(new Request('/api/echo', { method: 'POST', body: 'abc' }))).json()).contentType;
+      network.done = true;
+    })();
+  </script>`);
+  for (let attempt = 0; attempt < 50 && !(await evaluate("network.done === true")); attempt++) await Bun.sleep(20);
+  expect(JSON.parse(await evaluate("JSON.stringify(network)"))).toEqual({
+    shadowed: 42,
+    used: "TypeError",
+    stringType: "text/plain;charset=UTF-8",
+    done: true,
+  });
+});
+
+test("classic scripts are sloppy-mode code whose missing receiver is the page global, never the engine's", async () => {
+  await load(`<script>
+    const page = (value) => value === window ? "page" : value && typeof value === "object" && ("Bun" in value || "process" in value) ? "ENGINE" : typeof value;
+    window.sloppy = {
+      call: page((function () { return this; })()),
+      nullCall: page((function () { return this; }).call(null)),
+      apply: page(Reflect.apply(function () { return this; }, undefined, [])),
+      fn: page(Function("return this")()),
+      evaluated: page(eval("(function () { return this; })")()),
+      indirect: page((0, eval)("(function () { return this; })")()),
+      topLevel: page(this),
+      callee: (function () { return typeof arguments.callee; })(),
+      withStatement: Function("with ({ a: 7 }) return a")(),
+      octal: Function("return 010")(),
+      implicitGlobal: (Function("implicitGlobal = 3")(), window.implicitGlobal),
+      strictStaysStrict: (function () { "use strict"; return this; })(),
+      engine: typeof Bun + " " + typeof process,
+    };
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(sloppy)"))).toEqual({
+    call: "page", nullCall: "page", apply: "page", fn: "page", evaluated: "page", indirect: "page", topLevel: "page",
+    callee: "function", withStatement: 7, octal: 8, implicitGlobal: 3, strictStaysStrict: undefined,
+    engine: "undefined undefined",
+  });
+});
+
+test("direct eval sees the caller's variables, and functions print the source the page wrote", async () => {
+  await load(`<script>
+    function counter(n) {
+      const step = 2;
+      eval("n += step");
+      return [n, eval("typeof step"), eval("0,function () { return n * step; }")()];
+    }
+    function rewritten(n) { for (; n-- > 0;) eval("n"); return [this, (async () => {}).constructor, "<!-- -->"]; }
+    window.evalResults = {
+      counter: counter(1),
+      declaresEval: eval('var eval = "shadowed"; eval'),
+      source: rewritten.toString(),
+      made: Function("a", "return this.a + a").toString(),
+    };
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(evalResults)"))).toEqual({
+    counter: [3, "number", 6],
+    declaresEval: "shadowed",
+    source: 'function rewritten(n) { for (; n-- > 0;) eval("n"); return [this, (async () => {}).constructor, "<!-- -->"]; }',
+    made: "function anonymous(a\n) {\nreturn this.a + a\n}",
+  });
+});
+
+test("Web APIs look like a browser's built-ins: native functions, interface prototypes and tags", async () => {
+  await load(`<script>
+    const descriptor = Object.getOwnPropertyDescriptor(Navigator.prototype, "userAgent");
+    window.shape = {
+      fetch: fetch.toString(),
+      fetchTag: Object.prototype.toString.call(fetch),
+      getter: descriptor.get.toString(),
+      illegalInvocation: (() => { try { descriptor.get.call({}); return "no error"; } catch (error) { return error.message; } })(),
+      illegalConstructor: (() => { try { new Navigator(); return "no error"; } catch (error) { return error.message; } })(),
+      navigatorOwn: Object.getOwnPropertyNames(navigator).length,
+      tags: [window, navigator, screen, document.body, localStorage, performance].map((value) => Object.prototype.toString.call(value)),
+      plugins: [navigator.plugins.length, navigator.mimeTypes.length, navigator.plugins[0].name, navigator.vendor],
+      storage: (localStorage.theme = "dark", [localStorage.getItem("theme"), Object.keys(localStorage)]),
+      enumerable: ["Array", "Navigator", "document", "setTimeout"].map((name) => Object.keys(window).includes(name)),
+      sesGlobals: [typeof Compartment, typeof harden, typeof lockdown],
+    };
+    localStorage.clear();
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(shape)"))).toEqual({
+    fetch: "function fetch() { [native code] }",
+    fetchTag: "[object Function]",
+    getter: "function get userAgent() { [native code] }",
+    illegalInvocation: "Illegal invocation",
+    illegalConstructor: "Illegal constructor",
+    navigatorOwn: 0,
+    tags: ["[object Window]", "[object Navigator]", "[object Screen]", "[object HTMLBodyElement]", "[object Storage]", "[object Performance]"],
+    plugins: [5, 2, "PDF Viewer", "Google Inc."],
+    storage: ["dark", ["theme"]],
+    enumerable: [false, false, true, true],
+    sesGlobals: ["undefined", "undefined", "undefined"],
   });
 });
 

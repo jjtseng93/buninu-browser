@@ -1,0 +1,106 @@
+diff --git a/dist/ses.mjs b/dist/ses.mjs
+index 8bda46b..d7b18ff 100644
+--- a/dist/ses.mjs
++++ b/dist/ses.mjs
+@@ -9568,7 +9568,7 @@ function buildOptimizer(constants, name) {
+             ${globalObjectOptimizer}
+             ${moduleLexicalOptimizer}
+             return function() {
+-              'use strict';
++              ${context.sloppyCode ? '' : "'use strict';"}
+               return eval(arguments[0]);
+             };
+           }
+@@ -9611,6 +9611,7 @@ const { Fail } = assert;
+   moduleLexicals = {},
+   globalTransforms = [],
+   sloppyGlobalsMode = false,
++  sloppyCode = false,
+ }) => {
+   const scopeTerminator = sloppyGlobalsMode
+     ? createSloppyGlobalsScopeTerminator(globalObject)
+@@ -9623,6 +9624,7 @@ const { Fail } = assert;
+     moduleLexicals,
+     globalObject,
+     scopeTerminator,
++    sloppyCode,
+   });
+ 
+   // Defer creating the actual evaluator to first use.
+@@ -9715,6 +9717,14 @@ const nativeSuffix = ') { [native code] }';
+ // use this top level state so that multiple calls to `tameFunctionToString` are
+ // idempotent, rather than creating redundant indirections.
+ let markVirtualizedNativeFunction;
++let sourceTextTransform;
++// Taken (and deleted) by the embedder, like the native-function marker.
++Object.defineProperty(globalThis, Symbol.for('ses.setFunctionSourceTextTransform'), {
++  value: transform => {
++    sourceTextTransform = transform;
++  },
++  configurable: true,
++});
+ 
+ /**
+  * Replace `Function.prototype.toString` with one that recognizes
+@@ -9726,7 +9736,10 @@ let markVirtualizedNativeFunction;
+ 
+     const tamingMethods = {
+       toString() {
+-        const str = functionToString(this);
++        let str = functionToString(this);
++        // The embedder may map the text of source it rewrote back to the
++        // text the page wrote (see the registered symbol below).
++        if (sourceTextTransform !== undefined) str = sourceTextTransform(str);
+         if (
+           stringEndsWith(str, nativeSuffix) ||
+           !weaksetHas(virtualizedNativeFunctions, this)
+@@ -9744,6 +9757,8 @@ let markVirtualizedNativeFunction;
+     markVirtualizedNativeFunction = freeze(func =>
+       weaksetAdd(virtualizedNativeFunctions, func),
+     );
++    // Function.prototype.toString is itself a built-in function.
++    markVirtualizedNativeFunction(tamingMethods.toString);
+   }
+   return markVirtualizedNativeFunction;
+ };$h͏_once.tameFunctionToString(tameFunctionToString);
+@@ -12523,12 +12538,15 @@ const { quote: q } = assert;
+ 
+ 
+        const provideCompartmentEvaluator = (compartmentFields, options) => {
+-  const { sloppyGlobalsMode = false, __moduleShimLexicals__ = undefined } =
+-    options;
++  const {
++    sloppyGlobalsMode = false,
++    __moduleShimLexicals__ = undefined,
++    __sloppyCode__ = false,
++  } = options;
+ 
+   let safeEvaluate;
+ 
+-  if (__moduleShimLexicals__ === undefined && !sloppyGlobalsMode) {
++  if (__moduleShimLexicals__ === undefined && !sloppyGlobalsMode && !__sloppyCode__) {
+     ({ safeEvaluate } = compartmentFields);
+   } else {
+     // The scope proxy or global lexicals are different from the
+@@ -12560,6 +12578,7 @@ const { quote: q } = assert;
+       moduleLexicals,
+       globalTransforms,
+       sloppyGlobalsMode,
++      sloppyCode: __sloppyCode__,
+     }));
+   }
+ 
+@@ -15138,6 +15157,13 @@ globalThis.repairIntrinsics = options => {
+ 
+ const markVirtualizedNativeFunction = tameFunctionToString();
+ 
++// The embedder takes this once (and deletes it) to present its own
++// host-implemented Web APIs as built-in functions, as browsers do.
++Object.defineProperty(globalThis, Symbol.for('ses.markVirtualizedNativeFunction'), {
++  value: markVirtualizedNativeFunction,
++  configurable: true,
++});
++
+ const muteReporter = chooseReporter('none');
+ 
+ // @ts-ignore Compartment is definitely on globalThis.
