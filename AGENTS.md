@@ -5,7 +5,10 @@
 - Native bindings are generally not allowed in the headless shell itself
   * In the future when it is wrapped into a full browser on each platform, the frontend should stay as thin wrappers just enough to draw rendered content from the headlesss shell
   * Specifically, able to work with ../casty through CDP is an important goal
+- Working with casty requires setting the env CASTY_BROWSER to the absolute path of buninu-browser.js
+- Enable logs by BUNINU_LOG
 - Only use Bun FFI to dlopen libc when other methods are clearly not enough
+- Read README.md and `bun index.js --help` for a general understanding
 
 ## Implementing the browser
 - Do not treat any website specially when refining browser features like layout css js. Fix the actual problem that all websites can benefit from.
