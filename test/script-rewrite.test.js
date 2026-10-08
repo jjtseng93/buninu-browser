@@ -44,6 +44,17 @@ test("new on a rewritten constructor read constructs the object's constructor", 
   expect(result.x).toBe(2);
 });
 
+test("constructor reads preserve comma expressions as a single receiver", () => {
+  const source = 'var a = {}, b = {}; var result = (a.x = 1, b).constructor; (async () => {}).constructor;';
+  const rewritten = rewriteConstructorReads(source).code;
+  const run = new Function("$buninu$constructor", `${rewritten}; return [result, a.x];`);
+  expect(run((value, call = false) => {
+    expect(call).toBe(false);
+    return value.constructor;
+  })).toEqual([Object, 1]);
+  expect(restoreSourceText(rewritten)).toBe(source);
+});
+
 test("sources that cannot reach Function constructors are not parsed; bad syntax is left to the engine", () => {
   expect(rewriteConstructorReads("x.constructor.name")).toEqual({ code: "x.constructor.name", rewritten: false });
   // this.constructor is common and harmless; alone it does not trigger a parse.

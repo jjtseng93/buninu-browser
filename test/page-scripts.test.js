@@ -606,6 +606,17 @@ test("performance.timing follows the document lifecycle", async () => {
     .toBe(JSON.stringify([[true, 0], true, true, 0, 21]));
 });
 
+test("each document starts a new performance timeline", async () => {
+  await load('<p>first</p>');
+  const previousOrigin = await evaluate('performance.timeOrigin');
+  await Bun.sleep(100);
+  await load('<script>var initialNow = performance.now(); var frameTime; requestAnimationFrame(t => frameTime = t);</script>');
+  expect(await evaluate('performance.timeOrigin')).toBeGreaterThan(previousOrigin);
+  expect(await evaluate('initialNow')).toBeLessThan(100);
+  expect(await waitFor('typeof frameTime === "number"')).toBe(true);
+  expect(await evaluate('frameTime >= initialNow && frameTime <= performance.now()')).toBe(true);
+});
+
 test("location assignment asks the controller to navigate", async () => {
   navigations.length = 0;
   await load(`<script>setTimeout(() => { location.href = '/elsewhere?x=1' }, 0)</script>`);
@@ -618,6 +629,42 @@ test("geometry APIs read the real layout", async () => {
   expect(await evaluate("JSON.stringify(document.getElementById('box').getBoundingClientRect())"))
     .toBe(JSON.stringify({ x: 0, y: 10, left: 0, top: 10, width: 120, height: 30, right: 120, bottom: 40 }));
   expect(await evaluate("document.getElementById('box').offsetWidth + 'x' + innerWidth")).toBe("120x400");
+});
+
+test("DOM objects have their interfaces' shape: events, element.style, image attributes and Node methods", async () => {
+  await load(`<div id="host">a<b>c</b></div><script>
+    const event = document.createEvent("MouseEvents");
+    const enumerated = []; for (const key in event) enumerated.push(key);
+    const image = document.createElement("img");
+    const style = document.body.style;
+    style.setProperty("margin-top", "3px");
+    const frame = document.createElement("iframe");
+    document.body.appendChild(frame);
+    const host = document.getElementById("host");
+    host.appendChild(document.createTextNode("x"));
+    host.appendChild(document.createTextNode("y"));
+    host.normalize();
+    window.shapes = {
+      event: [Object.prototype.toString.call(event), event instanceof MouseEvent, event instanceof UIEvent,
+        Object.getOwnPropertyNames(event).join(), enumerated.includes("clientX"), enumerated.includes("preventDefault"),
+        typeof event.initMouseEvent, event.view, MouseEvent.prototype.hasOwnProperty("clientX"), Event.prototype.hasOwnProperty("clientX")],
+      unsupportedEvent: (() => { try { document.createEvent("NoSuchEvents"); return "created"; } catch (error) { return error.name; } })(),
+      style: [Object.prototype.toString.call(style), style instanceof CSSStyleDeclaration, style.setProperty.toString(),
+        style.getPropertyValue("margin-top"), style.marginTop],
+      image: [image.useMap, image.name, image.complete, image.decoding, image.crossOrigin, image.hspace],
+      frame: frame.contentWindow !== null,
+      node: [host.childNodes.length, host.isSameNode(host), host.isEqualNode(host.cloneNode(true)),
+        host.lookupNamespaceURI(null), host.lookupPrefix("http://www.w3.org/1999/xhtml"), host.getRootNode() === document, Node.NOTATION_NODE],
+    };
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(shapes)"))).toEqual({
+    event: ["[object MouseEvent]", true, true, "isTrusted", true, true, "function", null, true, false],
+    unsupportedEvent: "NotSupportedError",
+    style: ["[object CSSStyleDeclaration]", true, "function setProperty() { [native code] }", "3px", "3px"],
+    image: ["", "", true, "auto", null, 0],
+    frame: true,
+    node: [3, true, true, "http://www.w3.org/1999/xhtml", null, true, 12],
+  });
 });
 
 test("offsetParent is the nearest positioned ancestor, and offsets are measured from its padding edge", async () => {
@@ -1153,10 +1200,13 @@ test("Function constructors reached through prototypes work under SES", async ()
     var GeneratorFunction = (function* () {}).constructor;
     var plain = (function () {}).constructor;
     var classic = [[...new GeneratorFunction('yield 1; yield 2')()].join(), plain('return typeof window')(),
-      typeof Object.getPrototypeOf(async function* () {}).constructor('yield 1')];
+      typeof Object.getPrototypeOf(async function* () {}).constructor('yield 1'),
+      ({}).constructor === Object, typeof ({}).constructor.create];
   </script>`);
   for (let i = 0; i < 20 && !(await evaluate("typeof moduleResult")).startsWith("object"); i++) await Bun.sleep(25);
-  expect(await evaluate("JSON.stringify([moduleResult, classic])")).toBe(JSON.stringify([[3, true, "AsyncFunction"], ["1,2", "object", "function"]]));
+  expect(await evaluate("JSON.stringify([moduleResult, classic])")).toBe(JSON.stringify([
+    [3, true, "AsyncFunction"], ["1,2", "object", "function", true, "function"],
+  ]));
 });
 
 test("UI event constructors, table rows/cells and select options are available", async () => {
