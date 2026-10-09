@@ -131,3 +131,26 @@ test("a media element reports the intersection of separate audio and video buffe
   audio.noteEnd(8);
   expect(source.bufferedEnd()).toBe(5);
 });
+
+test("a media segment appended again is not concatenated twice, while gaps are still filled", () => {
+  const context = scope();
+  const { buffer } = openBuffer(context);
+  const [init, first, second] = fragmentedMp4Pieces();
+  let updates = 0;
+  buffer.addEventListener("updateend", () => updates++);
+  // The second segment arrives first; the first then fills the gap before it.
+  for (const bytes of [init, second, first]) {
+    buffer.appendBuffer(bytes);
+    context.flush();
+  }
+  const size = buffer._pipe.size;
+  expect(size).toBe(init.byteLength + second.byteLength + first.byteLength);
+  // A player retrying both segments on a slow network.
+  for (const bytes of [first, second]) {
+    buffer.appendBuffer(bytes);
+    context.flush();
+  }
+  expect(buffer._pipe.size).toBe(size);
+  expect(updates).toBe(5);
+  expect(buffer.buffered.end(0)).toBe(10);
+});
