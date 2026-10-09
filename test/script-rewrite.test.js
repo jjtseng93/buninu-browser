@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import {
   escapeSesHtmlComments, prepareDirectEvalSource, restoreSourceText, rewriteClassicScript, rewriteConstructorReads,
-  rewriteDirectEval,
+  rewriteClassicScriptSource, rewriteDirectEval,
 } from "../lib/renderer/script-rewrite.js";
 
 // The comment each constructor rewrite leaves for restoreSourceText.
@@ -56,10 +56,10 @@ test("constructor reads preserve comma expressions as a single receiver", () => 
 });
 
 test("sources that cannot reach Function constructors are not parsed; bad syntax is left to the engine", () => {
-  expect(rewriteConstructorReads("x.constructor.name")).toEqual({ code: "x.constructor.name", rewritten: false });
+  expect(rewriteConstructorReads("x.constructor.name")).toEqual({ code: "x.constructor.name", rewritten: false, program: null });
   // this.constructor is common and harmless; alone it does not trigger a parse.
   expect(rewriteConstructorReads("async function f() { return this.constructor }").rewritten).toBe(false);
-  expect(rewriteConstructorReads("(async () => {}).constructor(")).toEqual({ code: "(async () => {}).constructor(", rewritten: false });
+  expect(rewriteConstructorReads("(async () => {}).constructor(")).toEqual({ code: "(async () => {}).constructor(", rewritten: false, program: null });
   expect(rewrite("export const A = (async () => {}).constructor;", "module"))
     .toBe("export const A = ($buninu$constructor(async () => {}));");
 });
@@ -87,4 +87,21 @@ test("only parsed, non-strict programs are reported as sloppy-mode code", () => 
   expect(rewriteClassicScript("var = ;")).toMatchObject({ parsed: false });
   // A sloppy program's own `this` and its functions' go through the helper.
   expect(rewriteClassicScript("x = this; function f() { return this; }").code).not.toMatch(/[^(]this[^)]/);
+});
+
+test("the classic-script pipeline parses once when earlier rewrites change nothing, with the same result", () => {
+  const sources = [
+    "var a = 1; function f() { return this; }",
+    "var s = 'eval(1)'; for (var i = 0; i < 2; i++) {}",
+    "var g = (async () => {}).constructor; var t = this;",
+    "function h(x) { return eval(x); } var y = eval('2');",
+    "return 1;",
+  ];
+  for (const source of sources) {
+    const stepwise = rewriteClassicScript(rewriteConstructorReads(rewriteDirectEval(source).code).code);
+    expect(rewriteClassicScriptSource(source)).toEqual(stepwise);
+  }
+  const direct = rewriteDirectEval("var s = 'eval(1)';");
+  expect([direct.rewritten, direct.program?.type]).toEqual([false, "Program"]);
+  expect(rewriteDirectEval("eval(x); return 1;").program).toBe(null);
 });

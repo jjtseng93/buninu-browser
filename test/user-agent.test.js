@@ -40,3 +40,22 @@ test("CDP discovery, HTTP requests, and navigator report the same desktop user a
     site.stop(true);
   }
 });
+
+test("scripts added for new documents run before the page's own scripts, in every later document", async () => {
+  const site = Bun.serve({ port: 0, fetch: () => new Response(
+    "<!doctype html><script>window.seenByPage = window.early;</script>",
+    { headers: { "content-type": "text/html" } },
+  ) });
+  const browser = await createBrowser({ spareRenderer: false });
+  try {
+    const first = browser.context.addInitScript("window.early = (window.early ?? 0) + 1;");
+    await browser.context.navigate(`http://127.0.0.1:${site.port}/`);
+    expect(await browser.context.evaluate("window.seenByPage")).toBe(1);
+    browser.context.removeInitScript(first);
+    await browser.context.navigate(`http://127.0.0.1:${site.port}/again`);
+    expect(await browser.context.evaluate("window.seenByPage")).toBe(undefined);
+  } finally {
+    browser.close();
+    site.stop(true);
+  }
+});

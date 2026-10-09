@@ -171,6 +171,66 @@ test("classic scripts share globals, load in order and fire DOMContentLoaded the
   expect(await evaluate("document.readyState")).toBe("complete");
 });
 
+test("large classic scripts prepared on the rewrite thread run in document order with the others", async () => {
+  // Past the size the renderer prepares off its main thread (see prepareOffThread).
+  const padding = `/* ${"x".repeat(40 * 1024)} */`;
+  scripts.set("https://page.test/big.js", `${padding}\nvar bigVar = 'big'; function bigFunction() { return this === window; } order.push('big:' + bigFunction());`);
+  scripts.set("https://page.test/small.js", "order.push('small:' + bigVar);");
+  await load(`
+    <script>var order = ['first'];</script>
+    <script src="big.js"></script>
+    <script src="small.js"></script>
+    <script>${padding}
+      order.push('inline-big:' + (typeof bigFunction) + ':' + (function () { return this === window; })());</script>
+    <script>order.push('last');</script>`);
+  expect(await evaluate("order.join(',')")).toBe("first,big:true,small:big,inline-big:function:true,last");
+  expect(await evaluate("bigFunction.toString().includes('$buninu$')")).toBe(false);
+  scripts.set("https://page.test/dynamic-big.js", `${padding}\nwindow.dynamicBig = (function () { return this === window; })();`);
+  await evaluate("document.body.appendChild(Object.assign(document.createElement('script'), { src: 'dynamic-big.js' })), 0");
+  for (let i = 0; i < 50 && await evaluate("window.dynamicBig") !== true; i++) await Bun.sleep(50);
+  expect(await evaluate("window.dynamicBig")).toBe(true);
+});
+
+test("functions a direct eval defines keep live access to the caller's variables", async () => {
+  await load(`<script>
+    window.evalScope = (function () {
+      var count = 0, label = "a";
+      const bump = eval("0,function (step) { count += step; return { count, label }; }");
+      const relabel = eval("0,function (next) { label = next; }");
+      const first = bump(2);
+      relabel("b");
+      count = 10;
+      const second = bump(1);
+      return [first.count, first.label, second.count, second.label, count, label, String(bump)];
+    })();
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(evalScope)"))).toEqual([
+    2, "a", 11, "b", 11, "b", "function (step) { count += step; return { count, label }; }",
+  ]);
+});
+
+test("documents and shadow roots have adoptedStyleSheets, which page patches of Element.prototype may extend", async () => {
+  await load(`<div id="host"></div><script>
+    // As a popover polyfill does: every new shadow root adopts its sheet.
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(":host { color: red }");
+    const attach = Element.prototype.attachShadow;
+    Element.prototype.attachShadow = function (init) {
+      const root = attach.call(this, init);
+      root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
+      return root;
+    };
+    const root = document.getElementById("host").attachShadow({ mode: "open" });
+    document.adoptedStyleSheets.push(sheet);
+    window.adopted = [
+      Array.isArray(document.adoptedStyleSheets), document.adoptedStyleSheets.length, root.adoptedStyleSheets[0] === sheet,
+      (() => { try { document.adoptedStyleSheets = [{}]; return "accepted"; } catch (error) { return error.name; } })(),
+      (() => { try { root.adoptedStyleSheets = null; return "accepted"; } catch (error) { return error.name; } })(),
+    ];
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(adopted)"))).toEqual([true, 1, true, "TypeError", "TypeError"]);
+});
+
 test("navigator reports cookies and User-Agent Client Hints consistently", async () => {
   await load(`<script>
     navigator.userAgentData.getHighEntropyValues(['uaFullVersion']).then(value => {
@@ -667,6 +727,71 @@ test("DOM objects have their interfaces' shape: events, element.style, image att
   });
 });
 
+test("HTMLElement.prototype inherits Element's members, so patches to Element.prototype reach HTML elements", async () => {
+  await load(`<div id="host"></div><script>
+    const original = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (name, value) { window.patched = name; return original.call(this, name, value); };
+    document.getElementById("host").setAttribute("data-x", "1");
+    window.shape = [Object.hasOwn(HTMLElement.prototype, "setAttribute"), Object.hasOwn(HTMLElement.prototype, "focus"),
+      Object.hasOwn(HTMLElement.prototype, "onclick"), Object.hasOwn(Element.prototype, "focus"), Object.hasOwn(Element.prototype, "id")];
+  </script>`);
+  expect(await evaluate("window.patched")).toBe("data-x");
+  expect(JSON.parse(await evaluate("JSON.stringify(shape)"))).toEqual([false, true, true, false, true]);
+});
+
+test("Trusted Types: policies make trusted values, and eval runs a TrustedScript", async () => {
+  await load(`<div id="host"></div><script>
+    const policy = trustedTypes.createPolicy("page", { createHTML: (s) => s + "!", createScript: (s) => s, createScriptURL: (s) => s });
+    const html = policy.createHTML("<b>x</b>");
+    document.getElementById("host").innerHTML = html;
+    const script = policy.createScript("1 + 2");
+    window.trusted = [
+      Object.prototype.toString.call(trustedTypes), html instanceof TrustedHTML, String(html), JSON.stringify(html),
+      trustedTypes.isHTML(html), trustedTypes.isHTML("x"), trustedTypes.isScript(script), policy.name,
+      eval(script), (0, eval)(script), eval(7), trustedTypes.emptyHTML.toString(),
+      trustedTypes.getPropertyType("div", "innerHTML"), trustedTypes.getAttributeType("script", "src"), trustedTypes.defaultPolicy,
+      (() => { try { trustedTypes.createPolicy("bare").createHTML("x"); return "created"; } catch (error) { return error.name; } })(),
+      (() => { try { new TrustedHTML(); return "constructed"; } catch (error) { return error.name; } })(),
+      document.getElementById("host").innerHTML,
+      String(trustedTypes.createPolicy),
+    ];
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(trusted)"))).toEqual([
+    "[object TrustedTypePolicyFactory]", true, "<b>x</b>!", '"<b>x</b>!"',
+    true, false, true, "page",
+    3, 3, 7, "",
+    "TrustedHTML", "TrustedScriptURL", null,
+    "TypeError", "TypeError",
+    "<b>x</b>!",
+    "function createPolicy() { [native code] }",
+  ]);
+});
+
+test("addEventListener reads capture, once, passive and signal, and an aborted signal removes the listener", async () => {
+  await load(`<div id="host"></div><script>
+    const read = [];
+    const options = {};
+    for (const name of ["passive", "signal", "once", "capture"]) {
+      Object.defineProperty(options, name, { get() { read.push(name); return undefined; } });
+    }
+    const host = document.getElementById("host");
+    host.addEventListener("ping", () => {}, options);
+    const controller = new AbortController();
+    window.calls = 0;
+    host.addEventListener("ping", () => window.calls++, { signal: controller.signal });
+    host.dispatchEvent(new Event("ping"));
+    controller.abort();
+    host.dispatchEvent(new Event("ping"));
+    host.addEventListener("ping", () => window.calls++, { signal: controller.signal });
+    host.dispatchEvent(new Event("ping"));
+    window.optionReads = read.join();
+    window.badSignal = (() => { try { host.addEventListener("ping", () => {}, { signal: {} }); return "added"; } catch (error) { return error.name; } })();
+  </script>`);
+  expect(await evaluate("optionReads")).toBe("capture,once,passive,signal");
+  expect(await evaluate("calls")).toBe(1);
+  expect(await evaluate("badSignal")).toBe("TypeError");
+});
+
 test("offsetParent is the nearest positioned ancestor, and offsets are measured from its padding edge", async () => {
   await load(`<div id="outer" style="margin-left:20px;padding:5px">
     <div id="toggle" style="position:relative;border:3px solid;padding:8px;width:200px;overflow:hidden">
@@ -837,6 +962,7 @@ test("pages can wrap Promise methods without modifying another realm", async () 
   expect(await evaluate("Promise.resolve(0) instanceof Promise")).toBe(true);
   expect(await evaluate("(async () => 1)() instanceof Promise")).toBe(true);
   expect(await evaluate("(() => { class Child extends Promise {} return [new Child(r => r()) instanceof Child, Promise.resolve() instanceof Child]; })()")).toEqual([true, false]);
+  expect(await evaluate("['all', 'allSettled', 'any', 'race', 'reject', 'resolve', 'withResolvers'].every((name) => Object.hasOwn(Promise, name)) && Object.prototype.toString.call(Promise.resolve())")).toBe("[object Promise]");
   await load(`<script>window.promiseResult = null; Promise.all([Promise.resolve(7)]).then(v => promiseResult = v[0]);</script>`);
   await waitFor("promiseResult === 7");
   expect(await evaluate("typeof promiseCalls")).toBe("undefined");
