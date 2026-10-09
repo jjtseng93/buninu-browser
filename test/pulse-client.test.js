@@ -111,6 +111,8 @@ test("audio is sent in whole frames, so stereo channels never swap", async () =>
   expect(sizes.every((size) => size % 4 === 0)).toBeTrue();
   expect(offsets.every((offset) => offset === 0n)).toBeTrue();
   expect(flags.every((flag) => flag === 0)).toBeTrue();
+  // What the server holds, which it may still play after the stream closes.
+  expect(stream.sentBytes).toBe(sizes.reduce((sum, size) => sum + size, 0));
   expect(bufferAttributes[0]).toEqual([76800, 15360, 7680]); // 400/80/40 ms at 48 kHz stereo
   await client.openPlayback({ rate: 48000, channels: 1, leadSeconds: 0.12 });
   expect(bufferAttributes[1]).toEqual([15360, 3840, 3840]); // 160/40/40 ms at 48 kHz mono
