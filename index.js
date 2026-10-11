@@ -84,6 +84,11 @@ Frontends (first argument only):
   --win32, --gtk, --appkit, --qt
       Native windowed frontends (reserved, not implemented yet)
 
+Browser identity:
+  WebKit/Safari compatibility identity is the engine default (not native WebKit).
+  Pass -- --webkit or -- --chromium through casty; with --headless, omit --.
+  Last desktop identity flag wins; --mobile takes priority.
+
 Information:
   --help, -h, -help
       Show this help & exit

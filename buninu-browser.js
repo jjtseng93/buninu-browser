@@ -45,6 +45,10 @@ Options:
   --mobile                        Present as a phone: mobile user agent and touch media
                                   features (hover: none, pointer: coarse); user agent
                                   overrides over CDP are ignored
+  --webkit                        Use a desktop WebKit/Safari compatibility identity (default)
+                                  for JavaScriptCore; CDP user agent overrides are ignored
+  --chromium                      Use the previous desktop Chromium compatibility identity
+                                  Last desktop identity flag wins; --mobile takes priority
   --screenshot[=FILE]             Capture one PNG and exit (default screenshot.png)
   --window-size=WIDTH,HEIGHT      Viewport size for the screenshot (default 800,600)
   --screenshot-wait=MILLISECONDS  Wait after page load before capturing

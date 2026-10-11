@@ -24,6 +24,12 @@ npx buninu-browser
 # Open a URL
 npx buninu-browser buninu.org
 
+# WebKit/Safari compatibility identity is the default
+npx buninu-browser https://youtu.be/jf-pn0a-Twk
+
+# Switch back to the Chromium compatibility identity
+npx buninu-browser buninu.org -- --chromium
+
 # Arguments after -- go to the
 # browser engine; --mobile presents
 # it as a phone (mobile user agent,
@@ -60,6 +66,17 @@ this package's `buninu-browser.js`
 and starts casty with `npx` when npx
 and Bun are both installed, otherwise
 with `bunx`, or `bun x`.
+No adjacent casty checkout is needed. From a local Buninu Browser checkout,
+`bun index.js [URL] [-- BROWSER_FLAGS...]` uses the same package-based launcher.
+
+The engine defaults to a WebKit/Safari compatibility identity in casty,
+headless, and screenshot modes. `--webkit` explicitly selects this default;
+`--chromium` selects the previous desktop Chromium identity. Pass these flags
+after `--` through casty, or directly after `--headless`. If both desktop flags
+are supplied, the last one wins. `--mobile` takes priority over either desktop
+identity and retains the Android phone profile. These flags select browser
+identities, not native WebKit or Chromium engines. API callers can use
+`createBrowser({ webkit: false })` to select the Chromium identity.
 
 The first argument picks a frontend;
 the rest is passed on:
@@ -147,11 +164,11 @@ Compatibility with casty is therefore part of the initial vertical slice
 rather than a later layer: CDP discovery, target lifecycle, navigation,
 screenshots and screencast, viewport, and input. Early development and every
 screen test so far have been done in casty itself. casty launches the
-browser named by `CASTY_BROWSER` before looking for Chromium, so a checkout
-of this repository runs next to a casty checkout with:
+browser named by `CASTY_BROWSER` before looking for Chromium. The package
+launcher sets this automatically and obtains casty through the package runner:
 
 ```sh
-CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js buninu.org
+npx buninu-browser buninu.org
 ```
 
 ## Design
@@ -247,7 +264,7 @@ pushes a screencast frame.
 ### Mobile presentation
 
 Pages see a desktop browser unless `--mobile` is given. With it, requests
-and `navigator.userAgent` use an Android 16 WebView user agent, and the
+and `navigator.userAgent` use an Android 16 Chrome user agent, and the
 `hover`/`pointer` media features report a touch screen (`hover: none`,
 `pointer: coarse`). User agent overrides sent over CDP are ignored so the
 flag stays in effect under clients that set a desktop user agent, such as
@@ -257,10 +274,28 @@ asked for; input coordinates are scaled back, and pages see the factor as
 `visualViewport.scale`.
 
 ```sh
-CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js github.com -- --mobile
+npx buninu-browser github.com -- --mobile
 ```
 
 ### Video and audio
+
+The default desktop WebKit/Safari compatibility identity (also selectable with
+`--webkit`) matches Bun's JavaScriptCore more closely than the optional
+`--chromium` identity. It presents macOS Safari even on other operating systems, sets the
+matching navigator vendor/platform, and omits Chromium User-Agent Client Hints.
+This can help pages that compare their declared browser with JavaScript engine
+behavior. The flag applies to every site and keeps the page sandbox enabled.
+
+```sh
+npx buninu-browser https://youtu.be/jf-pn0a-Twk -- --webkit
+```
+
+The casty package version must support non-Chromium CDP backends without
+replacing their advertised identity or applying Chrome-specific page patches.
+The default and explicit
+`--webkit` profiles ignore CDP user-agent overrides. The same flag works with
+`--headless` and screenshot mode. This is a compatibility workaround, not a
+guarantee that a service will accept every session.
 
 `<video>` and `<audio>` share one pipeline; an `<audio controls>` is a
 300x32 control bar with no picture. Clicking plays or pauses, clicking the
@@ -289,7 +324,7 @@ Renderers cannot open files under seccomp, so the controller collects their
 output and writes the log.
 
 ```sh
-BUNINU_LOG=1 CASTY_BROWSER="$PWD/buninu-browser.js" bun ../casty/bin/casty.js github.com
+BUNINU_LOG=1 npx buninu-browser github.com
 ```
 
 ## Open-source components

@@ -351,7 +351,7 @@ test("a client may set up and navigate before the first renderer is up", async (
     fetched++;
     return new Response("<!doctype html><title>early</title><p>x</p>", { headers: { "content-type": "text/html" } });
   } });
-  const browser = await createBrowser({ spareRenderer: false, waitForRenderer: false });
+  const browser = await createBrowser({ spareRenderer: false, waitForRenderer: false, webkit: false });
   let ready = false;
   browser.ready.then(() => { ready = true; });
   try {

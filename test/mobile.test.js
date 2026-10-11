@@ -52,8 +52,8 @@ test("--mobile sends the mobile user agent, ignores overrides and applies touch 
   });
 }, 30_000);
 
-test("without --mobile nothing changes: overrides apply and touch rules do not", async () => {
-  const state = await pageState({});
+test("Chromium desktop allows overrides and does not apply touch rules", async () => {
+  const state = await pageState({ webkit: false });
   expect(state).toMatchObject({
     requestUserAgent: "Desktop/1.0 (casty override)",
     navigatorUserAgent: "Desktop/1.0 (casty override)",

@@ -2,7 +2,16 @@ import { expect, test } from "bun:test";
 import { CdpServer } from "../lib/cdp-server.js";
 import { createBrowser } from "../lib/headless-shell.js";
 import { MOBILE_USER_AGENT } from "../lib/renderer/flags.js";
-import { BROWSER_PRODUCT, CHROMIUM_VERSION, DESKTOP_USER_AGENT, WEBKIT_USER_AGENT, desktopUserAgent } from "../lib/user-agent.js";
+import { BROWSER_PRODUCT, CHROMIUM_VERSION, DESKTOP_USER_AGENT, WEBKIT_USER_AGENT, desktopUserAgent, webkitFromArgs } from "../lib/user-agent.js";
+
+test("CLI identity defaults to WebKit, last desktop flag wins and mobile takes priority", () => {
+  for (const [args, expected] of [
+    [[], true], [["--webkit"], true], [["--chromium"], false],
+    [["--webkit", "--chromium"], false], [["--chromium", "--webkit"], true],
+    [["--mobile"], false], [["--mobile", "--webkit"], false],
+    [["--webkit", "--mobile"], false], [["--mobile", "--chromium"], false],
+  ]) expect(webkitFromArgs(args)).toBe(expected);
+});
 
 test("desktop user agent uses the same version on each platform", () => {
   for (const [platform, arch, system] of [
@@ -19,13 +28,13 @@ test("mobile uses current Chrome for Android rather than WebView", () => {
   expect(MOBILE_USER_AGENT).toBe(`Mozilla/5.0 (Linux; Android 16; ASUSAI2501C Build/BQ2A.250525.001) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROMIUM_VERSION} Mobile Safari/537.36`);
 });
 
-test("CDP discovery, HTTP requests, and navigator report the same desktop user agent", async () => {
+test("Chromium opt-out reports the same identity through CDP, HTTP and navigator", async () => {
   let requestUserAgent;
   const site = Bun.serve({ port: 0, fetch(request) {
     requestUserAgent = request.headers.get("user-agent");
     return new Response("<!doctype html><title>UA test</title>", { headers: { "content-type": "text/html" } });
   } });
-  const browser = await createBrowser({ spareRenderer: false });
+  const browser = await createBrowser({ spareRenderer: false, webkit: false });
   const cdp = CdpServer.create(browser.context).listen(0, "127.0.0.1");
   try {
     const version = await fetch(`http://127.0.0.1:${cdp.port}/json/version`).then((response) => response.json());
@@ -41,16 +50,16 @@ test("CDP discovery, HTTP requests, and navigator report the same desktop user a
   }
 });
 
-test("WebKit compatibility identity is consistent across CDP, requests and navigator", async () => {
+test.each([{}, { webkit: true }])("default and explicit WebKit identity is consistent across CDP, requests and navigator: %j", async (options) => {
   let headers;
   const site = Bun.serve({ port: 0, fetch(request) {
     headers = request.headers;
     return new Response("<!doctype html><title>identity</title>", { headers: { "content-type": "text/html" } });
   } });
-  const browser = await createBrowser({ spareRenderer: false, webkit: true });
+  const browser = await createBrowser({ spareRenderer: false, ...options });
   const cdp = CdpServer.create(browser.context).listen(0, "127.0.0.1");
   try {
-    // An explicit CLI compatibility profile takes precedence over a CDP client's default UA.
+    // Default and explicit WebKit profiles both resist a CDP client's Chrome UA.
     await browser.context.setUserAgent(DESKTOP_USER_AGENT);
     const version = await fetch(`http://127.0.0.1:${cdp.port}/json/version`).then(r => r.json());
     expect(version.Browser).toBe(BROWSER_PRODUCT);
