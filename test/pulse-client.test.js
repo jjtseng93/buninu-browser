@@ -130,3 +130,70 @@ function header(length, channel) {
   out.writeUInt32BE(channel, 4);
   return out;
 }
+
+test("measured device progress governs the media clock and bounded audio queue through starvation", async () => {
+  const { createServer } = await import("node:net");
+  let received = 0, played = 0, reports = 0;
+  const times = [], errors = [];
+  const scalar64 = (tag, value) => {
+    const bytes = Buffer.alloc(9);
+    bytes[0] = tag;
+    bytes.writeBigInt64BE(BigInt(value), 1);
+    return bytes;
+  };
+  const server = createServer(socket => {
+    let input = Buffer.alloc(0);
+    socket.on("data", chunk => {
+      input = Buffer.concat([input, chunk]);
+      while (input.length >= 20 && input.length >= 20 + input.readUInt32BE(0)) {
+        const length = input.readUInt32BE(0), channel = input.readUInt32BE(4);
+        const body = input.subarray(20, 20 + length);
+        input = input.subarray(20 + length);
+        if (channel !== 0xffffffff) { received += length; continue; }
+        const command = body.readUInt32BE(1), tag = body.readUInt32BE(6);
+        let extra = Buffer.alloc(0);
+        if (command === 3) extra = Buffer.from([0x4c, ...u32(1), 0x4c, ...u32(1), 0x4c, ...u32(1e7)]);
+        if (command === 14) {
+          reports++;
+          expect(body[15]).toBe(0x54); // timestamp request, protocol v8
+          const timeval = Buffer.from([0x54, ...u32(1), ...u32(0)]);
+          // Everything has reached the backend, but the device still holds
+          // received-played bytes. REQUEST credits are deliberately unrelated.
+          extra = Buffer.concat([scalar64(0x55, (received - played) * 1000), scalar64(0x55, 0),
+            Buffer.from([0x31]), timeval, timeval, scalar64(0x72, received), scalar64(0x72, received)]);
+        }
+        const reply = Buffer.concat([Buffer.from([0x4c, ...u32(2), 0x4c, ...u32(tag)]), extra]);
+        socket.write(Buffer.concat([header(reply.length, 0xffffffff), reply]));
+      }
+    });
+  });
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  const client = await PulseClient.connect({ port: server.address().port });
+  try {
+    const stream = await client.openPlayback({ rate: 500, channels: 1,
+      onTiming: timing => times.push(timing.seconds), onTimingError: error => errors.push(error) });
+    stream.write(new Uint8Array(2000));
+    await Bun.sleep(180);
+    expect(reports).toBeGreaterThan(0);
+    expect(received).toBe(500); // at most the 0.5 s queue budget, not 2 s
+    expect(times.at(-1)).toBe(0); // server/device hasn't played anything
+    played = 100;
+    await Bun.sleep(120);
+    expect(times.at(-1)).toBeCloseTo(0.1, 5);
+    expect(received).toBe(600);
+    // A long network/producer pause is NOT permission to catch up by queuing seconds.
+    await Bun.sleep(180);
+    expect(times.at(-1)).toBeCloseTo(0.1, 5);
+    expect(received).toBe(600);
+    played = 600;
+    await Bun.sleep(120);
+    expect(times.at(-1)).toBeCloseTo(0.6, 5);
+    expect(received).toBeGreaterThan(1000);
+    expect(received).toBeLessThanOrEqual(1100);
+    expect(errors).toEqual([]);
+    await stream.close();
+  } finally {
+    client.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});

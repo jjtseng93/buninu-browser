@@ -306,9 +306,39 @@ MPEG-4, Theora, MPEG-1/2; MP3, AAC, FLAC, Vorbis, Opus, WAV).
 
 Sound, a video's included, plays through a PulseAudio native-protocol server
 on `127.0.0.1:4713`, such as [jspulse](https://github.com/jjtseng93/jspulse)
-(`npx @drxiaozhi/jspulse`); without one, video plays silently. The controller
-holds the connection, since renderers cannot open sockets, and paces the
-stream to real time, so pausing stops the sound within half a second.
+or PulseAudio itself; without one, video plays silently. Start jspulse with
+the backend appropriate for your platform:
+
+```sh
+npx @drxiaozhi/jspulse --sles   # Android OpenSL ES
+npx @drxiaozhi/jspulse --alsa   # Linux ALSA
+npx @drxiaozhi/jspulse --win32  # Windows waveform audio
+```
+
+Keep the server on its default port, `4713`, when using Buninu Browser.
+Although jspulse supports `-p` / `--port`, the browser currently connects to
+`127.0.0.1:4713` and does not read `PULSE_SERVER`.
+
+The controller
+holds the connection, since renderers cannot open sockets. For media playback
+it polls the server's playback cursor and measured sink latency; video follows
+the reported audio progress, not the amount of PCM submitted or elapsed wall
+time. Missing timing feedback holds the clock and is logged, rather than being
+replaced by a fixed A/V delay. Audio queued ahead is bounded, including across
+network stalls and decoder reopens.
+
+Synchronization requires the standard PulseAudio timing query and an output
+backend that reports its measured queue latency. jspulse provides a common
+timing interface across ALSA, Windows, and OpenSL ES: ALSA uses hardware delay
+and software queue measurements; Windows and OpenSL ES track buffer completion.
+The shared Windows/ALSA mixer accounts for each stream separately.
+Use a jspulse version that includes this timing support; older OpenSL ES
+backends lack it. A server reporting zero latency while retaining an
+unreported device queue cannot provide accurate synchronization.
+Buffer-completion timing has buffer-sized resolution and does not measure
+additional unreported downstream latency, such as Bluetooth output latency.
+With `BUNINU_LOG`, `media sync` records reported audio progress, the latest
+rendered video position, and the output queue/latency for diagnosis.
 
 ### Diagnostics
 

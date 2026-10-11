@@ -1674,7 +1674,7 @@ test("MediaSource consumes an append that arrived before the decoder stalled", a
   expect(await waitFor("document.getElementById('v').currentTime > 0.75", 4000)).toBe(true);
 });
 
-test("a video plays while its audio SourceBuffer is not decodable yet", async () => {
+test("a video waits for its missing audio SourceBuffer instead of outrunning sound", async () => {
   await load(`<video id="v" width="160" height="120"></video>`);
   await evaluate(`(() => {
     const video = document.getElementById("v");
@@ -1698,7 +1698,9 @@ test("a video plays while its audio SourceBuffer is not decodable yet", async ()
   })()`);
   await waitFor("window.mse.videoUpdated === true");
   expect(await waitFor(`(() => { const v = document.getElementById('v');
-    return !v.paused && v.error === null && v.currentTime > 0 && v.videoWidth > 0; })()`)).toBe(true);
+    return !v.paused && v.error === null && v.videoWidth > 0; })()`)).toBe(true);
+  await Bun.sleep(1000);
+  expect(await evaluate("document.getElementById('v').currentTime")).toBe(0);
 });
 
 test("initial MSE playback waits briefly for a separate audio segment", async () => {
@@ -1710,14 +1712,15 @@ test("initial MSE playback waits briefly for a separate audio segment", async ()
     video.src = URL.createObjectURL(source);
     source.addEventListener("sourceopen", async () => {
       const bytes = new Uint8Array(await (await fetch("/video.mp4")).arrayBuffer());
+      const audioBytes = new Uint8Array(await (await fetch("/tone.mp3")).arrayBuffer());
       const picture = source.addSourceBuffer('video/mp4; codecs="avc1.4d401e"');
-      const sound = source.addSourceBuffer('audio/mp4; codecs="mp4a.40.2"');
+      const sound = source.addSourceBuffer('audio/mpeg');
       picture.addEventListener("updateend", () => video.play(), { once: true });
       picture.appendBuffer(bytes);
-      sound.appendBuffer(bytes.subarray(0, 16));
+      sound.appendBuffer(audioBytes.subarray(0, 16));
       setTimeout(() => {
         window.audioAppendedAt = performance.now();
-        sound.appendBuffer(bytes.subarray(16));
+        sound.appendBuffer(audioBytes.subarray(16));
       }, 250);
     });
   })()`);
