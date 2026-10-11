@@ -209,6 +209,23 @@ test("functions a direct eval defines keep live access to the caller's variables
   ]);
 });
 
+test("direct eval preserves receivers of lexical calls and tagged templates", async () => {
+  await load(`<script>
+    window.evalReceivers = (function () {
+      function strict() { "use strict"; return this === undefined; }
+      function sloppy() { return this === window; }
+      const object = { method() { return this === object; } };
+      const missing = null;
+      const source = "(function () { return [strict(), strict?.(), strict\u0060tag\u0060, sloppy(), object.method(), missing?.()]; })";
+      const made = eval(source);
+      return [made(), made.toString() === source.slice(1, -1)];
+    })();
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(evalReceivers)"))).toEqual([
+    [true, true, true, true, true, null], true,
+  ]);
+});
+
 test("documents and shadow roots have adoptedStyleSheets, which page patches of Element.prototype may extend", async () => {
   await load(`<div id="host"></div><script>
     // As a popover polyfill does: every new shadow root adopts its sheet.

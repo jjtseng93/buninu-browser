@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { CdpServer } from "../lib/cdp-server.js";
 import { createBrowser } from "../lib/headless-shell.js";
 import { MOBILE_USER_AGENT } from "../lib/renderer/flags.js";
-import { CHROMIUM_VERSION, DESKTOP_USER_AGENT, desktopUserAgent } from "../lib/user-agent.js";
+import { BROWSER_PRODUCT, CHROMIUM_VERSION, DESKTOP_USER_AGENT, WEBKIT_USER_AGENT, desktopUserAgent } from "../lib/user-agent.js";
 
 test("desktop user agent uses the same version on each platform", () => {
   for (const [platform, arch, system] of [
@@ -29,11 +29,39 @@ test("CDP discovery, HTTP requests, and navigator report the same desktop user a
   const cdp = CdpServer.create(browser.context).listen(0, "127.0.0.1");
   try {
     const version = await fetch(`http://127.0.0.1:${cdp.port}/json/version`).then((response) => response.json());
-    expect(version.Browser).toBe(`Chrome/${CHROMIUM_VERSION}`);
+    expect(version.Browser).toBe(BROWSER_PRODUCT);
     expect(version["User-Agent"]).toBe(DESKTOP_USER_AGENT);
     await browser.context.navigate(`http://127.0.0.1:${site.port}/`);
     expect(requestUserAgent).toBe(DESKTOP_USER_AGENT);
     expect(await browser.context.evaluate("navigator.userAgent")).toBe(DESKTOP_USER_AGENT);
+  } finally {
+    cdp.stop(true);
+    browser.close();
+    site.stop(true);
+  }
+});
+
+test("WebKit compatibility identity is consistent across CDP, requests and navigator", async () => {
+  let headers;
+  const site = Bun.serve({ port: 0, fetch(request) {
+    headers = request.headers;
+    return new Response("<!doctype html><title>identity</title>", { headers: { "content-type": "text/html" } });
+  } });
+  const browser = await createBrowser({ spareRenderer: false, webkit: true });
+  const cdp = CdpServer.create(browser.context).listen(0, "127.0.0.1");
+  try {
+    // An explicit CLI compatibility profile takes precedence over a CDP client's default UA.
+    await browser.context.setUserAgent(DESKTOP_USER_AGENT);
+    const version = await fetch(`http://127.0.0.1:${cdp.port}/json/version`).then(r => r.json());
+    expect(version.Browser).toBe(BROWSER_PRODUCT);
+    expect(version["User-Agent"]).toBe(WEBKIT_USER_AGENT);
+    await browser.context.navigate(`http://127.0.0.1:${site.port}/`);
+    expect(headers.get("user-agent")).toBe(WEBKIT_USER_AGENT);
+    expect(headers.has("sec-ch-ua")).toBe(false);
+    expect(await browser.context.evaluate(`[
+      navigator.userAgent, navigator.vendor, navigator.platform,
+      'userAgentData' in navigator, typeof NavigatorUAData, typeof window.chrome,
+    ]`)).toEqual([WEBKIT_USER_AGENT, "Apple Computer, Inc.", "MacIntel", false, "undefined", "undefined"]);
   } finally {
     cdp.stop(true);
     browser.close();
