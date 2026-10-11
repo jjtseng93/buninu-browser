@@ -231,6 +231,66 @@ test("documents and shadow roots have adoptedStyleSheets, which page patches of 
   expect(JSON.parse(await evaluate("JSON.stringify(adopted)"))).toEqual([true, 1, true, "TypeError", "TypeError"]);
 });
 
+test("Web APIs have their Web IDL property shapes", async () => {
+  await load(`<p>shape</p>`);
+  const shape = JSON.parse(await evaluate(`JSON.stringify((() => {
+    const d = (o, k) => Object.getOwnPropertyDescriptor(o, k);
+    const title = d(HTMLElement.prototype, "title");
+    const constant = d(Node, "ELEMENT_NODE");
+    const doc = d(window, "document");
+    const self = d(window, "self");
+    return [
+      title.get.name, title.set.name, d(HTMLElement.prototype, "onclick").get.name,
+      clearTimeout.name, clearInterval.name, cancelAnimationFrame.name, clearTimeout === clearInterval,
+      clearTimeout.length, cancelAnimationFrame.length, scrollTo.length, EventTarget.prototype.addEventListener.length,
+      Element.prototype.toggleAttribute.length, Promise.length, Function.length,
+      constant.writable, constant.configurable, d(EventTarget.prototype, "constructor").enumerable,
+      typeof doc.get, doc.configurable, doc.enumerable, typeof self.set, d(window, "console").enumerable,
+      (() => { window.innerWidth = 5; return window.innerWidth; })(),
+    ];
+  })())`));
+  expect(shape).toEqual([
+    "get title", "set title", "get onclick",
+    "clearTimeout", "clearInterval", "cancelAnimationFrame", false,
+    0, 1, 0, 2,
+    1, 1, 1,
+    false, false, false,
+    "function", false, true, "function", false,
+    5,
+  ]);
+});
+
+test("each HTML element has its interface, and unknown names are HTMLUnknownElement", async () => {
+  await load(`<p>tags</p>`);
+  const names = await evaluate(`["ins", "col", "caption", "data", "xmp", "article", "lh", "blink", "my-widget", "audio"]
+    .map((tag) => Object.prototype.toString.call(document.createElement(tag)).slice(8, -1)
+      + (document.createElement(tag) instanceof HTMLUnknownElement ? "?" : "")).join()`);
+  expect(names).toBe("HTMLModElement,HTMLTableColElement,HTMLTableCaptionElement,HTMLDataElement,HTMLPreElement,"
+    + "HTMLElement,HTMLUnknownElement?,HTMLUnknownElement?,HTMLElement,HTMLAudioElement");
+  expect(await evaluate("Object.hasOwn(HTMLMediaElement.prototype, 'currentTime') && !Object.hasOwn(HTMLAudioElement.prototype, 'currentTime')")).toBe(true);
+});
+
+test("unhandled rejections fire unhandledrejection, then rejectionhandled when caught later", async () => {
+  await load(`<script>
+    window.log = [];
+    addEventListener("unhandledrejection", (event) => {
+      log.push(event.type, event instanceof PromiseRejectionEvent, event.reason, event.promise === late, event.cancelable);
+      event.preventDefault();
+    });
+    onrejectionhandled = (event) => log.push(event.type, event.reason, event.promise === late);
+    var late = Promise.reject("why");
+    setTimeout(() => late.catch(() => {}), 50);
+  </script>`);
+  expect(await waitFor("log.length === 8", 3000)).toBe(true);
+  expect(await evaluate("JSON.stringify(log)")).toBe(JSON.stringify([
+    "unhandledrejection", true, "why", true, true, "rejectionhandled", "why", true,
+  ]));
+  expect(await evaluate(`(() => { const p = Promise.resolve(); const e = new PromiseRejectionEvent("x", { promise: p, reason: 1 });
+    return [e.promise === p, e.reason, String(e), PromiseRejectionEvent.length,
+      (() => { try { new PromiseRejectionEvent("x", {}); return "ok"; } catch (error) { return error.name; } })()].join(); })()`))
+    .toBe("true,1,[object PromiseRejectionEvent],2,TypeError");
+});
+
 test("navigator reports cookies and User-Agent Client Hints consistently", async () => {
   await load(`<script>
     navigator.userAgentData.getHighEntropyValues(['uaFullVersion']).then(value => {
@@ -801,11 +861,11 @@ test("offsetParent is the nearest positioned ancestor, and offsets are measured 
   expect(JSON.parse(await evaluate(`JSON.stringify((() => {
     const tab = document.getElementById("tab"), toggle = document.getElementById("toggle");
     return [tab.offsetParent === toggle, tab.offsetLeft, tab.offsetTop, toggle.offsetParent === document.body,
-      document.body.offsetParent, toggle.scrollWidth, toggle.clientWidth];
+      document.body.offsetParent, toggle.scrollWidth, toggle.clientWidth, document.body.offsetLeft, document.body.offsetTop];
   })())`))).toEqual([
     // An absolutely positioned child as wide as the padding box does not
-    // add the end padding again: nothing overflows.
-    true, 8, 8, true, null, 216, 216,
+    // add the end padding again: nothing overflows. The body's offsets are 0.
+    true, 8, 8, true, null, 216, 216, 0, 0,
   ]);
 });
 

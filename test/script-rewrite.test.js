@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import {
   escapeSesHtmlComments, prepareDirectEvalSource, restoreSourceText, rewriteClassicScript, rewriteConstructorReads,
-  rewriteClassicScriptSource, rewriteDirectEval,
+  referenceHelper, rewriteClassicScriptSource, rewriteDirectEval,
 } from "../lib/renderer/script-rewrite.js";
 
 // The comment each constructor rewrite leaves for restoreSourceText.
@@ -77,8 +77,9 @@ test("every rewrite of a function's text is undone for Function.prototype.toStri
     const own = code.slice(code.indexOf("function ", code.indexOf("=")));
     expect(restoreSourceText(own.slice(0, own.lastIndexOf("}") + 1))).toBe(text);
   }
-  expect(restoreSourceText(prepareDirectEvalSource("(function () { return this; })", [], false).code))
-    .toBe("(function () { return this; })");
+  // The prepared program starts with its constants; the function's own text follows.
+  const prepared = prepareDirectEvalSource("(function () { return this; })", [], false).code;
+  expect(restoreSourceText(prepared.slice(prepared.indexOf("(function")))).toBe("(function () { return this; })");
 });
 
 test("only parsed, non-strict programs are reported as sloppy-mode code", () => {
@@ -104,4 +105,32 @@ test("the classic-script pipeline parses once when earlier rewrites change nothi
   const direct = rewriteDirectEval("var s = 'eval(1)';");
   expect([direct.rewritten, direct.program?.type]).toEqual([false, "Program"]);
   expect(rewriteDirectEval("eval(x); return 1;").program).toBe(null);
+});
+
+test("global variable reads go through the script's global binding, keeping their semantics and text", () => {
+  const global = { Q: (x) => x + 1, n: 2, nothing: null };
+  global.$buninu$ref = referenceHelper(global);
+  const run = (source) => {
+    const { code } = rewriteClassicScript(source);
+    // Evaluated the way the page realm does: inside `with` scopes over the global.
+    return Function("g", `with (g) { return eval(arguments[1]); }`)(global, code.replace("globalThis", "g"));
+  };
+  expect(rewriteClassicScript("function f(x) { return Q(x) + n; }").code).toContain("($buninu$g.Q ?? $buninu$g.$buninu$ref(\"Q\"))");
+  expect(run("(function () { return nothing; })")()).toBe(null);
+  expect(run("(function (x) { return Q(x) + n; })")(1)).toBe(4);
+  expect(run("(function () { return [typeof missing, typeof Q]; })")()).toEqual(["undefined", "function"]);
+  expect(() => run("(function () { return missing; })")()).toThrow("missing is not defined");
+  // Locals, parameters and names inside the page's own `with` stay variables; writes stay identifiers.
+  const source = "function f(Q, o) { var n = 1; with (o) { k; } k = Q; k += n; return {n, Q, z: x => x + n}; }";
+  expect(rewriteClassicScript(source).code).not.toContain("$buninu$g.Q");
+  expect(rewriteClassicScript(source).code).not.toContain("$buninu$g.k");
+  // Shorthand properties keep their key; the page's text is restored exactly.
+  const shorthand = "function s() { return { Q, n, m: Q }; }";
+  expect(run(`(${shorthand})`)()).toEqual({ Q: global.Q, n: 2, m: global.Q });
+  const code = rewriteClassicScript(shorthand).code;
+  const own = code.slice(code.indexOf("function s"));
+  expect(restoreSourceText(own.slice(0, own.lastIndexOf("}") + 1))).toBe(shorthand);
+  expect(restoreSourceText("(function () { return typeof $buninu$g.Q; })")).toBe("(function () { return typeof Q; })");
+  // A block-level function outside functions (Annex B) leaves the script's identifiers as written.
+  expect(rewriteClassicScript("{ function b() {} } b(Q);").code).not.toContain("$buninu$g");
 });

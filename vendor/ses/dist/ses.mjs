@@ -12537,7 +12537,13 @@ const { quote: q } = assert;
 
 
 
-       const provideCompartmentEvaluator = (compartmentFields, options) => {
+       // Evaluators for sloppyGlobalsMode / __sloppyCode__, one per compartment and
+// combination: building one scans the global object and compiles a new
+// evaluator function, which made every such evaluate() call cost hundreds of
+// microseconds.
+const sloppyEvaluators = new WeakMap();
+
+const provideCompartmentEvaluator = (compartmentFields, options) => {
   const {
     sloppyGlobalsMode = false,
     __moduleShimLexicals__ = undefined,
@@ -12545,6 +12551,13 @@ const { quote: q } = assert;
   } = options;
 
   let safeEvaluate;
+
+  const cacheKey = __moduleShimLexicals__ === undefined
+    ? `${Boolean(sloppyGlobalsMode)}:${Boolean(__sloppyCode__)}` : undefined;
+  let cached = sloppyEvaluators.get(compartmentFields);
+  if (cacheKey !== undefined && cached && cached.has(cacheKey)) {
+    return { safeEvaluate: cached.get(cacheKey) };
+  }
 
   if (__moduleShimLexicals__ === undefined && !sloppyGlobalsMode && !__sloppyCode__) {
     ({ safeEvaluate } = compartmentFields);
@@ -12580,6 +12593,13 @@ const { quote: q } = assert;
       sloppyGlobalsMode,
       sloppyCode: __sloppyCode__,
     }));
+    if (cacheKey !== undefined) {
+      if (!cached) {
+        cached = new Map();
+        sloppyEvaluators.set(compartmentFields, cached);
+      }
+      cached.set(cacheKey, safeEvaluate);
+    }
   }
 
   return { safeEvaluate };
