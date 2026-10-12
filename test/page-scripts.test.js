@@ -417,6 +417,24 @@ test("form.elements is a live named collection of form controls", async () => {
   expect(await evaluate("document.getElementById('form').elements.length")).toBe(3);
 });
 
+test("uncommitted links do not change the base used by subsequent fragment links", async () => {
+  for (const href of ["/archive.zip", "/LICENSE"]) {
+    for (const scripted of [false, true]) {
+      await load(`<a id="away" href="${href}">away</a><a id="toc" href="#contents">TOC</a>
+        <h2 id="contents">Contents</h2>`);
+      const before = await evaluate("[document.URL, document.baseURI, location.href, document.getElementById('toc').href]");
+      if (scripted) await evaluate("document.getElementById('away').click()");
+      else {
+        const point = await evaluate("(() => { const r=document.getElementById('away').getBoundingClientRect(); return [r.x+r.width/2,r.y+r.height/2]; })()");
+        expect(await renderer.call("click", ...point)).toBe(`https://page.test${href}`);
+      }
+      expect(await evaluate("[document.URL, document.baseURI, location.href, document.getElementById('toc').href]")).toEqual(before);
+      await evaluate("document.getElementById('toc').click()");
+      expect(await evaluate("[location.href, document.URL, document.baseURI]")).toEqual(Array(3).fill("https://page.test/#contents"));
+    }
+  }
+});
+
 test("constructable CSSStyleSheet supports feature checks and basic rule mutation", async () => {
   await load(`<p>cssom</p>`);
   expect(await evaluate(`(async () => {

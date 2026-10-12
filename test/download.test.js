@@ -19,6 +19,8 @@ beforeAll(() => {
         + '<a id="attachment" href="/attachment">attachment</a>'
         + '<a id="data" href="data:text/plain,hello%20data" download="data.txt">data</a>'
         + '<a id="blob" download="blob.txt">blob</a>'
+        + '<a id="toc" href="#contents">contents</a><h2 id="contents">Contents</h2>'
+        + '<script>document.getElementById("toc").addEventListener("click", event => { event.preventDefault(); location.href = event.currentTarget.href; });</script>'
         + '<script>document.getElementById("blob").href = URL.createObjectURL(new Blob(["blob bytes"]));</script>',
       { headers: { "content-type": "text/html" } });
       if (path === "/plain") return new Response("original bytes", { headers: { "content-type": "text/plain" } });
@@ -74,6 +76,12 @@ test("clicked downloads save files and leave the current page in place", async (
     await click("#attachment");
     expect(readFileSync(join(dir, "photo.jpg"), "utf8")).toBe("photo bytes");
     expect(browser.context.resourceContent()?.url).toBe(`${origin}/links`);
+    expect(await browser.context.evaluate("[location.href, document.URL, document.baseURI, document.getElementById('toc').href]"))
+      .toEqual([`${origin}/links`, `${origin}/links`, `${origin}/links`, `${origin}/links#contents`]);
+    await click("#toc");
+    expect(await browser.context.evaluate("[location.href, document.URL]"))
+      .toEqual([`${origin}/links#contents`, `${origin}/links#contents`]);
+    expect(events.filter((item) => item.event === "willBegin")).toHaveLength(4);
     await click("#data");
     expect(readFileSync(join(dir, "data.txt"), "utf8")).toBe("hello data");
     await browser.context.evaluate("document.getElementById('blob').click()");
