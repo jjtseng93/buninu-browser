@@ -134,7 +134,7 @@ function header(length, channel) {
 test("measured device progress governs the media clock and bounded audio queue through starvation", async () => {
   const { createServer } = await import("node:net");
   let received = 0, played = 0, reports = 0;
-  const times = [], errors = [];
+  const times = [], errors = [], requests = [];
   const scalar64 = (tag, value) => {
     const bytes = Buffer.alloc(9);
     bytes[0] = tag;
@@ -171,11 +171,17 @@ test("measured device progress governs the media clock and bounded audio queue t
   const client = await PulseClient.connect({ port: server.address().port });
   try {
     const stream = await client.openPlayback({ rate: 500, channels: 1,
+      onRequest: bytes => requests.push(bytes),
       onTiming: timing => times.push(timing.seconds), onTimingError: error => errors.push(error) });
-    stream.write(new Uint8Array(2000));
+    expect(requests).toEqual([2000]); // controller reserve, not the device queue
+    stream.write(new Uint8Array(100));
+    await Bun.sleep(80);
+    expect(received).toBe(0); // a short prefix does not start/stop playback
+    stream.write(new Uint8Array(1900));
     await Bun.sleep(180);
     expect(reports).toBeGreaterThan(0);
     expect(received).toBe(500); // at most the 0.5 s queue budget, not 2 s
+    expect(stream.queued).toBe(1500); // survives a renderer busy spell in the controller
     expect(times.at(-1)).toBe(0); // server/device hasn't played anything
     played = 100;
     await Bun.sleep(120);
@@ -190,8 +196,17 @@ test("measured device progress governs the media clock and bounded audio queue t
     expect(times.at(-1)).toBeCloseTo(0.6, 5);
     expect(received).toBeGreaterThan(1000);
     expect(received).toBeLessThanOrEqual(1100);
+    // No more PCM is provided by the producer: continue from the local reserve.
+    for (let i = 0; i < 4; i++) {
+      played = received;
+      await Bun.sleep(150);
+    }
+    expect(received).toBeGreaterThan(1500);
+    expect(received).toBeLessThanOrEqual(2000);
+    expect(requests.reduce((sum, value) => sum + value, 0)).toBeLessThanOrEqual(4000);
     expect(errors).toEqual([]);
     await stream.close();
+    expect(stream.queued).toBe(0); // pause/seek discards reserve; no extra device tail
   } finally {
     client.close();
     await new Promise(resolve => server.close(resolve));

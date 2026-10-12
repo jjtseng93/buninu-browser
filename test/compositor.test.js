@@ -62,6 +62,44 @@ test("the compositor answers screenshots and scrolling while the main thread is 
 }, 30_000);
 
 let server;
+test("video continues presenting while page JavaScript blocks, then freezes on pause", async () => {
+  const host = new RendererHost({ timeout: 20_000,
+    fetch: async () => new Response(Bun.file(new URL("./fixtures/long-video.mp4", import.meta.url)),
+      { headers: { "content-type": "video/mp4" } }) });
+  try {
+    await host.start();
+    await host.call("resize", 160, 120, 1);
+    await host.call("loadDocument", { url: "https://page.test/", contentType: "text/html",
+      source: '<body style="margin:0"><video id="v" width="160" height="120" src="/movie.mp4"></video>' });
+    await host.call("whenLoaded");
+    await host.call("evaluate", "document.getElementById('v').play()");
+    await Bun.sleep(400);
+    const busy = host.call("evaluate", "(() => { const end=Date.now()+2000; while(Date.now()<end); return true; })()");
+    await Bun.sleep(200);
+    const first = await host.composite("screenshot");
+    await Bun.sleep(600);
+    const second = await host.composite("screenshot");
+    expect(Bun.hash(second)).not.toBe(Bun.hash(first));
+    expect(await busy).toBe(true);
+    await host.call("evaluate", "document.getElementById('v').pause()");
+    const paused = await host.composite("screenshot");
+    await Bun.sleep(350);
+    expect(await host.composite("screenshot")).toBe(paused);
+    await host.call("evaluate", "document.getElementById('v').currentTime=5");
+    await Bun.sleep(250);
+    const sought = await host.composite("screenshot");
+    expect(Bun.hash(sought)).not.toBe(Bun.hash(paused));
+    await host.call("evaluate", "document.getElementById('v').play()");
+    await Bun.sleep(400);
+    const resumed = await host.composite("screenshot");
+    await Bun.sleep(400);
+    expect(Bun.hash(await host.composite("screenshot"))).not.toBe(Bun.hash(resumed));
+    await host.call("loadDocument", { url: "https://page.test/next", contentType: "text/html", source: '<body style="background:red">next</body>' });
+    const next = await host.composite("screenshot");
+    await Bun.sleep(300);
+    expect(await host.composite("screenshot")).toBe(next);
+  } finally { host.close(); }
+}, 30_000);
 let releaseStyles;
 let releaseScript;
 beforeAll(() => {
