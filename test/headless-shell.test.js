@@ -126,6 +126,8 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", x: demoKey.x + demoKey.width / 2,
       y: demoKey.y + demoKey.height - 15, button: "left", clickCount: 1 });
     expect(await view.evaluate("document.activeElement.id")).toBe("buninu-piano-input");
+    await view.cdp("Input.insertText", { text: "jkl JKL!" });
+    expect(await view.evaluate("document.activeElement.value")).toBe("");
     await view.resize(480, 240);
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
@@ -198,12 +200,32 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await view.cdp("Input.dispatchMouseEvent", { type: "mousePressed", x: pianoRect.x + 10, y: pianoRect.y + 10, button: "left", clickCount: 1 });
     await view.cdp("Input.dispatchMouseEvent", { type: "mouseReleased", x: pianoRect.x + 10, y: pianoRect.y + 10, button: "left", clickCount: 1 });
     await view.cdp("Input.insertText", { text: "j" });
+    await view.cdp("Input.insertText", { text: "jk lJK!中" });
+    for (const key of ["j", "k", " "]) {
+      await view.cdp("Input.dispatchKeyEvent", { type: "rawKeyDown", key, autoRepeat: true });
+      await view.cdp("Input.dispatchKeyEvent", { type: "keyUp", key });
+    }
     await view.cdp("Input.dispatchKeyEvent", { type: "rawKeyDown", key: "k", code: "KeyK" });
     await view.cdp("Input.dispatchKeyEvent", { type: "keyUp", key: "k", code: "KeyK" });
+    for (const type of ["rawKeyDown", "char", "keyUp"]) {
+      for (const key of ["j", "k", "l"]) {
+        await view.cdp("Input.dispatchKeyEvent", { type, key, code: `Key${key.toUpperCase()}`, text: type === "char" ? key : undefined });
+      }
+    }
     expect(await view.evaluate("document.getElementById('buninu-piano-input').value")).toBe("");
     await view.navigate(`http://127.0.0.1:${fixture.port}/`);
 
     expect(await view.evaluate("scrollY")).toBe(0);
+    await view.evaluate(`window.spaceKeys=[];document.addEventListener('keydown',event=>{
+      if(event.keyCode===32){event.preventDefault();spaceKeys.push([event.keyCode,event.which]);}
+    });`);
+    for(let i=0;i<6;i++) {
+      for(const type of ['rawKeyDown','char','keyUp']) {
+        await view.cdp('Input.dispatchKeyEvent', {type,key:' ',code:'Space',windowsVirtualKeyCode:32,text:type==='char'?' ':undefined});
+      }
+    }
+    expect(await view.evaluate('spaceKeys')).toEqual(Array.from({length:6},()=>[32,32]));
+    expect(await view.evaluate('scrollY')).toBe(0);
     await view.cdp("Input.dispatchMouseEvent", {
       type: "mouseWheel",
       x: 100,

@@ -27,6 +27,27 @@ test("computes the initial UA and inherited style subset", () => {
   window.happyDOM.abort();
 });
 
+test(":empty includes text nodes, but ignores comments and empty text nodes", () => {
+  const { document, window } = parseHTMLDocument('<span id="text">0</span><span id="space"> </span><span id="empty"><!--comment--></span>');
+  const styles = new StyleEngine().compute(document, ['span:empty { display:none }']);
+  expect(document.querySelector('#text').matches(':empty')).toBe(false);
+  expect(styles.get(document.querySelector('#text')).display).toBe('inline');
+  expect(styles.get(document.querySelector('#space')).display).toBe('inline');
+  expect(styles.get(document.querySelector('#empty')).display).toBe('none');
+  window.happyDOM.abort();
+});
+
+test("percentage root fonts set the basis for rem and descendant percentage fonts", () => {
+  const { document, window } = parseHTMLDocument(`<html style="font-size:62.5%"><body>
+    <div id="relative" style="font-size:1.4rem"><span id="child" style="font-size:150%">text</span></div>
+  </body></html>`);
+  const styles = new StyleEngine().compute(document);
+  expect(styles.get(document.documentElement).fontSize).toBe(10);
+  expect(styles.get(document.getElementById('relative')).fontSize).toBe(14);
+  expect(styles.get(document.getElementById('child')).fontSize).toBe(21);
+  window.happyDOM.abort();
+});
+
 test("inline declarations validate values and preserve important priority", () => {
   const { document, window } = parseHTMLDocument(`<div id="box" style="
     display: block; display: none !important; display: inline;

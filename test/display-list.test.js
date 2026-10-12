@@ -20,6 +20,20 @@ function displayListFor(html, css, resources = new WeakMap()) {
   return { document, window, tree, displayList: buildDisplayList(layout, tree) };
 }
 
+test("native video controls are opt-in and do not cover a site's own player UI", () => {
+  const { window, displayList } = displayListFor('<video></video><video controls></video>', 'video { width:100px; height:60px }');
+  expect(displayList.items.filter(item => item.op === 'drawVideo').map(item => item.controls)).toEqual([false, true]);
+  window.happyDOM.abort();
+});
+
+test("rounded overflow containers clip descendant media, including transformed clips", () => {
+  const { window, displayList } = displayListFor('<div><video></video></div>',
+    'div { width:100px;height:60px;overflow:hidden;border-radius:12px;transform:scale(2);transform-origin:0 0 } video {width:100px;height:60px}');
+  const video = displayList.items.find(item => item.op === 'drawVideo');
+  expect(video.roundedClips).toEqual([{rect:{x:0,y:0,width:200,height:120},radii:{x:24,y:24}}]);
+  window.happyDOM.abort();
+});
+
 test("paints box decorations in tree order before inline content", () => {
   const { window, displayList } = displayListFor(
     `<div class="card"><p>hi <code>x</code></p></div>`,

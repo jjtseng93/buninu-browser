@@ -226,6 +226,69 @@ test("direct eval preserves receivers of lexical calls and tagged templates", as
   ]);
 });
 
+test("pointer movement delivers trusted mouse events to page controls", async () => {
+  await load(`<div id="control" style="width:100px;height:100px;background:red"></div><script>
+    window.moves = [];
+    for (const type of ['mouseenter','mousemove','mouseleave']) {
+      document.querySelector('#control').addEventListener(type, e => moves.push([e.type,e.isTrusted]));
+    }
+  </script>`);
+  await renderer.call('move', 30, 30);
+  await renderer.call('move', 150, 150);
+  expect(await evaluate('moves')).toEqual([['mouseenter',true],['mousemove',true],['mouseleave',true]]);
+});
+
+test("assigning element.style forwards to cssText without replacing its identity", async () => {
+  await load(`<div id="target"></div><script>
+    const target = document.querySelector('#target'), original = target.style;
+    target.style = 'width: 73px; color: red';
+    window.styleResult = [target.style === original, target.style.width, target.style.color];
+    target.style = '';
+    styleResult.push(target.style.cssText);
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(styleResult)"))).toEqual([true, '73px', 'red', '']);
+});
+
+test("History methods borrowed from an iframe operate on the receiving history", async () => {
+  await load(`<iframe></iframe><script>
+    const frame = document.querySelector('iframe').contentWindow;
+    frame.History.prototype.replaceState.call(history, { step: 1 }, '', '/watch?v=example');
+    frame.History.prototype.pushState.call(history, { step: 2 }, '', '#comments');
+    window.historyResult = [location.href, history.state.step, history.length, frame.location.href];
+    try { frame.History.prototype.replaceState.call(history, {}, '', 'https://other.test/'); }
+    catch (e) { window.historyOriginError = e.name; }
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(historyResult)"))).toEqual([
+    'https://page.test/watch?v=example#comments', 2, 2, 'about:blank',
+  ]);
+  expect(await evaluate("historyOriginError")).toBe('SecurityError');
+});
+
+test("custom elements receive observed attribute reactions and can enable deferred initialization", async () => {
+  await load(`<script>
+    window.reactions = [];
+    window.observedReads = 0;
+    class DeferredPanel extends HTMLElement {
+      static get observedAttributes() { observedReads++; return ['disable-upgrade']; }
+      attributeChangedCallback(name, before, after) {
+        reactions.push([name, before, after, this === document.querySelector('deferred-panel')]);
+        if (after === null) this.textContent = 'ready';
+      }
+    }
+    customElements.define('deferred-panel', DeferredPanel);
+    const panel = document.createElement('deferred-panel');
+    document.body.appendChild(panel);
+    panel.setAttribute('disable-upgrade', '');
+    panel.setAttribute('unobserved', 'value');
+    panel.removeAttribute('disable-upgrade');
+  </script>`);
+  expect(JSON.parse(await evaluate("JSON.stringify(reactions)"))).toEqual([
+    ['disable-upgrade', null, '', true], ['disable-upgrade', '', null, true],
+  ]);
+  expect(await evaluate("observedReads")).toBe(1);
+  expect(await evaluate("document.querySelector('deferred-panel').textContent")).toBe('ready');
+});
+
 test("documents and shadow roots have adoptedStyleSheets, which page patches of Element.prototype may extend", async () => {
   await load(`<div id="host"></div><script>
     // As a popover polyfill does: every new shadow root adopts its sheet.
@@ -389,6 +452,23 @@ test("document.elementFromPoint finds the topmost element painted there", async 
     <div id="over" style="position:absolute;top:0;left:100px;width:50px;height:50px"></div>`);
   expect(await evaluate(`[document.elementFromPoint(5, 5)?.id, document.elementFromPoint(110, 10)?.id,
     document.elementFromPoint(300, 30)?.id, document.elementFromPoint(-1, 5)]`)).toEqual(["text", "over", "under", null]);
+});
+
+test("rounded overflow clips a child's pixels rather than only the parent's background", async () => {
+  await load('<div style="width:40px;height:40px;border-radius:20px;overflow:hidden"><div style="width:40px;height:40px;background:red"></div></div>');
+  const clipped = await renderer.call("screenshot");
+  const { default: init } = await import('../usr/lib/canvaskit/canvaskit.js');
+  const kit = await init({ locateFile: name => new URL(`../usr/lib/canvaskit/${name}`, import.meta.url).pathname });
+  const image = kit.MakeImageFromEncoded(Buffer.from(clipped, 'base64'));
+  try {
+    const pixel = (x, y) => Array.from(image.readPixels(x, y, {
+      width:1, height:1, colorType:kit.ColorType.RGBA_8888, alphaType:kit.AlphaType.Unpremul, colorSpace:kit.ColorSpace.SRGB,
+    })).slice(0, 3);
+    expect(pixel(0, 0)).toEqual([255, 255, 255]);
+    expect(pixel(20, 20)).toEqual([255, 0, 0]);
+  } finally { image.delete(); }
+  await load('<div style="width:40px;height:40px;background:red"></div>');
+  expect(await renderer.call("screenshot")).not.toBe(clipped);
 });
 
 test("scripts change the DOM and the next screenshot shows it", async () => {
@@ -575,6 +655,40 @@ test("the root element's client size is the viewport, and computed style reports
 test("CSS.escape produces selectors for leading digits and punctuation", async () => {
   await load(`<div id="1:a"></div>`);
   expect(await evaluate("CSS.escape('1:a')")).toBe("\\31 \\:a");
+});
+
+test("legacy keyboard shortcuts cancel space scrolling on every press", async () => {
+  await load(`<div tabindex="0" id="player" style="height:100px"></div><div style="height:2000px"></div>
+    <script>var keys=[],player=document.getElementById('player');player.focus();player.addEventListener('keydown',e=>{
+      keys.push([e.key,e.code,e.keyCode,e.which,e.isTrusted]);if(e.keyCode===32)e.preventDefault();
+    });</script>`);
+  for (let i=0;i<6;i++) await renderer.call('press',' ',{code:'Space',windowsVirtualKeyCode:32});
+  expect(await evaluate('keys')).toEqual(Array.from({length:6},()=>[' ','Space',32,32,true]));
+  expect(await renderer.call('scrollOffset')).toEqual({x:0,y:0});
+  await evaluate('player.blur()');
+  await renderer.call('press',' ',{code:'Space'});
+  expect((await renderer.call('scrollOffset')).y).toBeGreaterThan(0);
+});
+
+test("site media controls can repeatedly toggle using playing/pause events and legacy space keys", async () => {
+  await load(`<div id="player" tabindex="0" style="height:100px"><video id="v" src="/long-video.mp4" style="width:100px;height:80px"></video></div><div style="height:2000px"></div>
+    <script>var state='paused',events=[],player=document.getElementById('player'),v=document.getElementById('v');
+    for(const type of ['play','playing','pause'])v.addEventListener(type,()=>{events.push(type);if(type!=='play')state=type;});
+    function toggle(){if(state==='playing')v.pause();else v.play();}
+    player.addEventListener('click',toggle);
+    player.addEventListener('keydown',e=>{if(e.keyCode===32){e.preventDefault();toggle();}});
+    player.focus();</script>`);
+  for (const input of ['click','press']) {
+    for(let i=0;i<6;i++) {
+      if(input==='click')await renderer.call('click',40,40);
+      else await renderer.call('press',' ',{code:'Space'});
+      const expected=i%2===0?'playing':'pause';
+      expect(await waitFor(`state===${JSON.stringify(expected)}`,5000)).toBe(true);
+      expect(await evaluate('v.paused')).toBe(i%2===1);
+    }
+  }
+  expect(await renderer.call('scrollOffset')).toEqual({x:0,y:0});
+  expect(await evaluate('events.slice(0,3)')).toEqual(['play','playing','pause']);
 });
 
 test("a video plays frames and pauses when clicked", async () => {
@@ -1707,7 +1821,8 @@ test("initial MSE playback waits briefly for a separate audio segment", async ()
   await load(`<video id="v" width="160" height="120"></video>`);
   await evaluate(`(() => {
     const video = document.getElementById("v");
-    video.addEventListener("play", () => { window.startedAt = performance.now(); });
+    // play is the unpause request; playing is when buffered media can advance.
+    video.addEventListener("playing", () => { window.startedAt = performance.now(); }, { once:true });
     const source = new MediaSource();
     video.src = URL.createObjectURL(source);
     source.addEventListener("sourceopen", async () => {
@@ -1859,6 +1974,31 @@ test("a click inside an iframe goes to the element under it in the frame's docum
   await waitFor(`document.getElementById("frame").contentWindow.clicked`);
   await renderer.call("click", 70, 60);
   expect(await evaluate(`document.getElementById("frame").contentWindow.clicked`)).toEqual([[20, 20]]);
+});
+
+test("dynamic linked stylesheets fire load after their rules become available", async () => {
+  await load(`<div id="target"></div><script>
+    window.sheetLoaded = false;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/slow.css';
+    link.onload = () => { window.sheetLoaded = getComputedStyle(document.body).color; };
+    document.head.appendChild(link);
+  </script>`);
+  for (let i = 0; i < 60 && await evaluate('sheetLoaded') === false; i++) await Bun.sleep(25);
+  expect(await evaluate('sheetLoaded')).toBe('rgba(255, 0, 0, 1)');
+});
+
+test("decoded dynamic images report natural dimensions and fire load", async () => {
+  await load(`<script>
+    window.imageLoaded = false;
+    const img = document.createElement('img');
+    img.onload = () => { window.imageLoaded = [img.complete, img.naturalWidth, img.naturalHeight]; };
+    img.src = '/red-2x3.png';
+    document.body.appendChild(img);
+  </script>`);
+  for (let i = 0; i < 60 && await evaluate('imageLoaded') === false; i++) await Bun.sleep(25);
+  expect(await evaluate('imageLoaded')).toEqual([true, 2, 3]);
 });
 
 test("images a script inserts and measures at once still load", async () => {

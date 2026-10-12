@@ -8,6 +8,68 @@ function boxFor(tree, layout, tagName) {
   return layout.boxes.find((box) => tree.nodesById.get(box.nodeId)?.tagName === tagName);
 }
 
+test("percentage and calc padding reserve an aspect-ratio box and reflow on resize", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">
+    <div id="ratio" style="position:relative;padding-bottom:calc(100% * 9 / 16)">
+      <div id="fill" style="position:absolute;inset:0"></div>
+    </div><div id="next" style="height:20px"></div>
+  </body>`);
+  const styles = new StyleEngine().compute(document);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  for (const width of [320, 640]) {
+    const layout = layoutText(tree, { x:0, y:0, width });
+    const rect = id => layout.boxes.find(box => tree.nodesById.get(box.nodeId)?.domNode?.id === id);
+    expect(rect('ratio').height).toBe(width * 9 / 16);
+    expect(rect('fill').height).toBe(width * 9 / 16);
+    expect(rect('next').y).toBe(width * 9 / 16);
+  }
+  window.happyDOM.abort();
+});
+
+test("nested absolute percentage heights use their own containing block, including on resize", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0">
+    <div style="position:relative;height:500px"><div style="position:absolute;bottom:0;width:100%;height:60px">
+      <div id="track" style="position:absolute;bottom:56px;width:100%;height:6px">
+        <div id="fill" style="position:absolute;bottom:0;width:100%;height:100%"></div>
+      </div>
+    </div></div></body>`);
+  const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document));
+  const engine = new LayoutEngine();
+  for (const width of [320, 640]) {
+    const layout = engine.layout(tree, { x:0, y:0, width });
+    const rect = id => layout.boxes.find(box => tree.nodesById.get(box.nodeId)?.domNode?.id === id);
+    expect(rect('fill').height).toBe(6);
+    expect(rect('fill').y).toBe(rect('track').y);
+    expect(rect('fill').width).toBe(width);
+  }
+  window.happyDOM.abort();
+});
+
+test("legacy vertical line clamping limits lines and adds an ellipsis without changing DOM text", () => {
+  for (const display of ["-webkit-box", "block"]) {
+    const { document, window } = parseHTMLDocument(`<body style="margin:0"><div style="display:${display};-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:10px;line-height:10px;width:40px;overflow:hidden;overflow-wrap:anywhere">abcdefghijklmnop</div></body>`);
+    const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document));
+    const layout = layoutText(tree, { x:0, y:0, width:200, measureText:text=>text.length*10 });
+    expect(layout.fragments.length).toBe(display === "block" ? 4 : 2);
+    const painted = layout.fragments.flatMap(f=>f.runs).map(r=>r.text).join('');
+    expect(painted).toBe(display === "block" ? "abcdefghijklmnop" : "abcdefg…");
+    expect(document.querySelector('div').textContent).toBe("abcdefghijklmnop");
+    window.happyDOM.abort();
+  }
+});
+
+test("empty blocks do not add adjoining vertical margins twice", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0"><div style="padding-top:1px">
+    <div style="height:20px;margin-bottom:12px"></div>
+    <div style="margin-top:12px"></div><div></div>
+    <div id="next" style="height:20px;margin-top:12px"></div>
+  </div></body>`);
+  const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document));
+  const layout = layoutText(tree, { x:0, y:0, width:200 });
+  expect(layout.boxes.find(box => tree.nodesById.get(box.nodeId)?.domNode?.id === 'next').y).toBe(33);
+  window.happyDOM.abort();
+});
+
 test("creates positioned immutable line fragments with fixed-column wrapping", () => {
   const { document, window } = parseHTMLDocument(
     `<body style="margin:0">1234567890ABCDEFGHIJ<br>中文😀abcdef</body>`,
