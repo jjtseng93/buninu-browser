@@ -65,3 +65,27 @@ test("an ended prefix or failed reopen never claims to have reached the target",
   const sound = track(pipe, 2);
   expect(await advanceAudio(() => sound, 8, { needsMore: () => false, reopen: async () => false })).toBe(false);
 });
+
+test("a seek before the first audio epoch cannot keep reopening an unreachable prefix", async () => {
+  let sound = { position: 6, decoder: { sampleRate: 1, channels: 1 } }, reopened = 0;
+  expect(await advanceAudio(() => sound, 2, {
+    needsMore: () => true,
+    reopen: async () => { reopened++; sound = { ...sound, position: 6 }; return true; },
+  })).toBe(false);
+  expect(reopened).toBe(1);
+});
+
+test("audio epoch EOF resumes at the next absolute sample cursor", async () => {
+  const pipe = createBytePipe(); pipe.finish();
+  let sound = { position: 6, pending: null, endTime: 6, snapshotId: 1, openedGeneration: 1, pipe,
+    decoder: { sampleRate: 1, channels: 1, nextSamples: () => null } };
+  expect(await advanceAudio(() => sound, 7, {
+    needsMore: () => true,
+    reopen: async () => {
+      sound = { ...sound, position: 6, endTime: Infinity, snapshotId: 2, pending: new Float32Array([6, 7]) };
+      return true;
+    },
+  })).toBe(true);
+  expect(sound.position).toBe(7);
+  expect([...sound.pending]).toEqual([7]);
+});

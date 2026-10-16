@@ -150,6 +150,26 @@ test("Headers instrumentation is page-local and reaches Request and Response hea
   await eventually("fetchHeaders", true);
 });
 
+test("fetch and response cloning read internal headers without invoking page instrumentation", async () => {
+  await load('<p>internal fetch headers</p>');
+  expect(await evaluate(`(async () => {
+    const original = Headers.prototype.get;
+    let calls = 0;
+    Headers.prototype.get = function () { calls++; throw new Error('page header hook'); };
+    try {
+      const response = await fetch('data:application/octet-stream,media-chunk');
+      const copy = response.clone();
+      const [blob, copiedText] = await Promise.all([response.blob(), copy.text()]);
+      const result = [calls, response.headers instanceof Headers, blob.type, await blob.text(), copiedText];
+      try { response.headers.get('content-type'); } catch {}
+      result.push(calls);
+      return result;
+    } finally {
+      Headers.prototype.get = original;
+    }
+  })()`)).toEqual([0, true, 'application/octet-stream', 'media-chunk', 'media-chunk', 1]);
+});
+
 test("DOMParser returns separate inert documents with page interfaces and XML namespaces", async () => {
   await load('<main id="main">active page</main>');
   expect(await evaluate(`JSON.stringify((() => {

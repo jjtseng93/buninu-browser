@@ -54,6 +54,75 @@ test("reopening at a keyframe does not show the prefix before the resume positio
   } finally { video.stop(); }
 });
 
+test("a presentation keeps absolute epoch times and ends before replaced frames", async () => {
+  let at = 0;
+  const seeks = [], reports = [];
+  const video = new VideoPresentation({ decode: async () => ({ width: 2, height: 2, fps: 10,
+    seek(ms) { seeks.push(ms); at = 0; },
+    nextFrame(w, h) { return new Uint8Array(w * h * 4).fill(++at); }, close() {} }) },
+    () => {}, report => reports.push(report));
+  const tick = seconds => {
+    clearTimeout(video.timer);
+    video.timing(9, seconds - 12);
+    video.step();
+  };
+  try {
+    video.timing(9, 0.2);
+    await video.open({ id: 3, time: 12.2, startTime: 12, endTime: 12.5,
+      hasAudio: true, audioId: 9, audioStart: 12 });
+    expect(Math.min(...seeks)).toBe(12000);
+    expect(video.frame.time).toBeCloseTo(12.2);
+    expect(reports.some(report => report.end !== undefined)).toBe(false);
+    tick(12.49);
+    expect(video.frame.time).toBeCloseTo(12.4);
+    expect(reports.some(report => report.end !== undefined)).toBe(false);
+    tick(12.5);
+    tick(13);
+    expect(reports.filter(report => report.end !== undefined)).toEqual([{ id: 3, end: 12.5 }]);
+    expect(reports.filter(report => report.time !== undefined).every(report => report.time >= 12.2 && report.time < 12.5)).toBe(true);
+  } finally { video.stop(); }
+});
+
+test("a short epoch snapshot reports its actual EOF so playback can request more bytes", async () => {
+  let at = 0;
+  const reports = [];
+  const video = new VideoPresentation({ decode: async () => ({ width: 2, height: 2, fps: 10,
+    nextFrame(w, h) { return ++at <= 2 ? new Uint8Array(w * h * 4).fill(at) : null; }, close() {} }) },
+    () => {}, report => reports.push(report));
+  try {
+    video.timing(10, 0.25);
+    await video.open({ id: 4, time: 40, startTime: 40, endTime: 45,
+      hasAudio: true, audioId: 10, audioStart: 40 });
+    expect(video.frame.time).toBeCloseTo(40.1);
+    expect(reports.find(report => report.end !== undefined)?.end).toBeCloseTo(40.2);
+  } finally { video.stop(); }
+});
+
+test("a later epoch discards queued old frames at its boundary without accepting stale bindings", async () => {
+  const reports = [];
+  const video = new VideoPresentation({ decode: async () => ({ width: 2, height: 2, fps: 10,
+    nextFrame(w, h) { return new Uint8Array(w * h * 4); }, close() {} }) },
+    () => {}, report => reports.push(report));
+  try {
+    video.timing(11, 0);
+    await video.open({ id: 5, time: 10, startTime: 10,
+      hasAudio: true, audioId: 11, audioStart: 10 });
+    expect(video.queue.some(frame => frame.time > 10.3)).toBe(true);
+    video.bind(4, 11, 10, 10, 10.1);
+    expect(video.config.endTime).toBeUndefined();
+    video.bind(5, undefined, undefined, undefined, 10.3);
+    expect(video.config.audioId).toBe(11);
+    expect(video.config.audioStart).toBe(10);
+    expect(video.config.time).toBe(10);
+    clearTimeout(video.timer);
+    video.timing(11, 0.3);
+    video.step();
+    expect(video.frame.time).toBeCloseTo(10.2);
+    expect(reports.find(report => report.end !== undefined)).toEqual({ id: 5, end: 10.3 });
+    expect(video.queue).toHaveLength(0);
+  } finally { video.stop(); }
+});
+
 test("video layer preserves opaque controls, translucent overlays and clipped pixels", () => {
   const base = new Uint8Array([0,0,0,255, 255,255,255,255, 0,0,128,255, 10,20,30,255]);
   const mask = new Uint8Array([255,255,255,0, 0,0,0,0, 127,127,127,0, 0,0,0,0]);
