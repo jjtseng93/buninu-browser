@@ -40,6 +40,34 @@ test("keeps node IDs stable across generations of the same DOM", () => {
   window.happyDOM.abort();
 });
 
+test("closed details show only their first summary and update when opened", async () => {
+  const { StyleEngine } = await import("../lib/style/computed-style.js");
+  const { document, window } = parseHTMLDocument(`<details><p>Before summary</p><summary>Menu</summary><summary>Extra summary</summary><p>Contents</p></details>`);
+  const builder = new RenderTreeBuilder();
+  const styles = new StyleEngine();
+  const first = builder.build(document, styles.compute(document));
+  expect(renderTreeText(first)).toBe("▶ Menu");
+  document.querySelector("details").setAttribute("open", "");
+  const second = builder.build(document, styles.compute(document));
+  expect(renderTreeText(second)).toContain("▼ Menu");
+  expect(renderTreeText(second)).toContain("Extra summary");
+  expect(renderTreeText(second)).toContain("Contents");
+  expect(renderTreeText(second)).toContain("Before summary");
+  window.happyDOM.abort();
+});
+
+test("details without summary generate the default label and author CSS can override hidden", async () => {
+  const { StyleEngine } = await import("../lib/style/computed-style.js");
+  const { document, window } = parseHTMLDocument(`<details style="padding:20px;border:3px solid;color:red">Contents</details><p hidden style="display:block">Visible</p>`);
+  const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document));
+  expect(renderTreeText(tree)).toBe("▶ DetailsVisible");
+  const summary = [...tree.nodesById.values()].find(node => node.tagName === "SUMMARY");
+  expect(summary.style.padding).toEqual([0, 0, 0, 0]);
+  expect(summary.style.borderWidths).toEqual([0, 0, 0, 0]);
+  expect(summary.style.color).toBe("rgba(255, 0, 0, 1)");
+  window.happyDOM.abort();
+});
+
 test("includes visible elements appended beside body under html", async () => {
   const { StyleEngine } = await import("../lib/style/computed-style.js");
   const { document, window } = parseHTMLDocument(`<html><head></head><body><p>body</p></body></html>`);

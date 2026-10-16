@@ -1216,7 +1216,7 @@ test("ES modules: graphs, live exports, JSON, import.meta, dynamic import, TLA, 
   await load(`
     <script type="importmap">{ "imports": { "cdn-lib": "https://cdn.test/lib/index.js" } }</script>
     <script type="module" src="/modules/main.js"></script>
-    <script type="module">window.inlineModule = import.meta.url.includes('#inline-module');</script>`);
+    <script type="module">window.inlineModule = import.meta.url === document.baseURI;</script>`);
   expect(await evaluate("moduleResult")).toBe([
     // Imports are live bindings, named and namespace alike.
     "named:2", "namespace:2", "twice:42", "json:42", "loaded lazily from lazy.js",

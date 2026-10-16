@@ -107,6 +107,28 @@ test("relative offsets and translate move a box and its content without affectin
   expect(box(".centered")).toMatchObject({ x: -20, y: 40 + 10 });
 });
 
+test("transform lists compose pixel and percentage translations in order", () => {
+  const { box } = render(
+    `<div class="popup"></div><div class="scaled"></div><div class="reversed"></div><div class="math"></div>`,
+    `.popup,.scaled,.reversed,.math { position:absolute;left:0;top:0;width:100px;height:153px }
+     .popup { transform:translate(56px,780px) translate(0,-100%) }
+     .scaled { transform:scale(2,3) translate(10px,20%) translateX(5px) }
+     .reversed { transform:translate(10px,20%) scale(2,3) translateX(5px) }
+     .math { transform:translate(calc(25% + 10px),min(20%,40px)) translate(10%,5px) }`,
+  );
+  expect(box(".popup")).toEqual({x:56,y:627,width:100,height:153});
+  expect(box(".scaled")).toMatchObject({x:30,y:91.8});
+  expect(box(".reversed")).toMatchObject({x:20,y:30.6});
+  expect(box(".math")).toMatchObject({x:45,y:35.6});
+});
+
+test("individual translate precedes the transform list and preserves normal flow", () => {
+  const {box} = render('<div class="translated"></div><div class="next"></div>',
+    '.translated{width:100px;height:80px;translate:10px -50%;transform:scale(2) translate(5px,10px)}.next{height:20px}');
+  expect(box('.translated')).toEqual({x:20,y:-20,width:100,height:80});
+  expect(box('.next').y).toBe(80);
+});
+
 test("an absolutely positioned ::after arrow is centred on its host's edge", () => {
   // The buninu.org step arrow: top:50%; right:-.75rem; translate(50%,-50%).
   const { box } = render(

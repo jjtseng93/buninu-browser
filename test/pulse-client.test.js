@@ -135,6 +135,13 @@ test("measured device progress governs the media clock and bounded audio queue t
   const { createServer } = await import("node:net");
   let received = 0, played = 0, reports = 0;
   const times = [], errors = [], requests = [];
+  // The suite also runs CPU-heavy renderers in parallel. Observe protocol
+  // progress instead of assuming a polling timer ran within 120 ms.
+  const waitFor = async predicate => {
+    const deadline = Date.now() + 2000;
+    while (!predicate() && Date.now() < deadline) await Bun.sleep(10);
+    expect(predicate()).toBe(true);
+  };
   const scalar64 = (tag, value) => {
     const bytes = Buffer.alloc(9);
     bytes[0] = tag;
@@ -178,13 +185,13 @@ test("measured device progress governs the media clock and bounded audio queue t
     await Bun.sleep(80);
     expect(received).toBe(0); // a short prefix does not start/stop playback
     stream.write(new Uint8Array(1900));
-    await Bun.sleep(180);
+    await waitFor(() => reports > 0 && received === 500 && times.length > 0);
     expect(reports).toBeGreaterThan(0);
     expect(received).toBe(500); // at most the 0.5 s queue budget, not 2 s
     expect(stream.queued).toBe(1500); // survives a renderer busy spell in the controller
     expect(times.at(-1)).toBe(0); // server/device hasn't played anything
     played = 100;
-    await Bun.sleep(120);
+    await waitFor(() => times.at(-1) === 0.1 && received === 600);
     expect(times.at(-1)).toBeCloseTo(0.1, 5);
     expect(received).toBe(600);
     // A long network/producer pause is NOT permission to catch up by queuing seconds.
@@ -192,7 +199,7 @@ test("measured device progress governs the media clock and bounded audio queue t
     expect(times.at(-1)).toBeCloseTo(0.1, 5);
     expect(received).toBe(600);
     played = 600;
-    await Bun.sleep(120);
+    await waitFor(() => times.at(-1) === 0.6 && received > 1000);
     expect(times.at(-1)).toBeCloseTo(0.6, 5);
     expect(received).toBeGreaterThan(1000);
     expect(received).toBeLessThanOrEqual(1100);

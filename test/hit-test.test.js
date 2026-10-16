@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
-import { elementAtPoint, elementBounds, hitTest, interactiveRegions } from "../lib/input/hit-test.js";
+import { elementAtPoint, elementBounds, elementBox, hitTest, interactiveRegions } from "../lib/input/hit-test.js";
 import { buildDisplayList } from "../lib/paint/display-list.js";
 import { layoutText } from "../lib/layout/text-layout.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
@@ -32,6 +32,26 @@ test("finds content bounds for fragment navigation targets", () => {
 
   expect(bounds.top).toBeGreaterThan(12);
   expect(bounds.height).toBeGreaterThan(0);
+  window.happyDOM.abort();
+});
+
+test("geometry lookups combine inline descendants and follow replacement layouts", () => {
+  const { document, window } = parseHTMLDocument('<div id="box"><span id="outer">one <b>two</b></span><span id="other">tail</span></div><div id="hidden" style="display:none">hidden</div>');
+  const styles = new StyleEngine().compute(document, ['body{margin:0} #box{width:70px}']);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const options = { width:200, x:0, y:0, measureText:text=>text.length*10, lineHeight:20, fontMetrics:()=>({ascent:16,height:20}) };
+  const layout = layoutText(tree, options);
+  const box = document.getElementById('box'), outer = document.getElementById('outer');
+  expect(elementBox(tree, layout, box).box.width).toBe(70);
+  expect(elementBox(tree, layout, outer)).toBe(null);
+  const bounds = elementBounds(tree, layout, outer);
+  expect(bounds.width).toBeGreaterThan(0);
+  expect(elementBounds(tree, layout, box).bottom).toBeGreaterThanOrEqual(bounds.bottom);
+  expect(elementBounds(tree, layout, document.getElementById('hidden'))).toBe(null);
+  const shifted = layoutText(tree, { ...options, x:40, y:100 });
+  expect(elementBox(tree, shifted, box).box.y).toBe(elementBox(tree, layout, box).box.y + 100);
+  expect(elementBounds(tree, shifted, outer).left).toBe(bounds.left + 40);
+  expect(elementBounds(tree, shifted, outer).top).toBe(bounds.top + 100);
   window.happyDOM.abort();
 });
 

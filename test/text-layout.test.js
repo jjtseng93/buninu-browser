@@ -8,6 +8,32 @@ function boxFor(tree, layout, tagName) {
   return layout.boxes.find((box) => tree.nodesById.get(box.nodeId)?.tagName === tagName);
 }
 
+test("display contents removes the wrapper box while preserving inherited text styles", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0;font-size:10px;line-height:10px">
+    before <div id="wrapper" style="display:contents;padding:50px;border:10px solid;position:absolute;color:red"><span>inside</span></div> after
+  </body>`);
+  const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document));
+  const layout = layoutText(tree, { x:0, y:0, width:200, measureText:text=>text.length });
+  expect(layout.boxes.some(box => tree.nodesById.get(box.nodeId)?.domNode?.id === "wrapper")).toBe(false);
+  expect(layout.fragments.length).toBe(1);
+  expect(layout.fragments[0].text.trim()).toBe("before inside after");
+  expect([...tree.nodesById.values()].find(node => node.type === "text" && node.text === "inside").style.color).toBe("rgba(255, 0, 0, 1)");
+  window.happyDOM.abort();
+});
+
+test("display contents promotes nested children into flex and grid item placement", () => {
+  for (const display of ["flex", "grid"]) {
+    const { document, window } = parseHTMLDocument(`<body style="margin:0"><main style="display:${display};grid-template-columns:20px 20px 20px;gap:5px">
+      <div style="display:contents"><i style="width:20px;height:10px"></i><span style="display:contents"><i style="width:20px;height:10px"></i></span></div>
+      <i style="width:20px;height:10px"></i></main></body>`);
+    const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document));
+    const layout = layoutText(tree, { x:0, y:0, width:200 });
+    expect(layout.boxes.filter(box => tree.nodesById.get(box.nodeId)?.tagName === "I").map(box => [box.x,box.y,box.width,box.height]))
+      .toEqual([[0,0,20,10],[25,0,20,10],[50,0,20,10]]);
+    window.happyDOM.abort();
+  }
+});
+
 test("percentage and calc padding reserve an aspect-ratio box and reflow on resize", () => {
   const { document, window } = parseHTMLDocument(`<body style="margin:0">
     <div id="ratio" style="position:relative;padding-bottom:calc(100% * 9 / 16)">
@@ -338,6 +364,86 @@ function layoutFixture(html, css = "", width = 400) {
   };
   return { ...parsed, tree, layout, box };
 }
+
+test("column flex distributes growth, scaled shrink and constrained free space", () => {
+  for (const [children, expected] of [
+    ['<i style="flex:1;min-height:0"></i><b style="flex:2;min-height:0"></b>', [100,200]],
+    ['<i style="height:200px;min-height:0"></i><b style="height:400px;min-height:0"></b>', [100,200]],
+    ['<i style="flex:1;max-height:70px"></i><b style="flex:1"></b>', [70,230]],
+    ['<i style="flex:.25"></i><b style="flex:.25"></b>', [75,75]],
+  ]) {
+    const {window,box} = layoutFixture(`<main>${children}</main>`, 'main{display:flex;flex-direction:column;height:300px}');
+    expect([box('i').height,box('b').height]).toEqual(expected);
+    expect(box('b').y).toBe(expected[0]);
+    window.happyDOM.abort();
+  }
+});
+
+test("column flex automatic minimum protects content, while scrollable items can shrink", () => {
+  for (const [overflow,height] of [["visible",100],["auto",80],["hidden",80]]) {
+    const {window,box} = layoutFixture('<main><section><i></i></section></main>',
+      `main{display:flex;flex-direction:column;height:80px}section{overflow:${overflow}}i{display:block;height:100px}`);
+    expect(box('section').height).toBe(height);
+    window.happyDOM.abort();
+  }
+});
+
+test("an omitted flex basis uses content in an auto-height column capped by max-height", () => {
+  for (const [flex,expected] of [["1",250],["1 1",250],["1 1 0",0],["1 1 0%",250]]) {
+    const {window,box} = layoutFixture('<main><header></header><section><i></i></section></main>',
+      `main{display:flex;flex-direction:column;max-height:300px}header{height:50px;flex:none}
+       section{flex:${flex};min-height:0;overflow-y:auto}i{display:block;height:800px}`);
+    expect(box('section').height).toBe(expected);
+    expect(box('main').height).toBe(expected+50);
+    window.happyDOM.abort();
+  }
+});
+
+test("column auto margins absorb free space before justify-content", () => {
+  const {window,box} = layoutFixture('<main><i></i><b></b></main>',
+    'main{display:flex;flex-direction:column;height:300px;justify-content:space-between}i{height:40px;margin-top:auto}b{height:60px;margin-bottom:auto}');
+  expect([box('i').y,box('b').y]).toEqual([100,140]);
+  window.happyDOM.abort();
+});
+
+test("stretched and inset-sized flex columns center within their final used height", () => {
+  for (const css of [
+    'main{display:flex;height:300px}section{display:flex;flex-direction:column;justify-content:center}',
+    'main{position:relative;height:300px}section{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center}',
+  ]) {
+    const {window,box} = layoutFixture('<main><section><i></i></section></main>',css+'i{display:block;height:60px;width:30px}');
+    expect(box('section').height).toBe(300);
+    expect(box('i').y).toBe(120);
+    window.happyDOM.abort();
+  }
+});
+
+test("nested column flex growth fills the viewport-sized modal wrapper", () => {
+  const {window,box} = layoutFixture('<main><section><article><i></i></article></section></main>',
+    'main{display:flex;flex-direction:column;height:800px}section{display:flex;flex-direction:column;flex-grow:1;justify-content:center}article{display:flex;justify-content:center}i{height:300px;width:200px}');
+  expect(box('section').height).toBe(800);
+  expect(box('i')).toMatchObject({x:100,y:250,width:200,height:300});
+  window.happyDOM.abort();
+});
+
+test("percentage HTML image dimensions size flex items within their container", () => {
+  const {window,box,layout} = layoutFixture('<main><img width="100%" height="100%"></main>',
+    'main{display:flex;width:84px;height:84px}');
+  expect(box('img')).toMatchObject({width:84,height:84});
+  const image=layout.fragments.flatMap(fragment=>fragment.runs).find(run=>run.type==='image');
+  expect(image).toMatchObject({width:84,height:84});
+  window.happyDOM.abort();
+});
+
+test("author auto sizing overrides HTML dimension hints and uses the image's intrinsic size", () => {
+  const {document,window}=parseHTMLDocument('<body style="margin:0"><img width="30" height="20" style="width:auto;height:auto"></body>');
+  const element=document.querySelector('img'),resources=new Map([[element,{width:120,height:60}]]);
+  const styles=new StyleEngine().compute(document);
+  const tree=new RenderTreeBuilder().build(document,styles,resources);
+  const layout=layoutText(tree,{width:400,lineHeight:20,measureText:text=>text.length*10,fontMetrics:()=>({ascent:16,height:20})});
+  expect(layout.fragments.flatMap(fragment=>fragment.runs).find(run=>run.type==='image')).toMatchObject({width:120,height:60});
+  window.happyDOM.abort();
+});
 
 test("nests block boxes and includes ancestor padding and borders", () => {
   const { window, layout, box } = layoutFixture(

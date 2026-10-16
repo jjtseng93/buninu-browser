@@ -220,6 +220,64 @@ test("implicit columns are created past the explicit grid", () => {
   expect(item(0)).toEqual({ left: 4, top: 0, width: 6, height: 1 });
 });
 
+test("column auto-flow fills each explicit row before adding a column", () => {
+  const { items } = render(grid("grid-template-rows: 2px 3px; grid-auto-columns: 4px; grid-auto-flow: column", letters(5)));
+  expect(items().map((box) => [box.left, box.top, box.width, box.height])).toEqual([
+    [0, 0, 4, 2], [0, 2, 4, 3], [4, 0, 4, 2], [4, 2, 4, 3], [8, 0, 4, 2],
+  ]);
+});
+
+test("column auto-flow honors row spans and dense packing", () => {
+  const content = `<i style="grid-row: 2 / 4">a</i><i style="grid-row: span 2">b</i><i>c</i>`;
+  const sparse = render(grid("grid-template-rows: repeat(3, 2px); grid-auto-columns: 4px; grid-auto-flow: column", content));
+  const dense = render(grid("grid-template-rows: repeat(3, 2px); grid-auto-columns: 4px; grid-auto-flow: column dense", content));
+  expect(sparse.items().map((box) => [box.left, box.top])).toEqual([[0, 2], [4, 0], [4, 4]]);
+  expect(dense.items().map((box) => [box.left, box.top])).toEqual([[0, 2], [4, 0], [0, 0]]);
+});
+
+test("named areas place source-order-independent content and spanning cells", () => {
+  const { items } = render(grid('grid-template-columns: 4px 20px 6px; grid-template-rows: 2px 3px; grid-template-areas: "icon title meta" "icon body meta"',
+    '<i style="grid-area: title">title</i><i style="grid-area: meta">m</i><i style="grid-area: icon">i</i><i style="grid-area: body">body</i>'));
+  expect(items()).toEqual([
+    { left: 4, top: 0, width: 20, height: 2 }, { left: 24, top: 0, width: 6, height: 5 },
+    { left: 0, top: 0, width: 4, height: 5 }, { left: 4, top: 2, width: 20, height: 3 },
+  ]);
+});
+
+test("named areas create explicit tracks and implicit start/end line names", () => {
+  const { items } = render(grid('grid-template-areas: "a a ." "b b ."; grid-auto-columns: 4px; grid-auto-rows: 2px',
+    '<i style="grid-column: a; grid-row: 1">a</i><i style="grid-column: b-start / b-end; grid-row: b">b</i><i style="grid-column: -2 / -1; grid-row: 1">c</i>'));
+  expect(items()).toEqual([
+    { left: 0, top: 0, width: 8, height: 2 }, { left: 0, top: 2, width: 8, height: 2 },
+    { left: 8, top: 0, width: 4, height: 2 },
+  ]);
+});
+
+test("grid-template shorthand combines area strings, row sizes and columns", () => {
+  const { items } = render(grid('grid-template:"icon title"2px"icon body"3px/4px 20px',
+    '<i style="grid-area: title">title</i><i style="grid-area: icon">i</i><i style="grid-area: body">body</i>'));
+  expect(items()).toEqual([
+    { left: 4, top: 0, width: 20, height: 2 }, { left: 0, top: 0, width: 4, height: 5 },
+    { left: 4, top: 2, width: 20, height: 3 },
+  ]);
+  const defaults = render(grid('grid-template: "a b" / 4px 6px', '<i style="grid-area:b">b</i>'));
+  expect(defaults.item(0)).toEqual({ left: 4, top: 0, width: 6, height: 1 });
+});
+
+test("grid-template track shorthand resets old area placement", () => {
+  const { items } = render(grid('grid-template-areas:"b a";grid-template:2px / 4px 6px', letters(2)));
+  expect(items()).toEqual([
+    { left: 0, top: 0, width: 4, height: 2 }, { left: 4, top: 0, width: 6, height: 2 },
+  ]);
+});
+
+test("nonrectangular or unequal-width area declarations are discarded", () => {
+  for (const invalid of ['"a a" "a b"', '"a a" "b"', '"a ?"']) {
+    const { items } = render(grid(`grid-template-columns: 4px 6px; grid-template-areas: ${invalid}`, letters(2)));
+    expect(items().map((box) => box.width)).toEqual([4, 6]);
+  }
+});
+
 // Gaps (css-align-3)
 
 test("column-gap separates the columns and comes off the free space", () => {

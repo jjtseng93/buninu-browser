@@ -39,6 +39,35 @@ test("parses transform lists into one matrix", () => {
   expect([a, b, c, d].map((value) => Math.round(value))).toEqual([0, 1, -1, 0]);
 });
 
+test("SVG paint follows the CSS cascade, inherited HTML fill and descendant currentColor", () => {
+  const { document, window } = parseHTMLDocument(`<main style="fill:green;color:blue"><svg viewBox="0 0 24 24" style="opacity:.5">
+    <path id="inherited" d="M0 0h3v3z"/>
+    <path id="overridden" fill="red" stroke-width="1" d="M4 0h3v3z"/>
+    <g style="color:red;fill:currentColor;opacity:.5"><path d="M8 0h3v3z"/></g>
+    <path id="inline" fill="red" style="fill:yellow" d="M12 0h3v3z"/>
+  </svg></main>`);
+  const styles = new StyleEngine().compute(document, ["#overridden {fill:blue;stroke:currentColor;stroke-width:2;fill-opacity:50%;fill-rule:evenodd}"]);
+  const tree = new RenderTreeBuilder().build(document, styles);
+  const svg = [...tree.nodesById.values()].find(node => node.tagName === "SVG").svg;
+  expect(svg.shapes.map(shape => shape.fill)).toEqual([
+    "rgba(0, 128, 0, 1)", "rgba(0, 0, 255, 1)", "rgba(255, 0, 0, 1)", "rgba(255, 255, 0, 1)",
+  ]);
+  expect(svg.shapes[1]).toMatchObject({ stroke: "rgba(0, 0, 255, 1)", strokeWidth: 2, fillOpacity: .5, fillRule: "evenodd" });
+  expect(svg.shapes[0].fillOpacity).toBe(1); // Root opacity is applied by its CSS box, once.
+  expect(svg.shapes[2].fillOpacity).toBe(.5);
+  window.happyDOM.abort();
+});
+
+test("SVG CSS display removes a subtree while visible descendants can override visibility", () => {
+  const { document, window } = parseHTMLDocument(`<svg><g class="hidden"><path d="M0 0h3v3z"/><path class="visible" d="M4 0h3v3z"/></g>
+    <g class="none"><path class="visible" d="M8 0h3v3z"/></g></svg>`);
+  const styles = new StyleEngine().compute(document, [".hidden {visibility:hidden}.visible{visibility:visible}.none{display:none}"]);
+  const svg = extractSvg(document.querySelector("svg"), "black", styles);
+  expect(svg.shapes).toHaveLength(1);
+  expect(svg.shapes[0].d).toBe("M4 0h3v3z");
+  window.happyDOM.abort();
+});
+
 test("inline SVG is a replaced box with margins and vertical-align in the line", () => {
   const { document, window } = parseHTMLDocument(`<body style="margin:0"><p style="margin:0">
     <svg viewBox="0 0 16 16" width="16" height="16" style="margin-right:8px;vertical-align:text-bottom"><path d="M0 0h16v16z"/></svg>Readme</p></body>`);

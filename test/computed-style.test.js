@@ -2,8 +2,48 @@ import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
 import { RenderTreeBuilder, renderTreeText } from "../lib/render-tree/index.js";
 import {
-  absolutizeStyleSheetUrls, computeElementStyle, matchSelectors, parseDeclarations, StyleEngine,
+  absolutizeStyleSheetUrls, computeElementStyle, extractFontFaces, matchSelectors, parseDeclarations, StyleEngine,
+  parseStyleSheet,
 } from "../lib/style/computed-style.js";
+
+test("escaped selector punctuation does not consume following stylesheet rules", () => {
+  const { document, window } = parseHTMLDocument(`<div id="quoted" class="[feature:'alt']"></div><div id="punctuation" class="braces{}paren(,)"></div><div id="after" class="after"></div>`);
+  const css = String.raw`@layer utilities {
+    .\[feature\:\'alt\'\] { width: 20px }
+    .braces\{\}paren\(\,\) { height: 30px }
+    .after { --size: 40px; width: var(--size); height: 50px }
+  }`;
+  expect(parseStyleSheet(css)).toHaveLength(3);
+  const styles = new StyleEngine().compute(document, [css]);
+  expect(styles.get(document.getElementById('quoted')).width).toBe(20);
+  expect(styles.get(document.getElementById('punctuation')).height).toBe(30);
+  expect(styles.get(document.getElementById('after')).width).toBe(40);
+  expect(styles.get(document.getElementById('after')).height).toBe(50);
+  window.happyDOM.abort();
+});
+
+test("border corner longhands, elliptical shorthand and logical corners follow the cascade", () => {
+  const { document, window } = parseHTMLDocument(`<div id="parent" style="border-radius:10px 20px 30px / 40px 50%;border-top-left-radius:3px 4px">
+    <div id="child" style="border-radius:inherit; border-bottom-left-radius:initial"></div></div>
+    <div id="logical" style="border-start-start-radius:9px;border-end-end-radius:11px;direction:rtl"></div>
+    <div id="invalid" style="border-radius:7px; border-top-left-radius:-2px; border-top-right-radius:1px 2px 3px"></div>`);
+  const styles = new StyleEngine().compute(document);
+  const parent = styles.get(document.querySelector('#parent'));
+  expect(parent.borderTopLeftRadius).toEqual([3, 4]);
+  expect(parent.borderTopRightRadius).toEqual([20, { unit: '%', value: 50 }]);
+  expect(parent.borderBottomRightRadius).toEqual([30, 40]);
+  expect(parent.borderBottomLeftRadius).toEqual([20, { unit: '%', value: 50 }]);
+  const child = styles.get(document.querySelector('#child'));
+  expect(child.borderTopLeftRadius).toEqual([3, 4]);
+  expect(child.borderBottomLeftRadius).toEqual([0, 0]);
+  const logical = styles.get(document.querySelector('#logical'));
+  expect(logical.borderTopRightRadius).toEqual([9, 9]);
+  expect(logical.borderBottomLeftRadius).toEqual([11, 11]);
+  const invalid = styles.get(document.querySelector('#invalid'));
+  expect(invalid.borderTopLeftRadius).toEqual([7, 7]);
+  expect(invalid.borderTopRightRadius).toEqual([7, 7]);
+  window.happyDOM.close();
+});
 
 test("computes the initial UA and inherited style subset", () => {
   const { document, window } = parseHTMLDocument(`<body>
@@ -45,6 +85,223 @@ test("percentage root fonts set the basis for rem and descendant percentage font
   expect(styles.get(document.documentElement).fontSize).toBe(10);
   expect(styles.get(document.getElementById('relative')).fontSize).toBe(14);
   expect(styles.get(document.getElementById('child')).fontSize).toBe(21);
+  window.happyDOM.abort();
+});
+
+test("ch lengths use the final font's zero advance independent of declaration order", () => {
+  const { document, window } = parseHTMLDocument(`<body style="font-size:20px; font-family:parent">
+    <div id="a" style="max-width:64ch; padding:1ch; font:30px child; font-weight:700"></div>
+    <div id="b" style="font:30px child; font-weight:700; max-width:64ch; padding:1ch"></div>
+    <div id="c" style="width:calc(2ch + 10px); font-size:2ch"></div>
+  </body>`);
+  const measureText = (text, style) => {
+    expect(text).toBe("0");
+    return style.fontSize * (style.fontFamily[0] === "child" && style.fontWeight === 700 ? 0.6 : 0.5);
+  };
+  const styles = new StyleEngine({ measureText }).compute(document);
+  for (const id of ["a", "b"]) {
+    const style = styles.get(document.getElementById(id));
+    expect(style.maxWidth).toBe(1152);
+    expect(style.padding).toEqual([18, 18, 18, 18]);
+  }
+  const child = styles.get(document.getElementById("c"));
+  expect(child.fontSize).toBe(20);
+  expect(child.width).toBe(30);
+  window.happyDOM.abort();
+});
+
+test("ch falls back to half an em without font measurements and preserves font cascade", () => {
+  const { document, window } = parseHTMLDocument(`<div style="width:10ch; font-family:custom; font:20px monospace; line-height:2"></div>`);
+  const style = computeElementStyle(document.querySelector("div"));
+  expect(style.width).toBe(100);
+  expect(style.fontFamily).toEqual(["monospace"]);
+  expect(style.lineHeight).toBe(40);
+  window.happyDOM.abort();
+});
+
+test("logical spacing, sizes and insets resolve in physical cascade order", () => {
+  const { document, window } = parseHTMLDocument(`<div dir="rtl" style="
+    padding:1px; padding-inline:2px 3px; padding-inline-start:4px; padding-left:5px;
+    margin-block:6px 7px; margin-inline:auto; inline-size:100px; min-block-size:20px;
+    inset-block:8px 9px; inset-inline-start:10px;
+  "></div>`);
+  const style = computeElementStyle(document.querySelector("div"));
+  expect(style.padding).toEqual([1, 4, 1, 5]);
+  expect(style.margin).toEqual([6, "auto", 7, "auto"]);
+  expect(style.inset).toEqual([8, 10, 9, "auto"]);
+  expect(style.width).toBe(100);
+  expect(style.minHeight).toBe(20);
+  window.happyDOM.abort();
+});
+
+test("logical declarations use final direction and reject invalid paired values together", () => {
+  const { document, window } = parseHTMLDocument(`<div style="
+    padding-inline-start:10px; direction:rtl; padding-block:1px -2px;
+    margin-inline:2px invalid; inline-size:90px; width:100px;
+  "><i style="padding-inline-start:inherit"></i></div>`);
+  const engine = new StyleEngine().compute(document);
+  const style = engine.get(document.querySelector("div"));
+  expect(style.padding).toEqual([0, 10, 0, 0]);
+  expect(style.margin).toEqual([0, 0, 0, 0]);
+  expect(style.width).toBe(100);
+  expect(engine.get(document.querySelector("i")).padding).toEqual([0, 10, 0, 0]);
+  window.happyDOM.abort();
+});
+
+test("flex-flow sets both longhands and resets omitted components", () => {
+  const { document, window } = parseHTMLDocument(`<div style="flex-direction:column;flex-flow:wrap"></div>
+    <i style="flex-flow:wrap column;flex-wrap:nowrap"></i>`);
+  expect(computeElementStyle(document.querySelector("div"))).toMatchObject({ flexDirection: "row", flexWrap: "wrap" });
+  expect(computeElementStyle(document.querySelector("i"))).toMatchObject({ flexDirection: "column", flexWrap: "nowrap" });
+  window.happyDOM.abort();
+});
+
+test("font styles inherit and the shorthand resets or inherits every supported component", () => {
+  const { document, window } = parseHTMLDocument(`<main style="font:italic bold condensed 20px/2 monospace">
+    <i id="reset" style="font:12px serif"></i><span id="inherited" style="font:inherit"></span>
+    <b id="override" style="font:oblique 16px serif;font-style:normal"></b><em></em>
+  </main>`);
+  const engine = new StyleEngine().compute(document);
+  expect(engine.get(document.querySelector("main"))).toMatchObject({ fontStyle: "italic", fontSize: 20, fontWeight: 700, fontStretch: 75 });
+  expect(engine.get(document.querySelector("#reset"))).toMatchObject({ fontStyle: "normal", fontSize: 12, fontWeight: 400, fontStretch: 100 });
+  expect(engine.get(document.querySelector("#inherited"))).toMatchObject({ fontStyle: "italic", fontSize: 20, fontWeight: 700, fontStretch: 75, lineHeight: 40 });
+  expect(engine.get(document.querySelector("#override")).fontStyle).toBe("normal");
+  expect(engine.get(document.querySelector("em")).fontStyle).toBe("italic");
+  window.happyDOM.abort();
+});
+
+test("font-face extraction keeps resource candidates, weight ranges and unicode subsets", () => {
+  const faces = extractFontFaces(`@font-face {
+    font-family: 'Example Sans'; font-weight: 100 900; font-style: italic; font-stretch:62% 125%; font-display:swap;
+    src: local('Example Sans Regular'), url('../fonts/a.woff2') format('woff2'), url(b.ttf) format(truetype);
+    unicode-range: U+0-FF, U+4??, U+1F600;
+  }`, "https://example.test/css/main.css");
+  expect(faces).toEqual([{ family: "Example Sans", weight: [100, 900], style: "italic", stretch: [62, 125], display: "swap",
+    sources: [{ local: "Example Sans Regular" }, { url: "https://example.test/fonts/a.woff2", format: "woff2" },
+      { url: "https://example.test/css/b.ttf", format: "truetype" }],
+    unicodeRanges: [[0, 255], [1024, 1279], [128512, 128512]] }]);
+});
+
+test("font stretch percentages, width alias and ch measurements share the final font", () => {
+  const { document, window } = parseHTMLDocument(`<main style="font-stretch:87.5%"><div style="width:10ch;font-width:75%"></div>
+    <i style="font-width:unset"></i><b style="font-stretch:expanded;font-width:-2%"></b></main>`);
+  const engine = new StyleEngine({ measureText: (_text, style) => style.fontStretch / 10 }).compute(document);
+  expect(engine.get(document.querySelector("div"))).toMatchObject({ fontStretch: 75, width: 75 });
+  expect(engine.get(document.querySelector("i")).fontStretch).toBe(87.5);
+  expect(engine.get(document.querySelector("b")).fontStretch).toBe(125);
+  window.happyDOM.abort();
+});
+
+test("small, large and dynamic viewport units track the headless viewport on resize", () => {
+  const {document,window} = parseHTMLDocument('<main style="min-height:100dvh;width:50svi;padding:2vmin 3lvmax"><i style="height:calc(100svh - 20px);width:20dvb"></i></main>');
+  const engine = new StyleEngine();
+  for (const [width,height] of [[1000,600],[400,800]]) {
+    engine.compute(document, [], {width,height});
+    expect(engine.get(document.querySelector('main'))).toMatchObject({minHeight:height,width:width/2,
+      padding:[Math.min(width,height)*.02,Math.max(width,height)*.03,Math.min(width,height)*.02,Math.max(width,height)*.03]});
+    expect(engine.get(document.querySelector('i'))).toMatchObject({height:height-20,width:height*.2});
+  }
+  window.happyDOM.abort();
+});
+
+test("container query units use the small viewport when no query container exists", () => {
+  const {document,window} = parseHTMLDocument(`<main style="width:25cqw;height:25cqh;padding:2cqmin 3cqmax">
+    <i style="width:10cqi;height:10cqb"></i><b style="--size:clamp(48px,25cqw,136px);width:var(--size);height:calc(var(--size) / 2)"></b></main>`);
+  const engine = new StyleEngine();
+  for (const [width,height] of [[1000,600],[400,800]]) {
+    engine.compute(document, [], {width,height});
+    expect(engine.get(document.querySelector('main'))).toMatchObject({width:width/4,height:height/4,
+      padding:[Math.min(width,height)*.02,Math.max(width,height)*.03,Math.min(width,height)*.02,Math.max(width,height)*.03]});
+    expect(engine.get(document.querySelector('i'))).toMatchObject({width:width*.1,height:height*.1});
+    const size=Math.max(48,Math.min(width*.25,136));
+    expect(engine.get(document.querySelector('b'))).toMatchObject({width:size,height:size/2});
+  }
+  window.happyDOM.abort();
+});
+
+test("author all resets override HTML and SVG presentation hints even inside cascade layers", () => {
+  const {document,window}=parseHTMLDocument('<img width="80" height="40"><svg><rect fill="red" stroke="blue"></rect></svg>');
+  const engine=new StyleEngine().compute(document,['@layer reset{img,rect{all:unset}}']);
+  expect(engine.get(document.querySelector('img'))).toMatchObject({width:'auto',height:'auto'});
+  expect(engine.get(document.querySelector('rect'))).toMatchObject({fill:'rgba(0, 0, 0, 1)',stroke:'none'});
+  window.happyDOM.abort();
+});
+
+test("font-face extraction follows matching group rules and ignores invalid faces", () => {
+  const face = (family) => `@font-face { font-family:${family}; src:url(${family}.ttf) }`;
+  const faces = extractFontFaces(`@media (min-width:900px) { ${face("Wide")} }
+    @media (max-width:899px) { @layer text { ${face("Narrow")} } }
+    @supports (display:grid) { ${face("Supported")} }
+    @font-face { font-family: serif; src:url(bad.ttf) }
+    @font-face { font-family: MissingSource }
+    div { content:'@font-face { font-family:Fake; src:url(fake.ttf) }' }`,
+    "https://example.test/main.css", { width: 800 });
+  expect(faces.map((face) => face.family)).toEqual(["Narrow", "Supported"]);
+  expect(faces[0]).toMatchObject({ weight: [400, 400], style: "normal", unicodeRanges: [[0, 0x10ffff]] });
+});
+
+test("font-face strings allow escaped names and commas inside URLs", () => {
+  const [face] = extractFontFaces(String.raw`@font-face { font-family:'A\20 B';
+    src:url('data:font/ttf;base64,AA==') format('truetype'), url('name(1).woff2') format('woff2') tech(variations);
+    unicode-range:U+110000; font-weight:1500;
+  }`, "https://example.test/main.css");
+  expect(face.family).toBe("A B");
+  expect(face.sources).toEqual([{ url: "data:font/ttf;base64,AA==", format: "truetype" },
+    { url: "https://example.test/name(1).woff2", format: "woff2", tech: ["variations"] }]);
+  expect(face.weight).toEqual([400, 400]);
+  expect(face.unicodeRanges).toEqual([[0, 0x10ffff]]);
+});
+
+test("all unset removes UA heading styles while inheriting fonts and retaining custom properties", () => {
+  const { document, window } = parseHTMLDocument(`<main style="font:36px/50px monospace;color:red;direction:rtl">
+    <h1 style="all:unset;--size:24px;padding-inline-start:var(--size)">Title</h1>
+  </main>`);
+  const engine = new StyleEngine().compute(document);
+  const style = engine.get(document.querySelector("h1"));
+  expect(style).toMatchObject({ display: "inline", fontSize: 36, fontWeight: 400, lineHeight: 50,
+    color: "rgba(255, 0, 0, 1)", direction: "rtl" });
+  expect(style.fontFamily).toEqual(["monospace"]);
+  expect(style.margin).toEqual([0, 0, 0, 0]);
+  expect(style.padding).toEqual([0, 24, 0, 0]);
+  window.happyDOM.abort();
+});
+
+test("all reset participates in importance, source order and font-relative sizing", () => {
+  const { document, window } = parseHTMLDocument(`<div class="x" style="all:initial; font-size:20px; width:2em; padding-left:3px"></div>
+    <p class="x" style="font-size:20px;all:unset!important;width:10px"></p>`);
+  const engine = new StyleEngine().compute(document, [".x { margin:10px; color:red!important; font:30px serif }"]);
+  const first = engine.get(document.querySelector("div"));
+  expect(first).toMatchObject({ display: "inline", fontSize: 20, width: 40, color: "rgba(255, 0, 0, 1)" });
+  expect(first.fontFamily).toEqual(["sans-serif"]);
+  expect(first.padding).toEqual([0, 0, 0, 3]);
+  expect(first.margin).toEqual([0, 0, 0, 0]);
+  expect(engine.get(document.querySelector("p"))).toMatchObject({ width: "auto", fontSize: 16, color: "rgba(0, 0, 0, 1)" });
+  window.happyDOM.abort();
+});
+
+test("CSS-wide side resets preserve the other border and inset sides", () => {
+  const { document, window } = parseHTMLDocument(`<div style="border:3px solid red;border-left-width:initial;border-bottom-color:initial;inset:5px;top:initial"></div>`);
+  const style = computeElementStyle(document.querySelector("div"));
+  expect(style.borderWidths).toEqual([3, 3, 3, 3]);
+  expect(style.borderColors).toEqual(["rgba(255, 0, 0, 1)", "rgba(255, 0, 0, 1)", "rgba(0, 0, 0, 1)", "rgba(255, 0, 0, 1)"]);
+  expect(style.inset).toEqual(["auto", 5, 5, 5]);
+  window.happyDOM.abort();
+});
+
+test("complex functional selectors style the subject, not the first compound", () => {
+  const { document, window } = parseHTMLDocument(`<main class="prose"><h2 id="heading">Title <code id="code">code</code></h2>
+    <section class="not-prose"><h2 id="excluded">Excluded</h2></section></main>`);
+  const engine = new StyleEngine().compute(document, [`
+    h2 { font-size:inherit }
+    .prose :where(h2):not(:where(.not-prose, .not-prose *)) {font-size:24px}
+    .prose :where(h2 code):not(:where(.not-prose, .not-prose *)) {font-size:.875em}
+  `]);
+  expect(engine.get(document.getElementById("heading")).fontSize).toBe(24);
+  expect(engine.get(document.getElementById("code")).fontSize).toBe(21);
+  expect(engine.get(document.getElementById("excluded")).fontSize).toBe(16);
+  expect([...document.querySelectorAll(":is(.prose h2 > code)")].map(e => e.id)).toEqual(["code"]);
+  expect(document.getElementById("heading").matches(":is(*)")).toBe(true);
+  expect(document.getElementById("heading").matches(":where(h2 code)")).toBe(false);
   window.happyDOM.abort();
 });
 

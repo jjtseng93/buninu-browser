@@ -113,6 +113,18 @@ test("resolves percentage radii per axis and scales overlapping radii down", () 
   window.happyDOM.abort();
 });
 
+test("independent elliptical corners share the CSS overlap factor and inset clipping per side", () => {
+  const { window, displayList } = displayListFor(
+    '<div style="width:100px;height:80px;border:10px solid black;border-left-width:20px;overflow:hidden;background:red;border-radius:80px 40px 20px 0 / 20px 40px 60px 0"><span>clipped</span></div>',
+    'body {margin:0}');
+  const fill = displayList.items.find(item => item.op === 'fillRect');
+  // Border box130x100: no radii overlap. Each clip subtracts its adjacent borders.
+  expect(fill.radii.corners).toEqual([[80,20],[40,40],[20,60],[0,0]]);
+  const text = displayList.items.find(item => item.op === 'drawText');
+  expect(text.roundedClips[0].radii.corners).toEqual([[60,10],[30,30],[10,50],[0,0]]);
+  window.happyDOM.close();
+});
+
 test("visibility, opacity and overflow/clip clipping apply to descendants", () => {
   const { window, displayList } = displayListFor(`
     <div id="hidden" style="visibility:hidden"><span>gone</span><b style="visibility:visible">shown</b></div>

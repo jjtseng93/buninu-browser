@@ -58,4 +58,5 @@ test("a redirected document has the URL it ended on, and its POST form submits t
   }]);
   // The 303 after it was followed with a GET, and the document is at its URL.
   expect(await context.evaluate("location.href")).toBe(`${origin}/done`);
+  expect(await context.evaluate("document.referrer")).toBe(`${origin}/dir/form?step=1`);
 });
