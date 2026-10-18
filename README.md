@@ -97,6 +97,23 @@ the rest is passed on:
 casty's and the engine's options:
 `--casty --help`, `--headless --help`.
 
+### Websites with self-signed certificates
+
+To browse a website with an untrusted self-signed HTTPS certificate, set
+`NODE_TLS_REJECT_UNAUTHORIZED=0` for that invocation:
+
+```sh
+env NODE_TLS_REJECT_UNAUTHORIZED=0 npx buninu-browser https://localhost:8443
+
+# From a local checkout
+env NODE_TLS_REJECT_UNAUTHORIZED=0 bun index.js https://localhost:8443
+```
+
+This disables TLS certificate verification for the process and inherited
+child processes, including requests to other sites. Use it only for trusted
+test sites; avoid exporting it globally. Without this variable, certificate
+verification remains enabled.
+
 ### Requirements
 
 - [Bun](https://bun.sh) 1.4.2 or
