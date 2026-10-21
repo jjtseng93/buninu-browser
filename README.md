@@ -218,6 +218,12 @@ not start a browser process or CDP listener.
 
 ### Page sandbox
 
+Pages can copy text with `navigator.clipboard.writeText()` after a user click
+or key press on HTTPS (or localhost). The controller writes the clipboard,
+preferring `xclip -selection clipboard`, with platform clipboard commands as
+fallbacks. Clipboard command access stays outside the page sandbox; unavailable
+providers reject the promise instead of reporting a successful copy.
+
 Page JavaScript runs behind three layers:
 
 1. **SES and bindings.** The renderer calls `lockdown()`, and each document
