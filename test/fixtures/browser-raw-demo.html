@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Browser raw frame demo</title>
+<style>body{margin:0;padding:32px;background:#10252f;color:#e4f4fa;font:22px sans-serif}h1{color:#63dedb}a{color:#73d8ff}.box{padding:20px;margin:16px 0;background:#183c4c;border:2px solid #3b7a8d}.track{height:75px;background:#244451;position:relative;overflow:hidden}#bar{position:absolute;left:0;top:0;width:150px;height:75px;background:#49d6c8}.stripe{height:70px;padding:15px;margin-top:10px}</style>
+</head>
+<body>
+<h1>Buninu Browser · Raw BGRA</h1>
+<div class="box">這是 buninu-browser 自己繪製的頁面，不是 Firefox 或 Chromium。<br>Raw 像素經 Casty 傳給 bunterm。請試著捲動、點網址列，或瀏覽其他網站。</div>
+<div class="track">
+<div id="bar">
+</div>
+</div>
+<p id="tick">Animation starting…</p>
+<p>
+<a href="https://example.com">example.com</a> · <a href="https://www.wikipedia.org">Wikipedia</a>
+</p>
+<div class="stripe" style="background:rgb(30,55,75)">Scroll test 1 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(35,62,80)">Scroll test 2 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(40,69,85)">Scroll test 3 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(45,76,90)">Scroll test 4 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(50,83,95)">Scroll test 5 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(55,90,100)">Scroll test 6 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(60,97,105)">Scroll test 7 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(65,104,110)">Scroll test 8 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(70,111,115)">Scroll test 9 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(75,118,120)">Scroll test 10 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(80,125,125)">Scroll test 11 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(85,132,130)">Scroll test 12 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(90,139,135)">Scroll test 13 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(95,146,140)">Scroll test 14 — 中文 ABC 0123456789</div>
+<div class="stripe" style="background:rgb(100,153,145)">Scroll test 15 — 中文 ABC 0123456789</div>
+<script>let n=0;setInterval(()=>{n++;document.getElementById('bar').style.left=((n*7)%900)+'px';document.getElementById('tick').textContent='Animation tick: '+n;},50);</script>
+</body>
+</html>

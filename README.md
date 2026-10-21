@@ -390,6 +390,11 @@ rendered video position, and the output queue/latency for diagnosis.
 
 ### Diagnostics
 
+[`test/fixtures/browser-raw-demo.html`](test/fixtures/browser-raw-demo.html)
+is a self-contained animated page for checking rendering, scrolling, and links
+through Casty and bunterm. Serve it over a local HTTP server to reuse the visual
+demo; it does not require external assets.
+
 casty does not show the browser's stderr. Set `BUNINU_LOG=1` to also write
 it to `buninu-browser.log` in the working directory, or set
 `BUNINU_LOG=<path>` to choose the file. The log includes:
