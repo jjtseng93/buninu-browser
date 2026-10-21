@@ -288,6 +288,16 @@ commands are never replayed, avoiding duplicate input.
 跨來源導航更換 renderer 時，唯讀截圖會等待新的 renderer 載入文件後重試一次；
 捲動命令不會重送，避免重複套用輸入。
 
+DOM-triggered rendering coalesces updates with a 16 ms minimum wait, increased
+to twice the last style/layout rebuild time for expensive documents. This is
+separate from Casty's screenshot interval and is not a 60 FPS guarantee:
+raster work and frame delivery still take time. More frequent updates can
+increase CPU usage on continuously animated pages.
+
+DOM 變更觸發的繪製會以至少 16 ms 等待合併更新；排版昂貴時則延長為上次
+樣式／排版重建耗時的兩倍。這與 Casty 的截圖間隔不同，也不保證 60 FPS；
+光柵繪製與畫面傳遞仍需時間，持續動畫的 CPU 用量可能增加。
+
 The compositor now connects to an authenticated, length-prefixed loopback
 socket before the sandbox is installed, instead of reading numeric fd 3.
 It connects directly to the controller, so a busy page main thread cannot
