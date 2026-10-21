@@ -70,9 +70,21 @@ test('normal CDP routes raw requests to the controller without changing standard
  try{
   await cdp.ready;const {targetId}=await cdp.send('Target.createTarget',{url:'about:blank'});
   const {sessionId}=await cdp.send('Target.attachToTarget',{targetId,flatten:true});cdp.sessionId=sessionId;
-  const {data}=await cdp.send('Page.captureScreenshot',{format:'bgra'});
+  await cdp.send('Emulation.setDeviceMetricsOverride',{width:16,height:9,deviceScaleFactor:1.75,mobile:false});
+  const metrics=await cdp.send('Page.getLayoutMetrics');
+  expect(metrics.cssVisualViewport).toMatchObject({pageX:0,pageY:0});
+  const {data}=await cdp.send('Page.captureScreenshot',{format:'bgra',clip:{x:0,y:0,width:16,height:15/1.75,scale:1}});
   const frame=JSON.parse(data);directory=dirname(frame.path);
-  expect(frame).toMatchObject({version:1,transport:'file',format:'bgra'});expect(existsSync(frame.path)).toBe(true);
+  expect(frame).toMatchObject({version:1,transport:'file',format:'bgra',width:28,height:15});expect(existsSync(frame.path)).toBe(true);
+  cdp.events.length=0;
+  await cdp.send('Page.startScreencast',{format:'png',maxWidth:4,maxHeight:2,clip:{x:0,y:0,width:4,height:2,scale:1},everyNthFrame:1});
+  let event;for(let i=0;i<100;i++){event=cdp.events.find(e=>e.method==='Page.screencastFrame');if(event)break;await Bun.sleep(20);}
+  expect(event).toBeDefined();
+  const crop=Buffer.from(event.params.data,'base64');
+  // Native 1.75 density is preserved, rather than rescaling to maxWidth/maxHeight.
+  expect([crop.readUInt32BE(16),crop.readUInt32BE(20)]).toEqual([7,4]);
+  await cdp.send('Page.screencastFrameAck',{sessionId:event.params.sessionId});
+  await cdp.send('Page.stopScreencast');
   const png=await cdp.send('Page.captureScreenshot',{format:'png'});
   expect([...Buffer.from(png.data,'base64').subarray(0,4)]).toEqual([137,80,78,71]);
  }finally{cdp.close();server.stop(true);browser.close();}
@@ -85,3 +97,33 @@ test('closing during listener startup rejects promptly and a new start remains u
  await expect(pending).rejects.toThrow('closed');
  try{await host.start();expect(host.pid).toBeGreaterThan(0);}finally{host.close();}
 },15000);
+
+for(const compositor of [true,false])test(`fractional CDP clips preserve exact physical dimensions and raw pixels (compositor=${compositor})`,async()=>{
+ const host=new RendererHost({compositor});
+ try {
+  await host.start();await host.call('resize',16,9,1.75);
+  await host.call('loadDocument',{url:'https://clip.test/',contentType:'text/html',source:'<body style="margin:0;background:red"><div style="height:3px;background:blue"></div><div style="height:100px"></div>'});
+  await host.call('whenLoaded');
+  const full=JSON.parse(await host.composite('screenshot',{format:'rgba'}));
+  expect([full.width,full.height]).toEqual([28,16]);
+  const clip={x:0,y:0,width:16,height:15/1.75,scale:1};
+  const cropped=JSON.parse(await host.composite('screenshot',{format:'rgba',clip}));
+  expect([cropped.width,cropped.height]).toEqual([28,15]);
+  expect(readFileSync(cropped.path)).toEqual(readFileSync(full.path).subarray(0,28*15*4));
+  const CK=await kit;const png=CK.MakeImageFromEncoded(Buffer.from(await host.composite('screenshot',{format:'png',clip}),'base64'));
+  expect([png.width(),png.height()]).toEqual([28,15]);png.delete();
+  await host.composite('scroll',0,4);
+  const offset=await host.composite('scrollOffset');
+  const scrolled=JSON.parse(await host.composite('screenshot',{format:'bgra',clip:{...clip,y:offset.y}}));
+  expect([...readFileSync(scrolled.path).subarray(0,4)]).toEqual([0,0,255,255]);
+  await expect(host.composite('screenshot',{format:'rgba',clip:{...clip,width:Infinity}})).rejects.toThrow();
+ }finally{host.close();}
+},20000);
+
+test('scale-one full-width fractional clip borrows contiguous raster bytes',async()=>{
+ const {captureViewport}=await import('../lib/paint/frame.js');
+ const tile={x:0,y:0,scale:1.75,pixelWidth:28,pixelHeight:16,pixels:new Uint8Array(28*16*4)};
+ const frame=captureViewport(tile,0,0,16,9,{x:0,y:0,width:16,height:15/1.75,scale:1});
+ expect(frame.pixels.buffer).toBe(tile.pixels.buffer);
+ expect(frame.pixels.byteLength).toBe(28*15*4);
+});

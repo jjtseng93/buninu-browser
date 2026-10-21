@@ -266,6 +266,21 @@ host removes the directory. Standard PNG/JPEG/WebP output and CLI screenshots
 retain their existing behavior. Casty falls back to its configured codec when
 raw transport is unsupported.
 
+Standard CDP `clip` rectangles also apply to raw captures. Fractional CSS
+width/height are retained until physical-pixel rounding, so a 1.75× viewport
+can deliver exactly 1918×1053 pixels. At `clip.scale: 1`, a full-width crop
+borrows a contiguous raster view instead of rescaling; encoded output uses
+the same crop. `Page.getLayoutMetrics` provides the viewport position so
+Casty can follow document scrolling.
+
+Casty also sends a private `clip` on `Page.startScreencast`. It takes precedence over fallback max limits and crops at native pixel density, without resizing. Width/height are CSS units; output pixels still follow device scale. This extension is not standard CDP.
+
+Casty 也會在 `Page.startScreencast` 傳入私有 `clip`；優先於相容用的 max 限制，以原像素密度裁切、不縮放。寬高是 CSS 單位，實體像素仍隨 device scale 換算。此擴充不是標準 CDP。
+
+標準 CDP `clip` 也適用於 raw 截圖；小數 CSS 尺寸保留到最後才換算成實體像素，
+避免字體大小改變後差一列而觸發 bunterm 縮放。`clip.scale: 1` 的全寬裁切
+直接借用連續像素，不重新縮放；Casty 透過 viewport 位置跟隨頁面捲動。
+
 The compositor now connects to an authenticated, length-prefixed loopback
 socket before the sandbox is installed, instead of reading numeric fd 3.
 It connects directly to the controller, so a busy page main thread cannot
