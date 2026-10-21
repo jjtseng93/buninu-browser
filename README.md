@@ -248,7 +248,32 @@ threads:
 
 When idle, the main thread rasterizes a tile reaching half a viewport above
 and one viewport below the visible area, so the compositor can scroll
-without waiting. Screenshots are encoded with `Bun.Image`.
+without waiting. Standard screenshots are encoded with `Bun.Image`.
+
+Casty can negotiate raw RGBA/BGRA file screenshots with native bunterm. Raw
+pixels travel over the compositor's binary channel to the controller, which
+owns a private temporary directory and returns a versioned file descriptor
+through CDP. The renderer cannot create files: its seccomp policy is unchanged.
+Each delivery has a unique file, bounded to 16 outstanding files / 128 MiB;
+abandoned files expire on subsequent writes after 60 seconds, and closing the
+host removes the directory. Standard PNG/JPEG/WebP output and CLI screenshots
+retain their existing behavior. Casty falls back to its configured codec when
+raw transport is unsupported.
+
+The compositor now connects to an authenticated, length-prefixed loopback
+socket before the sandbox is installed, instead of reading numeric fd 3.
+It connects directly to the controller, so a busy page main thread cannot
+block screenshot or scroll requests. This removes the previous Windows-only
+compositor disablement; the same tests can run on Windows, but this change
+has so far been executed on Linux only. No additional native library is used.
+
+原生 bunterm 可與 Casty 協商 RGBA／BGRA 原始像素檔案。renderer 經二進位通道
+交給 controller 寫檔，不放寬 seccomp；標準截圖與不支援 raw 的終端維持原路徑。
+compositor 改用沙箱啟用前建立、帶驗證的本機連線，不再依賴 fd 3，因此移除了
+Windows 專用的停用條件；目前已實測 Linux，Windows 仍待真機驗證。
+
+`bun tools/bench-raw-capture.js` measures changing-viewport capture delivery
+(including controller file writes for raw), not terminal FPS.
 
 `<video>` can decode and display MP4 video frames with basic playback and
 seeking. Video bytes are fetched through the controller; the renderer uses

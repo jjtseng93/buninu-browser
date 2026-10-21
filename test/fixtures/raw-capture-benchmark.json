@@ -1,0 +1,76 @@
+{
+  "sandbox": {
+    "seccomp": {
+      "installed": true,
+      "reason": null
+    },
+    "ses": {
+      "installed": true,
+      "reason": null
+    }
+  },
+  "capture": [
+    1920,
+    1035
+  ],
+  "reports": [
+    {
+      "format": "png",
+      "count": 20,
+      "meanMs": 168.16266580000007,
+      "medianMs": 167.81952999999976,
+      "bytes": 123889
+    },
+    {
+      "format": "jpeg",
+      "count": 20,
+      "meanMs": 42.5512477499999,
+      "medianMs": 41.08310699999947,
+      "bytes": 150292
+    },
+    {
+      "format": "rgba",
+      "count": 20,
+      "meanMs": 22.61524315000006,
+      "medianMs": 23.11667800000032,
+      "bytes": 7948800
+    },
+    {
+      "format": "bgra",
+      "count": 20,
+      "meanMs": 25.103456849999976,
+      "medianMs": 25.162263999999595,
+      "bytes": 7948800
+    },
+    {
+      "format": "bgra",
+      "count": 20,
+      "meanMs": 24.67374660000005,
+      "medianMs": 25.82330600000023,
+      "bytes": 7948800
+    },
+    {
+      "format": "rgba",
+      "count": 20,
+      "meanMs": 21.321299350000118,
+      "medianMs": 21.798502999999982,
+      "bytes": 7948800
+    },
+    {
+      "format": "jpeg",
+      "count": 20,
+      "meanMs": 43.68695314999977,
+      "medianMs": 46.23293099999864,
+      "bytes": 150292
+    },
+    {
+      "format": "png",
+      "count": 20,
+      "meanMs": 169.70291704999983,
+      "medianMs": 169.88830599999892,
+      "bytes": 123889
+    }
+  ],
+  "method": "Native Intel i5-5200U, alternating viewport crops, three warmups then 20 captures per pass; round trip includes controller file write for raw. Not terminal FPS.",
+  "date": "2026-10-22"
+}
