@@ -127,3 +127,26 @@ test('scale-one full-width fractional clip borrows contiguous raster bytes',asyn
  expect(frame.pixels.buffer).toBe(tile.pixels.buffer);
  expect(frame.pixels.byteLength).toBe(28*15*4);
 });
+
+test('in-flight raw capture follows an origin renderer swap without exposing compositor closed',async()=>{
+ const {createBrowser}=await import('../lib/headless-shell.js');
+ const server=Bun.serve({port:0,fetch:()=>new Response('<body style="margin:0;background:rgb(211,73,19)">',{headers:{'content-type':'text/html'}})});
+ const browser=await createBrowser({spareRenderer:false});
+ const original=RendererHost.prototype.composite;let rejectCapture,armed=true;
+ const reached=Promise.withResolvers();
+ RendererHost.prototype.composite=function(method,...params){
+  if(armed&&method==='screenshot'){
+   armed=false;reached.resolve();return new Promise((_,reject)=>rejectCapture=reject);
+  }
+  return original.call(this,method,...params);
+ };
+ try{
+  const pending=browser.context.screenshot({format:'bgra'});
+  await reached.promise;
+  await browser.context.navigate(`http://127.0.0.1:${server.port}/`);
+  rejectCapture(Error('compositor closed'));
+  const frame=JSON.parse(await pending);const bytes=readFileSync(frame.path);
+  expect(frame.format).toBe('bgra');expect([...bytes.subarray(0,4)]).toEqual([19,73,211,255]);
+  unlinkSync(frame.path);
+ }finally{RendererHost.prototype.composite=original;browser.close();server.stop(true);}
+},20000);

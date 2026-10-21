@@ -281,6 +281,13 @@ Casty 也會在 `Page.startScreencast` 傳入私有 `clip`；優先於相容用�
 避免字體大小改變後差一列而觸發 bunterm 縮放。`clip.scale: 1` 的全寬裁切
 直接借用連續像素，不重新縮放；Casty 透過 viewport 位置跟隨頁面捲動。
 
+Read-only captures interrupted by an origin renderer swap retry once against
+its replacement, after the new renderer has loaded its document. Scroll
+commands are never replayed, avoiding duplicate input.
+
+跨來源導航更換 renderer 時，唯讀截圖會等待新的 renderer 載入文件後重試一次；
+捲動命令不會重送，避免重複套用輸入。
+
 The compositor now connects to an authenticated, length-prefixed loopback
 socket before the sandbox is installed, instead of reading numeric fd 3.
 It connects directly to the controller, so a busy page main thread cannot
