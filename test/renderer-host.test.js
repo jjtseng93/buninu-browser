@@ -70,3 +70,14 @@ test("fetches only http(s)/data resources on the renderer's behalf", async () =>
     .toEqual({ error: "blocked script-with-cookies request for https:" });
   expect(requested).toEqual(["https://example.test/a.css"]);
 });
+
+
+test("explicit close prevents queued calls and captures from restarting the renderer", async () => {
+  const renderer = host();
+  const queued = renderer.call("title");
+  renderer.close();
+  await expect(queued).rejects.toThrow("Renderer is closed");
+  await expect(renderer.start()).rejects.toThrow("Renderer is closed");
+  await expect(renderer.composite("screenshot", { format: "bgra" })).rejects.toThrow("Renderer is closed");
+  expect(renderer.pid).toBeNull();
+});
