@@ -43,6 +43,11 @@ const INFORMATION = new Map([
 /** Splits the command line into a frontend and the arguments it receives. */
 export function chooseFrontend(argv) {
   const [first, ...rest] = argv;
+
+  // wayland handle begin: independent native frontend
+  if (first === "--wayland") return { frontend: "wayland", args: rest };
+  // wayland handle end
+
   if (first === "--casty") return { frontend: "casty", args: rest };
   if (first === "--headless") return { frontend: "headless", args: rest };
   if (RESERVED_FRONTENDS.has(first)) return { frontend: first.slice(2), args: rest, reserved: true };
@@ -66,13 +71,17 @@ export function castyCommand(args, which = Bun.which) {
 }
 
 export function usage(name = packageInfo.name) {
+  // wayland handle begin: frontend help
+  const waylandHelp = '  --wayland\n      Experimental standard Wayland SHM window; --wayland --help for options\n';
+  // wayland handle end
+
   return `Usage:
   ${name} [URL] [CASTY_OPTIONS...] [-- BROWSER_FLAGS...]
   ${name} --casty [CASTY_ARGS...]
   ${name} --headless [ENGINE_OPTIONS...]
 
 Frontends (first argument only):
-  --casty
+${typeof waylandHelp === "undefined" ? "" : waylandHelp}  --casty
       Browse in the terminal with casty (the default)
       Needs a terminal with the Kitty graphics protocol
       Any first argument not listed here also starts casty,
@@ -147,6 +156,13 @@ if (import.meta.main) {
     await printReadme();
     process.exit(0);
   }
+
+  // wayland handle begin: launch the isolated frontend
+  if (frontend === "wayland") {
+    process.exit(await run([process.execPath, join(import.meta.dir, "frontends/wayland/index.js"), ...args]) ?? 1);
+  }
+  // wayland handle end
+
   const code = frontend === "headless"
     ? await run([process.execPath, ENGINE, ...args])
     : await run(castyCommand(args), { ...process.env, CASTY_BROWSER: ENGINE });

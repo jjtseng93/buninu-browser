@@ -10,7 +10,14 @@ directly as JavaScript and WebAssembly.
 > [!WARNING]
 > Buninu Browser is in an early experimental stage and is not yet a
 > general-purpose browser engine or replacement for Chromium. The headless
-> shell is the initial frontend; native windowed frontends are planned later.
+> shell is the initial frontend; a standard Wayland frontend is experimental.
+
+## Experimental Wayland frontend
+
+`bun index.js --wayland URL` opens a standard Wayland SHM window using
+`WAYLAND_DISPLAY` and `XDG_RUNTIME_DIR`. Casty remains the default.
+See [frontend details and limitations](frontends/wayland/README.md).
+This does not yet provide full Quickshell/Flea/Omastorm compatibility.
 
 ## Usage
 
