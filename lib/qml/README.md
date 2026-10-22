@@ -35,7 +35,7 @@ Scripting disabled shows source rather than silently enabling execution.
 - `loader.js`: bounded, per-document import graph through the existing resource bridge;
   relative/URI imports, qmldir entries, singletons and JS dependencies.
 - `document.js`: DOM factory and JS identifier/binding translation. It never
-  executes QML expressions in the host. Generated JS runs as an ordinary page script.
+  evaluates QML expressions during compilation. Generated JS runs in the selected renderer realm.
 - `reactive.js`: small dependency tracker with microtask batching, dynamic
   dependency cleanup and an update-loop limit. Not a SolidJS dependency.
 - `runtime.js`: DOM/CSS updates and viewport signals, serialized into the page
@@ -96,18 +96,35 @@ Find them with:
 rg -n 'qml handle' lib
 ```
 
-Only two existing files contain integration:
+Existing integration points are marked `qml handle`:
 
-1. `lib/document-types.js`: remove both marked blocks (import and classification).
-2. `lib/renderer/page-renderer.js`: remove both marked blocks (import and DOM
-   factory). The ordinary `let isHtml`, `let parsed`, and `parsed ??=` fallback
-   remain outside the blocks. No original lines need to be restored. The fallback
-   calls the HTML parser only when no frontend has supplied a document, so QML
-   does not construct and discard an unnecessary HTML document.
+1. `lib/document-types.js`: format recognition, unchanged by host support.
+2. `lib/renderer/page-renderer.js`: QML DOM factory, host attachment and disposal.
+   The ordinary `let isHtml`, `let parsed`, and `parsed ??=` HTML fallback remain.
+3. `lib/headless-shell.js`: QML-specific arguments and renderer selection.
+   The ordinary origin key, spare acquisition and navigation remain outside blocks.
+4. `lib/renderer/host.js`: QML-only environment inheritance. The default empty
+   environment (plus Windows SystemRoot) remains outside the block.
+5. `lib/renderer/main.js`: the internal QML-host flag overrides ordinary settings.
+   The original `--dangerously-allow-host-js` test and reason remain outside.
 
-Then remove `lib/qml`, the `test/qml*.test.js` tests, `test/manual-flea-qml.js`, and `test/fixtures/qml`. No changes to
-package.json, the launcher, CSS/layout engine, page realm, compositor or transport
-are needed. Tests stay in QML-specific files.
+Delete every marked begin/end block (including the markers) in these five files,
+then remove `lib/qml` and the QML-specific tests/fixtures. No replacement statements
+or restored function bodies are needed. General-purpose local variables and
+acquisition callbacks remain valid without QML. No changes were made to the page
+realm, CSS/layout engine, compositor, transport or package entry points.
+QML types, host services and compatibility stay under `lib/qml`.
+
+Verify removal without changing the working tree:
+
+```sh
+bun test/manual-qml-removal.js
+```
+
+This copies the browser to a temporary directory, deletes the 13 integration
+blocks and `lib/qml`, then runs ordinary renderer, navigation and headless tests.
+暫存副本會實際刪掉接入區塊及 QML 目錄再測試，不會改動工作目錄。
+
 
 ## Reference checkouts
 
@@ -127,8 +144,9 @@ here using existing Acorn, rather than importing an old QML runtime or Python to
 並把綁定與事件產生為普通頁面 JavaScript；不產生 HTML，不保留另一棵 QML
 元件樹，也不新增原生依賴。所有核心程式集中在本目錄。
 
-外部僅有兩個檔案、四個 `qml handle begin/end` 區塊。移除方式如上，
-四個接入區塊都能直接刪除，不需要補回原本程式。一般文件的建立流程留在區塊外。
+外部接入集中在上述五個檔案的 `qml handle begin/end` 區塊。
+刪除全部標記區塊及本目錄即可移除功能，不需要補回任何程式；QML 專用測試與
+fixtures 可一併移除。一般文件建立、renderer 選擇及隔離環境的預設值都留在區塊外。
 已提供互動元件與下述 import 路徑；不宣稱可跑完整 Flea。
 
 ## Imports and component scope / 匯入與元件作用域
@@ -145,18 +163,18 @@ here using existing Acorn, rather than importing an old QML runtime or Python to
 - JS imports (`import "logic.js" as Logic`), nested `.import "other.js" as Other`,
   exported top-level functions/variables, and `.pragma library`. Ordinary JS state
   belongs to its component instance; library JS shares state within the document.
-- Source code runs only in the existing page realm. The loader never evaluates it
-  in the host or exposes Bun/filesystem/process APIs to QML.
+- Source code runs in the renderer, never in the controller. Local top-level QML
+  uses a dedicated host renderer; HTTP(S) QML retains the isolated page realm.
 
 The loader accepts file and HTTP(S) resource URLs using existing resource permissions.
 Remote QML cannot import local files. A data URL can use built-ins but cannot resolve
 relative imports. Limits: 128 resource requests, 256 KiB per imported source, 4 MiB
 combined imported sources, import depth 48 and 2,000 expanded objects. Recursive
-component construction, singleton/JS dependency cycles, missing imports and native
+component construction, JS dependency cycles, missing imports and native
 plugin directives produce a visible diagnostic and the original document source.
 
 Built-in Qt module version numbers are accepted, not a claim of full Qt API coverage.
-There is no system QML_IMPORT_PATH search, version-suffixed module directories,
+Local QML searches QML_IMPORT_PATH for URI modules. There are no version-suffixed module directories,
 native Qt plugin loading, qmldir dependency/prefer directives, dynamic Loader,
 or `.mjs`/ES-module export syntax yet. Rich text and the remaining QML/Qt types
 remain separate features. Component completion and binding semantics are still
@@ -166,9 +184,9 @@ an experimental subset, not a full Qt compatibility claim.
 載入路徑。每份元件有獨立 id／屬性；singleton 與 library JS 在同一文件共用，
 重新導航時重建。支持屬性覆寫、readonly、alias 與普通 JS 語法的方法。
 
-所有資源仍走 Browser 現有權限與資源介面，程式只在頁面 realm 執行。
+HTTP QML 仍走隔離的頁面 realm；本機 QML 使用獨立 host renderer，具備本機應用程式權限。
 不支援的原生服務、模組或語法會明確報錯，不注入替代品。
-命名模組目前只查匯入檔案及入口文件旁的對應目錄，不查系統 Qt 安裝路徑。
+命名模組查匯入檔案、入口文件及本機 QML_IMPORT_PATH；不載入原生 Qt plugin。
 
 ```sh
 bun index.js --wayland file://"$PWD"/test/fixtures/qml/imports/main.qml
@@ -187,3 +205,41 @@ Flea 範例已改用真正 import，按鈕可同時更新兩個 esc 的共用主
 Reference consulted: qmlweb's per-file import contexts and qualified directory
 lookup (`../qmlweb/src/engine/QMLEngine.js`, MIT). No qmlweb runtime dependency or
 source code was copied; our graph is compiled away into the existing DOM/page JS.
+
+
+## Local QML applications / 本機 QML 應用程式
+
+Local `file:` QML automatically uses host JavaScript in a dedicated renderer,
+with the application's environment (HOME, PATH, XDG_RUNTIME_DIR, QML_IMPORT_PATH).
+This is executable application code with Bun access, not sandboxed web content.
+A reload starts a fresh renderer. Navigating to ordinary HTML, including a file in
+that same directory, swaps back to the normal renderer; host objects are not reused.
+Explicit `--dangerously-allow-host-js` keeps its existing all-pages meaning.
+
+The QML-only `lib/qml/host.js` adapter supplies filesystem reads/watches and process
+execution. FileView reads/reload/waitForJob are synchronous; Process stdout/stderr
+collectors and exit handlers are asynchronous. Resources are disposed on document
+replacement or renderer termination. Browser input, layout, raster, CDP and Wayland
+frontends continue to use their existing paths. Integrations carry `qml handle`
+markers. Remote QML does not receive this adapter or the host environment.
+
+This stage adds object-valued properties, required properties, signals,
+Connections, Timer, FileView, Process/StdioCollector, TextMetrics/FontMetrics,
+Qt color values and the color helpers used by Theme. Mutually referring singleton
+objects are allocated before their bindings run (e.g. Theme/Glass, Color/Style).
+It does not implement every Qt/Quickshell method: Qt.createComponent/Qt.binding
+and the live Hyprland GlassTagger path remain explicit unsupported operations.
+
+本機 QML 自動使用專屬 host renderer，繼承主機環境，可讀檔、監看與執行程序。
+重新載入會建立新 renderer；離開 QML 回到普通 HTML 時會換回原本隔離路徑，
+並清理原本的監看與程序。HTTP QML 不會取得這些主機能力。
+本階段已接通真正 Flea Theme 與 Omarchy Commons；不是完整 Flea 相容宣告。
+
+```sh
+bun test/manual-flea-theme.js
+bun test test/qml-host.test.js
+```
+
+The real Theme fixture and its upstream licenses/provenance are in
+`test/fixtures/qml/flea-theme/README.md`. The earlier `manual-flea-qml.js` remains
+an intentionally small test-theme demonstration.

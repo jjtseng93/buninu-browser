@@ -1,0 +1,296 @@
+.pragma library
+
+// The Add-network-place form is a form over a gvfs URI, never a second mount system: a protocol
+// picks the scheme, prefills the port and swaps the field set, and the Mounts-as line always shows
+// the exact URI the dialog will hand to gio mount.
+
+// The five the canvas draws, in the order it draws them.
+var PROTOCOLS = ["SMB", "SFTP", "FTPS", "WebDAV", "NFS"]
+
+// Which fields each protocol asks for. "path" is the label the canvas gives that row, which differs
+// per protocol because the thing it names differs: a share, a remote path, an export.
+var FIELDS = {
+    "SMB": { pathLabel: "Share",  credentials: true,  domain: true,  tls: false },
+    "SFTP":   { pathLabel: "Path",   credentials: true,  domain: false, tls: false },
+    "FTPS":   { pathLabel: "Path",   credentials: true,  domain: false, tls: true },
+    "WebDAV": { pathLabel: "Path",   credentials: true,  domain: false, tls: true },
+    // NFS has no credentials at all: the export is authorised by the server, not by a password.
+    "NFS": { pathLabel: "Export", credentials: false, domain: false, tls: false }
+}
+
+// The TLS box flips two schemes and defaults on, which is what the canvas draws ticked.
+function scheme(protocol, tls) {
+    switch (protocol) {
+    case "SMB": return "smb"
+    case "SFTP": return "sftp"
+    case "FTPS": return tls ? "ftps" : "ftp"
+    case "WebDAV": return tls ? "davs" : "dav"
+    case "NFS": return "nfs"
+    }
+    return ""
+}
+
+function fieldsFor(protocol) {
+    return FIELDS[protocol] || FIELDS["SMB"]
+}
+
+// The port the form prefills. It belongs to the scheme, never to the protocol: WebDAV builds two
+// schemes and SCHEME_PORTS below is the one table both this and the rail's dedup read it out of.
+function defaultPort(protocol, tls) {
+    return defaultPortFor(scheme(protocol, tls))
+}
+
+// The exact URI gio mount will be handed. Empty when there is not enough to build one, so the
+// Mounts-as line shows nothing rather than a half-formed address.
+function uri(form) {
+    var host = String(form.host || "").trim()
+    var port = String(form.port || "").trim()
+    if (!validHost(host) || !validPort(port)) {
+        return ""
+    }
+    var spec = fieldsFor(form.protocol)
+    var head = scheme(form.protocol, form.tls) + "://"
+    if (spec.credentials) {
+        head += userPart(form, spec)
+    }
+    head += host
+    // Keep canvas defaults in the form, but omit them because GVFS NFS rejects an explicit :2049.
+    if (port.length > 0 && Number(port) !== defaultPort(form.protocol, form.tls)) {
+        head += ":" + port
+    }
+    return head + pathPart(form.path)
+}
+
+function validHost(host) {
+    return /^\[[0-9A-Fa-f:.]+\]$/.test(host) || /^[A-Za-z0-9._-]+$/.test(host)
+}
+
+function validPort(port) {
+    if (port.length === 0) {
+        return true
+    }
+    if (!/^[0-9]+$/.test(port)) {
+        return false
+    }
+    var number = Number(port)
+    return number >= 1 && number <= 65535
+}
+
+// smb://DOMAIN;user@host/share is the form a domain takes; without one it is just user@host.
+function userPart(form, spec) {
+    var user = String(form.user || "").trim()
+    if (user.length === 0) {
+        return ""
+    }
+    var domain = spec.domain ? String(form.domain || "").trim() : ""
+    return (domain.length > 0 ? encodeURIComponent(domain) + ";" : "")
+        + encodeURIComponent(user) + "@"
+}
+
+function pathPart(path) {
+    var text = String(path || "").trim()
+    if (text.length === 0) {
+        return "/"
+    }
+    var parts = text.split("/")
+    for (var i = 0; i < parts.length; i++) {
+        parts[i] = encodeURIComponent(parts[i])
+    }
+    var encoded = parts.join("/")
+    return encoded.charAt(0) === "/" ? encoded : "/" + encoded
+}
+
+// The label the sidebar row will carry: what the operator typed, or the last part of the path.
+function label(form) {
+    var given = String(form.label || "").trim()
+    if (given.length > 0) {
+        return given
+    }
+    var path = String(form.path || "").replace(/\/+$/, "")
+    var cut = path.lastIndexOf("/")
+    var leaf = cut >= 0 ? path.substring(cut + 1) : path
+    return leaf.length > 0 ? leaf : String(form.host || "").trim()
+}
+
+// A form with nothing to mount cannot be saved, which is what greys the Save row out.
+function complete(form) {
+    var host = String(form.host || "").trim()
+    var port = String(form.port || "").trim()
+    return validHost(host) && validPort(port)
+}
+
+// The port each scheme drops, which is a property of the scheme and not of the protocol the form
+// picked: WebDAV builds two schemes whose ports differ, and one number for both stripped a real
+// ":443" off "dav://" and left its real ":80" on, the duplicate rail row this exists to remove.
+// Measured on this box against gvfs 1.60.2 and glib2 2.88.3 by round-tripping each spelling through
+// Gio.File, the uri mapper "gio mount -l" prints through: gio drops smb 445, sftp 22, ftp 21,
+// ftps 21 (not IANA's 990), dav 80 and davs 443, and keeps every other port it is given, ftps 990
+// and dav 443 included. It drops no nfs port at all, so 2049 is here for the other half of the job:
+// the port an nfs client uses when the line omits one, so two spellings of one export make one row.
+var SCHEME_PORTS = {
+    "smb": 445, "sftp": 22, "ftp": 21, "ftps": 21, "dav": 80, "davs": 443, "nfs": 2049
+}
+
+// A bookmarks line is arbitrary text, so an inherited Object member must never answer as a port.
+function defaultPortFor(uriScheme) {
+    var want = String(uriScheme || "").toLowerCase()
+    return SCHEME_PORTS.hasOwnProperty(want) ? SCHEME_PORTS[want] : 0
+}
+
+// "gio mount -l" never reports a scheme's default port and the add form spells out the one it
+// prefilled, so the same share arrives spelled two ways and must resolve to one rail row. The port
+// is found in the authority alone: a ":" or an "@" further along belongs to the path.
+function stripDefaultPort(uri) {
+    var text = String(uri || "")
+    var auth = authority(text)
+    var tail = ":" + defaultPortFor(schemeOf(text))
+    // A bracketed IPv6 literal ends in "]", so its own trailing digits can never match this tail.
+    if (auth.length === 0 || tail === ":0" || auth.substring(auth.length - tail.length) !== tail)
+        return text
+    var mark = text.indexOf("://") + 3
+    return text.substring(0, mark) + auth.substring(0, auth.length - tail.length)
+        + text.substring(mark + auth.length)
+}
+
+// The scheme a built or bookmarked URI carries, lowercased; "" when the text is not a URI at all.
+function schemeOf(uri) {
+    var text = String(uri || "")
+    var mark = text.indexOf("://")
+    return mark < 0 ? "" : text.substring(0, mark).toLowerCase()
+}
+
+// Everything between "://" and the next "/", which is the only place a userinfo, a host or a port
+// can live: a scan over the whole URI would read a "@" or a ":" inside the path as one of those.
+function authority(uri) {
+    var text = String(uri || "")
+    var mark = text.indexOf("://")
+    if (mark < 0)
+        return ""
+    var rest = text.substring(mark + 3)
+    var slash = rest.indexOf("/")
+    return slash < 0 ? rest : rest.substring(0, slash)
+}
+
+// The host alone: userinfo dropped at the authority's own last "@", a bracketed IPv6 literal kept
+// whole because its colons are not a port separator, and any real port dropped.
+function hostOf(uri) {
+    var auth = authority(uri)
+    var at = auth.lastIndexOf("@")
+    var hostPort = at < 0 ? auth : auth.substring(at + 1)
+    if (hostPort.charAt(0) === "[") {
+        var close = hostPort.indexOf("]")
+        return close < 0 ? hostPort : hostPort.substring(0, close + 1)
+    }
+    var colon = hostPort.indexOf(":")
+    return colon < 0 ? hostPort : hostPort.substring(0, colon)
+}
+
+// gvfsd renders a network mount as "<share> <word> <host>" and translates that word, so issue #36's
+// rule reads the URI instead: the tail that gets cut is this URI's own host, in any language, and a
+// label that does not end in it is left exactly as gio gave it.
+function shareName(rawLabel, uri) {
+    var text = String(rawLabel || "")
+    var host = hostOf(uri)
+    var head = text.substring(0, text.length - host.length)
+    if (host.length === 0 || head.length === 0 || text.substring(head.length) !== host)
+        return text
+    // The one assumption left after the host check: gvfsd's connector is a single whitespace-delimited
+    // word in whatever language it renders. A translation using two would leave one of them on the
+    // name, a wrong label and never a wrong destination; a head this does not shorten is left whole.
+    var name = head.replace(/\s+\S+\s+$/, "")
+    return name.length > 0 && name !== head ? name : text
+}
+
+// Sample input: smb://dan@192.168.1.75/test, the reporter's share, and its FUSE folder
+// /run/user/1000/gvfs/smb-share:server=192.168.1.75,share=test,user=dan. A FUSE path for
+// another user, another share or another server must never open as this share's listing:
+// a mount problem answers as one instead of reading like an unreadable directory.
+function decodeSegment(raw) {
+    try { return decodeURIComponent(String(raw)) } catch (e) { return String(raw) }
+}
+
+// The smb:// request as gio sees it: the user past any DOMAIN; prefix, the host without
+// a port, and the share as the first path segment. Null when not an smb:// URI at all.
+function smbParts(uri) {
+    if (schemeOf(uri) !== "smb") return null
+    var auth = authority(uri)
+    if (auth.length === 0) return null
+    var at = auth.lastIndexOf("@")
+    var info = at < 0 ? "" : auth.substring(0, at)
+    var semi = info.indexOf(";")
+    var user = semi < 0 ? info : info.substring(semi + 1)
+    var mark = String(uri).indexOf("://") + 3
+    var rest = String(uri).substring(mark + auth.length)
+    if (rest.charAt(0) === "/") rest = rest.substring(1)
+    var cut = rest.indexOf("/")
+    var share = cut < 0 ? rest : rest.substring(0, cut)
+    return { user: decodeSegment(user), host: hostOf(uri).toLowerCase(), share: decodeSegment(share) }
+}
+
+// The smb-share: FUSE directory gio info prints a local path for, or null when the path
+// is no smb FUSE directory at all. Null is undecided, never a mismatch: an unknown shape
+// opens exactly as before rather than refusing a mount over a format this never learned.
+function fuseSmbParts(path) {
+    var m = String(path || "").match(/smb-share:server=([^,\/]+),share=([^,\/]+)(?:,user=([^,\/]+))?/)
+    if (!m) return null
+    return { host: String(m[1]).toLowerCase(), share: m[2], user: m[3] || "" }
+}
+
+// Whether gio info's answer belongs to the smb:// request that asked for it. True for any
+// non-smb URI and whenever either side will not parse; false only on a parsed mismatch, a
+// user the answer drops or changes above all, so that answer is refused as a mount failure.
+function smbFuseMatches(uri, fusePath) {
+    if (schemeOf(uri) !== "smb") return true
+    var want = smbParts(uri)
+    var got = fuseSmbParts(fusePath)
+    if (!want || !got) return true
+    var wantUser = String(want.user || "")
+    var gotUser = String(got.user || "")
+    var semi = gotUser.indexOf(";")
+    if (semi >= 0) gotUser = gotUser.substring(semi + 1)
+    return want.host === got.host
+        && String(want.share).toLowerCase() === String(got.share).toLowerCase()
+        && wantUser.toLowerCase() === gotUser.toLowerCase()
+}
+
+// Sample input: uri smb://dan@192.168.1.75/test with gio info printing the path without
+// ,user=dan while only the user=dan folder exists. Answers the entry whose user the URI
+// names; with no user the single share match wins, several prefer the desktop login.
+function smbResolve(uri, fusePaths, login) {
+    var found = { path: "", users: [] }
+    var want = smbParts(uri)
+    if (!want) return found
+    var hits = []
+    var list = fusePaths || []
+    for (var i = 0; i < list.length; i++) {
+        var got = fuseSmbParts(list[i])
+        if (!got || got.host !== want.host) continue
+        if (String(got.share).toLowerCase() !== String(want.share).toLowerCase()) continue
+        hits.push({ path: list[i], user: String(got.user || "") })
+    }
+    if (String(want.user || "").length > 0) {
+        for (var j = 0; j < hits.length; j++) {
+            if (hits[j].user.toLowerCase() === String(want.user).toLowerCase()) {
+                found.path = hits[j].path
+                return found
+            }
+        }
+        return found
+    }
+    if (hits.length === 1) {
+        found.path = hits[0].path
+        return found
+    }
+    if (hits.length > 1) {
+        for (var k = 0; k < hits.length; k++) {
+            if (hits[k].user.toLowerCase() === String(login || "").toLowerCase()) {
+                found.path = hits[k].path
+                return found
+            }
+        }
+        for (var m = 0; m < hits.length; m++) {
+            if (found.users.indexOf(hits[m].user) < 0) found.users.push(hits[m].user)
+        }
+    }
+    return found
+}

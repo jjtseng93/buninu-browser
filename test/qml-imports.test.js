@@ -37,12 +37,16 @@ test('HTTP imports share library JS, reset on navigation, and keep ordinary HTML
  const browser=await createBrowser({spareRenderer:false});
  try{
    const url=`http://127.0.0.1:${server.port}/main.qml`;
-   await browser.context.navigate(url);
+   let loaded;const ready=new Promise(resolve=>{loaded=browser.context.onLifecycle(name=>{if(name==='load')resolve();});});
+   await browser.context.navigate(url);await ready;loaded();
    expect(await browser.context.evaluate('document.body.textContent')).toContain('one:1:1/1');
    expect(await browser.context.evaluate('document.body.textContent')).toContain('two:1:1/2');
    expect(requests.filter(p=>p==='/theme/Theme.qml').length).toBe(1);
+   expect(await browser.context.evaluate('typeof Bun')).toBe('undefined');
+   expect(await browser.context.evaluate('typeof __qmlHost')).toBe('undefined');
    await browser.context.evaluate('document.querySelector("[data-qml-type=MouseArea]").click()');
-   await browser.context.reload();
+   const reloaded=new Promise(resolve=>{loaded=browser.context.onLifecycle(name=>{if(name==='load')resolve();});});
+   await browser.context.reload();await reloaded;loaded();
    expect(await browser.context.evaluate('document.body.textContent')).toContain('one:1:1/1');
    await browser.context.navigate(`http://127.0.0.1:${server.port}/plain`);
    expect(await browser.context.evaluate('document.title')).toBe('plain');
@@ -72,7 +76,7 @@ test('readonly component properties reject external overrides',async()=>{
  expect(result.document.body.textContent).toContain('Cannot override readonly');
 });
 
-test('singleton cycles, absent pragma, duplicate aliases and import budgets are explicit',async()=>{
+test('mutual singleton references, absent pragma, duplicate aliases and import budgets are explicit',async()=>{
  const {loadQmlDocument}=await import('../lib/qml/document.js');
  const url='https://qml.test/main.qml';
  const files={
@@ -81,7 +85,8 @@ test('singleton cycles, absent pragma, duplicate aliases and import budgets are 
   'https://qml.test/B.qml':'pragma Singleton\nimport QtQuick\nQtObject { property int n: A.n }',
  };
  const result=await loadQmlDocument('import QtQuick\nText { text: A.n }',url,{fetchResource:memoryFetch(files)});
- expect(result.document.body.textContent).toContain('Cyclic singleton dependency');
+ // Singleton references may be mutual (Theme/Glass and Color/Style); object construction must terminate.
+ expect(result.document.querySelector('script')).not.toBeNull();
  files['https://qml.test/B.qml']='import QtQuick\nQtObject { property int n: 1 }';
  await expect(loadQmlGraph('import QtQuick\nText { text: A.n }',url,memoryFetch(files))).rejects.toThrow('needs pragma Singleton');
  await expect(loadQmlGraph('import QtQuick as Q\nimport QtQuick.Controls as Q\nItem {}',url,memoryFetch({}))).rejects.toThrow('Duplicate QML import alias');
