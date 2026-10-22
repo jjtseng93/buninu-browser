@@ -59,3 +59,25 @@ Rectangle {
   expect(await host.call('evaluate','document.body.textContent')).toBe('ordinary HTML');
  }finally{host.close();}
 },30000);
+
+test('Quickshell multiply fixture uses editable DOM controls and click handlers',async()=>{
+ const host=new RendererHost({timeout:20000});
+ const source=await Bun.file(new URL('./fixtures/qml/multiply.qml',import.meta.url)).text();
+ try{
+  await host.start();await host.call('resize',640,480,1);
+  await host.call('loadDocument',{url:'https://qml.test/multiply.qml',source,contentType:'text/x-qml'});await host.call('whenLoaded');
+  expect(await host.call('evaluate',"document.querySelectorAll('input').length")).toBe(3);
+  const point=async selector=>JSON.parse(await host.call('evaluate',`JSON.stringify((()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2]})())`));
+  const click=async selector=>host.call('click',...await point(selector));
+  const value=()=>host.call('evaluate',"document.getElementById('result').value");
+  await click('button');expect(await value()).toBe('42');
+  await click('#first');await host.call('press','a',{modifiers:2});await host.call('type','-2.5');
+  await click('#second');await host.call('press','a',{modifiers:2});await host.call('type','4');
+  await click('button');expect(await value()).toBe('-10');
+  await click('#result');await host.call('type','999');expect(await value()).toBe('-10');
+  await click('#first');await host.call('press','a',{modifiers:2});await host.call('press','Backspace');
+  await click('button');expect(await value()).toBe('Please enter two valid numbers');
+  const rects=JSON.parse(await host.call('evaluate',"JSON.stringify([...document.querySelectorAll('input,button')].map(e=>{const r=e.getBoundingClientRect();return [r.x,r.y,r.width,r.height]}))"));
+  for(let i=1;i<rects.length;i++)expect(rects[i][1]).toBeGreaterThanOrEqual(rects[i-1][1]+rects[i-1][3]);
+ }finally{host.close();}
+},30000);

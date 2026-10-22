@@ -41,10 +41,28 @@ Scripting disabled shows source rather than silently enabling execution.
 
 ## Initial subset
 
-Imports: `QtQuick` and `Quickshell`, optionally with a numeric version. Version
+Imports: `QtQuick`, `QtQuick.Controls` and `Quickshell`, optionally with a numeric version. Version
 syntax is accepted but does not claim compatibility with that module's API.
 
-Types: `Item`, `Rectangle`, `Text`, `MouseArea`, `FloatingWindow`.
+Types: `Item`, `Rectangle`, `Text`, `MouseArea`, `FloatingWindow`, `Column`,
+`Label`, `TextField`, `Button`.
+
+The Controls subset maps directly to DOM inputs/buttons; it does not emulate Qt's
+style engine. Column uses CSS flex column/gap and natural DOM height. TextField
+synchronizes user input with `text`, supports `readOnly`, `placeholderText`,
+`selectByMouse` (CSS selection policy) and `Accessible.name` (ARIA label).
+Ctrl+A/Meta+A selects the field; Button supports Enter/Space activation.
+Mouse selection/caret behavior otherwise follows the browser's existing input support.
+A root FloatingWindow fills the supplied browser viewport; implicit dimensions do
+not resize the native window yet.
+
+`test/fixtures/qml/multiply.qml` is the same interactive three-field calculator
+verified with real Quickshell. Open it with `bun index.js --wayland file:///…/multiply.qml`.
+
+新增的 Column、Label、TextField、Button 直接映射成 DOM/CSS，不模擬 Qt 主題。
+文字輸入會同步到 QML 的 text，支援唯讀、提示文字、無障礙名稱與 Ctrl+A 全選。
+Column 使用 CSS flex 排列；滑鼠選字／游標仍受現有 Browser 輸入能力限制。
+乘法範例與真正 Quickshell 測過的是同一份 QML，沒有針對範例檔名的特判。
 
 Properties: `id`; initialized `property int/real/bool/string/var/color` (no Qt type
 coercion yet); width/height/implicitWidth/implicitHeight, x/y, color, radius,
@@ -54,7 +72,7 @@ Handlers: `onClicked`, `Component.onCompleted`. JS expressions/blocks are parsed
 by Acorn, but QML scope translation is experimental, not full Qt name resolution.
 
 Not implemented: custom QML components, import loading/qmldir, required/readonly/
-alias properties, signal declarations, QtQuick Controls, ListView/delegates,
+alias properties, signal declarations, the remaining QtQuick Controls, ListView/delegates,
 animations, image/media objects, Quickshell process/IO/services, Omarchy modules,
 multiple OS windows. Flea cannot run on this initial subset. Unsupported features
 should be added explicitly with tests, not silently treated as empty items.
