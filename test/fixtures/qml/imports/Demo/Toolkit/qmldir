@@ -1,0 +1,3 @@
+module Demo.Toolkit
+VersionLabel 1.0 VersionLabel.qml
+VersionLabel 1.1 VersionLabelNew.qml
