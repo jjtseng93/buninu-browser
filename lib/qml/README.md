@@ -243,3 +243,32 @@ bun test test/qml-host.test.js
 The real Theme fixture and its upstream licenses/provenance are in
 `test/fixtures/qml/flea-theme/README.md`. The earlier `manual-flea-qml.js` remains
 an intentionally small test-theme demonstration.
+
+## Settings ruler / 設定刻度控制項
+
+The unchanged upstream Flea `SettingsRuler.qml` now runs with the real Theme.
+The demo changes shared ViewState in memory, updates the preview font, disables
+and re-enables the ruler, and restores the Omarchy size. It does not save settings.
+
+```sh
+bun test/manual-flea-settings.js
+bun test test/qml-repeater.test.js test/qml-host.test.js
+# Optional: compare with an already extracted Debian arm64 Quickshell binary.
+BUNINU_QS_ROOT=/path/to/sid/root bun test test/qml-quickshell-settings.test.js
+```
+
+Repeater delegates compile to ordinary JS DOM factories, with per-instance IDs,
+index/modelData, array or numeric models, count/itemAt and nested repeaters.
+Replacing the model rebuilds delegates and disposes their bindings/listeners.
+Limits: 1,000 model entries and 2,000 live objects; no ListModel, incremental model
+notifications or service objects inside delegates yet. This is not a virtual list.
+
+TapHandler currently maps DOM clicks for ReleaseWithinBounds; it is not Qt's full
+gesture arbitration/multitouch implementation. HoverHandler supplies pointer cursor
+and enter/leave state. Text implicit dimensions use the existing canvas text
+measurement, and horizontal-center anchors map to CSS positioning.
+
+未修改的上游 SettingsRuler 已能互動，使用真正 Theme／ViewState；範例只修改記憶體，
+不寫入個人設定。Repeater 編譯為建立 DOM 的 JS 函式，不保留 QML AST；每個委派有
+自己的 id 與綁定，替換模型時會清理舊事件與效果。這不是完整設定面板或虛擬列表。
+上述可選 Quickshell 對照只執行現有 binary，在獨立 Land 上測點擊，不讀其原始碼。

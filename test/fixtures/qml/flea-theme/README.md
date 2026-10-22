@@ -25,3 +25,19 @@ The current test covers the Theme path on Land, not the entire Flea application.
 本目錄保留真正上游 QML／JS；Theme 及 Commons 不是 stub。手動示範使用獨立的
 臨時 HOME，讀入範例 TOML，關窗後移除。測試涵蓋主題讀取、文字尺寸、主題更新、
 程序輸出與清理，以及切回普通網頁的隔離。未宣稱完整 Flea 或 Hyprland 相容。
+
+## SettingsRuler
+
+`ui/SettingsRuler.qml` is another unchanged file from the same Flea revision.
+`settings.qml` is our interactive test wrapper: selecting a size changes the real
+ViewState in memory; Theme updates both the original ruler and a text preview.
+The wrapper does not call the persistent settings writer.
+
+`test/qml-quickshell-settings.test.js` optionally runs the same wrapper and upstream
+sources with a locally available Quickshell binary on an isolated Land instance.
+Qt eagerly checks qmldir entries absent from this subset, so only its temporary
+fixture copy filters those missing entries. No QML/JS source is replaced or stubbed.
+The repository's original qmldir files remain unchanged.
+
+SettingsRuler 來自同一上游版本，原檔未修改。互動範例只調整記憶體內的 ViewState，
+不寫個人設定；Quickshell 對照的暫存副本只刪除未打包檔案的 qmldir 索引。

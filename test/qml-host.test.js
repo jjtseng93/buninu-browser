@@ -159,3 +159,43 @@ test('QML Process stdout and exit signal reach reactive DOM', async () => {
     rmSync(dir, { recursive: true, force: true });
   }
 }, 30000);
+
+test('upstream SettingsRuler changes shared Theme, disables taps and follows the system again', async () => {
+  const dir=mkdtempSync(join(tmpdir(),'qml-settings-')),oldHome=process.env.HOME,oldRoots=process.env.QML_IMPORT_PATH;
+  const theme=join(dir,'.local/state/omarchy/current/theme');
+  mkdirSync(theme,{recursive:true});
+  await Bun.write(join(theme,'shell.toml'),'[font]\nbase-size = 14\n');
+  process.env.HOME=dir;
+  process.env.QML_IMPORT_PATH=Bun.fileURLToPath(new URL('imports/',root));
+  const b=await createBrowser({spareRenderer:false});
+  try {
+    await b.context.navigate(new URL('settings.qml',root).href);
+    const status=()=>b.context.evaluate('document.getElementById("status").textContent');
+    await until(async()=>await status()==='Size: 14 / clicks: 0');
+    const font=()=>b.context.evaluate('document.getElementById("sample").style.fontSize');
+    expect(await font()).toBe('14px');
+    const tap=async size=>{
+      const point=JSON.parse(await b.context.evaluate(`JSON.stringify((()=>{const e=[...document.querySelectorAll("[data-qml-type=Text]")].find(e=>e.textContent===${JSON.stringify(String(size))}).parentElement;const r=e.getBoundingClientRect();return [r.x+r.width/2,r.y+r.height/2]})())`));
+      await b.context.click(...point);
+    };
+    await tap(20);
+    expect(await status()).toBe('Size: 20 / clicks: 1');
+    expect(await font()).toBe('20px');
+    await b.context.evaluate('document.getElementById("toggle").click()');
+    await tap(9);
+    expect(await status()).toBe('Size: 20 / clicks: 1');
+    await b.context.evaluate('document.getElementById("toggle").click()');
+    await tap(9);
+    expect(await status()).toBe('Size: 9 / clicks: 2');
+    expect(await font()).toBe('9px');
+    await b.context.evaluate('document.getElementById("reset").click()');
+    expect(await status()).toBe('Size: 14 / clicks: 2');
+    expect(await font()).toBe('14px');
+    await Bun.write('/tmp/browser-flea-settings.png',Buffer.from(await b.context.screenshot({format:'png'}),'base64'));
+  } finally {
+    b.close();
+    if(oldHome===undefined)delete process.env.HOME;else process.env.HOME=oldHome;
+    if(oldRoots===undefined)delete process.env.QML_IMPORT_PATH;else process.env.QML_IMPORT_PATH=oldRoots;
+    rmSync(dir,{recursive:true,force:true});
+  }
+},30000);
