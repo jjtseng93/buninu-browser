@@ -42,5 +42,21 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Browser SHM, pointer, keyboa
   const before=app.window.width;land.context.resize(900,700,1);
   await wait(()=>app.window.width!==before&&surface().pixels.width===app.window.width);
   expect(JSON.parse(await app.browser.context.evaluate('JSON.stringify([innerWidth,innerHeight])'))).toEqual([app.window.width,app.window.height]);
+  for(const type of ['keyDown','keyUp'])land.context.dispatchKeyEvent({type,key:'w',code:'KeyW',modifiers:4});
+  await wait(()=>app.client.connection.closed&&land.compositor.wm.visible.length===0);
+  await app.done;
+  expect(app.window.closed).toBe(true);
  }finally{app?.close();land?.close();if(old===undefined)delete process.env.XDG_RUNTIME_DIR;else process.env.XDG_RUNTIME_DIR=old;rmSync(dir,{recursive:true,force:true});}
 },30000);
+
+test('Wayland input queued around close never calls the disposed renderer',async()=>{
+ const {attachInput}=await import('../frontends/wayland/input.js');
+ let capabilities,pointer,calls=0,errors=0,reject;
+ const client={globals:new Map([['wl_seat',{}]]),connection:{closed:false},bind(_i,_v,fn){capabilities=fn;return 2;},object(iface,fn){if(iface==='wl_pointer')pointer=fn;return 3;},request(){}};
+ const window={surface:4,closed:false};
+ attachInput(client,window,{move(){calls++;return new Promise((_r,no)=>reject=no);}},()=>errors++);
+ capabilities('capabilities',[1]);pointer('enter',[1,4,0,0]);pointer('motion',[1,3,4]);
+ await Promise.resolve();expect(calls).toBe(1);
+ window.closed=true;reject(Error('Renderer closed'));pointer('motion',[2,4,5]);
+ await Bun.sleep(0);expect(calls).toBe(1);expect(errors).toBe(0);
+});

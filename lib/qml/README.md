@@ -68,6 +68,7 @@ Properties: `id`; initialized `property int/real/bool/string/var/color` (no Qt t
 coercion yet); width/height/implicitWidth/implicitHeight, x/y, color, radius,
 opacity, visible, enabled, clip, text, title; font pixelSize/family/bold; border
 width/color; anchors fill/centerIn/margins; horizontalAlignment (left/center).
+Text supports explicit `textFormat: Text.PlainText`; other formats still report a diagnostic.
 Handlers: `onClicked`, `Component.onCompleted`. JS expressions/blocks are parsed
 by Acorn, but QML scope translation is experimental, not full Qt name resolution.
 
@@ -128,3 +129,14 @@ here using existing Acorn, rather than importing an old QML runtime or Python to
 外部僅有兩個檔案、四個 `qml handle begin/end` 區塊。移除方式如上，
 四個接入區塊都能直接刪除，不需要補回原本程式。一般文件的建立流程留在區塊外。
 目前只提供 Hello World、點擊計數、基本尺寸與屬性綁定；不宣稱可跑 Flea。
+
+## Flea first component / 第一個 Flea 元件
+
+`bun test/manual-flea-qml.js` opens the unchanged upstream `EscapeHint.qml` object
+in the Wayland frontend, with a test-supplied static Theme and a surrounding demo.
+See `test/fixtures/qml/flea/README.md` for provenance, license and limitations.
+This verifies a real leaf component, not Flea startup or automatic imports.
+Run `bun test test/qml-flea.test.js` for the browser rendering check.
+
+已能顯示上游原碼的 EscapeHint；Theme 由測試框架提供，尚非完整 Flea。
+下一步是同目錄元件／singleton 載入與作用域，再逐步處理 Theme 依賴。

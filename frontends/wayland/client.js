@@ -21,7 +21,7 @@ export class WaylandClient {
   request(id,name,...args) {const object=this.objects.get(id);if(!object)throw Error(`Unknown object ${id}`);const packet=encodeRequest(id,object.iface,name,args);this.connection.send(packet.data,packet.fds);this.connection.flush();}
   receive() {
     const c=this.connection;
-    while(c.input.length>=8){
+    while(!c.closed&&c.input.length>=8){
       const id=c.input.readUInt32LE(0),header=c.input.readUInt32LE(4),size=header>>>16,opcode=header&65535;
       if(size<8||size%4)throw Error('Invalid event size');if(c.input.length<size)return;
       const object=this.objects.get(id),spec=interfaces.get(object?.iface)?.events[opcode];

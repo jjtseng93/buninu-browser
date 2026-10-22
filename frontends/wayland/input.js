@@ -19,7 +19,14 @@ export function keysym(symbol){
 export function attachInput(client,window,context,onError) {
   if(!client.globals.has('wl_seat'))return;
   let pointer,keyboard,x=0,y=0,focused=false,keys=new Map(),mods=0,locked=0;
-  const invoke=(method,...args)=>Promise.resolve(context[method](...args)).catch(onError);
+  const active=()=>!window.closed&&!client.connection.closed;
+  const invoke=(method,...args)=>{
+    if(!active())return;
+    // A compositor can send leave/modifier events in the same batch as close.
+    // Pending input is cancelled with the renderer; it must not restart/report it.
+    Promise.resolve().then(()=>active()?context[method](...args):undefined)
+      .catch(error=>{if(active())onError(error);});
+  };
   const seat=client.bind('wl_seat',5,(event,[caps])=>{
     if(event!=='capabilities')return;
     if((caps&1)&&!pointer){pointer=client.object('wl_pointer',(name,args)=>{

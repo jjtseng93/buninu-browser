@@ -90,6 +90,7 @@ export class Connection {
         this.input = Buffer.concat([this.input, this.data.subarray(0,n)]);
         if (this.input.length > 1024*1024 || this.fds.length > 256) throw Error('Client queue limit');
         this.onData();
+        if (this.closed) return;
       }
       this.flush();
     } catch (e) { console.error(`Wayland client: ${e.message}`);
