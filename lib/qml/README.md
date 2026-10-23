@@ -233,7 +233,7 @@ Verified against those sources:
 
 The source inventory parses 239 QML files and compiles 231 of 235 top-level UI
 components. The four remaining compile blockers are QtQuick.Pdf (PdfViewer,
-PreviewPdf), AnimatedImage (PreviewAnimation), and QtMultimedia (PreviewMedia).
+PreviewPdf) and AnimatedImage (PreviewAnimation).
 Dynamic loaders defer some of these until the associated feature is opened.
 
 **Full Flea file management is not yet supported or validated.** The original
@@ -565,7 +565,7 @@ Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 S
 所有應用程式測試都使用獨立 HOME／XDG，不寫個人設定，也沒有偽造後端回覆。
 
 已解析 239 個 QML 檔案，235 個頂層 UI 元件中 231 個能編譯；這不是完整功能覆蓋。
-剩餘四個編譯阻礙為 PDF、AnimatedImage 和 QtMultimedia 相關元件。
+剩餘三個編譯阻礙為 PDF 與 AnimatedImage 相關元件。
 最初 73 項測試沒有 Flea 後端；後續已用 Omarchy 官方 0.3.12-1 aarch64 套件，
 驗證官方 binary 直接呼叫我們的 `lib/qml/qs` wrapper，經標準 Wayland 顯示。
 真實列檔、目錄新增通知、Ctrl-L／Enter 切換目錄及 Super-W 關閉已測過。
@@ -720,3 +720,48 @@ fallback glyph metrics, so CJK code lines do not crowd into a taller item box.
 MarkdownText 將段落的軟換行視為 HTML 空白，保留明確換行與程式碼區塊的逐行內容。
 比例行高在 CSS 繪製與 QML 幾何計算使用相同字型行框，包含替補字型的度量，
 避免中文程式碼擠在較高區塊的上方。
+
+
+## Media playback / 媒體播放
+
+Local QML supports a subset of QtMultimedia: MediaPlayer, AudioOutput and
+VideoOutput reuse the browser's existing HTML media decoder, clock, seeking,
+video presentation and PulseAudio output. No native Qt plugin or new decoder
+is loaded. Source loading, autoPlay, play/pause/stop, millisecond position and
+duration, playback/media status, looping, volume/mute, and fit/crop/stretch
+video output are available. VideoOutput exposes sourceRect/contentRect.
+Changing the source or destroying a player releases its output and decoders.
+Audio still requires the browser's usual jspulse/PulseAudio server on
+127.0.0.1:4713 for audible playback.
+
+Quickshell.Wayland IdleInhibitor is accepted with supported=false. Enabling it
+prints a warning; it neither prevents sleep nor blocks playback. Playback rate,
+track selection, subtitles, camera capture, video rotation/mirroring and native
+MPRIS integration are not implemented by this adapter. Flea's own external
+MPRIS helper remains subject to its ordinary host prerequisites.
+
+The only renderer integration is in removable qml handle blocks: a capability
+adapter to existing media operations and optional gain on the already converted
+PCM output chunk. Video is not re-encoded or captured into an additional canvas.
+See Qt's [MediaPlayer](https://doc.qt.io/qt-6/qml-qtmultimedia-mediaplayer.html)
+and [VideoOutput](https://doc.qt.io/qt-6/qml-qtmultimedia-videooutput.html) APIs.
+
+本地 QML 的 MediaPlayer、AudioOutput、VideoOutput 沿用瀏覽器現有的
+HTML 媒體解碼器、時鐘、跳轉、影片繪製與 PulseAudio 輸出，不新增 Qt plugin
+或另一套解碼器。支援來源載入、自動播放、播放／暫停／停止、以毫秒表示的位置與長度、
+播放狀態、循環、音量／靜音，以及影片等比例縮放、裁切與拉伸。
+VideoOutput 提供 sourceRect／contentRect；換來源或銷毀播放器時會釋放輸出與解碼器。
+實際發聲仍需瀏覽器原本使用的 127.0.0.1:4713 jspulse／PulseAudio 服務。
+
+IdleInhibitor 可載入但 supported=false；啟用時只提示，不會阻止休眠，也不阻止播放。
+播放速度、音軌選擇、字幕、攝影機、影片旋轉／鏡像及原生 MPRIS 整合尚未實作；
+Flea 自己的外部 MPRIS helper 仍需其原本的主機條件。
+Renderer 接入仍全部位於可移除的 qml handle 區塊；影片不重編碼、不另建 Canvas，
+音量僅處理既有 PCM 輸出區塊。
+
+Validation: bun test test/qml-media.test.js checks real MP4/MP3 metadata and
+seeking, paused video pixels, real decoded MP3 PCM through an in-memory audio
+device, mute and output closure. With BUNINU_FLEA_ROOT and BUNINU_OMARCHY_ROOT,
+test/qml-flea-media.test.js also loads Flea's unchanged PreviewMedia.qml.
+測試包含真實 MP4／MP3、跳轉、影片截圖與記憶體音訊端的 PCM、靜音、關閉；
+設定 Flea／Omarchy 來源路徑後，也測試未修改的 PreviewMedia.qml。
