@@ -101,3 +101,24 @@ Rectangle {
     expect((await read()).lines).toBe(1);
   } finally { host.close(); }
 }, 30000);
+
+test('Qt.binding attaches to a default property and a plain write detaches it', async () => {
+ const host = new RendererHost({timeout:20000});
+ try {
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,default-binding',contentType:'text/x-qml',source:`import QtQuick
+Item {id:root;width:100;height:100;property bool shown:true
+ Rectangle {id:box;width:40;height:40}
+ Component.onCompleted:box.visible=Qt.binding(function(){return root.shown})
+ Button {id:toggle;onClicked:root.shown=!root.shown}
+ Button {id:detach;onClicked:box.visible=true}
+}`});
+  await host.call('whenLoaded');
+  const display=()=>host.call('evaluate','document.getElementById("box").style.display');
+  const click=id=>host.call('evaluate',`document.getElementById('${id}').click()`);
+  expect(await display()).toBe('block');
+  await click('toggle');expect(await display()).toBe('none');
+  await click('toggle');expect(await display()).toBe('block');
+  await click('detach');await click('toggle');expect(await display()).toBe('block');
+ }finally{host.close();}
+},30000);
