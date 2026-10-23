@@ -28,3 +28,46 @@ Rectangle {
   }
  }finally{host.close()}
 },30000);
+
+test('synchronous Loader reaches indirect item bindings before open returns',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,loader-chain',contentType:'text/x-qml',source:`import QtQuick
+Rectangle {
+ id:root;width:300;height:200;property int received:0
+ readonly property var quickLook:loader.item
+ property var preview:root.quickLook
+ Component {id:dialog;Item {signal requested();function open(){requested()}}}
+ Loader {id:loader;active:false;sourceComponent:dialog}
+ Connections {target:loader.item;function onRequested(){root.received++}}
+ Text {id:status;text:root.received}
+ onClicked:{loader.active=true;root.preview.open()}
+}`});
+  await host.call('whenLoaded');
+  await host.call('evaluate',"document.getElementById('root').click()");
+  expect(await host.call('evaluate',"Number(document.getElementById('status').textContent)")).toBe(1);
+ }finally{host.close()}
+},30000);
+
+test('initial property handlers can call child ListView methods in a lazy component',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,loader-child-methods',contentType:'text/x-qml',source:`import QtQuick
+Rectangle {
+ id:root;width:300;height:200;property int result:-9
+ Component {id:preview;Item {
+  property bool wrap:true
+  onWrapChanged:root.result=list.indexAt(0,1)
+  ListView {id:list;width:100;height:100;model:2;delegate:Rectangle {height:20;width:100}}
+ }}
+ Loader {id:loader;active:false;sourceComponent:preview}
+ Text {id:status;text:root.result}
+ onClicked:loader.active=true
+}`});
+  await host.call('whenLoaded');
+  await host.call('evaluate',"document.getElementById('root').click()");
+  expect(await host.call('evaluate',"Number(document.getElementById('status').textContent)")).toBe(0);
+ }finally{host.close()}
+},30000);
