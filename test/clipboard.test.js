@@ -33,3 +33,22 @@ test('a real button click writes through controller; page-only calls cannot over
   expect(await host.call('evaluate','window.copyStatus')).toBe('copied');
  }finally{host.close();}
 },20000);
+
+test('Windows also uses Bun.which-resolved xclip before its platform fallback',async()=>{
+ const seen=[];
+ await writeClipboard('Windows 中文',{platform:'win32',which:name=>{seen.push(name);return name==='xclip'?'C:/bin/xclip.exe':null;},spawn:(args,opts)=>{expect(args).toEqual(['C:/bin/xclip.exe','-selection','clipboard']);expect(opts.stdin.toString()).toBe('Windows 中文');return {exited:Promise.resolve(0),kill(){}};}});
+ expect(seen).toEqual(['xclip']);
+});
+
+test('clipboard read is one-shot, preserves empty/text values, and prefers xclip on Windows too',async()=>{
+ const {readClipboard}=await import('../lib/clipboard.js');
+ const calls=[];let value='中文\n';
+ const options={platform:'win32',which:name=>name==='xclip'?'/bin/xclip':null,spawn:(args)=>{
+   calls.push(args);return {stdout:new Response(value).body,exited:Promise.resolve(0),kill(){}};
+ }};
+ expect(await readClipboard(options)).toBe('中文\n');
+ expect(calls).toEqual([['/bin/xclip','-selection','clipboard','-o']]);
+ value='';expect(await readClipboard(options)).toBe('');
+ await Bun.sleep(30);expect(calls).toHaveLength(2);
+ await expect(readClipboard({...options,which:()=>null})).rejects.toThrow('No working');
+});

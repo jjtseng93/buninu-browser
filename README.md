@@ -225,11 +225,19 @@ not start a browser process or CDP listener.
 
 ### Page sandbox
 
-Pages can copy text with `navigator.clipboard.writeText()` after a user click
-or key press on HTTPS (or localhost). The controller writes the clipboard,
+Pages can copy or read text with `navigator.clipboard.writeText()` and
+`navigator.clipboard.readText()` after a user click or key press on HTTPS
+(or localhost). Each operation consumes that activation. The controller accesses the clipboard,
 preferring `xclip -selection clipboard`, with platform clipboard commands as
 fallbacks. Clipboard command access stays outside the page sandbox; unavailable
-providers reject the promise instead of reporting a successful copy.
+providers reject the promise instead of reporting success. Reads happen only
+on request, with no clipboard polling. HTML inputs and textareas share selection,
+caret blinking, Shift+arrows, and Ctrl+C/X/V editing. Paste
+replaces the selection, or inserts at the cursor. Up/Down currently follow
+explicit textarea line breaks, not soft-wrapped visual lines.
+
+PowerShell clipboard quoting and newline handling are reused from jsmdcui
+under its [MIT license](LICENSES/jsmdcui.txt).
 
 Page JavaScript runs behind three layers:
 
