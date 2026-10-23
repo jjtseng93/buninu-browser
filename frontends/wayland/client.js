@@ -66,7 +66,7 @@ export class WaylandWindow {
   get available(){return this.configured&&!this.framePending&&this.buffers.filter(b=>b.busy).length<2;}
   present(bytes,width,height) {
     if(!this.available||width!==this.width||height!==this.height)return false;
-    const c=this.client,size=width*height*4;if(bytes.length!==size)throw Error('Invalid raw pixel length');
+    const c=this.client,size=width*height*4,parts=Array.isArray(bytes)?bytes:[bytes];if(parts.reduce((sum,part)=>sum+part.length,0)!==size)throw Error('Invalid raw pixel length');
     for(const b of [...this.buffers])if(!b.busy&&(b.width!==width||b.height!==height))this.disposeBuffer(b);
     let b=this.buffers.find(b=>!b.busy);
     if(!b){
@@ -78,7 +78,7 @@ export class WaylandWindow {
         c.request(pool,'create_buffer',b.id,0,width,height,width*4,1);c.request(pool,'destroy');this.buffers.push(b);
       }catch(e){closeSync(fd);throw e;}
     }
-    let written=0;while(written<size){const n=writeSync(b.fd,bytes,written,size-written,written);if(!n)throw Error('Short SHM write');written+=n;}
+    let position=0;for(const part of parts){let written=0;while(written<part.length){const n=writeSync(b.fd,part,written,part.length-written,position);if(!n)throw Error('Short SHM write');written+=n;position+=n;}}
     b.busy=true;this.framePending=true;
     const callback=c.object('wl_callback',()=>{this.framePending=false;this.onReady?.();});
     c.request(this.surface,'attach',b.id,0,0);c.request(this.surface,'damage',0,0,width,height);c.request(this.surface,'frame',callback);c.request(this.surface,'commit');return true;

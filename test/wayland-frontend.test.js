@@ -36,12 +36,33 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Browser SHM, pointer, keyboa
   const surface=()=>land.compositor.wm.renderSurfaces().find(s=>s.pixels);
   await wait(()=>surface());expect(surface().pixels.width).toBe(app.window.width);
   const click=async(x,y)=>{const o=land.compositor.wm.origin(surface());for(const type of ['mouseMoved','mousePressed','mouseReleased'])land.context.dispatchMouseEvent({type,x:o.x+x,y:o.y+y,button:'left'});};
-  await click(30,125);await wait(()=>land.compositor.wm.visible[0].surface.xdg.toplevel.title==='Clicked');
-  await click(30,25);land.context.type('hello');
+  await click(30,157);await wait(()=>land.compositor.wm.visible[0].surface.xdg.toplevel.title==='Clicked');
+  await click(30,57);land.context.type('hello');
   await wait(()=>land.compositor.wm.visible[0].surface.xdg.toplevel.title==='hello');
+  // Editing browser chrome must not suspend page frames. Conversely, blinking
+  // chrome alone must reuse the last raw page frame rather than recapture it.
+  let captures=0,presents=0;
+  const screenshot=app.browser.context.screenshot.bind(app.browser.context);
+  app.browser.context.screenshot=(...args)=>{captures++;return screenshot(...args);};
+  const present=app.window.present.bind(app.window);
+  app.window.present=(...args)=>{presents++;return present(...args);};
+  await app.browser.context.evaluate('document.activeElement.blur()');
+  app.toolbar.open();
+  await Bun.sleep(800);
+  const idleCaptures=captures,idlePresents=presents;
+  await Bun.sleep(1100);
+  expect(captures).toBe(idleCaptures);
+  expect(presents).toBeGreaterThan(idlePresents);
+  await app.browser.context.evaluate(`globalThis.animationTick=0;globalThis.animationTimer=setInterval(()=>{document.body.style.background=++animationTick%2?'red':'blue'},80)`);
+  const animatedCaptures=captures,animatedPresents=presents;
+  await wait(()=>captures>=animatedCaptures+3&&presents>=animatedPresents+3);
+  expect(app.toolbar.editor.editing).toBe(true);
+  expect(Number(await app.browser.context.evaluate('animationTick'))).toBeGreaterThan(2);
+  await app.browser.context.evaluate('clearInterval(animationTimer)');
+  app.toolbar.editor.cancelEditing();
   const before=app.window.width;land.context.resize(900,700,1);
   await wait(()=>app.window.width!==before&&surface().pixels.width===app.window.width);
-  expect(JSON.parse(await app.browser.context.evaluate('JSON.stringify([innerWidth,innerHeight])'))).toEqual([app.window.width,app.window.height]);
+  expect(JSON.parse(await app.browser.context.evaluate('JSON.stringify([innerWidth,innerHeight])'))).toEqual([app.window.width,app.window.height-32]);
   for(const type of ['keyDown','keyUp'])land.context.dispatchKeyEvent({type,key:'w',code:'KeyW',modifiers:4});
   await wait(()=>app.client.connection.closed&&land.compositor.wm.visible.length===0);
   await app.done;

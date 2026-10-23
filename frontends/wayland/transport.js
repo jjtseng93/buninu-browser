@@ -24,6 +24,10 @@ for (const [name, symbol] of candidates) {
     connect: signature(['i32','ptr','u32']), socket: signature(['i32','i32','i32']),
     recvmsg: signature(['i32','ptr','i32'], 'i64'), sendmsg: signature(['i32','ptr','i32'], 'i64'),
     dup: signature(['i32']), send: signature(['i32','ptr','u64','i32'], 'i64'), close: signature(['i32']),
+
+    // Standard Wayland clipboard FD transfer.
+    pipe2: signature(['ptr','i32']), fcntl: signature(['i32','i32','i32']),
+
     [symbol]: signature([], 'ptr'),
   }); errnoSymbol = symbol; break; }
   catch (error) { failures.push(`${name} (${symbol}): ${error.message}`); }

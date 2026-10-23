@@ -33,10 +33,19 @@ export function attachInput(client,window,context,onError) {
       if(name==='enter'){focused=args[1]===window.surface;[x,y]=args.slice(2);}
       if(name==='leave')focused=false;
       if(name==='motion'){[x,y]=args.slice(1);if(focused)invoke('move',x,y);}
-      if(name==='button'&&focused&&args[2]===272&&args[3]===0)invoke('click',x,y);
+
+      // Mouse-triggered copy also has a valid Wayland input serial.
+      if(name==='button'&&focused&&client.clipboard)client.clipboard.serial=args[0];
+
+      if(name==='button'&&focused&&context.pointerButton)invoke('pointerButton',x,y,args[2],args[3]);
+      else if(name==='button'&&focused&&args[2]===272&&args[3]===0)invoke('click',x,y);
       if(name==='axis'&&focused)invoke('scroll',args[1]===1?args[2]:0,args[1]===0?args[2]:0,{x,y});
     });client.request(seat,'get_pointer',pointer);}
     if((caps&2)&&!keyboard){keyboard=client.object('wl_keyboard',(name,args)=>{
+
+      // Use the compositor's real keyboard serial for selection.
+      if(name==='enter'||name==='key')if(client.clipboard)client.clipboard.serial=args[0];
+
       if(name==='keymap'){const [format,fd,size]=args;try{if(format===1&&size<=1024*1024){const bytes=Buffer.alloc(size);let n=0;while(n<size){const got=readSync(fd,bytes,n,size-n,n);if(!got)break;n+=got;}keys=parseKeymap(bytes.subarray(0,n).toString());}}finally{libc.close(fd);}}
       if(name==='modifiers'){mods=args[1]|args[2];locked=args[3];}
       if(name==='key'&&args[3]===1){const symbols=keys.get(args[2]);if(!symbols)return;let shift=!!(mods&1);if((locked&2)&&/^[a-z]$/.test(keysym(symbols[0])||''))shift=!shift;
