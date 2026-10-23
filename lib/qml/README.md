@@ -300,8 +300,35 @@ Flickable, ListView/GridView and basic Shape paths.
   page-loop signals, not a guarantee of native Wayland presentation timing.
 
 ShaderEffectSource and arbitrary shader/texture composition are not replaced by
-empty stubs. Supporting snapshots of a subtree properly needs additional rendering
-work; a screenshot of the whole viewport would include unrelated siblings/overlays.
+empty stubs. The underlying DOM-to-canvas snapshot path is now available, but
+ShaderEffectSource lifecycle and ShapePath texture fills are not wired up yet.
+
+### Local QML DOM images
+
+In local `file:` QML's dedicated host renderer, `ctx.drawImage(element, ...)`
+also accepts a connected DOM element with a laid-out block box. All three
+ordinary drawImage argument forms reuse canvas positioning, source cropping,
+scaling, transforms and alpha. This is an internal QML extension, not a web API:
+ordinary HTML (including local HTML/host mode) and remote QML do not enable it.
+The capability is tracked outside page-writable globals.
+
+The existing painter draws only the selected render subtree into a temporary
+CanvasKit surface; siblings and ancestor opacity/clips are excluded. The source's
+own styles, internal stacking, text and nested canvases use normal browser
+painting. The snapshot uses the source border-box dimensions at one pixel per
+CSS pixel and stays frozen until another draw. It does not modify the source DOM.
+Images stay native to the same WASM CanvasKit instance: no PNG/base64 or pixel
+readback is needed, and the temporary image/surface are released after use.
+
+This initial path does not capture detached, display:none or inline-only sources,
+iframes, or a subtree containing the destination canvas. Source visibility is
+still governed by CSS; ShaderEffectSource hideSource semantics remain future
+work. Captures are limited to 8192 pixels per side and 16,777,216 total pixels.
+Cross-origin image/tainted-canvas resources propagate canvas readback restrictions;
+unknown image origins are treated conservatively.
+
+Run `bun test test/qml-canvas-dom.test.js` for pixel, isolation and resource-lifetime
+checks. The removal check also strips the canvas adapter.
 
 ## Local host services and isolation
 
@@ -355,7 +382,7 @@ bun test/manual-qml-removal.js
 
 Existing integrations are in `lib/document-types.js`,
 `lib/renderer/page-renderer.js`, `lib/headless-shell.js`, `lib/renderer/host.js`
-`lib/renderer/main.js`, and `frontends/wayland/index.js`. Delete the 14 marked blocks and `lib/qml`, plus its
+`lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, and `frontends/wayland/index.js`. Delete the 17 marked blocks and `lib/qml`, plus its
 tests/fixtures, to remove QML. Ordinary `let isHtml`, `let parsed`, `parsed ??=`,
 renderer acquisition callbacks and default environments remain valid without
 replacement statements. The removal test does this in a temporary copy and runs
@@ -389,7 +416,19 @@ Fixture provenance and bundled licenses are in
 
 這是直接把 QML 編譯成既有 DOM、CSS、JS 的實驗，不產生 HTML，不保留另一棵
 QML 元件樹，也不新增 Qt 或原生依賴。本輪程式集中在 `lib/qml`，測試在 `test`；
-Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 14 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
+Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 17 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
+
+本地 `file:` QML 的專用 host renderer 現在允許 `ctx.drawImage(DOM元素, …)`，
+沿用三種 drawImage 呼叫形式、縮放、裁切及 canvas 透明度／變換。
+能力由內部記錄控制，普通 HTML（包含本地 HTML／host 模式）與遠端 QML 不啟用。
+指定子樹由既有 painter 畫到離屏 CanvasKit surface，不包含兄弟元素與祖先裁切／透明度；
+文字、內部堆疊與子 canvas 沿用原有繪製，不修改 DOM，也不經 PNG、base64 或像素回讀。
+快照以來源 border box、每 CSS pixel 一個像素繪製，下一次 draw 才更新，暫存影像隨用隨釋放。
+目前不接受未連接、display:none、只有 inline box 的來源、iframe 或包含目標 canvas 的子樹；
+來源本身的 CSS visibility 仍有效。尺寸上限為單邊 8192、總計 16,777,216 像素，
+跨來源圖片與受污染 canvas 的讀取限制會傳遞。這只是底層快照能力，
+尚未接上 ShaderEffectSource 的 hideSource／更新生命週期與 ShapePath 材質填充。
+測試：`bun test test/qml-canvas-dom.test.js`。
 
 目前原版 Flea 已能啟動真正的主視窗、Theme／Commons／Ui、設定頁、鍵盤說明、
 路徑輸入、網路分享表單，以及文字、CSV、Markdown、SVG／PNG 預覽。
