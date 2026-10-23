@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=/usr/local/bin/flea-thumbnail-stub
+Exec=/usr/local/bin/flea-thumbnail-stub %i %o %s
+MimeType=video/mp4;video/webm;video/x-matroska;video/quicktime;video/x-msvideo;video/mpeg;video/ogg;

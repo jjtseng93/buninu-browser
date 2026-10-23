@@ -1,0 +1,227 @@
+[
+  {
+    "name": "sample.js",
+    "lang": "js",
+    "text": "const answer = 42; // comment\n"
+  },
+  {
+    "name": "sample.mjs",
+    "lang": "JavaScript",
+    "text": "export const answer = 42;\n"
+  },
+  {
+    "name": "sample.cjs",
+    "lang": "node",
+    "text": "const answer = require(\"fs\");\n"
+  },
+  {
+    "name": "sample.jsx",
+    "lang": "jsx",
+    "text": "const answer = 42;\n"
+  },
+  {
+    "name": "sample.ts",
+    "lang": "ts",
+    "text": "const answer: number = 42;\n"
+  },
+  {
+    "name": "sample.tsx",
+    "lang": "tsx",
+    "text": "const answer: number = 42;\n"
+  },
+  {
+    "name": "sample.mts",
+    "lang": "typescript",
+    "text": "export const answer: number = 42;\n"
+  },
+  {
+    "name": "sample.py",
+    "lang": "python3",
+    "text": "def answer():\n    return 42 # comment\n"
+  },
+  {
+    "name": "sample.sh",
+    "lang": "bash",
+    "text": "#!/bin/sh\necho \"$HOME\" # comment\n"
+  },
+  {
+    "name": "sample.zsh",
+    "lang": "zsh",
+    "text": "#!/bin/zsh\necho \"$HOME\"\n"
+  },
+  {
+    "name": "sample.fish",
+    "lang": "fish",
+    "text": "echo \"$HOME\"\n"
+  },
+  {
+    "name": "sample.json",
+    "lang": "json",
+    "text": "{\"answer\":42,\"ok\":true}\n"
+  },
+  {
+    "name": "sample.jsonc",
+    "lang": "jsonc",
+    "text": "{\"answer\":42} // comment\n"
+  },
+  {
+    "name": "sample.json5",
+    "lang": "json5",
+    "text": "{\"answer\":42}\n"
+  },
+  {
+    "name": "sample.jsonl",
+    "lang": "jsonl",
+    "text": "{\"answer\":42}\n"
+  },
+  {
+    "name": "sample.yaml",
+    "lang": "yml",
+    "text": "answer: 42 # comment\n"
+  },
+  {
+    "name": "sample.toml",
+    "lang": "toml",
+    "text": "answer = 42 # comment\n"
+  },
+  {
+    "name": "sample.ini",
+    "lang": "ini",
+    "text": "[section]\nanswer = 42\n"
+  },
+  {
+    "name": ".env",
+    "lang": "dotenv",
+    "text": "ANSWER=\"hello\" # comment\n"
+  },
+  {
+    "name": "sample.html",
+    "lang": "HTML",
+    "text": "<div class=\"hello\">world</div>\n"
+  },
+  {
+    "name": "sample.xml",
+    "lang": "xml",
+    "text": "<hello answer=\"42\"/>\n"
+  },
+  {
+    "name": "sample.css",
+    "lang": "css",
+    "text": "body { color: red; margin: 42px; }\n"
+  },
+  {
+    "name": "sample.scss",
+    "lang": "css",
+    "text": "body { color: red; }\n"
+  },
+  {
+    "name": "sample.sql",
+    "lang": "sql",
+    "text": "SELECT * FROM users WHERE id = 42;\n"
+  },
+  {
+    "name": "sample.c",
+    "lang": "c",
+    "text": "int main(void) { return 42; }\n"
+  },
+  {
+    "name": "sample.cpp",
+    "lang": "cpp",
+    "text": "int main() { return 42; }\n"
+  },
+  {
+    "name": "sample.cs",
+    "lang": "c#",
+    "text": "public class Hello { int answer = 42; }\n"
+  },
+  {
+    "name": "sample.go",
+    "lang": "golang",
+    "text": "package main\nfunc main() { println(42) }\n"
+  },
+  {
+    "name": "sample.rs",
+    "lang": "rs",
+    "text": "fn main() { let answer = 42; }\n"
+  },
+  {
+    "name": "sample.java",
+    "lang": "java",
+    "text": "public class Hello { int answer = 42; }\n"
+  },
+  {
+    "name": "sample.kt",
+    "lang": "kt",
+    "text": "val answer = 42\n"
+  },
+  {
+    "name": "sample.rb",
+    "lang": "rb",
+    "text": "def answer\n  return 42\nend\n"
+  },
+  {
+    "name": "sample.php",
+    "lang": "php",
+    "text": "<?php echo \"hello\"; ?>\n"
+  },
+  {
+    "name": "sample.lua",
+    "lang": "lua",
+    "text": "local answer = 42 -- comment\n"
+  },
+  {
+    "name": "sample.pl",
+    "lang": "perl",
+    "text": "my $answer = 42; # comment\n"
+  },
+  {
+    "name": "sample.ps1",
+    "lang": "pwsh",
+    "text": "$answer = \"hello\" # comment\n"
+  },
+  {
+    "name": "sample.bat",
+    "lang": "cmd",
+    "text": "@echo off\nset ANSWER=42\nREM comment\n"
+  },
+  {
+    "name": "Dockerfile",
+    "lang": "docker",
+    "text": "FROM debian:13\nRUN echo hello\n"
+  },
+  {
+    "name": "Makefile",
+    "lang": "make",
+    "text": "all:\n\techo \"hello\" # comment\n"
+  },
+  {
+    "name": "CMakeLists.txt",
+    "lang": "cmake",
+    "text": "set(ANSWER 42) # comment\n"
+  },
+  {
+    "name": "sample.md",
+    "lang": "md",
+    "text": "# Heading\n**bold** and `code`\n"
+  },
+  {
+    "name": "sample.diff",
+    "lang": "diff",
+    "text": "--- a/file\n+++ b/file\n@@ -1 +1 @@\n-old\n+new\n"
+  },
+  {
+    "name": "sample.tf",
+    "lang": "tf",
+    "text": "variable \"answer\" { default = 42 }\n"
+  },
+  {
+    "name": "sample.vue",
+    "lang": "vue",
+    "text": "<template><div class=\"hello\">Hello</div></template>\n"
+  },
+  {
+    "name": "sample.svelte",
+    "lang": "svelte",
+    "text": "<script>const answer = 42;</script>\n"
+  }
+]

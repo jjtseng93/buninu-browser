@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <!-- Low priority: retain the distribution's more specific MIME definitions. -->
+  <mime-type type="text/x-buninu-source">
+    <comment>Source code</comment>
+    <sub-class-of type="text/plain"/>
+    <generic-icon name="text-x-script"/>
+    <glob pattern="*.jsonl" weight="10"/>
+    <glob pattern="*.ndjson" weight="10"/>
+    <glob pattern="*.jsonc" weight="10"/>
+    <glob pattern="*.json5" weight="10"/>
+    <glob pattern="*.jsx" weight="10"/>
+    <glob pattern="Dockerfile" weight="10"/>
+    <glob pattern="*.cjs" weight="10"/>
+    <glob pattern="*.ini" weight="10"/>
+    <glob pattern="*.mts" weight="10"/>
+    <glob pattern="*.cts" weight="10"/>
+    <glob pattern="*.vue" weight="10"/>
+    <glob pattern="*.svelte" weight="10"/>
+  </mime-type>
+  <!-- TSX is ambiguous: prefer TypeScript JSX over Debian's Tiled tileset rule (50). -->
+  <mime-type type="text/x-buninu-tsx">
+    <comment>TypeScript JSX source</comment>
+    <sub-class-of type="text/plain"/>
+    <generic-icon name="text-x-script"/>
+    <glob pattern="*.tsx" weight="60"/>
+  </mime-type>
+</mime-info>

@@ -1,0 +1,9 @@
+#!/bin/bash
+# Diagnostic only: retains real bwrap; currently fails under bunproot.
+args=()
+for arg in "$@"; do
+ case "$arg" in
+ --unshare-all) args+=(--unshare-user --unshare-ipc --unshare-pid --unshare-uts --unshare-cgroup-try) ;; --unshare-net) ;; *) args+=("$arg") ;;
+ esac
+done
+exec /usr/bin/bwrap-real "${args[@]}"

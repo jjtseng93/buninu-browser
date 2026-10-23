@@ -1,0 +1,10 @@
+#!/bin/bash
+# Experiment only: no namespace/filesystem isolation; outer prlimit remains.
+envargs=()
+while (($#)); do
+ case "$1" in
+ --unshare-*|--die-with-parent|--new-session|--clearenv) shift ;; --setenv) envargs+=("$2=$3"); shift 3 ;; --ro-bind|--bind|--symlink) shift 3 ;; --proc|--dev|--tmpfs|--dir) shift 2 ;;
+ --json-status-fd) fd=$2; [[ $fd =~ ^[0-9]+$ ]] || exit 2; eval "exec ${fd}>&-"; shift 2 ;; --) shift; break ;; --*) echo "Unsupported experimental bwrap option: $1" >&2; exit 2 ;; *) break ;;
+ esac
+done
+exec env "${envargs[@]}" "$@"

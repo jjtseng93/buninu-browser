@@ -1,0 +1,3 @@
+#!/bin/sh
+# Placeholder only: every video gets the same opaque PNG. Args: input output size.
+printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGMwsHAAAAFEAKn1rVKOAAAAAElFTkSuQmCC' | /usr/bin/base64 -d > "$2"

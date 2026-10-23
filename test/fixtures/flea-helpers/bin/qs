@@ -1,0 +1,3 @@
+#!/bin/sh
+export QML_IMPORT_PATH="/usr/share/omarchy${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
+exec bun /opt/buninu-browser/lib/qml/qswayland "$@"

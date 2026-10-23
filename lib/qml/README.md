@@ -43,7 +43,7 @@ For an already extracted Omarchy package and the existing Omarchy QML reference:
 ```sh
 FLEA_BIN=/path/to/package-root/usr/bin/flea \
 BUNINU_FLEA_ROOT=/path/to/package-root/usr/share/flea \
-BUNINU_OMARCHY_ROOT=../omarchy-qml-reference \
+BUNINU_OMARCHY_ROOT=/opt/omarchy-source \
   bun test/manual-flea-binary.js
 ```
 
@@ -92,6 +92,189 @@ complete Columns-view coverage, file operation safety coverage, or native QS IPC
 # Same environment as above, with BUNINU_QML_WAYLAND_TEST=1 for the socket test:
 bun test test/qml-flea-backend.test.js test/qml-flea-launcher.test.js
 ```
+
+## Flea依賴的外部環境和工具
+
+- **Android 第一步：在原生 Termux 開 jsgotty**：先確認 Termux 原生的 Bun 可用，不要在 Debian proot 裡執行這一步。保持這個 Termux 工作階段開著。
+
+  ```sh
+  bun --version
+  bunx jsgotty -w -r --session bash
+  ```
+
+  `-w` 允許鍵盤輸入，`-r` 產生隨機網址路徑，`--session` 保留可重新連接的 shell。用手機瀏覽器／WebView 打開 jsgotty 印出的完整網址；同一手機可用 `127.0.0.1:8080`，但要保留印出的隨機路徑，不能只開首頁。這裡的 `-r` 是 server 的 random URL，不是 `--client -r PID`。
+
+- **Android 第二步：在瀏覽器裡的終端開 Land**：進入上述 jsgotty 畫面後執行以下命令，保持它運行。使用的是宿主 Termux 的 Bun；首次執行可能下載 Land／Casty。
+
+  ```sh
+  env XDG_RUNTIME_DIR="$TMPDIR" bunx buninu-land
+  ```
+
+  Land 的顯示留在這個瀏覽器視窗。預設 socket 是 `$TMPDIR/wayland-buninu`；若已有其他 Land，名稱可能是 `wayland-buninu1` 等，請以 Land 顯示的地址為準。
+
+- **需要聲音時：在宿主另外啟動 jspulse**：Android／Termux 使用 OpenSL ES；在另一個原生 Termux shell 執行並保持運行，不是在容器裡啟動。若已有 jspulse 服務就沿用，不必重複開。
+
+  ```sh
+  bunx @drxiaozhi/jspulse --sles
+  ```
+
+  一般 Linux 有 ALSA 裝置時，改用以下命令；這是兩種環境的替代選項，不是一起執行。
+
+  ```sh
+  bunx @drxiaozhi/jspulse --alsa
+  ```
+
+  播放前先確認音量，必要時先 **unmute**；ALSA 音效卡的播放開關、音量，以及 Flea 自己的靜音按鈕都可能影響出聲。Android 也要確認系統媒體音量。選卡、音量與解除靜音的操作詳見 jspulse 手冊：
+
+  ```sh
+  bunx @drxiaozhi/jspulse --readme
+  ```
+
+  播放器沿用 `127.0.0.1:4713`。Termux 的 js-udocker／proot 共用宿主網路，可直接連到該服務；一般 Docker 若另有網路隔離，需另安排 host 音訊服務的連線，不能假設容器的 localhost 就是宿主。沒有音訊服務仍可操作 Flea，但不能據此宣稱已驗證出聲。
+
+- **Android 第三步：另開一個原生 Termux shell，安裝 js-udocker**：不是在 Land 網址列輸入，也不是進入 Debian 後才裝。安裝腳本名稱是專案內附的 `termux_install.sh`；它會把 `udocker` 指向該 checkout，因此之後不要搬走或刪掉 checkout。wrapper 使用 Node.js 和 proot；已有這些套件可以略過 pkg 指令。
+
+  ```sh
+  pkg install git nodejs proot curl tar
+  cd "$HOME"
+  git clone https://github.com/jjtseng93/js-udocker.git
+  cd js-udocker
+  sh termux_install.sh
+  hash -r
+  command -v udocker
+  ```
+
+- **Android 第四步：取得本專案作為 build context**：繼續在第二個 Termux shell 執行。已有 buninu-browser checkout 時直接進入該目錄，並確保它包含這份 Dockerfile；不要在主專案執行 bun i，jsmdcui 會由 Dockerfile 安裝到容器的獨立 helper 目錄。
+
+  ```sh
+  cd "$HOME"
+  git clone https://github.com/jjtseng93/buninu-browser.git
+  cd buninu-browser
+  test -f test/fixtures/flea-helpers/Dockerfile
+  test -S "$TMPDIR/wayland-buninu"
+  ```
+
+  接著才執行下方的 `udocker build`／`udocker run`。容器透過 `-b "$TMPDIR:/tmp"` 使用剛剛的 Land；若實際 socket 是 `wayland-buninu1`，run 時再加 `-e WAYLAND_DISPLAY=wayland-buninu1`。回到瀏覽器即可看到 Flea，不必在容器裡再啟動 Land。
+
+- **直接建置：Dockerfile**：[test/fixtures/flea-helpers/Dockerfile](../../test/fixtures/flea-helpers/Dockerfile) 從固定的 `oven/bun:1.4.4` 開始，取得 Omarchy 官方 Flea 0.3.12-1、固定 revision 的 Omarchy QML，安裝 MIME 資料、基本 shell 工具及獨立的 `jsmdcui@0.19.2`，並複製本專案瀏覽器與所有 wrapper。**在原生 Termux 執行**，不要在既有 Debian proot 內再建置。先將完整 buninu-browser 專案設為目前目錄；`udocker` 是已安裝的 js-udocker 命令。建置會下載套件、建立新容器，不會把 node_modules 放到主專案。
+
+  ```sh
+  udocker build -t flea-qml -y -f test/fixtures/flea-helpers/Dockerfile .
+  udocker run -b "$TMPDIR:/tmp" flea-qml
+  ```
+
+  Land 須已在原生端啟動，socket 為 `$TMPDIR/wayland-buninu`。映像預設開 `/root/flea-demo`，包含文字、MP3、MP4。改目錄可用 `udocker run -b "$TMPDIR:/tmp" flea-qml /usr/bin/flea --gui /root`。Dockerfile 僅使用單階段 FROM、簡單 COPY、shell RUN、每行一組 `ENV KEY=value`、WORKDIR、JSON ENTRYPOINT／CMD；不用 BuildKit、heredoc、COPY --chmod 或一行多組 ENV。這份映像明確啟用無隔離的 bwrap 實驗替代與佔位縮圖，不包含原生 Qt／Quickshell。官方套件若從鏡像移除，建置會下載失敗，不會自動改用未知版本。
+
+  建置中的 [check.mjs](../../test/fixtures/flea-helpers/check.mjs) 檢查 Bun 版本、MIME、Omarchy 模組、jsmdcui 真實 ANSI 上色、官方 Flea 後端的 45 種格式／90 組上色請求、縮圖回覆與 QML DOM 截圖。也可手動重跑 `udocker run flea-qml bun /usr/local/lib/flea-helpers/check.mjs`；Termux 若在 base image 解壓時顯示 Perl 硬連結被拒，Dockerfile 會在第一個 RUN 補成普通檔案；其他解壓錯誤不能一概忽略。不能只以 js-udocker 最外層退出碼判定成功，應確認 `PASS:` 訊息，因目前 builder 可能繼續執行失敗 RUN 後的指令。2026-10-24 已從原生 Termux 實測 `build -t flea-qml`，上述檢查全過，並用 `udocker run -b "$TMPDIR:/tmp" flea-qml` 連到 Land，截圖確認三個範例檔案出現在視窗中。
+
+**接下來是詳細說明**：若已依上面的 Dockerfile 建置並成功啟動 Flea，就可以直接使用，不必再執行以下安裝步驟。以下逐項解釋依賴、wrapper 與替代方案，供手動建立環境、調整功能或排查問題時參考。
+
+- **範圍與順序**：以下以已驗證的 Flea **0.3.12-1**、Debian 13、Bun、已啟動的 Land 為基準；若選擇手動配置，依序做完「必要」與「實驗替代」項目，就能啟動檔案列表、文字上色及影音預覽。不是完整 Omarchy，也不保證垃圾桶、掛載、PDF、桌面服務都可用。所有本文使用的 wrapper 都收錄在本專案 [test/fixtures/flea-helpers](../../test/fixtures/flea-helpers/) 或 [test/fixtures/flea-thumbnail-stub](../../test/fixtures/flea-thumbnail-stub/)，不需要隔壁專案或作者的既有容器。每個 shell wrapper／stub 都不超過 10 行；`bat.mjs` 是保留實際上色功能的完整適配器，不是假成功 stub。
+
+- **必要：Linux 執行環境與 Flea 官方 binary／QML**：使用同架構的 Debian/glibc 環境及 Linux Bun，不能把 Android Bun 當作 Debian Bun。Flea binary 所需的 ELF loader、libc、libgcc 不能用退出成功的 stub 取代。從 Omarchy 套件來源取得 `flea-0.3.12-1` 對應架構的完整套件，保留其 `usr/bin/flea`、`usr/share/flea`、`usr/lib/flea` 和符號連結，解開到容器對應路徑；不要只複製 binary。套件管理器的完整桌面依賴不是本實驗的全部必要條件。此節從上述官方套件已解開、完整 buninu-browser 專案已放在 `/opt/buninu-browser` 開始；不以缺少官方檔案時自動產生假的 QML 補洞。
+
+- **必要：Omarchy 的 Commons／Ui QML 模組**：不能以空目錄 stub，Theme 和控制項真的會用到。若尚未有模組，可直接取得已驗證的官方版本，不引用本機隔壁 checkout。只需要其 `shell/Commons`、`shell/Ui` 及套件既有連結，不必啟動 Omarchy／Hyprland。
+
+  ```sh
+  git clone https://github.com/basecamp/omarchy.git /opt/omarchy-source
+  git -C /opt/omarchy-source checkout 3c7027db2a4fa9fa6a49d7af7f87c27ac48e677d
+  mkdir -p /usr/share/omarchy/shell
+  cp -a /opt/omarchy-source/shell/Commons /opt/omarchy-source/shell/Ui /usr/share/omarchy/shell/
+  ln -sfn shell /usr/share/omarchy/qs
+  ```
+
+- **必要：`qs` 啟動入口，替代原生 Quickshell／Qt**：先準備獨立 helper 目錄並複製本專案的檔案。下列 `qs` 是 3 行 wrapper，轉交 `/opt/buninu-browser/lib/qml/qswayland`，不用安裝原生 Quickshell、QtQuick 或 QtMultimedia。若專案放在別處，修改 wrapper 最後一行即可。僅啟用 `qs`；不要一次把所有實驗 stub 都放進 PATH。
+
+  ```sh
+  mkdir -p /usr/local/lib/flea-helpers /usr/local/bin
+  cp -a /opt/buninu-browser/test/fixtures/flea-helpers/. /usr/local/lib/flea-helpers/
+  chmod +x /usr/local/lib/flea-helpers/bin/*
+  ln -sfn /usr/local/lib/flea-helpers/bin/qs /usr/local/bin/qs
+  export PATH="/usr/local/bin:$PATH"
+  ```
+
+- **必要：Wayland socket 與可寫入的 HOME／XDG 目錄**：這是實際 IPC，不能用空檔案 stub。Termux 啟動容器時以 `-b "$TMPDIR:/tmp"` 分享宿主 tmp；容器中使用 `XDG_RUNTIME_DIR=/tmp`、`WAYLAND_DISPLAY=wayland-buninu`。原生 Linux 則填 Land 實際使用的目錄與 socket 名稱。HOME 要能寫入設定和快取；不要把宿主所有 XDG 路徑直接帶進不可見的容器。
+
+  ```sh
+  export XDG_RUNTIME_DIR=/tmp WAYLAND_DISPLAY=wayland-buninu
+  export XDG_CONFIG_HOME="$HOME/.config" XDG_DATA_HOME="$HOME/.local/share"
+  export XDG_STATE_HOME="$HOME/.local/state" XDG_CACHE_HOME="$HOME/.cache"
+  mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME" "$XDG_CACHE_HOME"
+  test -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY"
+  ```
+
+- **必要：`shared-mime-info` 資料庫**：Flea 依 `/usr/share/mime` 的 `globs2`、aliases 和描述分類檔案；沒有它時 PNG、文字可能變成 Data，根本不啟動預覽。不能用成功退出的命令 stub。Debian 可用 `apt-get install --no-install-recommends shared-mime-info`，或把該套件的完整 `/usr/share/mime` 解到容器；不要只造一個空檔。加入後重啟 Flea。
+  常見的新副檔名（例如 `.jsonl`）可能仍沒有 MIME 定義，會被 Flea 判成 Data，而不呼叫上色工具。可補本專案的 MIME 定義（包含 `Dockerfile` 檔名及 `.cjs`、`.ini`、`.tsx`），再重啟 Flea；Dockerfile 已包含這兩步。一般規則為低優先序；`.tsx` 特別以優先序 60 覆蓋 Debian 的 Tiled tileset 分類，讓 TypeScript JSX 可上色，因此同副檔名的 Tiled 檔案也會先走文字預覽：
+
+  ```sh
+  install -Dm644 test/fixtures/flea-helpers/source-mime.xml /usr/share/mime/packages/buninu-source.xml
+  update-mime-database /usr/share/mime
+  ```
+
+  HTML 是另一條路徑：Flea 預設要求網頁渲染預覽，並非原始碼上色。在 Space 開啟的預覽按 `r` 切換 source 才會使用 bat/jsmdcui。原始碼上色不需要 HTML 截圖工具；rendered 模式仍需要 Flea 呼叫 `/usr/bin/qml6` 與內附的 Qt WebEngine HTML 預覽程式，這個實驗容器尚未提供。
+
+- **實驗替代：`bat` 語法上色，透過 `bun i jsmdcui`**：Flea 要求 bat 的 realpath 位於 `/usr`，因此在獨立的 `/usr/local/lib/flea-helpers` 安裝，主專案不會新增 `node_modules`。`bat` wrapper 呼叫本專案附帶的 `bat.mjs`，它處理 Flea 的參數、stdin、行範圍與基本 ANSI 色碼，再使用 jsmdcui 真正上色。不能把 `bat` 直接連到 jsmdcui CLI，兩者參數不同。已驗證的 jsmdcui 原始版本為 0.19.2；新版本若變更內部模組，請改用 `bun i jsmdcui@0.19.2`。
+
+  ```sh
+  cd /usr/local/lib/flea-helpers
+  bun i --backend=copyfile jsmdcui
+  ln -sfn /usr/local/lib/flea-helpers/bin/bat /usr/local/bin/bat
+  ln -sfn /usr/local/lib/flea-helpers/bin/glow /usr/local/bin/glow
+  printf 'const answer = 42;\n' | bat --color=always --style=plain --paging=never --file-name=sample.js -
+  ```
+
+  `glow` 是另附的 jsmdcui `--cat` 入口，方便手動讀文件；Flea 程式碼上色呼叫的是 `bat`。`--backend=copyfile` 避免 Android／proot 的硬連結限制；一般原生 Linux 可直接 `bun i jsmdcui`。安裝位置是獨立 helper 目錄，Dockerfile 也採用同樣方式。適配器只覆蓋 Flea 使用的 bat 參數，不是完整 bat 實作。 自動載入 jsmdcui 的全部語法定義，另補常見語言別名及 JSX、MTS／CTS、JSONC／JSON5／JSONL 等副檔名。`syntax-compat.mjs` 在 adapter 內轉換語法規則的 Go regex flags／字邊界，修正 Dockerfile、batch 等規則在 JavaScript 無法編譯的問題，不修改 npm 安裝內容。
+
+  [check-highlighting.mjs](../../test/fixtures/flea-helpers/check-highlighting.mjs) 會真正透過官方 Flea 後端，檢查每種格式以檔案路徑與 Markdown 語言名稱送入時都有非零顏色 role，並確認文字未被改寫。樣本列在 [highlight-cases.json](../../test/fixtures/flea-helpers/highlight-cases.json)：JS／MJS／CJS／JSX、TS／TSX／MTS、Python、sh／zsh／fish、JSON／JSONC／JSON5／JSONL、YAML、TOML、INI／dotenv、HTML／XML、CSS／SCSS、SQL、C／C++／C#、Go、Rust、Java、Kotlin、Ruby、PHP、Lua、Perl、PowerShell、batch、Dockerfile、Makefile、CMake、Markdown、diff、Terraform、Vue、Svelte。這是沿用 jsmdcui 的語法規則，不是各語言的完整 parser；未知語言明確退回原文。
+
+  ```sh
+  udocker run flea-qml bun /usr/local/lib/flea-helpers/check-highlighting.mjs
+  ```
+
+  [check-preview.mjs](../../test/fixtures/flea-helpers/check-preview.mjs) 另用隔離設定開啟官方 Flea 的 JS、JSONL 與 HTML source 預覽（HTML 會按 `r` 切換），確認 UI 實際上色 並截圖到容器 `/tmp/flea-js-preview.png`；已目視確認關鍵字／運算子與數字顏色。可執行 `udocker run flea-qml bun /usr/local/lib/flea-helpers/check-preview.mjs` 重現，不影響目前 Land 視窗。
+
+- **實驗替代：`bubblewrap`／`bwrap` 與 `prlimit`**：上色、縮圖等 helper 會經過沙箱；缺少 `bwrap` 或 `prlimit` 時，有些路徑連工具都不會呼叫。一般 Linux 優先保留真正的 bubblewrap。bunproot 實驗可選用本專案的 10 行 `bwrap`，吃掉已知參數、關閉 status fd，再直接執行 helper；不捏造 PID。這會取消 namespace／檔案系統隔離，但仍保留外層 `prlimit`；不能視為安全沙箱。Debian 的 `prlimit` 由 `util-linux` 提供，不用成功 stub 偷偷取消資源限制。
+
+  ```sh
+  ln -sfn /usr/local/lib/flea-helpers/bin/bwrap /usr/local/bin/bwrap
+  command -v bwrap prlimit
+  ```
+
+  [bwrap-real-filter](../../test/fixtures/flea-helpers/bin/bwrap-real-filter) 也已保存於本專案，只供重現先前「過濾參數後仍呼叫 `/usr/bin/bwrap-real`」的診斷；該路徑在 bunproot 的 fd readlink 仍失敗，**不要用它作為成功啟動步驟**。shell wrapper 本身仍需要 Debian 的 `/bin/sh`、Bash、`realpath`、`dirname`、`env` 等基本工具。
+
+- **實驗替代：影片縮圖 `ffmpegthumbnailer`／`libffmpegthumbnailer.so.4`**：可以完全不安裝，改用本專案的 3 行 stub 和 4 行 `.thumbnailer`。它給每個註冊的影片 MIME 寫同一張不透明 1×1 PNG；沒有讀取影片，也不冒充解碼成功。官方 Flea 後端已實測回傳非空 `thumbed.file`，QML 因而不再顯示缺縮圖提示。播放仍由真正的 WASM 解碼器負責。複製後須重開 Flea；停用時刪除註冊檔，已生成的佔位縮圖仍可能留在快取。
+
+  ```sh
+  install -Dm755 /opt/buninu-browser/test/fixtures/flea-thumbnail-stub/flea-thumbnail-stub /usr/local/bin/flea-thumbnail-stub
+  install -Dm644 /opt/buninu-browser/test/fixtures/flea-thumbnail-stub/flea-placeholder.thumbnailer /usr/share/thumbnailers/flea-placeholder.thumbnailer
+  ```
+
+- **可省略：FFmpeg／`ffprobe` 媒體資訊**：Flea 用 `ffprobe` 讀編碼、採樣率等；瀏覽器的 MP3／MP4 播放不呼叫它。沒有就保留未知資訊，不要編造時長、大小或編碼。最小方案是不安裝、不提供 stub；若之後需要完整資訊，再裝 `ffmpeg`。影片縮圖則是上一項的另一條路徑，單裝 ffmpeg 不等於註冊了縮圖工具。
+
+- **播放與聲音：QtMultimedia、音訊服務、IdleInhibitor**：QtMultimedia 已由本專案 QML MediaPlayer／AudioOutput／VideoOutput 適配到原有瀏覽器播放器，不需要外部 Qt `.so`。出聲要有播放器可連到的 jspulse／PulseAudio `127.0.0.1:4713`；宿主執行 `bunx @drxiaozhi/jspulse --sles`（Android）或 `bunx @drxiaozhi/jspulse --alsa`（Linux ALSA）。假成功 stub 不會產生聲音，不要求出聲則可靜音。IdleInhibitor 只提示未實做，不阻止播放，不需要額外 stub。宿主音訊服務在容器網路下也必須可達。
+
+- **剪貼板：Wayland、`wl-copy` 與 host 工具**：文字框的複製貼上由本專案與 Land 的 Wayland 剪貼板處理；Land 優先 xclip，再走既有平台 fallback，不需要為此安裝 Qt。Flea 的選單「Copy Path」／分享連結另外直接呼叫 `wl-copy`，不是同一接口；要用它就安裝 `wl-clipboard` 或提供真的能寫入同一剪貼板的 adapter。本專案沒有把空寫入包裝成成功的 wl-copy stub；不安裝時省略這些選單功能，不宣稱已複製。
+
+- **可省略：`jq` JSON 美化**：它不是文字列表或播放器的啟動依賴。不裝時不要假裝回傳有效 JSON；需要完整 JSON 預覽時安裝 jq。本文的 jsmdcui 適配器負責上色，不是 jq 查詢語言替代品。
+
+- **可省略：圖片外掛、PDF、Office 與 Markdown 圖表**：一般 PNG／JPEG 等走瀏覽器現有解碼，不需要 Qt 的 kimageformats／libheif；HEIC 等未支援格式不能靠 stub 得到真實圖片。QtQuick.Pdf／qt6-webengine 仍不能由安裝套件直接接到我們的 DOM runtime，缺少 QML 相容功能時保留未支援。LibreOffice 用於 Office 預覽，QuickJS-NG（`qjs`）用於數學／圖表 helper；不需要這些功能就不裝。不能只把 qjs 連到 bun，旗標與執行環境尚未適配。
+
+- **可省略：垃圾桶、裝置、網路與桌面服務**：GLib/GIO、GVfs（含 AFC／MTP／gphoto2／NFS／SMB／DNSSD）、udisks2、usbmuxd、D-Bus，以及 Python／PyGObject、expect 等是相應桌面 helper 的依賴，不是本地檔案列表的前置服務。`gio trash`、掛載、卸載、解鎖不能用 `exit 0` 騙成功，否則會把未完成的操作呈現成完成；最小方案保留不可用，真的需要時安裝服務。原生 Flea 的 portal、FileManager1 與 MPRIS helper 不等於我們已提供完整 D-Bus 桌面。
+
+- **可省略：外部開檔／終端機**：`gio open`／xdg-utils、desktop MIME 關聯、`xdg-terminal-exec` 與 Omarchy launcher 不影響 Flea 內建預覽。要讓按鈕真的開出程式，需要實際 launcher；`xdg-terminal-exec` 接收 `--dir=...`，不能直接連到不接受該旗標的命令。沒有時保留不可用；不要把「已啟動」假回覆給使用者。hicolor-icon-theme 是桌面安裝圖示的配套，不是我們的 DOM 播放依賴。
+
+- **可省略：壓縮、轉檔與分享**：libarchive／`bsdtar`、7zip／`7z`、ImageMagick／`magick`、tailscale、dropbox-cli、zoxide 分別提供壓縮操作、圖片轉換、分享與常用目錄排序。沒有就不啟用這些功能，不用假成功 stub；涉及寫入的操作尤其不能只回傳 0。若測試環境需要一個明確失敗的命令，可複製 [unsupported](../../test/fixtures/flea-helpers/bin/unsupported) 並取所需名稱；它只有 3 行，印出未支援並回傳 1，不是完整協定替代品。
+
+- **最後啟動與驗收**：前述必要檔案、MIME、qs、bat／jsmdcui，以及需要時的 bwrap／縮圖替代都準備好後，從同一容器 shell 啟動。`QSG_RHI_BACKEND=opengl` 僅跳過 Flea 的原生 Vulkan 探測，不代表瀏覽器開啟 GPU。這些指令沒有啟動第二個 Land。
+
+  ```sh
+  command -v bun flea qs bat prlimit
+  test -r /usr/share/mime/globs2
+  test -d /usr/share/omarchy/qs/Commons
+  env PATH="/usr/local/bin:$PATH" QSG_RHI_BACKEND=opengl flea --gui "$HOME"
+  ```
+
+  驗收：先看一般檔案列表，用滑鼠開啟資料夾，或用上下方向鍵選取資料夾後按右方向鍵進入，找到 JS／TXT／MP4 範例檔案；程式碼應有色、影片先顯示固定色縮圖，按播放後顯示真實影片。若失敗，先區分缺少分類資料、helper 未找到、沙箱失敗、播放錯誤；不能把已知的佔位縮圖結果當成所有外部功能都支援。
 
 ## Termux udocker Debian experiment
 
@@ -251,12 +434,12 @@ bun test/manual-flea-application.js
 FLEA_BIN=/absolute/path/to/flea bun test/manual-flea-application.js
 
 # Headless application, preview, worker and compile inventory tests.
-BUNINU_FLEA_ROOT=../flea BUNINU_OMARCHY_ROOT=../omarchy-qml-reference \
+BUNINU_FLEA_ROOT=../flea BUNINU_OMARCHY_ROOT=/opt/omarchy-source \
   bun test test/qml-flea-app.test.js test/qml-flea-previews.test.js \
   test/qml-flea-compile.test.js test/qml-flea-rows.test.js test/qml-worker.test.js
 
 # Own isolated compositor; does not affect an existing Land session.
-BUNINU_FLEA_ROOT=../flea BUNINU_OMARCHY_ROOT=../omarchy-qml-reference \
+BUNINU_FLEA_ROOT=../flea BUNINU_OMARCHY_ROOT=/opt/omarchy-source \
   BUNINU_QML_WAYLAND_TEST=1 bun test test/qml-flea-wayland.test.js
 
 # Optional genuine Debian arm64 Quickshell binary already extracted elsewhere.
@@ -765,3 +948,24 @@ device, mute and output closure. With BUNINU_FLEA_ROOT and BUNINU_OMARCHY_ROOT,
 test/qml-flea-media.test.js also loads Flea's unchanged PreviewMedia.qml.
 測試包含真實 MP4／MP3、跳轉、影片截圖與記憶體音訊端的 PCM、靜音、關閉；
 設定 Flea／Omarchy 來源路徑後，也測試未修改的 PreviewMedia.qml。
+
+### Optional placeholder video thumbnails
+
+The isolated Flea experiment can use `test/fixtures/flea-thumbnail-stub/`:
+copy `flea-thumbnail-stub` to `/usr/local/bin/` (executable) and
+`flea-placeholder.thumbnailer` to `/usr/share/thumbnailers/`, then restart Flea.
+The 3-line shell stub writes the same opaque 1×1 PNG for every registered video
+format; it does not decode the video or provide metadata. The registration file
+is 4 lines. Flea 0.3.12's actual backend accepted it and published a stamped cache
+PNG (`thumbed.file` nonempty), using the existing experimental bwrap bypass.
+This avoids the missing-thumbnail message without changing Flea's QML.
+Remove the registration to disable it; already generated placeholder thumbnails
+remain in Flea's thumbnail cache until invalidated or removed.
+
+隔離 Flea 實驗可使用 `test/fixtures/flea-thumbnail-stub/`：將可執行的
+`flea-thumbnail-stub` 放入 `/usr/local/bin/`，註冊檔放入
+`/usr/share/thumbnailers/`，再重開 Flea。shell stub 只有 3 行，註冊檔
+4 行；所有註冊的影片都使用同一張不透明 1×1 PNG，不解碼影片也不提供
+媒體資訊。官方 0.3.12 後端已實測接受並寫入縮圖快取，沿用實驗容器的
+bwrap 繞過路徑，無須修改 Flea QML。刪除註冊檔可停用，但既有佔位縮圖
+仍保留在快取，直到失效或被移除。
