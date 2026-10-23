@@ -297,9 +297,12 @@ Flickable, ListView/GridView and basic Shape paths.
   and DropArea are partial DOM-event adapters, not Qt gesture arbitration or
   complete native drag-and-drop.
 - ListModel, DelegateModel/Group and virtualized views instantiate a bounded
-  visible/cache range, with pooling/reuse and synchronous forceLayout. Variable
-  row height, sections, full highlight behavior and model role semantics remain
-  limited. At most 500 visible delegates are created per view layout.
+  visible/cache range, with pooling/reuse and synchronous forceLayout. ListView
+  positions measured delegates by their individual heights (widths horizontally),
+  and updates following rows when a delegate grows. Unseen rows use estimated
+  extents; only visited measurements are stored. Sections, full highlight behavior
+  and model role semantics remain limited. At most 500 visible delegates are
+  created per view layout.
 - XmlListModel supports simple element paths and attribute/element roles such as
   XBEL bookmarks; it is not an XPath implementation.
 - Timer, basic numeric/property/sequence/parallel animations, Behavior and
@@ -609,3 +612,35 @@ repeatedly enters an empty `~` and goes back, checking every language icon.
 `test/qml-flea-navigation-backend.test.js` 使用官方後端反覆進入空的 `~` 再返回，
 確認各個語言圖示仍有內容。示範測試的 `HOME` 是隔離目錄；「NOTHING HERE YET」
 表示該目錄為空，不表示 `~` 展開失敗。
+
+### Markdown preview layout / Markdown 預覽排版
+
+ListView uses sparse measured sizes to place unequal-height blocks without
+overlap, including later height changes, scrolling and viewport resizing.
+Formatting whitespace between markup blocks does not add phantom text lines.
+PlainText retains explicit trailing newlines. No Flea-specific renderer is used.
+
+ListView 依各區塊實際高度排列，並追蹤後續高度變化；捲動與視窗改變大小時仍維持
+有限範圍的虛擬列表。未見過的區塊使用估計高度，不會建立整份文件。標籤區塊間的
+格式換行不再增加虛構文字行；PlainText 的明確換行則保留。這是通用 QML 修正。
+
+Tests / 測試：`test/qml-views.test.js`、`test/qml-layout-text.test.js`、
+`test/qml-flea-markdown-backend.test.js`。
+
+Markdown pre-reading also uses `StdioCollector.data`: the collector exposes the
+original bytes as an ArrayBuffer separately from decoded text, and signal
+handlers run with their declaring QML object as `this`. Byte concatenation is
+lazy and only occurs when `data` is read.
+
+Markdown 預讀使用的 `StdioCollector.data` 已提供原始位元組 ArrayBuffer，與解碼後
+的文字分開；讀取 `data` 時才合併位元組。訊號處理函式的 `this` 指向宣告它的
+QML 物件，供 `this.text`／`this.data.byteLength` 等標準用法使用。
+
+MarkdownText collapses paragraph soft breaks as HTML whitespace while preserving
+explicit hard breaks and fenced code lines. Proportional text line height uses
+the same measured font line box for CSS painting and QML geometry, including
+fallback glyph metrics, so CJK code lines do not crowd into a taller item box.
+
+MarkdownText 將段落的軟換行視為 HTML 空白，保留明確換行與程式碼區塊的逐行內容。
+比例行高在 CSS 繪製與 QML 幾何計算使用相同字型行框，包含替補字型的度量，
+避免中文程式碼擠在較高區塊的上方。

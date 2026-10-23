@@ -199,3 +199,40 @@ test('upstream SettingsRuler changes shared Theme, disables taps and follows the
     rmSync(dir,{recursive:true,force:true});
   }
 },30000);
+
+test('StdioCollector exposes original bytes separately from decoded text',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'qml-stdio-bytes-'));let browser;
+ try{
+  const command=[process.execPath,'-e','process.stdout.write(Buffer.from([0,255,228,184,173]))'];
+  await Bun.write(join(dir,'main.qml'),`import QtQuick
+import Quickshell.Io
+Text {id:root;text:"waiting"
+ Process {running:true;command:${JSON.stringify(command)}
+  stdout:StdioCollector {waitForEnd:true;onStreamFinished:root.text=Array.from(new Uint8Array(this.data)).join(",")+"|"+this.text.length}
+ }
+}`);
+  browser=await createBrowser({spareRenderer:false});await browser.context.navigate(Bun.pathToFileURL(join(dir,'main.qml')).href);
+  await until(async()=>(await browser.context.evaluate('document.body.innerText'))!=='waiting');
+  expect(await browser.context.evaluate('document.body.innerText')).toBe('0,255,228,184,173|3');
+ }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
+},30000);
+
+test('Markdown soft breaks collapse while hard breaks and code lines survive with matching line boxes', async () => {
+  const markdown = '中文第一行\n第二行\n\nthird  \nfourth\n\n```\ncode one\ncode two\n```';
+  const dir = mkdtempSync(join(tmpdir(), "qml-markdown-"));
+  const b = await createBrowser({spareRenderer:false});
+  try {
+  await Bun.write(join(dir, "main.qml"), `import QtQuick
+Item {width:500;height:400
+ Text {id:md;width:450;text:${JSON.stringify(markdown)};textFormat:Text.MarkdownText;font.pixelSize:16}
+ Text {id:status;y:350;text:md.contentHeight+":"+md.lineCount}
+}`);
+    await b.context.navigate(Bun.pathToFileURL(join(dir, "main.qml")).href);
+    const result = JSON.parse(await b.context.evaluate( `JSON.stringify({text:document.getElementById('md').textContent,code:document.getElementById('md').querySelector('pre').textContent,br:document.getElementById('md').querySelectorAll('br').length,line:parseFloat(document.getElementById('md').style.lineHeight),metrics:document.getElementById('status').textContent})`));
+    expect(result.text).toContain('中文第一行 第二行');
+    expect(result.code).toBe('code one\ncode two\n');
+    expect(result.br).toBe(1);
+    const [height, count] = result.metrics.split(':').map(Number);
+    expect(result.line).toBeCloseTo(height / count, 5);
+  } finally { b.close(); rmSync(dir, {recursive:true,force:true}); }
+}, 30000);

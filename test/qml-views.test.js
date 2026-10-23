@@ -309,3 +309,24 @@ Item {width:300;height:200
   expect(await host.call('evaluate','document.body.innerText')).toContain('row 0');
  }finally{host.close();}
 },30000);
+
+test('ListView positions unequal delegates by measured extent and updates following rows when a later row grows',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start();await host.call('loadDocument',{url:'data:text/x-qml,variable',contentType:'text/x-qml',source:`import QtQuick
+Item {id:root;width:400;height:400;property int extra:0
+ ListView {id:view;width:200;height:300;spacing:5;model:[20,80,35,60]
+  delegate:Rectangle {required property int index;required property var modelData;width:200;height:modelData+(index===1?root.extra:0)}
+ }
+ Text {id:report;x:220}
+ Button {id:inspect;y:330;onClicked:report.text=JSON.stringify({rows:[0,1,2,3].map(i=>{var c=view.itemAtIndex(i);return c?[c.y,c.height]:null}),index:view.indexAt(10,110),gap:view.indexAt(10,22),content:view.contentHeight})}
+ Button {id:grow;x:100;y:330;onClicked:root.extra=50}
+}`});await host.call('whenLoaded');
+  const read=async()=>{await host.call('evaluate','document.getElementById("inspect").click()');return JSON.parse(await host.call('evaluate','document.getElementById("report").textContent'));};
+  let state=await wait(read,s=>s.rows[3]?.[0]===150);
+  expect(state.rows).toEqual([[0,20],[25,80],[110,35],[150,60]]);expect(state.index).toBe(2);expect(state.gap).toBe(-1);
+  await host.call('evaluate','document.getElementById("grow").click()');
+  state=await wait(read,s=>s.rows[3]?.[0]===200);
+  expect(state.rows).toEqual([[0,20],[25,130],[160,35],[200,60]]);expect(state.content).toBe(265);
+ }finally{host.close();}
+},30000);

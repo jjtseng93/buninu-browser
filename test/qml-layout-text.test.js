@@ -192,3 +192,14 @@ Item {width:300;height:200
     },
   );
 }, 30000);
+
+test('markup formatting newlines after blocks do not add phantom text lines',async()=>{
+ await fixture(`import QtQuick
+Item {width:400;height:200
+ Text {id:rich;width:300;text:"<p>one</p>\\n<p>two</p>\\n";textFormat:Text.RichText}
+ Text {id:plain;y:80;text:"one\\ntwo\\n";textFormat:Text.PlainText}
+ Text {id:status;y:150;text:rich.lineCount+":"+plain.lineCount}
+}`,async host=>{
+  expect(await host.call('evaluate','document.getElementById("status").textContent')).toBe('2:3');
+ });
+});
