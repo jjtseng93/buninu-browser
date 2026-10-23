@@ -41,3 +41,30 @@ The repository's original qmldir files remain unchanged.
 
 SettingsRuler 來自同一上游版本，原檔未修改。互動範例只調整記憶體內的 ViewState，
 不寫個人設定；Quickshell 對照的暫存副本只刪除未打包檔案的 qmldir 索引。
+
+## Additional unchanged controls and models
+
+The following files are copied byte-for-byte from the same Flea revision above:
+
+- `ui/SettingsSegment.qml`, `ui/DialogButton.qml`, `ui/DialogField.qml`
+- `ui/Glyph.qml`, `ui/GlyphSolid.qml`, `ui/Reveal.qml`, `ui/StableModel.qml`
+- `ui/js/Icons.js`, `ui/js/Motion.js`
+
+`button.qml`, `field.qml` and `segment.qml` are our small test wrappers, not
+upstream files. DialogButton and DialogField are tested both through this browser
+and the genuine Quickshell binary. StableModel is tested with a virtualized view,
+including resizing and warm delegates. Source fixtures are not reformatted.
+
+The larger `qml-flea-app`, `qml-flea-previews`, `qml-flea-compile` and
+`qml-flea-wayland` opt-in tests read existing external checkouts instead of
+bundling the entire Flea application. They use a temporary HOME and XDG state;
+backend replies are never replaced. Without an explicitly supplied real FLEA_BIN,
+the unavailable backend state is expected. Those tests do not claim file-manager
+operations or mounting work.
+
+本輪新增的上述上游檔案均保持原文；三個 wrapper 是自製測試入口。
+完整主程式測試讀取隔壁既有 checkout，不把整個 Flea 打包進本專案，
+也不偽造後端服務。沒有實際後端時，不能據此宣稱檔案操作已通過。
+
+`text-metrics.qml` is also our wrapper. It compares empty-string and multiline
+line counts with the actual Quickshell binary; no Qt implementation source is used.

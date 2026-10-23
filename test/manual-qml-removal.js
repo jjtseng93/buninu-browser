@@ -7,6 +7,7 @@ import { join } from 'node:path';
 const source = Bun.fileURLToPath(new URL('../', import.meta.url));
 const copy = mkdtempSync(join(tmpdir(), 'browser-without-qml-'));
 const files = [
+  'frontends/wayland/index.js',
   'lib/document-types.js',
   'lib/headless-shell.js',
   'lib/renderer/page-renderer.js',
@@ -17,7 +18,7 @@ try {
   for (const entry of readdirSync(source, { withFileTypes: true })) {
     if (entry.name.startsWith('.')) continue;
     const from = join(source, entry.name), to = join(copy, entry.name);
-    if (entry.isDirectory() && !['lib', 'test'].includes(entry.name)) symlinkSync(from, to, 'dir');
+    if (entry.isDirectory() && !['lib', 'test', 'frontends'].includes(entry.name)) symlinkSync(from, to, 'dir');
     else cpSync(from, to, { recursive: true });
   }
   let blocks = 0;

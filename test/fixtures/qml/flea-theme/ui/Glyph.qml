@@ -1,0 +1,54 @@
+import QtQuick
+import QtQuick.Shapes
+import qs.Commons
+import "js/Icons.js" as Icons
+
+// One row or sidebar mark, chosen by name. Lucide's grid is 24 units at stroke 2, scaled to the slot.
+Item {
+    id: root
+
+    property string name: "file"
+    property color color: "transparent"
+    // Lucide draws on a 24 unit grid, so every path in Icons.js is in those units.
+    readonly property real grid: 24
+    // The mark's ceiling. Default is the row and menu mark; a surface drawing a mark alone passes its own.
+    property real maxSize: Theme.markSize
+    // The min() against the slot is the icon spec's own rule, so a smaller caller slot still wins
+    // (the Network "+" at the caption token needs it) and no container can ever enlarge a mark.
+    readonly property real markSize: Math.min(root.maxSize, root.width, root.height)
+    // Its own name: "scale" would shadow Item.scale, which qmllint flagged.
+    readonly property real gridScale: root.markSize / root.grid
+    property real strokeWidth: Theme.strokeWidth
+    // The solid part of the mark (Icons.js FILLED), empty for every mark but the few that have one.
+    readonly property string filledPath: Icons.filledPathFor(root.name)
+    // Built the first time a mark names a solid part: a plain glyph owns no object for it, which tests/rowcost.qml counts.
+    property Item solid: null
+    function syncSolid() {
+        if (root.solid === null && root.filledPath.length > 0)
+            root.solid = Qt.createComponent("GlyphSolid.qml").createObject(root, { glyph: root })
+    }
+    // filledPath starts empty, so its first non-empty value, on a build or a reuse, lands here.
+    onFilledPathChanged: root.syncSolid()
+
+    // The Shape is sized in grid units pre-transform; Scale's origin defaults to (0,0), so this
+    // offset is what re-centers the scaled-down box in root's slot instead of pinning it top-left.
+    Shape {
+        width: root.grid
+        height: root.grid
+        x: (root.width - root.markSize) / 2
+        y: (root.height - root.markSize) / 2
+        preferredRendererType: Shape.CurveRenderer
+        transform: Scale { xScale: root.gridScale; yScale: root.gridScale }
+
+        ShapePath {
+            strokeColor: root.color
+            fillColor: "transparent"
+            strokeWidth: root.strokeWidth
+            // The Omarchy cut: square caps and mitered joins, the edge of the brand spiral; Icons.js paths are redrawn sharp to match.
+            capStyle: ViewState.hyprlandIcons && Style.cornerRadius > 0 ? ShapePath.RoundCap : ShapePath.SquareCap
+            joinStyle: ViewState.hyprlandIcons && Style.cornerRadius > 0 ? ShapePath.RoundJoin : ShapePath.MiterJoin
+            // A mark with more than one stroke is one multi-subpath SVG string; see Icons.js "Lucide path data".
+            PathSvg { path: Icons.pathFor(root.name) }
+        }
+    }
+}

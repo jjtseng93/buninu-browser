@@ -1,87 +1,216 @@
 # Experimental QML DOM frontend
 
-This directory is an isolated experiment, not a QtQuick or Quickshell replacement.
-It creates the browser's existing DOM nodes directly. It does not generate HTML,
-feed generated markup through the HTML parser, or keep a QML component tree at
-runtime. The temporary AST is discarded after DOM construction and JS generation.
-Only flat DOM references, property state and reactive dependencies survive in the
-normal page realm. Rendering, input, screenshots and navigation use the existing
-browser pipeline. `FloatingWindow` means the document's root item, not an OS window.
+QML is compiled directly into this browser's existing DOM, CSS and page JavaScript.
+It does not generate HTML or retain a second QML component tree. Temporary syntax
+and import graphs are discarded after generating DOM factories and bindings.
+Flat property state, DOM references, delegate factories and reactive dependencies
+remain. No new npm dependency or native Qt library is required.
+
+This is an experimental subset, not a QtQuick/Quickshell replacement. Unknown
+imports, types and properties produce diagnostics. Recognized APIs also have
+limits documented below; successful compilation is not complete compatibility.
 
 ## Try it
 
-From the buninu-browser repository:
+Run these commands from the buninu-browser repository:
 
 ```sh
-bun index.js file://"$PWD"/test/fixtures/qml/hello.qml
-bun index.js --headless --window-size=800,480 --screenshot=/tmp/qml.png \
-  file://"$PWD"/test/fixtures/qml/hello.qml
-bun test test/qml.test.js
+bun index.js file://"$PWD"/test/fixtures/qml/multiply.qml
+bun index.js --wayland file://"$PWD"/test/fixtures/qml/multiply.qml
+bun test test/qml*.test.js
 ```
 
-The fixture has a click counter, a parent-width binding, centered text and a
-reactive background. Resizing the viewport updates the root and its descendants.
-QML loads for `text/x-qml`, `application/x-qml`, or `.qml` paths with generic/text
-MIME types. Explicit HTML MIME types retain HTML behavior. Large responses retain
-the existing bounded text preview; downloads still contain the original bytes.
-Unsupported syntax/imports/types/properties show a diagnostic and inert source.
-Scripting disabled shows source rather than silently enabling execution.
+The same three-field calculator has been checked with the real Quickshell binary.
+QML is recognized by `text/x-qml`, `application/x-qml`, or a `.qml` path with a
+text/generic MIME type. Explicit HTML retains HTML behavior. With scripting off,
+the source is displayed inertly. Downloads retain the original bytes.
 
-## Layout
+The standard Wayland frontend uses `WAYLAND_DISPLAY` and `XDG_RUNTIME_DIR` and
+presents ordinary `wl_shm` buffers. One browser frontend currently owns one native
+window; multiple QML `FloatingWindow` objects do not create multiple OS windows.
+The root fills the supplied viewport and follows its resize events.
 
-- `format.js`: MIME/path recognition only; safe to import in the controller.
-- `parser.js`: deliberately limited QML grammar, using the already vendored MIT
-  Acorn for embedded JS tokenization/AST. No additional npm dependencies.
-- `loader.js`: bounded, per-document import graph through the existing resource bridge;
-  relative/URI imports, qmldir entries, singletons and JS dependencies.
-- `document.js`: DOM factory and JS identifier/binding translation. It never
-  evaluates QML expressions during compilation. Generated JS runs in the selected renderer realm.
-- `reactive.js`: small dependency tracker with microtask batching, dynamic
-  dependency cleanup and an update-loop limit. Not a SolidJS dependency.
-- `runtime.js`: DOM/CSS updates and viewport signals, serialized into the page
-  realm. Imperative property assignment detaches that property's binding.
+## Flea: current verified scope
 
-## Initial subset
+The unchanged `ui/boot/shell.qml` from Flea revision
+`f21789e56cc4b0877caa3156fff7bce52a8dd9c2` runs with real Flea Theme and Omarchy
+Commons/Ui imports from revision `3c7027db2a4fa9fa6a49d7af7f87c27ac48e677d`.
+Tests use isolated HOME/XDG directories. They do not inject fake backend replies.
 
-Imports: `QtQuick`, `QtQuick.Controls` and `Quickshell`, optionally with a numeric version. Version
-syntax is accepted but does not claim compatibility with that module's API.
+Verified against those sources:
 
-Types: `Item`, `Rectangle`, `Text`, `MouseArea`, `FloatingWindow`, `Column`,
-`Label`, `TextField`, `Button`, `QtObject`, `Singleton`.
+- Main window startup, settings opened by the real toolbar, Display/Keys tabs,
+  and Escape closing the panel.
+- Ctrl-L path editing, replacement of selected text, and Escape cancellation.
+- The real keyboard help sheet and Add network share dialog, including typing a
+  host and switching SMB to SFTP. Connecting/mounting is **not** tested.
+- Original Row/GridTile components render metadata and react to changed input;
+  GridTile retains its two-line filename caption. These use test input data, not
+  a backend replacement.
+- Real text and CSV files through `PreviewText`; Markdown through the original
+  `MarkdownWorker.js` and its `Qt.include` dependencies on a real worker thread.
+- SVG/PNG preview, zoom and fit through the original `PreviewImage.qml`.
+- SettingsRuler, DialogButton and DialogField behavior compared with an existing
+  Quickshell binary, without reading its implementation source.
+- Flea StableModel resize/warm behavior and virtualized delegates; a separate
+  range-model test represents 100 million rows without creating that many DOM nodes.
+- A separate real Wayland socket test opens Settings, closes it with Escape, and
+  closes the native window with Land's Super-W. It owns a separate compositor.
 
-The Controls subset maps directly to DOM inputs/buttons; it does not emulate Qt's
-style engine. Column uses CSS flex column/gap and natural DOM height. TextField
-synchronizes user input with `text`, supports `readOnly`, `placeholderText`,
-`selectByMouse` (CSS selection policy) and `Accessible.name` (ARIA label).
-Ctrl+A/Meta+A selects the field; Button supports Enter/Space activation.
-Mouse selection/caret behavior otherwise follows the browser's existing input support.
-A root FloatingWindow fills the supplied browser viewport; implicit dimensions do
-not resize the native window yet.
+The source inventory parses 239 QML files and compiles 227 of 235 top-level UI
+components. The eight remaining compile blockers are ShaderEffectSource
+(ColumnsArea, HtmlClip, PreviewSwap, QuickLookSwap), QtQuick.Pdf (PdfViewer,
+PreviewPdf), AnimatedImage (PreviewAnimation), and QtMultimedia (PreviewMedia).
+Dynamic loaders defer some of these until the associated feature is opened.
 
-`test/fixtures/qml/multiply.qml` is the same interactive three-field calculator
-verified with real Quickshell. Open it with `bun index.js --wayland file:///…/multiply.qml`.
+**Full Flea file management is not yet supported or validated.** No Flea backend
+was installed during this work. Without `FLEA_BIN`, the main app displays its own
+unavailable state. Real listing/navigation, copying/moving/deleting, mounts,
+clipboard integration, PDF/media, and preview texture transitions remain outside
+this result. A compile inventory is not an end-to-end application test.
 
-新增的 Column、Label、TextField、Button 直接映射成 DOM/CSS，不模擬 Qt 主題。
-文字輸入會同步到 QML 的 text，支援唯讀、提示文字、無障礙名稱與 Ctrl+A 全選。
-Column 使用 CSS flex 排列；滑鼠選字／游標仍受現有 Browser 輸入能力限制。
-乘法範例與真正 Quickshell 測過的是同一份 QML，沒有針對範例檔名的特判。
+```sh
+# Existing, unchanged sibling checkouts; no download or installation is performed.
+bun test/manual-flea-application.js
 
-Properties: `id`; initialized `property int/real/bool/string/var/color` (no Qt type
-coercion yet); width/height/implicitWidth/implicitHeight, x/y, color, radius,
-opacity, visible, enabled, clip, text, title; font pixelSize/family/bold; border
-width/color; anchors fill/centerIn/margins; horizontalAlignment (left/center).
-Text supports explicit `textFormat: Text.PlainText`; other formats still report a diagnostic.
-Handlers: `onClicked`, `Component.onCompleted`. JS expressions/blocks are parsed
-by Acorn, but QML scope translation is experimental, not full Qt name resolution.
+# Optional: supply an already installed real backend.
+FLEA_BIN=/absolute/path/to/flea bun test/manual-flea-application.js
 
-Not implemented: required properties, typed QML functions, signal declarations, the remaining QtQuick Controls, ListView/delegates,
-animations, image/media objects, Quickshell process/IO/services, Omarchy modules,
-multiple OS windows. Flea cannot run on this initial subset. Unsupported features
-should be added explicitly with tests, not silently treated as empty items.
+# Headless application, preview, worker and compile inventory tests.
+BUNINU_FLEA_ROOT=../flea BUNINU_OMARCHY_ROOT=../omarchy-qml-reference \
+  bun test test/qml-flea-app.test.js test/qml-flea-previews.test.js \
+  test/qml-flea-compile.test.js test/qml-flea-rows.test.js test/qml-worker.test.js
+
+# Own isolated compositor; does not affect an existing Land session.
+BUNINU_FLEA_ROOT=../flea BUNINU_OMARCHY_ROOT=../omarchy-qml-reference \
+  BUNINU_QML_WAYLAND_TEST=1 bun test test/qml-flea-wayland.test.js
+
+# Optional genuine Debian arm64 Quickshell binary already extracted elsewhere.
+BUNINU_QS_ROOT=/path/to/sid/root bun test test/qml-quickshell-controls.test.js \
+  test/qml-quickshell-settings.test.js
+```
+
+Validation on 2026-10-23 (Bun 1.4.4 canary, Debian proot): all 73 QML tests
+passed with the Flea, Omarchy, real Quickshell and isolated Wayland options enabled
+(211 assertions). The removal check separately passed 9 ordinary browser tests
+(71 assertions) after deleting all 14 integration blocks and `lib/qml`.
+
+The manual app runner uses the current Wayland socket and creates temporary
+HOME/config/state/data/cache directories. It never writes personal Flea settings.
+Close the window to remove those directories. See its `--help` for paths/options.
+
+## Imports and language
+
+- Relative directories, implicit sibling components, named module directories,
+  and qualified imports. Local modules additionally search `QML_IMPORT_PATH`.
+- `qmldir` component entries, singleton/internal entries and version selection:
+  same major, highest available minor not above the requested version.
+- Per-instance IDs, inheritance, properties, required/readonly properties,
+  writable aliases, default/named content slots, methods and signal declarations.
+- Typed QML functions, inline components, grouped properties, `Behavior on`,
+  statement handlers and checked QML `as` casts. Types do not implement all Qt
+  conversion/coercion rules.
+- JS imports, nested `.import`, and `.pragma library`. Library dependencies share
+  document scope; ordinary scripts belong to the component instance. Generated
+  names avoid application variables. QML `String.arg()` is translated without
+  changing JavaScript's frozen/shared prototypes.
+- Singleton allocation precedes binding evaluation, including mutually referring
+  Theme/Glass and Color/Style objects. Reload creates fresh singleton state.
+- `Component`, `Loader`, local `Qt.createComponent`, `Qt.binding`, and `Binding`.
+  Factories make ordinary DOM and dispose instance effects, listeners and timers.
+  Imperative assignments detach bindings; aliases forward writes and can rebind.
+
+Limits: 256 KiB per imported source, 4 MiB combined source, import depth 48,
+1,024 local or 128 remote resource requests, 2,000 statically expanded objects.
+Live runtime limits are 30,000 local or 2,000 remote objects. Local Flea settings
+prebuilds require the higher local limit. Import cycles, native Qt plugins and
+unsupported declarations are explicit diagnostics. Module version syntax is not
+an assertion that every API from that Qt version exists.
+
+No version-suffixed module directories, qmldir dependency/prefer directives,
+`.mjs` imports, remote dynamic components or Qt native plugin loading.
+
+## Rendering and interaction
+
+Items map to DOM/CSS: Rectangle, Text/Label, TextInput/TextEdit/TextField, Button,
+MouseArea, pointer handlers, Image, Row/Column/Grid/Flow, RowLayout/ColumnLayout,
+Flickable, ListView/GridView and basic Shape paths.
+
+- Anchors include sides, centers, margins and baselines. Positioners respect
+  visible children and padding. Basic layouts support preferred/min/max/fill
+  sizes and alignment; full Qt layout negotiation is not implemented.
+- Text measurement uses the existing canvas text API and a bounded cache.
+  PlainText is literal. Styled/Rich/Auto text builds inert restricted DOM;
+  local Markdown uses Bun's Markdown renderer. Line counts and wrapped filename captions are supported. Mixed-format metrics
+  and multiline ellipsis are approximate, and rich-text embedded images are unsupported.
+- SVG-shaped icons reuse the browser's inline SVG painter. ShapePath linear
+  gradients use an ordinary page canvas on the existing CanvasKit instance:
+  no image encode/decode or raster readback is introduced for that path.
+- Raster Image uses the normal browser decoder. Basic file/data/HTTP SVG images
+  use inert inline SVG DOM instead of a PNG conversion. SVG text, gradients,
+  filters, masks and external resources are not implemented by that path.
+  `sourceSize`, EXIF autoTransform, tiled fill and precise Qt decode/cache policy
+  are not complete; raster size remains governed by the existing browser decoder.
+- Text selection/editing, accepted signals, focus, Keys.forwardTo and key
+  acceptance work with actual DOM events. Editing keys do not trigger ancestor
+  shortcuts; Escape can propagate. Hidden prebuilt controls cannot steal focus. FocusScope ancestors track active
+  focus and can restore their last active child. Menu/AltGr keys and mouse
+  back/forward buttons retain distinct codes.
+- TapHandler supports click/release and basic double taps; HoverHandler observes
+  pointer movement without intercepting underlying controls. Point/Drag handlers
+  and DropArea are partial DOM-event adapters, not Qt gesture arbitration or
+  complete native drag-and-drop.
+- ListModel, DelegateModel/Group and virtualized views instantiate a bounded
+  visible/cache range, with pooling/reuse and synchronous forceLayout. Variable
+  row height, sections, full highlight behavior and model role semantics remain
+  limited. At most 500 visible delegates are created per view layout.
+- XmlListModel supports simple element paths and attribute/element roles such as
+  XBEL bookmarks; it is not an XPath implementation.
+- Timer, basic numeric/property/sequence/parallel animations, Behavior and
+  FrameAnimation use the page event/animation loop. Window frame signals are
+  page-loop signals, not a guarantee of native Wayland presentation timing.
+
+ShaderEffectSource and arbitrary shader/texture composition are not replaced by
+empty stubs. Supporting snapshots of a subtree properly needs additional rendering
+work; a screenshot of the whole viewport would include unrelated siblings/overlays.
+
+## Local host services and isolation
+
+Local `file:` QML automatically uses a dedicated host renderer with application
+HOME, PATH and XDG environment. This is executable local application code with Bun
+access, not sandboxed web content. Reload starts a fresh renderer. Navigating back
+to ordinary HTML swaps to the normal renderer, even in the same directory.
+HTTP(S) QML stays isolated and cannot import local files or access these services.
+Explicit `--dangerously-allow-host-js` retains its existing all-pages meaning.
+
+`host.js` supplies real Process execution/stdin/streaming stdout/stderr,
+FileView reads/watches/writes, local component loading and WorkerScript.
+FileView atomic writes use a temporary sibling plus rename, and `saved` follows
+completion; this is not an fsync durability guarantee. `waitForJob` flushes a
+pending write. WorkerScript runs separately with bounded local `Qt.include`
+loading; no backend replies are substituted. Resources stop on disposal.
+
+LoggingCategory filters the available levels, not the complete Qt logging-rule
+language. IpcHandler currently registers an in-page dispatch table; it does not
+implement Quickshell's Unix IPC protocol. Live Hyprland services and GlassTagger
+are not supported. `Qt.openUrlExternally` invokes the existing local `xdg-open`.
+
+## Implementation map
+
+- `format.js`: MIME/path recognition only, safe in the controller.
+- `parser.js`: QML grammar with the already vendored MIT Acorn for JavaScript.
+- `loader.js`: bounded shared async/sync import resolver.
+- `document.js`: DOM factories, scope/alias resolution and hygienic JS generation.
+- `reactive.js`: dependency tracking, lazy dirty reads and batched updates.
+- `runtime.js`: properties, lifecycle, bindings, layout, input and services.
+- `models.js`: list/range/XML models and virtualized views.
+- `text.js`: inert rich-text DOM and plain-text measurement input.
+- `shapes.js`, `images.js`: existing SVG/canvas/raster rendering adapters.
+- `host.js`, `worker-thread.js`: local-only capabilities and worker execution.
 
 ## Removal / integration boundaries
 
-All integration outside this directory uses the same markers, separated from
+All integration outside this directory has removable blocks, separated from
 surrounding code by blank lines:
 
 ```js
@@ -90,185 +219,60 @@ surrounding code by blank lines:
 // qml handle end
 ```
 
-Find them with:
-
 ```sh
 rg -n 'qml handle' lib
-```
-
-Existing integration points are marked `qml handle`:
-
-1. `lib/document-types.js`: format recognition, unchanged by host support.
-2. `lib/renderer/page-renderer.js`: QML DOM factory, host attachment and disposal.
-   The ordinary `let isHtml`, `let parsed`, and `parsed ??=` HTML fallback remain.
-3. `lib/headless-shell.js`: QML-specific arguments and renderer selection.
-   The ordinary origin key, spare acquisition and navigation remain outside blocks.
-4. `lib/renderer/host.js`: QML-only environment inheritance. The default empty
-   environment (plus Windows SystemRoot) remains outside the block.
-5. `lib/renderer/main.js`: the internal QML-host flag overrides ordinary settings.
-   The original `--dangerously-allow-host-js` test and reason remain outside.
-
-Delete every marked begin/end block (including the markers) in these five files,
-then remove `lib/qml` and the QML-specific tests/fixtures. No replacement statements
-or restored function bodies are needed. General-purpose local variables and
-acquisition callbacks remain valid without QML. No changes were made to the page
-realm, CSS/layout engine, compositor, transport or package entry points.
-QML types, host services and compatibility stay under `lib/qml`.
-
-Verify removal without changing the working tree:
-
-```sh
 bun test/manual-qml-removal.js
 ```
 
-This copies the browser to a temporary directory, deletes the 13 integration
-blocks and `lib/qml`, then runs ordinary renderer, navigation and headless tests.
-暫存副本會實際刪掉接入區塊及 QML 目錄再測試，不會改動工作目錄。
+Existing integrations are in `lib/document-types.js`,
+`lib/renderer/page-renderer.js`, `lib/headless-shell.js`, `lib/renderer/host.js`
+`lib/renderer/main.js`, and `frontends/wayland/index.js`. Delete the 14 marked blocks and `lib/qml`, plus its
+tests/fixtures, to remove QML. Ordinary `let isHtml`, `let parsed`, `parsed ??=`,
+renderer acquisition callbacks and default environments remain valid without
+replacement statements. The removal test does this in a temporary copy and runs
+ordinary renderer/navigation/headless tests. This Flea compatibility round adds one removable Wayland title-poll guard: it
+waits until navigation has finished replacing a local QML renderer. All other
+changes stay in `lib/qml` and `test`.
 
+## References and provenance
 
-## Reference checkouts
+Adjacent optional references, none a runtime dependency:
 
-Adjacent repositories, for reading only; none is a runtime dependency:
+- [qmlweb-parser](https://github.com/qmlweb/qmlweb-parser), BSD-2-Clause.
+- [qmlweb](https://github.com/qmlweb/qmlweb), MIT.
+- [tree-sitter-qmljs](https://github.com/yuja/tree-sitter-qmljs), MIT.
+- [qmlcore](https://github.com/pureqml/qmlcore), MIT.
 
-- `../qmlweb-parser`: https://github.com/qmlweb/qmlweb-parser — BSD-2-Clause.
-- `../qmlweb`: https://github.com/qmlweb/qmlweb — MIT.
-- `../tree-sitter-qmljs`: https://github.com/yuja/tree-sitter-qmljs — MIT.
-- `../qmlcore`: https://github.com/pureqml/qmlcore — MIT.
+Earlier import resolution consulted qmlweb's per-file contexts and directory
+lookup; no qmlweb runtime was copied. This round uses Flea/Omarchy's MIT QML as
+application inputs, public Qt API descriptions, and genuine Quickshell binary
+behavior. No Quickshell implementation source was read or copied.
+API behavior was checked against the public Qt documentation for
+[Text](https://doc.qt.io/qt-6/qml-qtquick-text.html),
+[focus scopes](https://doc.qt.io/qt-6/qtquick-input-focus.html),
+[String.arg](https://doc.qt.io/qt-6/qml-string.html) and
+[key/button enums](https://doc.qt.io/qt-6/qt.html).
 
-These can inform future compatibility work. The initial QML subset is implemented
-here using existing Acorn, rather than importing an old QML runtime or Python toolchain.
+Fixture provenance and bundled licenses are in
+`test/fixtures/qml/flea-theme/README.md`.
 
 ## 中文說明
 
-這是可獨立移除的 QML 實驗入口。QML 解析後直接建立現有 DOM、設定 CSS，
-並把綁定與事件產生為普通頁面 JavaScript；不產生 HTML，不保留另一棵 QML
-元件樹，也不新增原生依賴。所有核心程式集中在本目錄。
+這是直接把 QML 編譯成既有 DOM、CSS、JS 的實驗，不產生 HTML，不保留另一棵
+QML 元件樹，也不新增 Qt 或原生依賴。本輪程式集中在 `lib/qml`，測試在 `test`；
+Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 14 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
 
-外部接入集中在上述五個檔案的 `qml handle begin/end` 區塊。
-刪除全部標記區塊及本目錄即可移除功能，不需要補回任何程式；QML 專用測試與
-fixtures 可一併移除。一般文件建立、renderer 選擇及隔離環境的預設值都留在區塊外。
-已提供互動元件與下述 import 路徑；不宣稱可跑完整 Flea。
+目前原版 Flea 已能啟動真正的主視窗、Theme／Commons／Ui、設定頁、鍵盤說明、
+路徑輸入、網路分享表單，以及文字、CSV、Markdown、SVG／PNG 預覽。
+Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 Super-W 關窗。
+所有應用程式測試都使用獨立 HOME／XDG，不寫個人設定，也沒有偽造後端回覆。
 
-## Imports and component scope / 匯入與元件作用域
+已解析 239 個 QML 檔案，235 個頂層 UI 元件中 227 個能編譯；這不是完整功能覆蓋。
+剩餘編譯阻礙包含 ShaderEffectSource、PDF、AnimatedImage 和 QtMultimedia。
+本輪沒有安裝 Flea 後端，因此不能宣稱完整列檔、檔案操作、掛載或預覽切換可用。
+無後端時顯示的是上游本身的 unavailable 狀態。上方列出實際測試與手動啟動命令。
 
-- Relative directory imports (`import "." as UI`) and implicit sibling component lookup.
-- Custom components with isolated internal IDs, per-instance properties, external
-  overrides, inheritance, methods and property aliases. Readonly properties reject writes.
-- Directory `qmldir`: component entries, `singleton`, `internal`, module name and
-  version selection (same major, highest available minor not above the requested version).
-- Named modules (`import Demo.Toolkit 1.0 as Tools`) resolve `Demo/Toolkit/qmldir`
-  under the importing file's directory, then the entry document's directory.
-- `pragma Singleton` + a singleton qmldir entry creates one shared object per page
-  navigation. Reload creates a fresh graph and fresh singleton state.
-- JS imports (`import "logic.js" as Logic`), nested `.import "other.js" as Other`,
-  exported top-level functions/variables, and `.pragma library`. Ordinary JS state
-  belongs to its component instance; library JS shares state within the document.
-- Source code runs in the renderer, never in the controller. Local top-level QML
-  uses a dedicated host renderer; HTTP(S) QML retains the isolated page realm.
-
-The loader accepts file and HTTP(S) resource URLs using existing resource permissions.
-Remote QML cannot import local files. A data URL can use built-ins but cannot resolve
-relative imports. Limits: 128 resource requests, 256 KiB per imported source, 4 MiB
-combined imported sources, import depth 48 and 2,000 expanded objects. Recursive
-component construction, JS dependency cycles, missing imports and native
-plugin directives produce a visible diagnostic and the original document source.
-
-Built-in Qt module version numbers are accepted, not a claim of full Qt API coverage.
-Local QML searches QML_IMPORT_PATH for URI modules. There are no version-suffixed module directories,
-native Qt plugin loading, qmldir dependency/prefer directives, dynamic Loader,
-or `.mjs`/ES-module export syntax yet. Rich text and the remaining QML/Qt types
-remain separate features. Component completion and binding semantics are still
-an experimental subset, not a full Qt compatibility claim.
-
-相對路徑、同目錄元件、命名模組、qmldir、singleton 與 JS import 已接成同一條
-載入路徑。每份元件有獨立 id／屬性；singleton 與 library JS 在同一文件共用，
-重新導航時重建。支持屬性覆寫、readonly、alias 與普通 JS 語法的方法。
-
-HTTP QML 仍走隔離的頁面 realm；本機 QML 使用獨立 host renderer，具備本機應用程式權限。
-不支援的原生服務、模組或語法會明確報錯，不注入替代品。
-命名模組查匯入檔案、入口文件及本機 QML_IMPORT_PATH；不載入原生 Qt plugin。
-
-```sh
-bun index.js --wayland file://"$PWD"/test/fixtures/qml/imports/main.qml
-bun test/manual-flea-qml.js
-bun test test/qml-imports.test.js test/qml-flea.test.js test/qml.test.js
-```
-
-The Flea demo loads unchanged upstream EscapeHint.qml via real imports. Its local
-Theme.qml is explicitly a test theme, not the Omarchy-dependent upstream Theme.
-The old injected JS Theme and source-inlining harness have been removed.
-See `test/fixtures/qml/flea/README.md` for provenance and limits.
-
-Flea 範例已改用真正 import，按鈕可同時更新兩個 esc 的共用主題；Theme.qml
-仍是標示清楚的測試主題，不代表完整 Flea／Omarchy 已能執行。
-
-Reference consulted: qmlweb's per-file import contexts and qualified directory
-lookup (`../qmlweb/src/engine/QMLEngine.js`, MIT). No qmlweb runtime dependency or
-source code was copied; our graph is compiled away into the existing DOM/page JS.
-
-
-## Local QML applications / 本機 QML 應用程式
-
-Local `file:` QML automatically uses host JavaScript in a dedicated renderer,
-with the application's environment (HOME, PATH, XDG_RUNTIME_DIR, QML_IMPORT_PATH).
-This is executable application code with Bun access, not sandboxed web content.
-A reload starts a fresh renderer. Navigating to ordinary HTML, including a file in
-that same directory, swaps back to the normal renderer; host objects are not reused.
-Explicit `--dangerously-allow-host-js` keeps its existing all-pages meaning.
-
-The QML-only `lib/qml/host.js` adapter supplies filesystem reads/watches and process
-execution. FileView reads/reload/waitForJob are synchronous; Process stdout/stderr
-collectors and exit handlers are asynchronous. Resources are disposed on document
-replacement or renderer termination. Browser input, layout, raster, CDP and Wayland
-frontends continue to use their existing paths. Integrations carry `qml handle`
-markers. Remote QML does not receive this adapter or the host environment.
-
-This stage adds object-valued properties, required properties, signals,
-Connections, Timer, FileView, Process/StdioCollector, TextMetrics/FontMetrics,
-Qt color values and the color helpers used by Theme. Mutually referring singleton
-objects are allocated before their bindings run (e.g. Theme/Glass, Color/Style).
-It does not implement every Qt/Quickshell method: Qt.createComponent/Qt.binding
-and the live Hyprland GlassTagger path remain explicit unsupported operations.
-
-本機 QML 自動使用專屬 host renderer，繼承主機環境，可讀檔、監看與執行程序。
-重新載入會建立新 renderer；離開 QML 回到普通 HTML 時會換回原本隔離路徑，
-並清理原本的監看與程序。HTTP QML 不會取得這些主機能力。
-本階段已接通真正 Flea Theme 與 Omarchy Commons；不是完整 Flea 相容宣告。
-
-```sh
-bun test/manual-flea-theme.js
-bun test test/qml-host.test.js
-```
-
-The real Theme fixture and its upstream licenses/provenance are in
-`test/fixtures/qml/flea-theme/README.md`. The earlier `manual-flea-qml.js` remains
-an intentionally small test-theme demonstration.
-
-## Settings ruler / 設定刻度控制項
-
-The unchanged upstream Flea `SettingsRuler.qml` now runs with the real Theme.
-The demo changes shared ViewState in memory, updates the preview font, disables
-and re-enables the ruler, and restores the Omarchy size. It does not save settings.
-
-```sh
-bun test/manual-flea-settings.js
-bun test test/qml-repeater.test.js test/qml-host.test.js
-# Optional: compare with an already extracted Debian arm64 Quickshell binary.
-BUNINU_QS_ROOT=/path/to/sid/root bun test test/qml-quickshell-settings.test.js
-```
-
-Repeater delegates compile to ordinary JS DOM factories, with per-instance IDs,
-index/modelData, array or numeric models, count/itemAt and nested repeaters.
-Replacing the model rebuilds delegates and disposes their bindings/listeners.
-Limits: 1,000 model entries and 2,000 live objects; no ListModel, incremental model
-notifications or service objects inside delegates yet. This is not a virtual list.
-
-TapHandler currently maps DOM clicks for ReleaseWithinBounds; it is not Qt's full
-gesture arbitration/multitouch implementation. HoverHandler supplies pointer cursor
-and enter/leave state. Text implicit dimensions use the existing canvas text
-measurement, and horizontal-center anchors map to CSS positioning.
-
-未修改的上游 SettingsRuler 已能互動，使用真正 Theme／ViewState；範例只修改記憶體，
-不寫入個人設定。Repeater 編譯為建立 DOM 的 JS 函式，不保留 QML AST；每個委派有
-自己的 id 與綁定，替換模型時會清理舊事件與效果。這不是完整設定面板或虛擬列表。
-上述可選 Quickshell 對照只執行現有 binary，在獨立 Land 上測點擊，不讀其原始碼。
+本機 QML 是有 Bun 權限的應用程式，使用專屬 renderer；HTTP QML 保持隔離。
+匯入、singleton、alias、動態 Loader、模型／虛擬列表、鍵盤輸入、程序／檔案／worker
+已接通所測路徑，但不是完整 Qt 相容層。多視窗、原生拖放、Quickshell IPC、媒體與
+精確渲染同步等仍有限制，詳見上方各節。

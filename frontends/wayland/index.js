@@ -28,6 +28,11 @@ export async function launch({url='about:blank',width=800,height=600,socket}={})
     };
     let readingTitle=false,lastTitle='';
     titleTimer=setInterval(async()=>{
+
+      // qml handle begin: navigation can replace the renderer for local QML
+      if (!ready) return;
+      // qml handle end
+
       if(closed||readingTitle)return;readingTitle=true;
       try{const title=String(await browser.context.title()||'Buninu Browser');if(!closed&&title!==lastTitle){lastTitle=title;client.request(window.toplevel,'set_title',title);}}
       catch(e){if(!closed)fail(e);}finally{readingTitle=false;}
