@@ -1,0 +1,5 @@
+#!/usr/bin/env bun
+// Experimental Quickshell-compatible launcher. Keep it opt-in via PATH.
+import { main } from './launcher.js';
+try { await main(Bun.argv.slice(2)); }
+catch (error) { console.error(`buninu qs: ${error.message}`); process.exitCode = 1; }

@@ -30,6 +30,67 @@ presents ordinary `wl_shm` buffers. One browser frontend currently owns one nati
 window; multiple QML `FloatingWindow` objects do not create multiple OS windows.
 The root fills the supplied viewport and follows its resize events.
 
+## Opt-in `qs` wrapper and official Flea binary
+
+`lib/qml/qs` is an executable Bun launcher, accepting `-p/--path` (file or
+configuration directory) and `-c/--config`. Put its directory first in PATH
+**for this application only**; it does not replace an installed Quickshell.
+Unknown arguments, including native `qs ipc`, fail explicitly. This is still
+our experimental DOM runtime, not the native Quickshell engine.
+
+For an already extracted Omarchy package and the existing Omarchy QML reference:
+
+```sh
+FLEA_BIN=/path/to/package-root/usr/bin/flea \
+BUNINU_FLEA_ROOT=/path/to/package-root/usr/share/flea \
+BUNINU_OMARCHY_ROOT=../omarchy-qml-reference \
+  bun test/manual-flea-binary.js
+```
+
+This creates a temporary HOME/XDG state and sample files, then runs the **actual
+Flea binary** with `--gui`. Flea finds our `qs -p .../boot/shell.qml` via PATH and
+supplies `FLEA_BIN`/`FLEA_PATH`; the wrapper preserves that environment and opens
+the ordinary Wayland frontend. Closing the window removes the temporary state.
+The script sets the upstream Qt renderer hint to `opengl` only to avoid Flea's
+native Vulkan probe; our renderer remains the browser's existing renderer.
+
+To use your own settings, the equivalent direct invocation is:
+
+```sh
+env PATH="$PWD/lib/qml:$PATH" \
+  FLEA_UI=/path/to/package-root/usr/share/flea/ui \
+  QML_IMPORT_PATH=/path/to/imports \
+  QSG_RHI_BACKEND=opengl \
+  /path/to/package-root/usr/bin/flea --gui /path/to/directory
+```
+
+The import root must contain `qs/Commons` and `qs/Ui` pointing to the Omarchy
+QML modules; the manual runner creates these links itself. Keep the backend and
+Flea QML from the same package. `WAYLAND_DISPLAY`/`XDG_RUNTIME_DIR` select Land.
+A real launch uses your settings and file access, like other local QML programs.
+
+Omarchy stable **0.3.12-1 aarch64** was tested on Debian proot: the original
+binary launches our wrapper, a real `--backend` child lists files, directory
+watch notifications update rows, Ctrl-L/Enter navigates to a directory, and
+Land's Super-W closes the wrapper. The settings controls also pass against
+this binary. `DelegateModel.items.create()` now supplies persisted membership
+before completion; views adopt those parked items without constructing duplicates.
+
+Wrapper validation: 60 general QML tests passed (17 opt-in cases skipped),
+the two real-backend/official-launcher tests passed with the above environment,
+and the official-backend settings test passed separately. The removable-integration
+check still passed all 9 ordinary-browser tests. No integration outside `lib/qml`
+or `test` was added for this wrapper.
+
+Use **List view** (Ctrl-1). Saved Columns view still encounters unsupported
+`ShaderEffectSource` and can leave the content area empty. This test does not
+claim complete Flea support, file operation safety coverage, or native QS IPC.
+
+```sh
+# Same environment as above, with BUNINU_QML_WAYLAND_TEST=1 for the socket test:
+bun test test/qml-flea-backend.test.js test/qml-flea-launcher.test.js
+```
+
 ## Flea: current verified scope
 
 The unchanged `ui/boot/shell.qml` from Flea revision
@@ -63,11 +124,12 @@ components. The eight remaining compile blockers are ShaderEffectSource
 PreviewPdf), AnimatedImage (PreviewAnimation), and QtMultimedia (PreviewMedia).
 Dynamic loaders defer some of these until the associated feature is opened.
 
-**Full Flea file management is not yet supported or validated.** No Flea backend
-was installed during this work. Without `FLEA_BIN`, the main app displays its own
-unavailable state. Real listing/navigation, copying/moving/deleting, mounts,
-clipboard integration, PDF/media, and preview texture transitions remain outside
-this result. A compile inventory is not an end-to-end application test.
+**Full Flea file management is not yet supported or validated.** The original
+73-test run used no backend; the later official-binary tests above cover real
+listing/navigation and directory updates. Without `FLEA_BIN`, the main app still
+displays its own unavailable state. Copying/moving/deleting, mounts, clipboard
+integration, PDF/media and preview texture transitions remain outside this result.
+A compile inventory is not an end-to-end application test.
 
 ```sh
 # Existing, unchanged sibling checkouts; no download or installation is performed.
@@ -269,8 +331,18 @@ Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 S
 
 已解析 239 個 QML 檔案，235 個頂層 UI 元件中 227 個能編譯；這不是完整功能覆蓋。
 剩餘編譯阻礙包含 ShaderEffectSource、PDF、AnimatedImage 和 QtMultimedia。
-本輪沒有安裝 Flea 後端，因此不能宣稱完整列檔、檔案操作、掛載或預覽切換可用。
-無後端時顯示的是上游本身的 unavailable 狀態。上方列出實際測試與手動啟動命令。
+最初 73 項測試沒有 Flea 後端；後續已用 Omarchy 官方 0.3.12-1 aarch64 套件，
+驗證官方 binary 直接呼叫我們的 `lib/qml/qs` wrapper，經標準 Wayland 顯示。
+真實列檔、目錄新增通知、Ctrl-L／Enter 切換目錄及 Super-W 關閉已測過。
+`DelegateModel.items.create()` 會在完成回呼前提供持久項目狀態，列表接手時
+沿用既有項目，不重新建立。複製／搬移／刪除、掛載與預覽切換仍未完整驗證。
+
+上方 `test/manual-flea-binary.js` 會呼叫官方 `flea --gui`，只對該程序把
+`lib/qml` 放在 PATH 最前面，保留系統原本的 Quickshell；使用隔離 HOME／XDG
+與範例檔案，關窗後清除。後端與 QML 請使用同一份套件。wrapper 支援
+`-p/--path`、`-c/--config`，不支援的參數會明確失敗，不冒充原生 QS IPC。
+請先使用列表檢視（Ctrl-1）；保存的欄式檢視仍會遇到未支援的
+`ShaderEffectSource` 而出現空白內容區。無後端時仍是上游的 unavailable 狀態。
 
 本機 QML 是有 Bun 權限的應用程式，使用專屬 renderer；HTTP QML 保持隔離。
 匯入、singleton、alias、動態 Loader、模型／虛擬列表、鍵盤輸入、程序／檔案／worker
