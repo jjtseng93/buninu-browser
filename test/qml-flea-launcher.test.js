@@ -1,7 +1,7 @@
 // Actual official executable -> PATH qs wrapper -> browser -> wl_shm on own Land.
 import { test, expect } from 'bun:test';
 import { join, resolve } from 'node:path';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, symlinkSync, writeFileSync } from 'node:fs';
 import { fleaSandbox } from './helpers/flea-sandbox.js';
 const root = process.env.BUNINU_FLEA_ROOT,
   omarchy = process.env.BUNINU_OMARCHY_ROOT,
@@ -16,6 +16,9 @@ test.skipIf(
       previous = process.env.XDG_RUNTIME_DIR;
     let land, child, logs;
     try {
+      const wrapperDir = join(sandbox.dir, 'bin');
+      mkdirSync(wrapperDir);
+      symlinkSync(resolve('lib/qml/qswayland'), join(wrapperDir, 'qs'));
       mkdirSync(join(sandbox.values.HOME, 'Documents'));
       writeFileSync(join(sandbox.values.HOME, 'hello.txt'), 'hello');
       process.env.XDG_RUNTIME_DIR = sandbox.dir;
@@ -26,7 +29,7 @@ test.skipIf(
       child = Bun.spawn([resolve(binary), '--gui', sandbox.values.HOME], {
         env: {
           ...process.env,
-          PATH: resolve('lib/qml') + ':' + process.env.PATH,
+          PATH: wrapperDir + ':' + process.env.PATH,
           FLEA_UI: join(sandbox.flea, 'ui'),
           WAYLAND_DISPLAY: 'wayland-buninu',
           QSG_RHI_BACKEND: 'software',

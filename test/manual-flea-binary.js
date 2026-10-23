@@ -1,10 +1,10 @@
 // Run an installed, unmodified Flea executable through our opt-in qs wrapper.
 import { resolve, join } from 'node:path';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, symlinkSync, writeFileSync } from 'node:fs';
 import { fleaSandbox } from './helpers/flea-sandbox.js';
 if (process.argv.some((arg) => ['-h', '--help'].includes(arg))) {
   console.log(
-    `Usage: FLEA_BIN=/path/to/flea BUNINU_FLEA_ROOT=/path/to/share/flea bun test/manual-flea-binary.js\n\nUses the current Wayland socket. BUNINU_OMARCHY_ROOT defaults to ../omarchy-qml-reference.\nLaunches the actual binary with --gui; it finds lib/qml/qs through PATH.\nCreates an isolated HOME/XDG state with sample files; removes it on exit.\nNo dependencies are installed. The native Quickshell executable is not replaced.`,
+    `Usage: FLEA_BIN=/path/to/flea BUNINU_FLEA_ROOT=/path/to/share/flea bun test/manual-flea-binary.js\n\nUses the current Wayland socket. BUNINU_OMARCHY_ROOT defaults to ../omarchy-qml-reference.\nLaunches the actual binary with --gui; a temporary qs symlink selects lib/qml/qswayland through PATH.\nCreates an isolated HOME/XDG state with sample files; removes it on exit.\nNo dependencies are installed. The native Quickshell executable is not replaced.`,
   );
   process.exit(0);
 }
@@ -22,6 +22,9 @@ for (const path of [
   if (!path || !existsSync(path))
     throw Error('Missing binary or QML imports: ' + path);
 const sandbox = fleaSandbox(root, omarchy);
+const wrapperDir = join(sandbox.dir, 'bin');
+mkdirSync(wrapperDir);
+symlinkSync(resolve('lib/qml/qswayland'), join(wrapperDir, 'qs'));
 mkdirSync(join(sandbox.values.HOME, 'Documents'));
 writeFileSync(
   join(sandbox.values.HOME, 'hello.txt'),
@@ -37,10 +40,7 @@ try {
   child = Bun.spawn([binary, '--gui', sandbox.values.HOME], {
     env: {
       ...process.env,
-      PATH:
-        Bun.fileURLToPath(new URL('../lib/qml/', import.meta.url)) +
-        ':' +
-        process.env.PATH,
+      PATH: wrapperDir + ':' + process.env.PATH,
       FLEA_UI: join(root, 'ui'),
       QSG_RHI_BACKEND: 'opengl',
     },
@@ -49,7 +49,7 @@ try {
     stderr: 'inherit',
   });
   console.log(
-    'Official Flea -> Buninu qs. Temporary HOME: ' + sandbox.values.HOME,
+    'Official Flea -> qs (temporary symlink) -> Buninu qswayland. Temporary HOME: ' + sandbox.values.HOME,
   );
   for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP'])
     process.on(signal, stop);
