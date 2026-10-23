@@ -48,7 +48,8 @@ BUNINU_OMARCHY_ROOT=../omarchy-qml-reference \
 ```
 
 This creates a temporary HOME/XDG state and sample files, then runs the **actual
-Flea binary** with `--gui`. Flea finds our `qs -p .../boot/shell.qml` via PATH and
+Flea binary** with `--gui`. A temporary PATH directory contains a `qs` symlink
+to `lib/qml/qswayland`. Flea calls `qs -p .../boot/shell.qml` and
 supplies `FLEA_BIN`/`FLEA_PATH`; the wrapper preserves that environment and opens
 the ordinary Wayland frontend. Closing the window removes the temporary state.
 The script sets the upstream Qt renderer hint to `opengl` only to avoid Flea's
@@ -90,6 +91,72 @@ claim complete Flea support, file operation safety coverage, or native QS IPC.
 # Same environment as above, with BUNINU_QML_WAYLAND_TEST=1 for the socket test:
 bun test test/qml-flea-backend.test.js test/qml-flea-launcher.test.js
 ```
+
+## Termux udocker Debian experiment
+
+Verified on 2026-10-23: the official **Flea 0.3.12-1 aarch64** package runs
+through `qswayland` in a separate Debian 13 (trixie) container and displays on
+an **already running Land outside the container**. The container was started
+from a native Termux shell via `jsgotty --client`, not inside the development
+Debian proot.
+
+The retained container is named **`flea-qswayland`**, under
+`~/.udocker/containers/flea-qswayland/ROOT` in Termux. Its ID is
+`82ef2c52-a491-4723-9604-855f22bd92d5`. It was created using
+`udocker run -b "$TMPDIR:/tmp" debian`, then named with `udocker rename`.
+
+#### Files copied into the container
+
+| Container location | Contents |
+| --- | --- |
+| `/usr/bin/flea`, `/usr/share/flea`, and other package paths | Extracted official Flea package, preserving symlinks |
+| `/opt/buninu-browser` | Browser working tree, excluding `.git` and `node_modules` |
+| `/usr/local/bin/bun` | Existing Linux aarch64 glibc Bun 1.4.4 executable |
+| `/usr/share/omarchy/shell/Commons` and `/usr/share/omarchy/shell/Ui` | Existing Omarchy QML reference modules |
+
+Copying only Flea and the browser is insufficient: Debian needs the Bun runtime,
+and Flea's QML package links `Commons`/`Ui` to `/usr/share/omarchy/shell/`.
+No additional apt/npm packages or native Qt/Quickshell runtime were installed.
+The Linux Bun executable is used inside Debian, not the Android Bun executable.
+
+For named QML imports, `/usr/share/omarchy/qs` links to `shell`.
+The executable `/usr/local/bin/qs` is this wrapper:
+
+```sh
+#!/bin/sh
+export QML_IMPORT_PATH="/usr/share/omarchy${QML_IMPORT_PATH:+:$QML_IMPORT_PATH}"
+exec /usr/local/bin/bun /opt/buninu-browser/lib/qml/qswayland "$@"
+```
+
+To reopen the prepared container, run **from Termux**:
+
+```sh
+udocker run -b "$TMPDIR:/tmp" flea-qswayland
+```
+
+Then run **inside the container**:
+
+```sh
+env XDG_RUNTIME_DIR=/tmp \
+  WAYLAND_DISPLAY=wayland-buninu \
+  QSG_RHI_BACKEND=opengl \
+  flea --gui /root
+```
+
+The bind exposes Termux's Wayland socket as `/tmp/wayland-buninu`; Land itself
+stays on the host. `QSG_RHI_BACKEND=opengl` bypasses Flea's native Vulkan probe
+and does not enable GPU rendering in our frontend. Flea finds `qs` on the
+container's default PATH and starts its real `--backend` child.
+
+Observed result: the host Land screenshot shows the container's `/root/Documents`
+and `/root/hello.txt`. This verifies launch and basic file listing, not optional
+Trash, mounts, previews, or all external-tool integrations. Notes are retained in
+`/root/FLEA-TEST.txt`; the test log is `/tmp/flea-udocker.log` on the shared tmp.
+The copied browser is a snapshot; later repository changes require copying again.
+
+During image extraction, Android rejected the hardlink for
+`/usr/bin/perl5.40.1`; this missing alias was repaired by copying `/usr/bin/perl`
+to that path. No other extraction error was reported in this run.
 
 ## Flea: current verified scope
 
@@ -338,7 +405,8 @@ Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 S
 沿用既有項目，不重新建立。複製／搬移／刪除、掛載與預覽切換仍未完整驗證。
 
 上方 `test/manual-flea-binary.js` 會呼叫官方 `flea --gui`，只對該程序把
-`lib/qml` 放在 PATH 最前面，保留系統原本的 Quickshell；使用隔離 HOME／XDG
+暫時目錄放在 PATH 最前面，其中 `qs` 連結至 `lib/qml/qswayland`，
+保留系統原本的 Quickshell；使用隔離 HOME／XDG
 與範例檔案，關窗後清除。後端與 QML 請使用同一份套件。wrapper 支援
 `-p/--path`、`-c/--config`，不支援的參數會明確失敗，不冒充原生 QS IPC。
 請先使用列表檢視（Ctrl-1）；保存的欄式檢視仍會遇到未支援的
@@ -348,6 +416,54 @@ Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 S
 匯入、singleton、alias、動態 Loader、模型／虛擬列表、鍵盤輸入、程序／檔案／worker
 已接通所測路徑，但不是完整 Qt 相容層。多視窗、原生拖放、Quickshell IPC、媒體與
 精確渲染同步等仍有限制，詳見上方各節。
+
+### Termux udocker Debian 實驗
+
+2026-10-23 已確認：官方 **Flea 0.3.12-1 aarch64** 可經 `qswayland` 在獨立
+Debian 13（trixie）容器執行，畫面送到**容器外原本開著的 Land**。這次是透過
+`jsgotty --client` 連入 Termux 原生 shell 後啟動，不是從開發用 Debian proot 再套一層。
+
+容器名稱為 **`flea-qswayland`**，Termux 上的根目錄為
+`~/.udocker/containers/flea-qswayland/ROOT`，ID 為
+`82ef2c52-a491-4723-9604-855f22bd92d5`。先用
+`udocker run -b "$TMPDIR:/tmp" debian` 建立，再以 `udocker rename` 命名。
+
+除了 Flea 整包與 `/opt/buninu-browser`（不含 `.git`、`node_modules`），還複製了
+Linux aarch64 glibc Bun 1.4.4 到 `/usr/local/bin/bun`，以及 Omarchy 的
+`Commons`／`Ui` 到 `/usr/share/omarchy/shell/`。因此不是只複製兩份專案就足夠，
+但沒有額外 apt/npm 安裝，也沒有安裝 Qt 或原生 Quickshell。
+
+Flea 套件原本就有指向 Omarchy 模組的符號連結；另建立
+`/usr/share/omarchy/qs → shell`，讓具名匯入能找到 `qs.Commons`／`qs.Ui`。
+預設 PATH 中的 `/usr/local/bin/qs` 使用上方同一份 wrapper，先設定
+`QML_IMPORT_PATH`，再直接執行 `qswayland`。
+
+在 **Termux 原生端**重新進入：
+
+```sh
+udocker run -b "$TMPDIR:/tmp" flea-qswayland
+```
+
+在**容器內**啟動：
+
+```sh
+env XDG_RUNTIME_DIR=/tmp \
+  WAYLAND_DISPLAY=wayland-buninu \
+  QSG_RHI_BACKEND=opengl \
+  flea --gui /root
+```
+
+綁定 tmp 是為了共用 `/tmp/wayland-buninu` socket，Land 不搬入容器。
+`QSG_RHI_BACKEND=opengl` 只是跳過 Flea 的原生 Vulkan 探測，不代表我們的前端
+改用 GPU。官方 Flea 會從 PATH 找到 `qs`，再啟動真正的 `--backend`。
+
+已從 Land 截圖確認容器內的 `/root/Documents`、`/root/hello.txt` 正常列出；
+這只驗證啟動與基本列檔，不代表 Trash、掛載、預覽及所有外部工具整合都已可用。
+容器內 `/root/FLEA-TEST.txt` 留有操作紀錄，共用 tmp 的
+`/tmp/flea-udocker.log` 是測試 log。瀏覽器是複製的快照，更新專案後需重新同步。
+
+本次解壓時 Android 拒絕建立 `/usr/bin/perl5.40.1` 硬連結，已把
+`/usr/bin/perl` 複製成該檔案補齊；當次沒有回報其他解壓錯誤。
 
 ## Explicit backend entry points
 
