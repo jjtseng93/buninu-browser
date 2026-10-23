@@ -83,9 +83,10 @@ and the official-backend settings test passed separately. The removable-integrat
 check still passed all 9 ordinary-browser tests. No integration outside `lib/qml`
 or `test` was added for this wrapper.
 
-Use **List view** (Ctrl-1). Saved Columns view still encounters unsupported
-`ShaderEffectSource` and can leave the content area empty. This test does not
-claim complete Flea support, file operation safety coverage, or native QS IPC.
+List view and the ShaderEffectSource-dependent preview components now compile.
+Headless tests exercise real text/PNG Quick Look navigation with the official
+backend, plus unchanged PreviewSwap/HtmlClip pixel behavior. This does not claim
+complete Columns-view coverage, file operation safety coverage, or native QS IPC.
 
 ```sh
 # Same environment as above, with BUNINU_QML_WAYLAND_TEST=1 for the socket test:
@@ -185,9 +186,8 @@ Verified against those sources:
 - A separate real Wayland socket test opens Settings, closes it with Escape, and
   closes the native window with Land's Super-W. It owns a separate compositor.
 
-The source inventory parses 239 QML files and compiles 227 of 235 top-level UI
-components. The eight remaining compile blockers are ShaderEffectSource
-(ColumnsArea, HtmlClip, PreviewSwap, QuickLookSwap), QtQuick.Pdf (PdfViewer,
+The source inventory parses 239 QML files and compiles 231 of 235 top-level UI
+components. The four remaining compile blockers are QtQuick.Pdf (PdfViewer,
 PreviewPdf), AnimatedImage (PreviewAnimation), and QtMultimedia (PreviewMedia).
 Dynamic loaders defer some of these until the associated feature is opened.
 
@@ -195,7 +195,7 @@ Dynamic loaders defer some of these until the associated feature is opened.
 73-test run used no backend; the later official-binary tests above cover real
 listing/navigation and directory updates. Without `FLEA_BIN`, the main app still
 displays its own unavailable state. Copying/moving/deleting, mounts, clipboard
-integration, PDF/media and preview texture transitions remain outside this result.
+integration and PDF/media remain outside this result.
 A compile inventory is not an end-to-end application test.
 
 ```sh
@@ -299,9 +299,37 @@ Flickable, ListView/GridView and basic Shape paths.
   FrameAnimation use the page event/animation loop. Window frame signals are
   page-loop signals, not a guarantee of native Wayland presentation timing.
 
-ShaderEffectSource and arbitrary shader/texture composition are not replaced by
-empty stubs. The underlying DOM-to-canvas snapshot path is now available, but
-ShaderEffectSource lifecycle and ShapePath texture fills are not wired up yet.
+Local QML supports the ShaderEffectSource subset used by Flea: sourceItem,
+sourceRect, textureSize, hideSource, live, scheduleUpdate and
+scheduledUpdateCompleted. Its canvas holds a frozen image when live is false;
+explicit updates and initial capture notify only after pixels are drawn.
+Live updates coalesce DOM mutations into a single animation-frame capture;
+there is no perpetual capture/poll loop when the source is unchanged. Arbitrary
+canvas/video bitmap changes without DOM mutations are not yet live invalidations.
+Multiple texture consumers reference-count a source; hideSource suppresses its
+main-scene painting while preserving layout/input, and teardown restores it.
+A referenced invisible QML source retains layout for capture. Its own opacity and
+placement transform do not affect the texture root. A display:none ancestor is
+still a limitation of retained-layout capture.
+
+ShapePath.fillItem accepts ShaderEffectSource and clips its canvas to PathSvg or
+PathRectangle, including per-corner radii. General Item fillItem, custom shaders,
+recursive feedback, mipmaps and multisampling are not implemented. Window's
+page-loop afterSynchronizing runs after pending texture captures; it is not a
+native Wayland presentation timestamp.
+
+Validation (no Land required):
+
+```sh
+bun test test/qml-textures.test.js test/qml-canvas-dom.test.js
+# With BUNINU_FLEA_ROOT, BUNINU_OMARCHY_ROOT and FLEA_BIN configured above:
+bun test test/qml-flea-textures.test.js test/qml-flea-preview-backend.test.js
+```
+
+These tests close their browser/backend in finally blocks. They check frozen
+pixels, explicit/live updates, idle capture counts, source restoration, original
+Flea hold/release and rounded masking, and actual text-to-text-to-PNG Quick Look
+navigation. Preview screenshots are written to `/tmp/flea-real-preview-*.png`.
 
 ### Local QML DOM images
 
@@ -322,8 +350,8 @@ readback is needed, and the temporary image/surface are released after use.
 
 This initial path does not capture detached, display:none or inline-only sources,
 iframes, or a subtree containing the destination canvas. Source visibility is
-still governed by CSS; ShaderEffectSource hideSource semantics remain future
-work. Captures are limited to 8192 pixels per side and 16,777,216 total pixels.
+still governed by CSS for ordinary DOM snapshots; referenced QML texture
+sources use the dedicated capture semantics described above. Captures are limited to 8192 pixels per side and 16,777,216 total pixels.
 Cross-origin image/tainted-canvas resources propagate canvas readback restrictions;
 unknown image origins are treated conservatively.
 
@@ -382,7 +410,7 @@ bun test/manual-qml-removal.js
 
 Existing integrations are in `lib/document-types.js`,
 `lib/renderer/page-renderer.js`, `lib/headless-shell.js`, `lib/renderer/host.js`
-`lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, and `frontends/wayland/index.js`. Delete the 17 marked blocks and `lib/qml`, plus its
+`lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, and `frontends/wayland/index.js`. Delete the 19 marked blocks and `lib/qml`, plus its
 tests/fixtures, to remove QML. Ordinary `let isHtml`, `let parsed`, `parsed ??=`,
 renderer acquisition callbacks and default environments remain valid without
 replacement statements. The removal test does this in a temporary copy and runs
@@ -416,7 +444,7 @@ Fixture provenance and bundled licenses are in
 
 這是直接把 QML 編譯成既有 DOM、CSS、JS 的實驗，不產生 HTML，不保留另一棵
 QML 元件樹，也不新增 Qt 或原生依賴。本輪程式集中在 `lib/qml`，測試在 `test`；
-Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 17 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
+Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 19 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
 
 本地 `file:` QML 的專用 host renderer 現在允許 `ctx.drawImage(DOM元素, …)`，
 沿用三種 drawImage 呼叫形式、縮放、裁切及 canvas 透明度／變換。
@@ -425,9 +453,24 @@ Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部
 文字、內部堆疊與子 canvas 沿用原有繪製，不修改 DOM，也不經 PNG、base64 或像素回讀。
 快照以來源 border box、每 CSS pixel 一個像素繪製，下一次 draw 才更新，暫存影像隨用隨釋放。
 目前不接受未連接、display:none、只有 inline box 的來源、iframe 或包含目標 canvas 的子樹；
-來源本身的 CSS visibility 仍有效。尺寸上限為單邊 8192、總計 16,777,216 像素，
-跨來源圖片與受污染 canvas 的讀取限制會傳遞。這只是底層快照能力，
-尚未接上 ShaderEffectSource 的 hideSource／更新生命週期與 ShapePath 材質填充。
+一般 DOM 快照仍遵守來源的 CSS visibility。尺寸上限為單邊 8192、總計 16,777,216 像素，
+跨來源圖片與受污染 canvas 的讀取限制會傳遞。
+
+本地 QML 已接上 Flea 使用的 ShaderEffectSource：sourceItem、sourceRect、textureSize、
+hideSource、live、scheduleUpdate 與 scheduledUpdateCompleted。live:false 保留快照，
+更新完成後才發出通知；live:true 將 DOM 變更合併到下一個 animation frame，來源靜止時不持續截圖。
+沒有 DOM 變動的任意 canvas／video 像素更新尚未自動追蹤。
+多個材質共用來源時會計數引用；hideSource 只排除主畫面繪製，保留佈局與輸入，釋放時恢復來源。
+被引用的 invisible QML 來源會保留佈局供截圖，來源本身的 opacity／位置變換不套進材質根節點；
+但祖先 display:none 仍有限制。ShapePath.fillItem 可使用 ShaderEffectSource，支援 PathSvg、
+PathRectangle 與獨立圓角；一般 Item fillItem、自訂 shader、遞迴材質、mipmap 與多重採樣仍未實作。
+afterSynchronizing 在待處理快照完成後發出，但屬頁面事件迴圈，不代表原生 Wayland 顯示時間。
+
+不需 Land 即可測試：`bun test test/qml-textures.test.js test/qml-canvas-dom.test.js`。
+設定上面的 Flea／Omarchy／官方 binary 環境變數後，可跑
+`bun test test/qml-flea-textures.test.js test/qml-flea-preview-backend.test.js`。
+測試涵蓋原版 PreviewSwap 舊圖保留／釋放、HtmlClip 圓角、真正文字檔與 PNG 的 Quick Look 切換，
+截圖留在 `/tmp/flea-real-preview-*.png`，測完會關閉 browser／backend。
 測試：`bun test test/qml-canvas-dom.test.js`。
 
 目前原版 Flea 已能啟動真正的主視窗、Theme／Commons／Ui、設定頁、鍵盤說明、
@@ -435,8 +478,8 @@ Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部
 Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 Super-W 關窗。
 所有應用程式測試都使用獨立 HOME／XDG，不寫個人設定，也沒有偽造後端回覆。
 
-已解析 239 個 QML 檔案，235 個頂層 UI 元件中 227 個能編譯；這不是完整功能覆蓋。
-剩餘編譯阻礙包含 ShaderEffectSource、PDF、AnimatedImage 和 QtMultimedia。
+已解析 239 個 QML 檔案，235 個頂層 UI 元件中 231 個能編譯；這不是完整功能覆蓋。
+剩餘四個編譯阻礙為 PDF、AnimatedImage 和 QtMultimedia 相關元件。
 最初 73 項測試沒有 Flea 後端；後續已用 Omarchy 官方 0.3.12-1 aarch64 套件，
 驗證官方 binary 直接呼叫我們的 `lib/qml/qs` wrapper，經標準 Wayland 顯示。
 真實列檔、目錄新增通知、Ctrl-L／Enter 切換目錄及 Super-W 關閉已測過。
@@ -448,8 +491,8 @@ Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 S
 保留系統原本的 Quickshell；使用隔離 HOME／XDG
 與範例檔案，關窗後清除。後端與 QML 請使用同一份套件。wrapper 支援
 `-p/--path`、`-c/--config`，不支援的參數會明確失敗，不冒充原生 QS IPC。
-請先使用列表檢視（Ctrl-1）；保存的欄式檢視仍會遇到未支援的
-`ShaderEffectSource` 而出現空白內容區。無後端時仍是上游的 unavailable 狀態。
+列表與依賴 ShaderEffectSource 的預覽元件已能編譯，Quick Look 文字與 PNG 路徑已用官方後端驗證；
+欄式檢視尚未宣稱完整覆蓋。無後端時仍是上游的 unavailable 狀態。
 
 本機 QML 是有 Bun 權限的應用程式，使用專屬 renderer；HTTP QML 保持隔離。
 匯入、singleton、alias、動態 Loader、模型／虛擬列表、鍵盤輸入、程序／檔案／worker

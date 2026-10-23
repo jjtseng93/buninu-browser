@@ -57,10 +57,6 @@ test.skipIf(!flea || !omarchy)(
         }
       }
       const expected = {
-        ColumnsArea: 'ShaderEffectSource',
-        HtmlClip: 'ShaderEffectSource',
-        QuickLookSwap: 'ShaderEffectSource',
-        PreviewSwap: 'ShaderEffectSource',
         PdfViewer: 'QtQuick.Pdf',
         PreviewPdf: 'QtQuick.Pdf',
         PreviewAnimation: 'AnimatedImage',
@@ -71,7 +67,7 @@ test.skipIf(!flea || !omarchy)(
         expect(message).toContain(expected[file.slice(0, -4)]);
       }
       expect(parsed).toBeGreaterThanOrEqual(239);
-      expect(compiled).toBeGreaterThanOrEqual(227);
+      expect(compiled).toBeGreaterThanOrEqual(231);
       console.log(
         `Flea: ${parsed} QML parsed; ${compiled} top-level components compiled; ${blocked.length} explicitly blocked. This is not full runtime coverage.`,
       );
