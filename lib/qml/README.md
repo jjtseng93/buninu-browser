@@ -410,7 +410,7 @@ bun test/manual-qml-removal.js
 
 Existing integrations are in `lib/document-types.js`,
 `lib/renderer/page-renderer.js`, `lib/headless-shell.js`, `lib/renderer/host.js`
-`lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, and `frontends/wayland/index.js`. Delete the 19 marked blocks and `lib/qml`, plus its
+`lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, `lib/render-tree/index.js`, and `frontends/wayland/index.js`. Delete the 21 marked blocks and `lib/qml`, plus its
 tests/fixtures, to remove QML. Ordinary `let isHtml`, `let parsed`, `parsed ??=`,
 renderer acquisition callbacks and default environments remain valid without
 replacement statements. The removal test does this in a temporary copy and runs
@@ -444,7 +444,7 @@ Fixture provenance and bundled licenses are in
 
 這是直接把 QML 編譯成既有 DOM、CSS、JS 的實驗，不產生 HTML，不保留另一棵
 QML 元件樹，也不新增 Qt 或原生依賴。本輪程式集中在 `lib/qml`，測試在 `test`；
-Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 19 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
+Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 21 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
 
 本地 `file:` QML 的專用 host renderer 現在允許 `ctx.drawImage(DOM元素, …)`，
 沿用三種 drawImage 呼叫形式、縮放、裁切及 canvas 透明度／變換。

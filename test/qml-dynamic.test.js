@@ -328,3 +328,32 @@ Item {id:root;width:300;height:200;property string gone:""
     rmSync(dir, { recursive: true, force: true });
   }
 }, 30000);
+
+test('shared JS libraries can create and release components relative to the script URL', async () => {
+  const dir = mkdtempSync('/tmp/qml-library-component-');
+  let browser;
+  try {
+    await Bun.write(dir + '/helpers/Factory.js', `.pragma library
+function make(parent, label) {
+ const component=Qt.createComponent("Cell.qml");
+ if(component.status!==1)throw Error(component.errorString());
+ const object=component.createObject(parent,{text:label});
+ component.destroy();
+ return object;
+}`);
+    await Bun.write(dir + '/helpers/Cell.qml', 'import QtQuick\nText {width:100;height:20}');
+    await Bun.write(dir + '/main.qml', `import QtQuick
+import "helpers/Factory.js" as Factory
+Item {id:root;property var first:null;property var second:null
+ Component.onCompleted:{first=Factory.make(root,"first");second=Factory.make(root,"second");second.y=30}
+ Button {id:remove;y:80;onClicked:root.first.destroy()}
+}`);
+    browser=await createBrowser({spareRenderer:false});
+    await browser.context.navigate(Bun.pathToFileURL(dir+'/main.qml').href);
+    expect(await browser.context.evaluate('document.body.innerText')).toContain('first');
+    expect(await browser.context.evaluate('document.body.innerText')).toContain('second');
+    await browser.context.evaluate('document.getElementById("remove").click()');
+    expect(await browser.context.evaluate('document.body.innerText')).not.toContain('first');
+    expect(await browser.context.evaluate('document.body.innerText')).toContain('second');
+  } finally {browser?.close();rmSync(dir,{recursive:true,force:true});}
+},30000);

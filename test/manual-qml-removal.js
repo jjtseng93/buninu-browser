@@ -12,6 +12,7 @@ const files = [
   'lib/headless-shell.js',
   'lib/renderer/page-renderer.js',
   'lib/renderer/canvas-2d.js',
+  'lib/render-tree/index.js',
   'lib/renderer/host.js',
   'lib/renderer/main.js',
 ];
