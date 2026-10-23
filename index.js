@@ -48,6 +48,9 @@ export function chooseFrontend(argv) {
   if (first === "--wayland") return { frontend: "wayland", args: rest };
   // wayland handle end
 
+  if (["--quickshell-wayland", "--quickshell-headless", "--quickshell-casty"].includes(first))
+    return { frontend: first.slice(2), args: rest };
+
   if (first === "--casty") return { frontend: "casty", args: rest };
   if (first === "--headless") return { frontend: "headless", args: rest };
   if (RESERVED_FRONTENDS.has(first)) return { frontend: first.slice(2), args: rest, reserved: true };
@@ -90,6 +93,9 @@ ${typeof waylandHelp === "undefined" ? "" : waylandHelp}  --casty
   --headless
       Start the engine only, as a CDP endpoint
       The engine's options: ${name} --headless --help
+  --quickshell-wayland, --quickshell-headless, --quickshell-casty
+      Experimental Quickshell CLI (-p FILE_OR_DIRECTORY / -c CONFIG)
+      Use -- before backend arguments; each entry supports --help
   --win32, --gtk, --appkit, --qt
       Native windowed frontends (reserved, not implemented yet)
 
@@ -155,6 +161,11 @@ if (import.meta.main) {
   if (frontend === "readme") {
     await printReadme();
     process.exit(0);
+  }
+
+  if (frontend.startsWith("quickshell-")) {
+    const entry = join(import.meta.dir, "lib/qml/qs" + frontend.slice("quickshell-".length));
+    process.exit(await run([process.execPath, entry, ...args]) ?? 1);
   }
 
   // wayland handle begin: launch the isolated frontend

@@ -348,3 +348,37 @@ Markdown 用原版 worker，圖片可測縮放與還原；Wayland 實測可用 S
 匯入、singleton、alias、動態 Loader、模型／虛擬列表、鍵盤輸入、程序／檔案／worker
 已接通所測路徑，但不是完整 Qt 相容層。多視窗、原生拖放、Quickshell IPC、媒體與
 精確渲染同步等仍有限制，詳見上方各節。
+
+## Explicit backend entry points
+
+The package launcher accepts Quickshell arguments independently of the backend:
+
+```sh
+bun index.js --quickshell-wayland -p /path/to/shell.qml
+bun index.js --quickshell-headless -p /path/to/shell.qml -- --remote-debugging-port=9222
+bun index.js --quickshell-casty -p /path/to/shell.qml
+```
+
+Each entry accepts `-p`/`--path`, `-c`/`--config`, and `-h`/`--help`.
+Use `--` to pass subsequent arguments to the backend. For Casty, an additional
+`--` forwards engine arguments, for example `-- -- --mobile`.
+Standalone `lib/qml/qs` still launches Wayland directly without going through
+`index.js`. These entries do not imply full native Quickshell compatibility.
+
+套件入口可明確選擇 Wayland、headless 或 Casty，並使用相同的 QS 設定解析。
+三個入口都接受 `-p`／`--path`、`-c`／`--config`、`-h`／`--help`。
+用 `--` 分隔後端參數；Casty 再用一個 `--` 分隔瀏覽器引擎參數，
+例如 `-- -- --mobile`。獨立的 `lib/qml/qs` 仍直接啟動 Wayland，
+不經過 `index.js`。這些入口不代表已完整相容原生 Quickshell。
+
+The same entries can run independently; `index.js` only routes arguments to them:
+
+```sh
+bun lib/qml/qswayland -p /path/to/shell.qml
+bun lib/qml/qsheadless -p /path/to/shell.qml
+bun lib/qml/qscasty -p /path/to/shell.qml
+```
+
+這三個檔案也能獨立執行；`index.js` 僅負責路由並原樣傳遞參數。
+共同的 QS 解析與後端啟動邏輯位於 `lib/qml/launcher.js`。
+原有 `lib/qml/qs` 保留原本的直接 Wayland 啟動方式。

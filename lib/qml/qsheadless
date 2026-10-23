@@ -1,0 +1,3 @@
+#!/usr/bin/env bun
+import { runBackend } from './launcher.js';
+await runBackend('headless');

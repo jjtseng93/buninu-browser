@@ -27,3 +27,16 @@ test("casty runs with npx when npx and bun exist, else bunx, else bun x", () => 
   expect(castyCommand(["a"], (name) => name === "bun" ? "/bin/bun" : null)).toEqual(["/bin/bun", "x", ...casty, "a"]);
   expect(castyCommand([], () => null)).toEqual([process.argv0, "x", ...casty]);
 });
+
+test("explicit Quickshell backends and their help work through the package entry", async () => {
+  for (const backend of ["wayland", "headless", "casty"]) {
+    const flag = `--quickshell-${backend}`;
+    expect(chooseFrontend([flag, "-p", "shell.qml", "--", "--help"]))
+      .toEqual({ frontend: flag.slice(2), args: ["-p", "shell.qml", "--", "--help"] });
+    const child = Bun.spawn([process.execPath, new URL('../index.js', import.meta.url).pathname, flag, '--help'], { stdout: 'pipe', stderr: 'pipe' });
+    const output = await new Response(child.stdout).text();
+    expect(await child.exited).toBe(0);
+    expect(output).toContain(flag);
+    expect(output).toContain('-p, --path');
+  }
+});
