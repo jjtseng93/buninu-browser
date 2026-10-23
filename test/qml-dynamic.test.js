@@ -357,3 +357,45 @@ Item {id:root;property var first:null;property var second:null
     expect(await browser.context.evaluate('document.body.innerText')).toContain('second');
   } finally {browser?.close();rmSync(dir,{recursive:true,force:true});}
 },30000);
+
+test('children of an instantiated component resolve properties added at the use site; rejected MouseAreas pass clicks to underlying rows',async()=>{
+ const dir=mkdtempSync('/tmp/qml-click-');let browser;
+ try{
+  await Bun.write(dir+'/Cell.qml','import QtQuick\nRectangle {width:200;height:40;color:"red"}');
+  await Bun.write(dir+'/main.qml',`import QtQuick
+Rectangle {width:300;height:150
+ property bool block: false
+ Cell {id:cell;property int rowIndex:7
+  TapHandler {onTapped:status.text=String(rowIndex)}
+ }
+ MouseArea {anchors.fill:cell;z:1;onPressed:mouse=>{mouse.accepted=false}}
+ MouseArea {anchors.fill:cell;z:2;onPressed:mouse=>{mouse.accepted=block}}
+ Text {id:status;y:60;text:"none"}
+ Button {id:gate;y:90;onClicked:block=true}
+}`);
+  browser=await createBrowser({spareRenderer:false});await browser.context.resize(300,150);await browser.context.navigate(Bun.pathToFileURL(dir+'/main.qml').href);
+  await browser.context.click(20,20);await browser.context.evaluate('0');
+  expect(await browser.context.evaluate('document.getElementById("status").textContent')).toBe('7');
+  await browser.context.evaluate('document.getElementById("gate").click();document.getElementById("status").textContent="blocked"');await browser.context.evaluate('0');
+  await browser.context.click(20,20);
+  expect(await browser.context.evaluate('document.getElementById("status").textContent')).toBe('blocked');
+ }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
+},30000);
+
+test('dynamic objects belong to their explicit parent, not the Loader currently creating them',async()=>{
+ const dir=mkdtempSync('/tmp/qml-parent-owner-');let browser;
+ try{
+  await Bun.write(dir+'/Icon.qml','import QtQuick\nText {text:"surviving icon"}');
+  await Bun.write(dir+'/main.qml',`import QtQuick
+Item {id:root;width:300;height:150
+ Item {id:keeper}
+ Loader {id:maker;sourceComponent:Text {text:"temporary maker";Component.onCompleted:{var c=Qt.createComponent("Icon.qml");c.createObject(keeper);c.destroy()}}}
+ Button {id:remove;y:50;onClicked:maker.active=false}
+}`);
+  browser=await createBrowser({spareRenderer:false});await browser.context.navigate(Bun.pathToFileURL(dir+'/main.qml').href);
+  expect(await browser.context.evaluate('document.body.innerText')).toContain('surviving icon');
+  await browser.context.evaluate('document.getElementById("remove").click()');await browser.context.evaluate('0');
+  const text=await browser.context.evaluate('document.body.innerText');
+  expect(text).toContain('surviving icon');expect(text).not.toContain('temporary maker');
+ }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
+},30000);

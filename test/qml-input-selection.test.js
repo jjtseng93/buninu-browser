@@ -26,3 +26,33 @@ Rectangle {width:360;height:160;color:"white"
   await click('all');await browser.context.press('Backspace',{code:'Backspace'});expect(await run('document.getElementById("field").value')).toBe('');expect(await blue()).toBe(0);
  }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
 },30000);
+
+test('QML input arrows collapse and extend selection, and the caret paints and blinks',async()=>{
+ const dir=mkdtempSync('/tmp/qml-caret-');let browser;
+ try{
+  await Bun.write(dir+'/main.qml',`import QtQuick
+Rectangle {width:360;height:100;color:"white"
+ TextInput {id:field;x:10;y:10;width:300;height:30;text:"abc😀xyz";font.pixelSize:20;color:"black"}
+ Button {id:all;y:60;onClicked:{field.forceActiveFocus();field.selectAll()}}
+}`);
+  browser=await createBrowser({spareRenderer:false});await browser.context.resize(360,100);await browser.context.navigate(Bun.pathToFileURL(dir+'/main.qml').href);
+  const run=s=>browser.context.evaluate(s),state=()=>run(`(()=>{const e=document.getElementById('field');return [e.selectionStart,e.selectionEnd]})()`);
+  const key=async(k,modifiers=0)=>{await browser.context.press(k,{code:k,modifiers});await run('0');};
+  await run(`document.getElementById('all').click()`);await run('0');
+  await key('ArrowRight');expect(await state()).toEqual([8,8]);
+  await key('ArrowLeft');expect(await state()).toEqual([7,7]);
+  await key('ArrowLeft',8);expect(await state()).toEqual([6,7]);
+  await key('ArrowLeft',8);expect(await state()).toEqual([5,7]);
+  await key('ArrowLeft',8);expect(await state()).toEqual([3,7]);
+  await key('ArrowRight');expect(await state()).toEqual([7,7]);
+  await key('a',2);await key('ArrowLeft');expect(await state()).toEqual([0,0]);
+  const caret=()=>run(`JSON.parse(document.getElementById('field').getAttribute('data-qml-caret'))`);
+  expect((await caret()).on).toBe(true);
+  const on=await browser.context.screenshot({format:'png'});
+  for(let i=0;i<60&&(await caret()).on;i++)await Bun.sleep(15);
+  expect((await caret()).on).toBe(false);
+  const off=await browser.context.screenshot({format:'png'});expect(off).not.toBe(on);
+  await run(`document.getElementById('field').blur()`);await run('0');
+  expect(await caret()).toBe(null);
+ }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
+},30000);

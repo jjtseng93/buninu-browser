@@ -284,7 +284,14 @@ Flickable, ListView/GridView and basic Shape paths.
   acceptance work with actual DOM events. Editing keys do not trigger ancestor
   shortcuts; Escape can propagate. Hidden prebuilt controls cannot steal focus. FocusScope ancestors track active
   focus and can restore their last active child. Menu/AltGr keys and mouse
-  back/forward buttons retain distinct codes.
+  back/forward buttons retain distinct codes. Text controls paint a blinking
+  caret (500 ms per phase); Left/Right collapse a selection to its corresponding
+  edge, and Shift extends it. Home/End and Ctrl+A use the same selection state.
+  Caret timers stop on blur, hiding, selection or destruction.
+- Rejected MouseArea presses fall through to the next painted item; the same
+  recipient receives the release/click, so overlays can decline a row press.
+  Replacing a ListView/GridView model resets its scroll to the origin, while
+  updating the same model preserves the current position.
 - TapHandler supports click/release and basic double taps; HoverHandler observes
   pointer movement without intercepting underlying controls. Point/Drag handlers
   and DropArea are partial DOM-event adapters, not Qt gesture arbitration or
@@ -580,3 +587,25 @@ bun lib/qml/qscasty -p /path/to/shell.qml
 這三個檔案也能獨立執行；`index.js` 僅負責路由並原樣傳遞參數。
 共同的 QS 解析與後端啟動邏輯位於 `lib/qml/launcher.js`。
 原有 `lib/qml/qs` 保留原本的直接 Wayland 啟動方式。
+
+### Text input and pointer fixes / 文字輸入與指標修正
+
+文字輸入支援每 500 ms 切換顯示的遊標；失焦、隱藏、選取文字或銷毀時停止計時。
+左右鍵會把選取折疊到對應端點，Shift 延伸選取，Home/End 與 Ctrl+A 共用選取狀態。
+MouseArea 拒絕按下事件時，會把該次按下、釋放及點擊傳給下層項目。
+ListView/GridView 換 model 時回到起點；更新同一個 model 則保留捲動位置。
+這些都是通用 QML 行為，沒有依照 Flea 名稱或檔案路徑分支。
+
+Tests / 測試：`test/qml-input-selection.test.js`、`test/qml-dynamic.test.js`、
+`test/qml-views.test.js`、`test/qml-flea-preview-backend.test.js`。
+
+Dynamic `createObject(parent)` ownership follows the explicit parent rather than
+the Loader/binding currently executing. Destroying an unrelated Loader cannot
+remove a surviving row's language icon. The official-backend navigation test
+repeatedly enters an empty `~` and goes back, checking every language icon.
+
+動態 `createObject(parent)` 依明確指定的父項目管理生命週期，不歸當時執行中的
+其他 Loader 或 binding 所有。清除其他 Loader 不會再連帶刪掉仍存活檔案列的圖示。
+`test/qml-flea-navigation-backend.test.js` 使用官方後端反覆進入空的 `~` 再返回，
+確認各個語言圖示仍有內容。示範測試的 `HOME` 是隔離目錄；「NOTHING HERE YET」
+表示該目錄為空，不表示 `~` 展開失敗。

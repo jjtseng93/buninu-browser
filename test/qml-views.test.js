@@ -291,3 +291,21 @@ Item {width:300;height:200
     host.close();
   }
 }, 30000);
+
+test('replacing a numeric ListView model resets its scroll before creating new delegates',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start();await host.call('loadDocument',{url:'data:text/x-qml,reset',contentType:'text/x-qml',source:`import QtQuick
+Item {width:300;height:200
+ ListView {id:view;width:200;height:100;model:100;delegate:Text {required property int index;text:"row "+index;width:200;height:20}}
+ Text {id:offset;y:110;text:String(view.contentY)+","+view.model+","+view.count}
+ Button {id:scroll;y:140;onClicked:view.positionViewAtIndex(50,ListView.Beginning)}
+ Button {id:replace;x:100;y:140;onClicked:view.model=80}
+}`});await host.call('whenLoaded');
+  await host.call('evaluate','document.getElementById("scroll").click()');
+  await wait(()=>host.call('evaluate','document.getElementById("offset").textContent'),v=>Number(v.split(",")[0])>0);
+  await host.call('evaluate','document.getElementById("replace").click()');
+  await wait(()=>host.call('evaluate','document.getElementById("offset").textContent'),v=>Number(v.split(",")[0])===0);
+  expect(await host.call('evaluate','document.body.innerText')).toContain('row 0');
+ }finally{host.close();}
+},30000);
