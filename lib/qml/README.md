@@ -159,6 +159,51 @@ During image extraction, Android rejected the hardlink for
 `/usr/bin/perl5.40.1`; this missing alias was repaired by copying `/usr/bin/perl`
 to that path. No other extraction error was reported in this run.
 
+The container now also contains a copy of the development Debian's complete
+`/usr/share/mime` database (including `globs2`, aliases and type descriptions).
+Flea uses it to classify filenames; without it, even `.txt` and `.png` can appear
+as generic Data and never reach their preview components. Restart Flea after
+copying. Media helpers and QML multimedia/PDF support remain separate requirements.
+
+容器另已複製目前 Debian 完整的 `/usr/share/mime` 資料庫，包含 `globs2`、別名
+與類型描述。缺少它時，文字與圖片也可能被歸類為 Data，無法進入對應預覽；
+複製後需重開 Flea。影音工具與 QML 影音／PDF 相容仍是另外的需求。
+
+### glow / bat compatibility experiment (2026-10-24)
+
+The retained `flea-qswayland` container contains an unchanged copy of
+`buninu/bin/glow.sh` and the entire bundled `apps/jsmdcui` at
+`/usr/local/lib/buninu-glow`. `/usr/local/bin/glow` points to `bin/glow.sh`;
+`bat` points to `bin/bat.sh`, which runs `bat.mjs`. The adapter accepts Flea's
+bat flags, highlights stdin with jsmdcui, selects the requested line range,
+and emits basic ANSI colors understood by Flea's role parser.
+
+At the user's request, container `bin/bwrap.sh` temporarily **bypasses bwrap**:
+it consumes the known sandbox options and executes the helper directly. It
+closes the JSON status fd without inventing a sandbox PID. The outer Flea
+`prlimit` still applies, but bwrap filesystem/namespace isolation does not.
+The real-bwrap filter is retained as `bin/bwrap-real-filter.sh`; that path
+currently fails on fd readlink after pivot_root under bunproot.
+No new native dependency was installed.
+
+Verified through native Termux → bunproot → Debian → official Flea 0.3.12
+backend: `/root/flea-color-probe.mjs` returned `state: "styled"` with keyword,
+number and comment roles 3, 1 and 4, using the actual helper subprocess.
+This verifies backend highlighting, not a new visual inspection of Flea's UI.
+`/root/glow-flea-probe.sh` tests the adapter directly and with Flea's flags;
+`/root/flea-bwrap-probe.sh` retains the real-bwrap reproduction.
+
+同一容器完整保留原始 glow 與 jsmdcui；`glow` 指向原始腳本，`bat` 改指向
+`bin/bat.sh`，透過 `bat.mjs` 適配 Flea 的參數、stdin、行範圍和基本 ANSI 顏色。
+依使用者要求，實驗用 `bin/bwrap.sh` 暫時直接執行 helper，關閉狀態 fd 而不
+捏造 PID；保留外層 prlimit，但沒有 bwrap 的檔案系統與 namespace 隔離。
+原本呼叫真正 bwrap 的版本保留為 `bin/bwrap-real-filter.sh`，仍卡在 bunproot
+切換根目錄後的 fd readlink。未安裝新的原生依賴。
+
+原生 Termux → bunproot → Debian → 官方 Flea 0.3.12 backend 實測回傳
+`state: "styled"`，關鍵字、數字與註解角色分別為 3、1、4。這是實際執行
+helper 的後端驗證，尚非本輪 Flea 畫面的視覺驗證；容器 `/root` 保留上述腳本。
+
 ## Flea: current verified scope
 
 The unchanged `ui/boot/shell.qml` from Flea revision
@@ -287,7 +332,12 @@ Flickable, ListView/GridView and basic Shape paths.
   back/forward buttons retain distinct codes. Text controls paint a blinking
   caret (500 ms per phase); Left/Right collapse a selection to its corresponding
   edge, and Shift extends it. Home/End and Ctrl+A use the same selection state.
-  Caret timers stop on blur, hiding, selection or destruction.
+  Selection painting, caret blinking and keyboard editing now use the common
+  HTML input/textarea implementation. QML only maps its properties, methods and
+  signals. Ctrl+C/X/V and copy()/cut()/paste() transfer text on demand; Wayland
+  uses wl_data_device and never polls the external clipboard. Shift+Up/Down
+  extends textarea selection across explicit lines; wrapped visual-line movement
+  is not yet implemented.
 - Rejected MouseArea presses fall through to the next painted item; the same
   recipient receives the release/click, so overlays can decline a row press.
   Replacing a ListView/GridView model resets its scroll to the origin, while
@@ -420,13 +470,29 @@ bun test/manual-qml-removal.js
 
 Existing integrations are in `lib/document-types.js`,
 `lib/renderer/page-renderer.js`, `lib/headless-shell.js`, `lib/renderer/host.js`
-`lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, `lib/render-tree/index.js`, and `frontends/wayland/index.js`. Delete the 21 marked blocks and `lib/qml`, plus its
+`lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, `lib/render-tree/index.js`, and `frontends/wayland/index.js`. Delete the marked blocks and `lib/qml`, plus its
 tests/fixtures, to remove QML. Ordinary `let isHtml`, `let parsed`, `parsed ??=`,
 renderer acquisition callbacks and default environments remain valid without
 replacement statements. The removal test does this in a temporary copy and runs
-ordinary renderer/navigation/headless tests. This Flea compatibility round adds one removable Wayland title-poll guard: it
-waits until navigation has finished replacing a local QML renderer. All other
-changes stay in `lib/qml` and `test`.
+ordinary renderer/navigation/headless tests. Wayland clipboard transport lives in `frontends/wayland/clipboard.js` and is
+shared by ordinary pages. The optional QML HTTP clipboard bridge starts only
+when navigating to local QML. Navigation guards discard stale renderer results
+for all pages; neither common feature depends on QML.
+
+Additional isolated checks:
+
+```sh
+bun test/manual-without-qml.js
+bun test/manual-casty-without-qml.js /path/printed/by/the/first/test/buninu-browser
+```
+
+The first checks ordinary editing/clipboard/Wayland tests after removing QML,
+and compares the original and stripped headless screenshots byte for byte.
+The second drives actual Casty through a PTY, with an isolated xclip/OSC 52
+clipboard and a minimal Kitty file-transfer peer. It checks selection,
+copy/cut/paste, caret movement/blinking, navigator.clipboard readText/writeText,
+denied reads without user activation, and raw BGRA frame delivery. It does not
+modify the system clipboard or represent a test of every navigator API.
 
 ## References and provenance
 
@@ -454,7 +520,17 @@ Fixture provenance and bundled licenses are in
 
 這是直接把 QML 編譯成既有 DOM、CSS、JS 的實驗，不產生 HTML，不保留另一棵
 QML 元件樹，也不新增 Qt 或原生依賴。本輪程式集中在 `lib/qml`，測試在 `test`；
-Wayland 前端另加一小段等待導航完成才輪詢標題的保護。外部接入總共是 21 個 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
+QML 外部接入使用 `qml handle begin/end` 區塊，可以整段刪除，不必補回程式。
+一般 Wayland 剪貼簿位於 `frontends/wayland/clipboard.js`，普通網頁也共用；
+QML 專用 HTTP 橋接只在導航至本地 QML 時啟動。導航期間忽略過期 renderer 結果
+的保護屬於通用功能，不依賴 QML。
+
+執行 `bun test/manual-without-qml.js` 可建立移除 QML 的獨立副本，
+測試普通網頁編輯、剪貼簿與 Wayland，並逐位元組比較原版和副本的截圖。
+再將輸出的副本路徑傳給 `bun test/manual-casty-without-qml.js 路徑`，
+可經真正 Casty PTY 驗證選取、複製／剪下／貼上、遊標移動與閃爍、
+navigator.clipboard 讀寫、無使用者操作時拒絕讀取，以及 BGRA 檔案傳輸。
+測試使用隔離的 xclip／OSC 52 剪貼簿，不影響系統內容；不表示全部 navigator API 都經過測試。
 
 本地 `file:` QML 的專用 host renderer 現在允許 `ctx.drawImage(DOM元素, …)`，
 沿用三種 drawImage 呼叫形式、縮放、裁切及 canvas 透明度／變換。

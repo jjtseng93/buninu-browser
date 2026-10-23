@@ -8,8 +8,14 @@ import {attachClipboard} from './clipboard.js';
 import {WaylandUrlBar,BAR_HEIGHT} from './urlbar.js';
 import {readClipboard,writeClipboard} from '../../lib/clipboard.js';
 
+// qml handle begin: local QML clipboard uses this frontend's Wayland seat
+import {attachQmlClipboard} from '../../lib/qml/wayland-clipboard.js';
+// qml handle end
 
 export async function launch({url='about:blank',width=800,height=600,socket,chrome}={}) {
+  // qml handle begin: local application windows default to no browser chrome
+  chrome ??= !/\.qml(?:[?#]|$)/i.test(url);
+  // qml handle end
 
   let browser,client,window,off,titleTimer,toolbar,closed=false,busy=false,dirty=true,ready=false;
   let pageDirty=true,pageBytes,pageSize='',navigation=0,navigating=0;
@@ -31,6 +37,9 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
     };
     browser=await createBrowser({spareRenderer:false,clipboard});
 
+    // qml handle begin: operation-triggered local QML clipboard bridge
+    await attachQmlClipboard(client,browser,done);
+    // qml handle end
 
     if(chrome ?? true)toolbar=await new WaylandUrlBar(browser.context,{
       close,changed:()=>{dirty=true;if(ready)void draw();},

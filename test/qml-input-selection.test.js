@@ -23,6 +23,9 @@ Rectangle {width:360;height:160;color:"white"
   expect(await run('({start:document.getElementById("field").selectionStart,end:document.getElementById("field").selectionEnd})')).toEqual({start:0,end:10});
   await click('part');const partial=await blue();expect(partial).toBeGreaterThan(50);expect(partial).toBeLessThan(full);expect(await bounds()).toEqual(original);
   await click('none');expect(await blue()).toBe(0);
+  await browser.context.click(original.x+1,original.y+12);
+  expect(await run('document.getElementById("field").selectionStart')).toBe(0);
+  await browser.context.type('X');expect(await run('document.getElementById("field").value')).toBe('Xabcdefghij');
   await click('all');await browser.context.press('Backspace',{code:'Backspace'});expect(await run('document.getElementById("field").value')).toBe('');expect(await blue()).toBe(0);
  }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
 },30000);
@@ -46,13 +49,18 @@ Rectangle {width:360;height:100;color:"white"
   await key('ArrowLeft',8);expect(await state()).toEqual([3,7]);
   await key('ArrowRight');expect(await state()).toEqual([7,7]);
   await key('a',2);await key('ArrowLeft');expect(await state()).toEqual([0,0]);
-  const caret=()=>run(`JSON.parse(document.getElementById('field').getAttribute('data-qml-caret'))`);
-  expect((await caret()).on).toBe(true);
   const on=await browser.context.screenshot({format:'png'});
-  for(let i=0;i<60&&(await caret()).on;i++)await Bun.sleep(15);
-  expect((await caret()).on).toBe(false);
-  const off=await browser.context.screenshot({format:'png'});expect(off).not.toBe(on);
+  // Capture work can span a blink phase on a loaded machine. Observe several
+  // frames rather than assuming two wall-clock samples land in opposite phases.
+  let changed=false;
+  for(let i=0;i<20;i++){
+   await Bun.sleep(125);
+   if(await browser.context.screenshot({format:'png'})!==on){changed=true;break;}
+  }
+  expect(changed).toBe(true);
   await run(`document.getElementById('field').blur()`);await run('0');
-  expect(await caret()).toBe(null);
+  const blurred=await browser.context.screenshot({format:'png'});await Bun.sleep(550);
+  expect(await browser.context.screenshot({format:'png'})).toBe(blurred);
+
  }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
 },30000);

@@ -66,3 +66,38 @@ Rectangle {
     host.close();
   }
 }, 30000);
+
+// Qt retains the long Wrap enum spelling used by styled code viewers.
+test('StyledText can toggle WrapAtWordBoundaryOrAnywhere and grow its line count', async () => {
+  const host = new RendererHost({ timeout: 20000 });
+  try {
+    await host.start();
+    await host.call('loadDocument', {
+      url: 'data:text/x-qml,wrap-alias', contentType: 'text/x-qml',
+      source: `import QtQuick
+Rectangle {
+ id: root; width: 320; height: 200; property bool wrapped: false
+ onClicked: wrapped = !wrapped
+ Text { id: code; width: 90; textFormat: Text.StyledText
+  text: "<font color='red'>const</font> averylongidentifierwithoutspaces = 123456789;"
+  wrapMode: root.wrapped ? Text.WrapAtWordBoundaryOrAnywhere : Text.NoWrap
+ }
+ Text { id: count; y: 180; text: code.lineCount }
+}`,
+    });
+    await host.call('whenLoaded');
+    const read = () => host.call('evaluate', `({
+      lines: Number(document.getElementById('count').textContent),
+      whiteSpace: document.getElementById('code').style.whiteSpace,
+      overflowWrap: document.getElementById('code').style.overflowWrap
+    })`);
+    expect((await read()).lines).toBe(1);
+    await host.call('evaluate', "document.getElementById('root').click()");
+    const wrapped = await read();
+    expect(wrapped.lines).toBeGreaterThan(1);
+    expect(wrapped.whiteSpace).toBe('pre-wrap');
+    expect(wrapped.overflowWrap).toBe('anywhere');
+    await host.call('evaluate', "document.getElementById('root').click()");
+    expect((await read()).lines).toBe(1);
+  } finally { host.close(); }
+}, 30000);

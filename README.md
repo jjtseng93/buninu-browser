@@ -232,7 +232,7 @@ preferring `xclip -selection clipboard`, with platform clipboard commands as
 fallbacks. Clipboard command access stays outside the page sandbox; unavailable
 providers reject the promise instead of reporting success. Reads happen only
 on request, with no clipboard polling. HTML inputs and textareas share selection,
-caret blinking, Shift+arrows, and Ctrl+C/X/V editing. Paste
+caret blinking, Shift+arrows, and Ctrl+C/X/V editing with QML controls. Paste
 replaces the selection, or inserts at the cursor. Up/Down currently follow
 explicit textarea line breaks, not soft-wrapped visual lines.
 
