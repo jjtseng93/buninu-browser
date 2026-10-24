@@ -995,8 +995,8 @@ env XDG_RUNTIME_DIR=/tmp bun test/manual-omastorm-engine.mjs /path/to/omastorm
 
 The probe does not download or start the engine. This stage has received the
 real engine's site list and polar-frame state, and rendered `RadarMark.qml`.
-The complete shell is still blocked by `Shortcut`, `Instantiator`, and subsequent
-unsupported types, particularly `ShaderEffect`; it is not yet a usable radar app.
+The complete shell now resolves past `Shortcut` and `Instantiator` and stops at
+`ShaderEffect`; it is not yet a usable radar app.
 
 ### Omastorm 相容性實驗
 
@@ -1013,5 +1013,48 @@ QML 顏色、reset 與銷毀清理。目前支援 `requestPaint`、`markDirty`�
 
 上方命令可使用未修改的 `Engine.qml` 連到已啟動的官方後端，不會下載或啟動後端。
 已實測收到站點清單與 polar frame 狀態，並渲染原版 `RadarMark.qml`；完整 shell
-仍缺 `Shortcut`、`Instantiator` 與後續類型，尤其是 `ShaderEffect`，目前還不能
-當作可用的雷達應用。
+已越過 `Shortcut`、`Instantiator`，目前停在 `ShaderEffect`，還不能當作可用的雷達應用。
+
+### Keyboard shortcuts and object delegates
+
+`Shortcut` supports string `sequence`/`sequences`, portable key names,
+Ctrl/Alt/Shift/Meta modifiers, up to four key strokes (one-second prefix timeout),
+enabled/autoRepeat, and activated/activatedAmbiguously signals. It consumes
+matching DOM keydown events before ordinary key handlers. Window scope uses the
+existing QML window/focus state; ApplicationShortcut applies across the document's
+windows. Native text currently uses portable text. Numeric StandardKey bindings,
+platform-localized key names and Keys.shortcutOverride are not implemented.
+
+`Instantiator` reuses Repeater's scoped factories for synchronous array/count
+models. Objects are parented to the Instantiator; active, count, object/objectAt,
+objectAdded/objectRemoved, model replacement and disposal are supported. Dynamic
+delegate replacement and richer model adapters remain unsupported; asynchronous
+creation is rejected explicitly. As with Repeater, a model replacement currently
+recreates all delegates rather than preserving identities by row diff.
+
+### 快捷鍵與物件委派
+
+`Shortcut` 支援字串 sequence／sequences、可攜式鍵名、Ctrl／Alt／Shift／Meta、
+最多四段按鍵（前綴等待一秒）、enabled／autoRepeat，以及 activated／
+activatedAmbiguously。透過 DOM keydown 攔截匹配按鍵，視窗範圍沿用既有 QML 焦點
+狀態。nativeText 暫用 portableText；數字 StandardKey、平台翻譯鍵名與
+Keys.shortcutOverride 尚未支援。
+
+`Instantiator` 重用 Repeater 的作用域工廠，同步建立陣列／數量模型的物件。
+支援正確父物件、active、count、object／objectAt、增加／移除訊號、模型替換與
+銷毀清理。動態 delegate 替換及其他模型轉接尚未支援，非同步建立會明確報錯。
+目前模型替換會重建所有委派，尚未以逐列差異保留物件身分。
+
+`PathMultiline` now emits independent SVG subpaths; the existing canvas ShapePath
+fallback also accepts the same geometry. `GridLayout` supports sequential
+row-major placement with columns/rows, spacing, preferred/minimum sizes,
+fill/alignment and implicit dimensions. Explicit cell coordinates, spans,
+right-to-left flow and uniform-cell options are not implemented. Nested layouts
+retain intrinsic preferred dimensions instead of feeding allocated widths back
+into the parent. The original Omastorm KeysSheet has been screenshot-checked with
+both columns visible; this does not validate the shader-dependent radar window.
+
+`PathMultiline` 已接到 SVG 子路徑，既有 canvas ShapePath 路徑也接受同一份幾何。
+`GridLayout` 支援逐列排列、欄列數、間距、偏好／最小尺寸、填滿／對齊與自然尺寸；
+指定格位、跨格、由右至左及等寬格選項尚未支援。巢狀 Layout 不再把父層分配的
+寬度反灌成自然寬度。已截圖確認原版 KeysSheet 雙欄正常，但不代表雷達視窗已可用。
