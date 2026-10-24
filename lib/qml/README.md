@@ -1008,12 +1008,12 @@ The complete shell now resolves past `Shortcut` and `Instantiator` and stops at
 QML `Canvas` 重用瀏覽器的 HTML canvas／2D context，只轉接重繪排程、尺寸、
 QML 顏色、reset 與銷毀清理。目前支援 `requestPaint`、`markDirty`（整張重繪）、
 `contextType: "2d"` 與動畫回呼；QML 圖片載入擴充、畫布分塊、其他渲染策略與
-自訂 `ShaderEffect` 尚未支援。`QtQuick.Window` import 可使用既有 Window
+自訂 `ShaderEffect` 已有實驗性軟體子集，詳見後段說明。`QtQuick.Window` import 可使用既有 Window
 附加行為，不代表該模組所有類型皆已實作。
 
 上方命令可使用未修改的 `Engine.qml` 連到已啟動的官方後端，不會下載或啟動後端。
 已實測收到站點清單與 polar frame 狀態，並渲染原版 `RadarMark.qml`；完整 shell
-已越過 `Shortcut`、`Instantiator`，目前停在 `ShaderEffect`，還不能當作可用的雷達應用。
+已越過 `Shortcut`、`Instantiator`，目前正在接通 `ShaderEffect` 相關功能，還不能當作可用的雷達應用。
 
 ### Keyboard shortcuts and object delegates
 
@@ -1058,3 +1058,61 @@ both columns visible; this does not validate the shader-dependent radar window.
 `GridLayout` 支援逐列排列、欄列數、間距、偏好／最小尺寸、填滿／對齊與自然尺寸；
 指定格位、跨格、由右至左及等寬格選項尚未支援。巢狀 Layout 不再把父層分配的
 寬度反灌成自然寬度。已截圖確認原版 KeysSheet 雙欄正常，但不代表雷達視窗已可用。
+
+### Experimental software ShaderEffect
+
+`shader/fragment.js` experimentally translates a Qt-style GLSL fragment subset
+to SkSL and compiles it with the existing CanvasKit RuntimeEffect. CPU raster
+surfaces execute it without EGL, Vulkan, WebGL, new native libraries or a second
+production CanvasKit instance. The caller supplies existing child shaders and
+uniforms; the drawing path does not encode images or read pixels back into JS.
+Only tests read pixels to verify results.
+
+```sh
+bun test test/qml-software-shader.test.js
+bun test/manual-omastorm-shaders.mjs /path/to/omastorm
+```
+
+The offline manual probe compiles all four upstream `.frag.qsb` packages and checks
+known pixels for tile and texture-check. Radar/grid compilation is **not** a
+visual correctness or performance result. The current translator supports one
+vec4 output, qt_TexCoord0, simple uniform blocks, scalar/vector/matrix uniforms,
+2D child sampling and level-zero textureSize. It is not a complete GLSL compiler;
+preprocessing, custom vertex shaders and additional interfaces are unsupported.
+Native shader compilation errors remain errors, never successful placeholders.
+
+Local QML ShaderEffect now accepts raw GLSL or QSB v9 desktop GLSL records.
+Numeric/vector/color uniforms update reactively; Image and ShaderEffectSource
+samplers reuse renderer images, and output goes directly into an HTML canvas.
+Resources are disposed on item destruction or page teardown. No PNG encoding,
+base64 or JS pixel readback is introduced in the rendering path.
+
+Run the self-contained clickable gradient with:
+
+```sh
+bun lib/qml/qswayland -p test/fixtures/qml-shader/main.qml
+```
+
+An original Omastorm tile QSB and cached map texture have rendered on CPU.
+This does not yet establish full RadarMap/TextureCheck compatibility. Custom
+vertex shaders, mesh/culling changes, full GLSL and other QSB versions remain
+unsupported. GPU acceleration remains optional future work.
+
+### 實驗性純軟體 ShaderEffect
+
+`shader/fragment.js` 實驗性地把 Qt 風格 GLSL fragment 子集轉成 SkSL，重用現有
+CanvasKit RuntimeEffect，在 CPU raster surface 執行，不需要 EGL、Vulkan、
+WebGL 或新的原生依賴。材質由同一個 CanvasKit 的 child shader 提供，繪製本身
+不做圖片編碼或像素讀回；測試才讀回像素驗證。
+
+上方離線實驗已編譯原版四份 `.frag`，並驗證 tile／texture-check 的已知像素。
+radar／grid 目前只證明可以編譯，還不能推論畫面正確或效能足夠。轉譯器僅支援
+單一 vec4 輸出、qt_TexCoord0、簡單 uniform block、數值／向量／矩陣 uniform、
+二維材質取樣及第零層 textureSize，不是完整 GLSL 編譯器。
+
+本地 QML 已接上 QSB v9 的桌面 GLSL、數值／向量／色彩 uniform、Image 與
+ShaderEffectSource 材質，以及重繪與資源釋放。輸出直接寫入既有 HTML canvas，
+沒有增加 PNG、base64 或 JS 像素讀回。上方命令可開啟點擊換色的獨立示範。
+已用原版 Omastorm 地圖 QSB 與快取材質確認 CPU 繪圖；完整 RadarMap 與
+TextureCheck 尚未跑通。自訂 vertex shader、mesh／culling、完整 GLSL 與其他
+QSB 版本仍未支援。純軟體是必要路徑，GPU 僅作未來可選加速。
