@@ -9,6 +9,7 @@ import {WaylandUrlBar,BAR_HEIGHT} from './urlbar.js';
 import {readClipboard,writeClipboard} from '../../lib/clipboard.js';
 
 // qml handle begin: local QML clipboard uses this frontend's Wayland seat
+import {qmlWindowConstraints} from '../../lib/qml/window-constraints.js';
 import {attachQmlClipboard} from '../../lib/qml/wayland-clipboard.js';
 // qml handle end
 
@@ -47,6 +48,11 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
     }).initialize();
     window=new WaylandWindow(client,{width,height:height+(toolbar?BAR_HEIGHT:0)});
     client.onClose=close;window.onClose=close;
+
+    // qml handle begin: forward declarative window constraints to xdg_toplevel
+    const syncQmlConstraints=qmlWindowConstraints(client,window,browser.context);
+    // qml handle end
+
     const draw=async()=>{
       if(closed||!ready||navigating||busy||!dirty||!window.available)return;
       busy=true;dirty=false;const generation=navigation;let path;
@@ -90,6 +96,10 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
         const title=String(await browser.context.title()||'Buninu Browser');
         if(closed||generation!==navigation)return;
         toolbar?.updateURL(browser.context.url);
+        // qml handle begin: refresh size hints alongside existing window metadata
+        await syncQmlConstraints();
+        // qml handle end
+
         if(title!==lastTitle){lastTitle=title;client.request(window.toplevel,'set_title',title);}
       }catch(e){if(!closed&&generation===navigation)fail(e);}finally{readingTitle=false;}
     },500);
@@ -102,6 +112,10 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
     }:browser.context;
     attachInput(client,window,input,fail);
     await browser.context.resize(width,height,1);await browser.context.navigate(url);ready=true;draw();
+    // qml handle begin: send initial window size hints
+    await syncQmlConstraints();
+    // qml handle end
+
     return {browser,client,window,toolbar,close,done};
   }catch(e){close();throw e;}
 }

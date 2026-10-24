@@ -1094,7 +1094,8 @@ bun lib/qml/qswayland -p test/fixtures/qml-shader/main.qml
 ```
 
 An original Omastorm tile QSB and cached map texture have rendered on CPU.
-This does not yet establish full RadarMap/TextureCheck compatibility. Custom
+A patched application copy now displays a polar RadarMap; large mosaic
+TextureCheck and complete UI compatibility are not yet verified. Custom
 vertex shaders, mesh/culling changes, full GLSL and other QSB versions remain
 unsupported. GPU acceleration remains optional future work.
 
@@ -1105,14 +1106,90 @@ CanvasKit RuntimeEffect，在 CPU raster surface 執行，不需要 EGL、Vulkan
 WebGL 或新的原生依賴。材質由同一個 CanvasKit 的 child shader 提供，繪製本身
 不做圖片編碼或像素讀回；測試才讀回像素驗證。
 
-上方離線實驗已編譯原版四份 `.frag`，並驗證 tile／texture-check 的已知像素。
-radar／grid 目前只證明可以編譯，還不能推論畫面正確或效能足夠。轉譯器僅支援
+上方離線實驗已編譯原版四份 `.frag.qsb`，並驗證 tile／texture-check 的已知像素。
+radar 已在完整介面顯示極座標回波；grid 仍只有編譯驗證，尚未確認大型拼接圖。轉譯器僅支援
 單一 vec4 輸出、qt_TexCoord0、簡單 uniform block、數值／向量／矩陣 uniform、
 二維材質取樣及第零層 textureSize，不是完整 GLSL 編譯器。
 
 本地 QML 已接上 QSB v9 的桌面 GLSL、數值／向量／色彩 uniform、Image 與
 ShaderEffectSource 材質，以及重繪與資源釋放。輸出直接寫入既有 HTML canvas，
 沒有增加 PNG、base64 或 JS 像素讀回。上方命令可開啟點擊換色的獨立示範。
-已用原版 Omastorm 地圖 QSB 與快取材質確認 CPU 繪圖；完整 RadarMap 與
-TextureCheck 尚未跑通。自訂 vertex shader、mesh／culling、完整 GLSL 與其他
+已用原版 Omastorm 地圖與雷達 QSB 確認 CPU 繪圖；大型拼接圖的
+TextureCheck 與全部 UI 行為尚未驗證。自訂 vertex shader、mesh／culling、完整 GLSL 與其他
 QSB 版本仍未支援。純軟體是必要路徑，GPU 僅作未來可選加速。
+
+### Item capture and Canvas image reads
+
+Local QML items support `grabToImage(callback, size)` using the existing DOM
+snapshot and HTML canvas path. The result exposes a PNG data URL; encoding is
+performed only for an explicit grab, never for each ShaderEffect frame.
+Canvas supports `loadImage`, `unloadImage`, `isImageLoaded`, `isImageLoading`,
+`isImageError`, `imageLoaded`, and the `createImageData(url)` image-read overload.
+Pending captures are cancelled on item destruction. `saveToFile` is not yet
+implemented. A sampler-size shader → 16×16 grab → Canvas image read integration
+test verifies green pixels for the actual 2×3 source texture, without a GPU.
+
+The original Omastorm application still explicitly rejects `GraphicsInfo.Software`;
+software shader support alone cannot bypass that application policy. The explicit
+test-copy procedure below removes those policy checks without faking a backend.
+
+### Item 擷取與 Canvas 圖片讀取
+
+本地 QML Item 的 `grabToImage(callback, size)` 重用既有 DOM snapshot 與 HTML
+canvas，回傳 PNG data URL。只有明確擷取才編碼，不增加每幀 ShaderEffect 的成本。
+Canvas 已支援載入、卸載、載入狀態查詢、`imageLoaded` 及
+`createImageData(url)` 讀取圖片。Item 銷毀會取消待執行擷取；`saveToFile` 尚未實作。
+整合測試已驗證「材質尺寸 shader → 16×16 擷取 → Canvas 讀取」取得正確綠色像素，
+確認原始 2×3 材質尺寸，完全不需要 GPU。
+
+Omastorm 原版仍明確拒絕 `GraphicsInfo.Software`，這是應用自己的限制，不能只靠
+軟體 shader 支援解除。下方明確修改測試副本的做法會移除這兩處政策限制，
+沒有假報繪圖後端。
+
+
+### Omastorm software application experiment
+
+With the official engine already running and Land available through
+`WAYLAND_DISPLAY` / `XDG_RUNTIME_DIR`:
+
+```sh
+bun test/manual-omastorm-software.mjs ../omastorm
+```
+
+The script prints a new temporary directory, copies only the UI, and removes
+the two explicit `GraphicsInfo.Software` rejection branches. It leaves the
+checkout, native shaders, texture-size verification and minimum window size
+unchanged. `--prepare-only` creates the copy without opening a window.
+
+The browser now supplies Button content/background/padding/focus handling,
+attached Window changes, ListModel required delegate roles, locale/date helpers,
+and size/vector defaults. `FloatingWindow.minimumSize` and `maximumSize` affect
+QML geometry and are sent as xdg_toplevel size hints by the Wayland frontend.
+Only one frontend toplevel is currently represented; independent native windows
+and all Qt Control styling semantics are not claimed. Rectangle antialiasing
+uses the existing CSS/CanvasKit raster policy (disabling it is not implemented).
+
+Nested Loader startup no longer loses pending outer change handlers. Imperative
+`createObject` initialization no longer adds child-state dependencies to its
+calling binding, which previously could recreate sockets repeatedly.
+
+The full UI has displayed cached KMUX polar radar echoes, map tiles and place
+labels using software rendering. Missing icon glyphs, rendering cost, custom
+cursor visuals, mosaic grids and the full set of interactions still need work.
+This is an experiment, not complete Omastorm compatibility.
+
+### Omastorm 軟體版應用實驗
+
+先啟動官方引擎及 Land，設定 `WAYLAND_DISPLAY`／`XDG_RUNTIME_DIR`，再執行上方
+命令。腳本會印出新的暫存目錄，只複製 UI、移除兩處 Software 拒絕判斷，不修改
+checkout、shader、材質尺寸驗證或最小視窗尺寸。`--prepare-only` 只建立副本。
+
+已補 Button 的內容、背景、padding 與焦點，Window 附加通知、ListModel 必填角色、
+地區／日期格式及 size／向量初值。`minimumSize`／`maximumSize` 除了約束 QML
+幾何，也會傳送 Wayland 尺寸提示。目前 frontend 仍只有單一原生 toplevel，
+不是完整多視窗或全部 Qt Controls 樣式相容。Rectangle 抗鋸齒沿用現有 renderer，
+尚未實作關閉抗鋸齒。
+
+已修正巢狀 Loader 啟動遺失外層變更通知，以及 `createObject` 建立過程污染呼叫方
+binding 依賴、造成 Socket 重建的問題。完整介面已用軟體顯示 KMUX 極座標雷達
+回波、地圖與地名；圖示缺字、繪製成本、自訂游標視覺、拼接圖及全部互動仍待驗證。
