@@ -969,3 +969,49 @@ remain in Flea's thumbnail cache until invalidated or removed.
 媒體資訊。官方 0.3.12 後端已實測接受並寫入縮圖快取，沿用實驗容器的
 bwrap 繞過路徑，無須修改 Flea QML。刪除註冊檔可停用，但既有佔位縮圖
 仍保留在快取，直到失效或被移除。
+
+## Omastorm compatibility experiments
+
+The first compatibility stage provides local `Quickshell.Io.Socket` with Unix
+socket connections, UTF-8 `SplitParser` messages, writes, disconnect/reconnect,
+and document-owned cleanup. `connected` reads the actual connection state;
+assigning it requests a connection/disconnection. Writes are queued immediately;
+`flush()` is accepted without adding a second buffer. This does not expose host
+sockets to ordinary HTML or remote QML.
+
+QML `Canvas` reuses the browser's HTML canvas and 2D context. The adapter supplies
+paint scheduling, dimensions, QML color conversion, reset, and cancellation when
+disposed. It currently supports `requestPaint`, `markDirty` (full repaint),
+`contextType: "2d"`, and animation callbacks. QML image-loading extensions,
+canvas tiling, alternate render strategies, and custom `ShaderEffect` are not
+implemented. `QtQuick.Window` imports resolve existing Window attached behavior;
+this does not implement every type from that module.
+
+To probe an existing official Omastorm engine using the unmodified `Engine.qml`:
+
+```sh
+env XDG_RUNTIME_DIR=/tmp bun test/manual-omastorm-engine.mjs /path/to/omastorm
+```
+
+The probe does not download or start the engine. This stage has received the
+real engine's site list and polar-frame state, and rendered `RadarMark.qml`.
+The complete shell is still blocked by `Shortcut`, `Instantiator`, and subsequent
+unsupported types, particularly `ShaderEffect`; it is not yet a usable radar app.
+
+### Omastorm 相容性實驗
+
+第一階段加入本地 `Quickshell.Io.Socket`：Unix socket 連線、UTF-8
+`SplitParser` 訊息、寫入、斷線重連，以及頁面關閉時清理。`connected` 讀取實際
+連線狀態，賦值則要求連線／斷線；寫入立即排入傳輸，`flush()` 不另建緩衝。
+一般 HTML 與遠端 QML 不會因此取得 host socket 能力。
+
+QML `Canvas` 重用瀏覽器的 HTML canvas／2D context，只轉接重繪排程、尺寸、
+QML 顏色、reset 與銷毀清理。目前支援 `requestPaint`、`markDirty`（整張重繪）、
+`contextType: "2d"` 與動畫回呼；QML 圖片載入擴充、畫布分塊、其他渲染策略與
+自訂 `ShaderEffect` 尚未支援。`QtQuick.Window` import 可使用既有 Window
+附加行為，不代表該模組所有類型皆已實作。
+
+上方命令可使用未修改的 `Engine.qml` 連到已啟動的官方後端，不會下載或啟動後端。
+已實測收到站點清單與 polar frame 狀態，並渲染原版 `RadarMark.qml`；完整 shell
+仍缺 `Shortcut`、`Instantiator` 與後續類型，尤其是 `ShaderEffect`，目前還不能
+當作可用的雷達應用。
