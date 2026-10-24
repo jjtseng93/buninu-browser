@@ -1193,3 +1193,55 @@ checkout、shader、材質尺寸驗證或最小視窗尺寸。`--prepare-only` �
 已修正巢狀 Loader 啟動遺失外層變更通知，以及 `createObject` 建立過程污染呼叫方
 binding 依賴、造成 Socket 重建的問題。完整介面已用軟體顯示 KMUX 極座標雷達
 回波、地圖與地名；圖示缺字、繪製成本、自訂游標視覺、拼接圖及全部互動仍待驗證。
+
+### Local fallback fonts / 本機備用字型
+
+Local QML documents in host mode accept `QT_QPA_FONTDIR`. It names **one
+folder**, as in Qt; colon/semicolon-separated folder lists are not supported.
+This implementation additionally searches subfolders and follows symlinks with
+cycle/duplicate protection. Put fonts from several sources under one folder
+(or link their folders into it).
+
+```sh
+env QT_QPA_FONTDIR=/path/to/fonts \
+  bun index.js --quickshell-wayland -p /path/to/shell.qml
+```
+
+Supported files are `.ttf` and `.otf`. Fonts are decoded once on the first local
+QML navigation per renderer process, then reused; there is no per-frame scan or
+automatic download. Existing fonts remain first, and the discovered fonts supply
+missing glyphs to both Text and Canvas. Regular faces are ordered before other
+faces. Explicit family names are also recognized, but complete Qt font style
+matching is not implemented. Private-use icon codepoints require the appropriate
+icon font (for example Nerd Font); another font may use the same codepoint for a
+different symbol.
+
+The directory is read from the environment at process startup. Restart after
+changing its contents. No variable means no extra font scan. Ordinary HTML pages
+retain their existing fonts, including after navigation away from QML. Invalid
+fonts are reported and skipped. Loading is bounded to 32 MiB per file, 128 MiB
+total, 128 decoded faces, 4096 visited paths and 16 directory levels. Font
+collections (`.ttc`), Fontconfig rules and automatic system discovery are not
+implemented here.
+
+本機 QML 的 host 模式支援 `QT_QPA_FONTDIR`，與 Qt 一樣指定**單一目錄**，
+不接受冒號或分號分隔的多目錄清單。我們另外支援遞迴子目錄及符號連結，會避免
+循環和重複；多個字型來源可以放在同一目錄下，或把它們的目錄連結進去。
+
+支援 `.ttf`、`.otf`，每個 renderer 程序首次載入本機 QML 時解碼一次並重用，
+不會每幀掃描或自動下載。原有字型優先，缺字才使用找到的字型，Text 與 Canvas
+共用。Regular 字型排在其他樣式之前，也支援直接指定找到的 family 名稱，但尚未
+完整實作 Qt 的字重／樣式匹配。私用區圖示需使用正確的圖示字型（例如 Nerd Font）；
+另一套字型在同一碼位可能是不同圖案。
+
+環境變數在程序啟動時讀取，修改目錄內容後請重啟。未設定就不額外掃描；一般 HTML
+維持原本字型，即使從 QML 導航回 HTML 也一樣。損壞字型會回報並跳過。上限為每檔
+32 MiB、合計 128 MiB、128 個解碼字型、4096 個路徑與 16 層目錄。此功能尚不支援
+`.ttc` 字型集合、Fontconfig 規則或自動搜尋系統字型。
+
+Manual Text/Canvas icon check / 手動檢查文字及 Canvas 圖示：
+
+```sh
+env QT_QPA_FONTDIR=/path/to/nerd-fonts \
+  bun index.js --quickshell-wayland -p test/fixtures/qml-fonts/main.qml
+```
