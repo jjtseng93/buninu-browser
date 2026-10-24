@@ -1245,3 +1245,23 @@ Manual Text/Canvas icon check / 手動檢查文字及 Canvas 圖示：
 env QT_QPA_FONTDIR=/path/to/nerd-fonts \
   bun index.js --quickshell-wayland -p test/fixtures/qml-fonts/main.qml
 ```
+
+### System locale / 系統地區設定
+
+Local host-mode QML reads `LC_ALL`, then the relevant category (`LC_TIME`,
+`LC_MEASUREMENT`, or `LC_MESSAGES`), then `LANG`. Empty values are ignored.
+`C`, `C.UTF-8` and `POSIX` use the Qt C locale: metric units, day-first short
+ dates and 24-hour time. Explicit `Qt.locale("en_US")` overrides the system
+categories; Unix names such as `en_US.UTF-8` are accepted. Unsupported locale
+names fall back to C. The environment is captured at process startup.
+Non-C format data and timezone labels still use JavaScript Intl, so exact
+punctuation or timezone abbreviations may differ from Qt's locale database.
+This does not change ordinary web-page Intl behavior.
+
+本機 host 模式的 QML 依序採用 `LC_ALL`、對應分類（`LC_TIME`、
+`LC_MEASUREMENT` 或 `LC_MESSAGES`）、`LANG`，空值跳過。
+`C`、`C.UTF-8` 和 `POSIX` 採 Qt 的 C locale：公制、日優先的短日期與
+24 小時制。明確指定 `Qt.locale("en_US")` 時不受系統分類設定影響，也接受
+`en_US.UTF-8` 形式；不支援的名稱退回 C。環境設定在程序啟動時保存。
+非 C 的格式資料及時區名稱仍使用 JavaScript Intl，因此標點或時區縮寫可能與
+Qt 資料庫不同。一般網頁的 Intl 行為不受影響。

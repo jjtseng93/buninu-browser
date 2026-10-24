@@ -93,3 +93,90 @@ Item {id:root
  expect(await host.call('evaluate','[root.child===first,root.child.derived,globalThis.created]')).toEqual([true,10,1]);
  }finally{host.close();}
 },20000);
+
+test('Button custom content sizes its RowLayout slot and reacts without a width cycle',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try {
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,button-size',contentType:'text/x-qml',source:`import QtQuick
+import QtQuick.Layouts
+import Quickshell
+FloatingWindow {
+ RowLayout { width:500; height:60; spacing:8
+  Button {id:button;padding:4
+   contentItem: RowLayout {spacing:6
+    Rectangle {id:first;implicitWidth:80;implicitHeight:20}
+    Rectangle {implicitWidth:100;implicitHeight:24}
+   }
+   background: Rectangle {implicitWidth:120;implicitHeight:30}
+  }
+  Rectangle {id:next;implicitWidth:30;implicitHeight:30}
+  Item {Layout.fillWidth:true}
+ }
+ Component.onCompleted:{globalThis.button=button;globalThis.first=first;globalThis.next=next;}
+}`});
+  await host.call('whenLoaded');
+  expect(await host.call('evaluate','[button.implicitWidth,button.implicitHeight,button.width,next.x]')).toEqual([194,32,194,202]);
+  await host.call('evaluate','first.implicitWidth=120');await Bun.sleep(20);
+  expect(await host.call('evaluate','[button.implicitWidth,button.width,next.x]')).toEqual([234,234,242]);
+ }finally{host.close();}
+},20000);
+
+test('Layouts retain explicit item dimensions for status dots and palette strips',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try {
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,layout-fallback',contentType:'text/x-qml',source:`import QtQuick
+import QtQuick.Layouts
+import Quickshell
+FloatingWindow {
+ RowLayout {id:row;width:300;height:30
+  Rectangle {id:dot;width:8;height:8;radius:4;color:"green"}
+  Item {Layout.fillWidth:true}
+ }
+ ColumnLayout {id:column;y:40;width:300;height:22;spacing:4
+  Rectangle {id:strip;Layout.fillWidth:true;height:6;color:"red"}
+  Item {implicitHeight:12;Layout.fillWidth:true}
+ }
+ GridLayout {y:80;columns:1
+  Rectangle {id:cell;width:11;height:7}
+ }
+ Component.onCompleted:{globalThis.dot=dot;globalThis.strip=strip;globalThis.cell=cell;globalThis.row=row;globalThis.column=column;}
+}`});
+  await host.call('whenLoaded');
+  expect(await host.call('evaluate','[dot.width,dot.height,strip.width,strip.height,cell.width,cell.height]')).toEqual([8,8,300,6,11,7]);
+  await host.call('evaluate','row.width=500;column.width=500');await Bun.sleep(20);
+  expect(await host.call('evaluate','[dot.width,dot.height,strip.width,strip.height]')).toEqual([8,8,500,6]);
+  await host.call('evaluate','row.width=300;column.width=300');await Bun.sleep(20);
+  expect(await host.call('evaluate','[dot.width,dot.height,strip.width,strip.height]')).toEqual([8,8,300,6]);
+ }finally{host.close();}
+},20000);
+
+test('Nested Layout receives explicit size bindings even when the dot starts hidden',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try {
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,late-dot',contentType:'text/x-qml',source:`import QtQuick
+import QtQuick.Layouts
+import Quickshell
+FloatingWindow {
+ property bool ready:false
+ id:root
+ ColumnLayout {anchors.fill:parent
+  RowLayout {Layout.fillWidth:true
+   Text {text:"TITLE"}
+   Item {Layout.fillWidth:true}
+   RowLayout {
+    spacing:8
+    Rectangle {id:dot;width:8;height:8;radius:4;visible:root.ready;Layout.alignment:Qt.AlignVCenter;color:"blue"}
+    Text {text:"LIVE"}
+   }
+  }
+ }
+ Component.onCompleted:{globalThis.root=root;globalThis.dot=dot;}
+}`});
+  await host.call('whenLoaded');
+  await host.call('evaluate','root.ready=true');await Bun.sleep(20);
+  expect(await host.call('evaluate','[dot.width,dot.height,dot.visible]')).toEqual([8,8,true]);
+ }finally{host.close();}
+},20000);
