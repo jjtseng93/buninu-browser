@@ -36,3 +36,14 @@ test('Toolbar raster cache and horizontal scrolling preserve page-independent re
   expect(bar.editor.selectedText.length).toBeGreaterThan(0);
  }finally{bar.dispose();}
 });
+
+test('Wayland chrome forwards page click counts through zoom and bar offset',async()=>{
+ const clicks=[];
+ const bar=new WaylandUrlBar({url:'about:blank',click:(...args)=>clicks.push(args)},{history,close(){},clipboard:{read:async()=>'',write:async()=>{}}});
+ try{
+  bar.zoom=2;
+  await bar.pointerButton(40,bar.height+60,272,1,{clickCount:2});
+  await bar.pointerButton(40,bar.height+60,272,0,{clickCount:2});
+  expect(clicks).toEqual([[20,30,{clickCount:2}]]);
+ }finally{bar.dispose()}
+});

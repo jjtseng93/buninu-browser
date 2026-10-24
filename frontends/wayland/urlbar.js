@@ -67,7 +67,7 @@ export class WaylandUrlBar {
     if(action){await this.action(action);return;}
     return this.context.press(key,options);
   }
-  async pointerButton(x,y,button,state) {
+  async pointerButton(x,y,button,state,options={}) {
     if(button!==272)return;
     if(y<this.height||this.editor.dragging) {
       const col=Math.max(1,Math.floor(x/this.cellWidth)+1);
@@ -78,7 +78,7 @@ export class WaylandUrlBar {
       return;
     }
     if(state&&this.editor.editing)this.editor.cancelEditing();
-    if(!state)return this.context.click(x/this.zoom,(y-this.height)/this.zoom);
+    if(!state)return this.context.click(x/this.zoom,(y-this.height)/this.zoom,options);
   }
   move(x,y){if(this.editor.dragging){this.editor.pointerMove(Math.max(1,Math.floor(x/this.cellWidth)+1));return;}if(y>=this.height)return this.context.move(x/this.zoom,(y-this.height)/this.zoom);}
   scroll(dx,dy,at){if(at?.y<this.height){if(this.editor.editing){if(dy<0)this.editor.historyUp();else this.editor.historyDown();}return;}return this.context.scroll(dx/this.zoom,dy/this.zoom,at?{x:at.x/this.zoom,y:(at.y-this.height)/this.zoom}:null);}

@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>雙擊測試 · ondblclick</title>
+<style>
+body{margin:0;padding:28px;background:#101c2c;color:#e9f2ff;font-family:sans-serif}
+h1{font-size:26px}p{line-height:1.6;color:#bed0e8}
+#target{display:block;width:100%;height:180px;background:#204763;color:white;border:2px solid #5ad5df;border-radius:12px;font-size:26px}
+#result{padding:18px;font-size:22px;color:#71edcf}
+#stats{padding:14px;background:#192b40;line-height:1.8}
+</style>
+<h1>雙擊才能開啟</h1>
+<p>在下面區域快速點兩下。單擊只更新紀錄，雙擊才會切換開啟／關閉狀態。</p>
+<button id="target" onclick="recordClick(event)" ondblclick="toggleDoor(event)">🔒 雙擊開啟</button>
+<div id="result">等待 dblclick…</div>
+<div id="stats">click：0　dblclick：0　最近 detail：0</div>
+<script>
+let clicks=0,doubles=0,opened=false;
+function stats(detail){document.getElementById('stats').textContent='click：'+clicks+'　dblclick：'+doubles+'　最近 detail：'+detail}
+function recordClick(e){clicks++;stats(e.detail)}
+function toggleDoor(e){doubles++;opened=!opened;document.getElementById('target').textContent=opened?'🔓 已開啟，雙擊關閉':'🔒 已關閉，雙擊開啟';document.getElementById('result').textContent='收到 ondblclick！第 '+doubles+' 次';stats(e.detail)}
+</script>

@@ -19,6 +19,7 @@ export function keysym(symbol){
 export function attachInput(client,window,context,onError) {
   if(!client.globals.has('wl_seat'))return;
   let pointer,keyboard,x=0,y=0,focused=false,keys=new Map(),mods=0,locked=0;
+  let lastClick=null, clickCount=0;
   const active=()=>!window.closed&&!client.connection.closed;
   const invoke=(method,...args)=>{
     if(!active())return;
@@ -31,14 +32,25 @@ export function attachInput(client,window,context,onError) {
     if(event!=='capabilities')return;
     if((caps&1)&&!pointer){pointer=client.object('wl_pointer',(name,args)=>{
       if(name==='enter'){focused=args[1]===window.surface;[x,y]=args.slice(2);}
-      if(name==='leave')focused=false;
+      if(name==='leave'){focused=false;lastClick=null;clickCount=0;}
       if(name==='motion'){[x,y]=args.slice(1);if(focused)invoke('move',x,y);}
 
       // Mouse-triggered copy also has a valid Wayland input serial.
       if(name==='button'&&focused&&client.clipboard)client.clipboard.serial=args[0];
 
-      if(name==='button'&&focused&&context.pointerButton)invoke('pointerButton',x,y,args[2],args[3]);
-      else if(name==='button'&&focused&&args[2]===272&&args[3]===0)invoke('click',x,y);
+      if(name==='button'&&focused){
+        const [,time,button,state]=args;
+        if(state){
+          // Wayland supplies monotonic uint32 milliseconds, not a click count.
+          // Allow modest touch jitter in surface coordinates; reset on leave.
+          clickCount=lastClick&&lastClick.button===button&&((time-lastClick.time)>>>0)<400
+            &&Math.abs(x-lastClick.x)<=12&&Math.abs(y-lastClick.y)<=12 ? clickCount+1 : 1;
+          lastClick={time,button,x,y};
+        }
+        const options={clickCount:clickCount||1};
+        if(context.pointerButton)invoke('pointerButton',x,y,button,state,options);
+        else if(button===272&&state===0)invoke('click',x,y,options);
+      }
       if(name==='axis'&&focused)invoke('scroll',args[1]===1?args[2]:0,args[1]===0?args[2]:0,{x,y});
     });client.request(seat,'get_pointer',pointer);}
     if((caps&2)&&!keyboard){keyboard=client.object('wl_keyboard',(name,args)=>{
