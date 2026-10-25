@@ -49,7 +49,7 @@ export function attachInput(client,window,context,onError) {
         }
         const options={clickCount:clickCount||1};
         if(context.pointerButton)invoke('pointerButton',x,y,button,state,options);
-        else if(button===272&&state===0)invoke('click',x,y,options);
+        else if(state===0&&button>=272&&button<=274)invoke('click',x,y,{...options,button:button===273?'right':button===274?'middle':'left'});
       }
       if(name==='axis'&&focused)invoke('scroll',args[1]===1?args[2]:0,args[1]===0?args[2]:0,{x,y});
     });client.request(seat,'get_pointer',pointer);}

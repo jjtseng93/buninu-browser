@@ -52,3 +52,34 @@ test('Wayland count resets on timeout, distance and leave and handles timestamp 
  p.event('leave',[]);p.event('enter',[1,3,100,100]);p.tap(1150,100,100);
  await Bun.sleep(0);expect(counts).toEqual([1,2,1,1,1]);
 });
+
+test('CDP and Wayland preserve non-primary buttons without primary activation',async()=>{
+ const b=await createBrowser({spareRenderer:false});const server=CdpServer.create(b.context).listen(0);
+ const cdp=new CDP(`ws://127.0.0.1:${server.port}/devtools/browser/cdp-server`);
+ const dir=mkdtempSync('/tmp/nonprimary-click-');
+ try {
+  await cdp.ready;
+  const url='data:text/html,'+encodeURIComponent(`<body style="margin:0"><a id="box" href="https://example.invalid/" style="display:block;width:200px;height:100px">link</a><script>globalThis.events=[];const box=document.getElementById("box");for(const t of ['mousedown','mouseup','click','auxclick','contextmenu'])box.addEventListener(t,e=>events.push([t,e.button,e.buttons]));box.onauxclick=e=>events.push(['property',e.button]);</script>`);
+  const {targetId}=await cdp.send('Target.createTarget',{url});
+  const {sessionId}=await cdp.send('Target.attachToTarget',{targetId,flatten:true});cdp.sessionId=sessionId;
+  await b.context.navigate(url);
+  for(const type of ['mousePressed','mouseReleased'])await cdp.send('Input.dispatchMouseEvent',{type,x:30,y:40,button:'right',clickCount:1});
+  expect(await b.context.evaluate('events')).toEqual([['mousedown',2,2],['contextmenu',2,2],['mouseup',2,0],['auxclick',2,0],['property',2]]);
+  expect(b.context.url).toBe(url);
+  await b.context.evaluate('events=[]');
+  const p=pointer(b.context);p.event('button',[1,1000,274,1]);p.event('button',[2,1030,274,0]);
+  await until(async()=>(await b.context.evaluate('events.length'))===4);
+  expect(await b.context.evaluate('events')).toEqual([['mousedown',1,4],['mouseup',1,0],['auxclick',1,0],['property',1]]);
+  await Bun.write(join(dir,'main.qml'),`import QtQuick
+Rectangle {width:200;height:100;color:"white"
+ Text {id:status;text:"none"}
+ TapHandler {acceptedButtons:Qt.LeftButton | Qt.RightButton | Qt.MiddleButton;onTapped:(point,button)=>{status.text="button="+button}}
+}`);
+  await b.context.navigate(Bun.pathToFileURL(join(dir,'main.qml')).href);
+  const q=pointer(b.context);
+  for(const [code,expected] of [[273,2],[274,4]]){
+   q.event('button',[1,2000,code,1]);q.event('button',[2,2030,code,0]);
+   await until(async()=>(await b.context.evaluate('document.getElementById("status").textContent'))==='button='+expected);
+  }
+ }finally{cdp.close();server.stop(true);b.close();rmSync(dir,{recursive:true,force:true})}
+},30000);

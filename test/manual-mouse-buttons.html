@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><title>滑鼠按鍵測試</title>
+<style>
+body{margin:0;padding:28px;background:#101a28;color:#e1f2ff;font-family:sans-serif}
+h1{font-size:28px}p{line-height:1.6}button{display:block;width:100%;height:220px;background:#146d83;color:white;border:3px solid #62dbe9;border-radius:18px;font-size:34px;font-weight:bold}
+#result{margin-top:24px;font-size:27px;color:#70efce}#counts{font-size:22px}pre{white-space:pre-wrap;background:#19283b;padding:16px;font-size:17px}
+</style>
+<h1>左鍵・右鍵・中鍵測試</h1><p>直接點按測左鍵。長按圖片，選 Right click 測右鍵。右鍵不應增加左鍵次數。</p>
+<button id="pad">在這裡點擊 / 長按</button><div id="result">等待按鍵…</div><p id="counts">左鍵 0 ｜ 右鍵 0 ｜ 中鍵 0</p><pre id="events">事件記錄</pre>
+<script>
+const pad=document.getElementById('pad'),result=document.getElementById('result'),counts=document.getElementById('counts'),log=document.getElementById('events');
+const totals=[0,0,0],names=['左鍵','中鍵','右鍵'];let rows=[];
+for(const type of ['mousedown','contextmenu','mouseup','click','auxclick'])pad.addEventListener(type,e=>{
+ if(type==='contextmenu')e.preventDefault();
+ rows.unshift(type+' button='+e.button+' buttons='+e.buttons);rows=rows.slice(0,10);log.textContent=rows.join('\n');
+ if(type==='click'||type==='auxclick'){totals[e.button]++;result.textContent='收到：'+names[e.button];counts.textContent='左鍵 '+totals[0]+' ｜ 右鍵 '+totals[2]+' ｜ 中鍵 '+totals[1];}
+});
+</script></html>

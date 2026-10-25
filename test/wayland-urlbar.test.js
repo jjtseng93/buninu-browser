@@ -47,3 +47,15 @@ test('Wayland chrome forwards page click counts through zoom and bar offset',asy
   expect(clicks).toEqual([[20,30,{clickCount:2}]]);
  }finally{bar.dispose()}
 });
+
+test('Wayland toolbar forwards right/middle page clicks but ignores them on chrome',async()=>{
+ const clicks=[];const bar=new WaylandUrlBar({click:(...a)=>clicks.push(a)},{history});
+ try{
+  for(const code of [273,274]){
+   await bar.pointerButton(40,bar.height+60,code,1);
+   await bar.pointerButton(40,bar.height+60,code,0);
+   await bar.pointerButton(40,5,code,0);
+  }
+  expect(clicks.map(c=>c[2].button)).toEqual(['right','middle']);
+ }finally{bar.dispose()}
+});
