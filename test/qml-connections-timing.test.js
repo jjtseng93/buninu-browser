@@ -71,3 +71,25 @@ Rectangle {
   expect(await host.call('evaluate',"Number(document.getElementById('status').textContent)")).toBe(0);
  }finally{host.close()}
 },30000);
+
+test('property Changed.connect synchronizes menu state before same-handler validation',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,menu-validation',contentType:'text/x-qml',source:`import QtQuick
+Rectangle {
+ id:root;width:300;height:200;property int result:-1;property int changes:0
+ property bool preparing:false
+ readonly property bool live:root.preparing || menu.opened
+ Item {id:menu;property bool preparing:false;property bool opened:false;property int count:root.live ? 1 : 0}
+ Component.onCompleted:menu.preparingChanged.connect(function(){root.preparing=menu.preparing;root.changes++})
+ Text {id:status;text:root.result+":"+root.changes+":"+menu.count}
+ onClicked:{menu.preparing=true;root.result=menu.count;menu.preparing=false}
+}`});
+  await host.call('whenLoaded');
+  for(const changes of [2,4,6]){
+   await host.call('evaluate',"document.getElementById('root').click()");
+   expect(await host.call('evaluate',"document.getElementById('status').textContent")).toBe('1:'+changes+':0');
+  }
+ }finally{host.close()}
+},30000);
