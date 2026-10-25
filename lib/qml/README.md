@@ -970,6 +970,138 @@ remain in Flea's thumbnail cache until invalidated or removed.
 bwrap 繞過路徑，無須修改 Flea QML。刪除註冊檔可停用，但既有佔位縮圖
 仍保留在快取，直到失效或被移除。
 
+## Omastorm container
+
+### Android / Termux setup
+
+Termux's terminal does not support Kitty graphics. Start Land inside jsgotty's
+browser terminal instead; keep container build commands in a separate native
+Termux shell. These steps are self-contained and do not require the Flea setup.
+
+1. **Install Bun and start jsgotty in native Termux**:
+
+   ```sh
+   npm i -g bun
+   bun --version
+   bunx jsgotty -w -r --session bash
+   ```
+
+   Open the complete URL printed by jsgotty in your phone's browser or WebView.
+   `-w` permits terminal input, `-r` generates that random URL, and `--session`
+   keeps the shell available for reconnection. This server-side `-r` is different
+   from the CLI client's `--client -r PID`.
+
+2. **Start Land inside that browser terminal** and leave it running:
+
+   ```sh
+   env XDG_RUNTIME_DIR="$TMPDIR" bunx buninu-land
+   ```
+
+   The first launch may download Land and Casty. Its display stays in the browser
+   terminal; the default socket is `$TMPDIR/wayland-buninu`. Use that default
+   socket for the commands below. An existing Land instance can cause a numbered
+   name such as `wayland-buninu1`; check the address shown by Land.
+
+3. **Open another native Termux shell and install js-udocker**. Do not run these
+   commands in Land's address bar or inside a Debian proot. Skip package
+   installation if these tools are already installed:
+
+   ```sh
+   pkg install git nodejs proot curl tar
+   cd "$HOME"
+   git clone https://github.com/jjtseng93/js-udocker.git
+   cd js-udocker
+   sh termux_install.sh
+   hash -r
+   command -v udocker
+   ```
+
+   The installer points `udocker` at this checkout and uses Node.js and proot.
+   Keep the checkout in place. If js-udocker is already installed, reuse it.
+
+4. **Get buninu-browser as the build context**, still in the second shell.
+   Reuse your checkout if it already contains this Dockerfile:
+
+   ```sh
+   cd "$HOME"
+   git clone https://github.com/jjtseng93/buninu-browser.git
+   cd buninu-browser
+   test -f test/fixtures/omastorm-helpers/Dockerfile
+   test -S "$TMPDIR/wayland-buninu"
+   ```
+
+   No `bun install` is needed in the checkout. A socket file alone does not prove
+   Land is still running: `ECONNREFUSED` means you must restart Land.
+
+5. **Build and run from the repository root**:
+
+   ```sh
+   udocker build -t omastorm-qml -y -f test/fixtures/omastorm-helpers/Dockerfile .
+   udocker run -b "$TMPDIR:/tmp" omastorm-qml
+   ```
+
+   Return to the browser terminal to use Omastorm. The bind exposes the host's
+   Land socket at `/tmp/wayland-buninu`; no extra startup arguments or font
+   environment variables are needed. Do not start another Land inside the
+   container. If deliberately using a numbered socket, pass
+   `-e WAYLAND_DISPLAY=/tmp/wayland-buninu1` before `omastorm-qml` in the run
+   command instead.
+
+### Linux Docker
+
+Start `bunx buninu-land` on the host in a terminal supporting Kitty graphics.
+Then build from the buninu-browser repository root in another shell:
+
+```sh
+docker build -t omastorm-qml -f test/fixtures/omastorm-helpers/Dockerfile .
+docker run --rm -v "${XDG_RUNTIME_DIR:-/tmp}:/tmp" omastorm-qml
+```
+
+The mounted directory must contain the running Land socket named
+`wayland-buninu`, and the container user must be able to connect to it.
+Docker's `--rm` removes container settings after exit; arrange persistent
+storage separately if needed.
+
+### Image contents and validation
+
+The following explains the image and its checks; no additional manual
+installation is needed after the steps above.
+
+- [Dockerfile](../../test/fixtures/omastorm-helpers/Dockerfile) uses `oven/bun:1.4.4`,
+  single-stage COPY/RUN, one `ENV KEY=value` per line and JSON CMD, matching the
+  Flea recipe and js-udocker parser.
+- It downloads Omastorm revision `492e97841146bd9d6d9f7a3064e5e1ae9840cc68`
+  (manifest 0.1.23) and the official engine 0.1.15 via upstream's pinned release
+  installer and checksums, for aarch64 or x86_64. Rust compilation is not needed.
+- It downloads JetBrainsMono Nerd Font Mono Regular from Nerd Fonts v3.4.0,
+  including its OFL license, and sets `QT_QPA_FONTDIR` inside the image.
+- Browser code and its existing WASM/fonts are copied from the build context;
+  no npm dependencies are installed into your checkout. Rebuild after changing
+  browser code. Native Qt, Quickshell, Mesa and GPU device access are unnecessary.
+- [prepare.mjs](../../test/fixtures/omastorm-helpers/prepare.mjs) removes only the
+  two explicit Software-backend refusal checks in this container's Omastorm UI.
+  It saves `.upstream` originals and refuses unexpected source changes. Actual
+  shader compilation and texture verification remain enabled; this is the same
+  experimental software path as the manual Omastorm demonstration.
+- [launch.mjs](../../test/fixtures/omastorm-helpers/launch.mjs) starts an owned
+  engine in a unique temporary runtime directory, then opens the QML frontend.
+  It keeps the Land socket at its original absolute path, so sharing `/tmp`
+  does not reuse or stop another Omastorm engine. Closing the window or stopping
+  the launcher closes its engine and removes its temporary textures/socket.
+- [check.mjs](../../test/fixtures/omastorm-helpers/check.mjs) runs during build:
+  verifies Bun version, the official engine executable, all four software
+  shaders, Nerd Font glyph coverage and a QML screenshot. It needs no Land or
+  weather downloads. Require the final `PASS:` message; js-udocker versions
+  which continue after failed RUN steps may still report overall success.
+- After binding `/tmp`, verify the real engine Unix-socket hello/site list with
+  `udocker run -b "$TMPDIR:/tmp" omastorm-qml bun /usr/local/lib/omastorm-helpers/check.mjs --engine`.
+  This is separate because js-udocker's unbound build ROOT/tmp path can exceed
+  the Unix socket path-length limit. The normal launcher also waits for its
+  engine socket before opening QML.
+- Live radar/map data still needs network access and a selected station. A fresh
+  profile may ask for a location; use the application's picker. Build checks do
+  not promise available live weather, full native-QML parity or GPU performance.
+
 ## Omastorm compatibility experiments
 
 The first compatibility stage provides local `Quickshell.Io.Socket` with Unix
@@ -983,8 +1115,9 @@ QML `Canvas` reuses the browser's HTML canvas and 2D context. The adapter suppli
 paint scheduling, dimensions, QML color conversion, reset, and cancellation when
 disposed. It currently supports `requestPaint`, `markDirty` (full repaint),
 `contextType: "2d"`, and animation callbacks. QML image-loading extensions,
-canvas tiling, alternate render strategies, and custom `ShaderEffect` are not
-implemented. `QtQuick.Window` imports resolve existing Window attached behavior;
+canvas tiling and alternate render strategies remain unsupported. Software
+`ShaderEffect` and image-loading support are described in the later experiment
+sections. `QtQuick.Window` imports resolve existing Window attached behavior;
 this does not implement every type from that module.
 
 To probe an existing official Omastorm engine using the unmodified `Engine.qml`:
@@ -995,8 +1128,8 @@ env XDG_RUNTIME_DIR=/tmp bun test/manual-omastorm-engine.mjs /path/to/omastorm
 
 The probe does not download or start the engine. This stage has received the
 real engine's site list and polar-frame state, and rendered `RadarMark.qml`.
-The complete shell now resolves past `Shortcut` and `Instantiator` and stops at
-`ShaderEffect`; it is not yet a usable radar app.
+That initial milestone has since progressed to the experimental software radar
+window described above; it does not imply full native Quickshell compatibility.
 
 ### Omastorm 相容性實驗
 
