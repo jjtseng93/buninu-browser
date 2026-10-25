@@ -1156,7 +1156,7 @@ QML 顏色、reset 與銷毀清理。目前支援 `requestPaint`、`markDirty`�
 
 上方命令可使用未修改的 `Engine.qml` 連到已啟動的官方後端，不會下載或啟動後端。
 已實測收到站點清單與 polar frame 狀態，並渲染原版 `RadarMark.qml`；完整 shell
-已越過 `Shortcut`、`Instantiator`，目前正在接通 `ShaderEffect` 相關功能，還不能當作可用的雷達應用。
+已由此初期成果推進到後段的軟體雷達實驗，詳見下方 ShaderEffect 與 Omastorm 軟體版應用說明；仍不代表完整相容。
 
 ### Keyboard shortcuts and object delegates
 
@@ -1408,3 +1408,20 @@ This does not change ordinary web-page Intl behavior.
 `en_US.UTF-8` 形式；不支援的名稱退回 C。環境設定在程序啟動時保存。
 非 C 的格式資料及時區名稱仍使用 JavaScript Intl，因此標點或時區縮寫可能與
 Qt 資料庫不同。一般網頁的 Intl 行為不受影響。
+
+### Pointer actions and synchronous notifications / 滑鼠操作與同步通知
+
+QML MouseArea and TapHandler now receive accepted right/middle clicks through
+both CDP/Casty and the Wayland frontend; double clicks also reach their handlers.
+Property `Changed.connect(...)` notifications run synchronously after binding
+invalidation, allowing callers to read mirrored state immediately. Ordinary
+rendering effects remain batched. This fixes Flea's Duplicate validation reading
+an obsolete zero selection count after its menu closes; it does not bypass the
+application's permission or selection checks. `Window.window.update()` requests
+a frame through the existing renderer; it does not create a separate render loop.
+
+QML MouseArea／TapHandler 可從 CDP／Casty 與 Wayland 收到允許的右／中鍵，
+雙擊也會傳給對應 handler。屬性的 `Changed.connect(...)` 在 binding 失效後同步
+通知，讓呼叫端立刻讀到同步後的狀態；一般畫面更新仍批次處理。這修復 Flea
+關閉選單後 Duplicate 驗證讀到舊的零選取數量，沒有跳過權限或選取檢查。
+`Window.window.update()` 透過既有 renderer 要求重繪，不另開繪圖迴圈。

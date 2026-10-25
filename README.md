@@ -17,7 +17,10 @@ directly as JavaScript and WebAssembly.
 `bun index.js --wayland URL` opens a standard Wayland SHM window using
 `WAYLAND_DISPLAY` and `XDG_RUNTIME_DIR`. Casty remains the default.
 See [frontend details and limitations](frontends/wayland/README.md).
-This does not yet provide full Quickshell/Flea/Omastorm compatibility.
+See the [experimental QML runtime and Flea/Omastorm container recipes](lib/qml/README.md)
+for local QML applications. This does not yet provide full Quickshell/Flea/Omastorm
+compatibility. For input checks, open `test/manual-pointer-scroll.html` through
+either frontend.
 
 ## Usage
 

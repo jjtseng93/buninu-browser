@@ -70,7 +70,12 @@ The producer's raw file is removed after consumption, including error paths.
 
 ## Input and scope / 輸入與範圍
 
-Pointer motion, left click, scrolling, basic XKB keymap symbols and modifiers.
+Pointer motion, left/right/middle clicks, double clicks, scrolling on both axes,
+basic XKB keymap symbols and modifiers. Right clicks dispatch `contextmenu`;
+non-primary clicks dispatch `auxclick` without left-click navigation or form actions.
+The same page event handling is available through CDP/Casty. QML MouseArea and
+TapHandler receive accepted non-primary buttons. Middle click does not yet paste
+PRIMARY selection, and selecting text does not publish a PRIMARY clipboard.
 Keyboard input uses the controller's existing paired keydown/keyup operation.
 Not full XKB: no compose, IME, layout groups, repeat, or independently held keys.
 No client cursor, drag/drop, popup, layer-shell or fractional scaling yet.
@@ -82,37 +87,40 @@ Clipboard API security/user-activation checks remain in effect.
 才讀主機工具，成功取得的非空文字也送回 Wayland，讓 Land 可以快取。
 網頁 API 原本的安全來源與使用者操作檢查仍保留。
 Connection and window are separate objects, but the launcher currently opens one
-browser document/window. QML `ShellRoot` and multiple windows are not implemented.
+browser document/window. QML `ShellRoot` can group logical objects, but multiple independent native windows
+are not implemented.
 
-支援基本滑鼠、左鍵、捲動與鍵盤；尚非完整 XKB/IME。按鍵沿用 controller 的成對
+支援滑鼠移動、左／右／中鍵、雙擊及雙軸捲動。右鍵送出 contextmenu，非左鍵送出
+auxclick，不執行左鍵導航或表單動作；CDP／Casty 也共用這些事件。QML MouseArea
+與 TapHandler 可收到允許的非左鍵按鈕。選取文字尚不發布 PRIMARY，中鍵也不會
+自動貼上 PRIMARY。尚非完整 XKB/IME；按鍵沿用 controller 的成對
 按下／放開，不支援獨立長按。啟動器目前只有單一文件／視窗。
 
 ## Compatibility targets / 相容性目標
 
-Neither Flea nor Omastorm runs unmodified on the current QML subset.
-Flea 和 Omastorm 目前都還不能直接以現有 QML 子集執行。
+The official Flea binary can launch the experimental QML wrapper; directory
+navigation, previews and selected file operations have been exercised. Omastorm
+has a software ShaderEffect experiment and a reproducible container recipe.
+See [QML setup and limitations](../../lib/qml/README.md) for required backends,
+fonts, external tools and the explicit Omastorm software-path adaptation.
+Neither result implies complete Qt/Quickshell compatibility: independent native
+windows, tab tearoff/layer-shell and arbitrary shaders remain outside this scope.
+Ordinary web pages do not acquire the local QML host's file/process permissions.
 
-* Flea: ShellRoot, custom components/imports, models, controls/layouts, Quickshell.Io
-  process/IPC and multiple windows. Tab tearoff also uses PanelWindow/WlrLayershell.
-* Omastorm (`../omastorm`, MIT reference checkout): its manifest exposes bar-widget
-  and panel entry points. Requires custom components, Controls/Layouts, FileView,
-  Process, Socket/SplitParser, IPC, timers, Image/Canvas and ShaderEffect.
-  `docs/protocol.md` defines newline-delimited JSON v2 over
-  `$XDG_RUNTIME_DIR/omastorm/engine.sock`, served by the separate Rust engine.
-  GPU texture files and shaders require rendering compatibility beyond DOM parsing.
-
-Flea 需要多視窗、元件、模型與程序／IPC；分離分頁另需 layer-shell。
-Omastorm 還需要 Unix socket JSON 橋接及雷達 shader／貼圖支援；只有 parser
-與標準 Wayland 視窗不足以適配。不會為一般網頁開放主機檔案或程序權限。
+官方 Flea binary 已可啟動實驗性 QML wrapper，並測試目錄導航、預覽與部分檔案操作。
+Omastorm 已有軟體 ShaderEffect 實驗及容器教學；所需後端、字型、外部工具與
+Omastorm 的軟體路徑調整，見 [QML 說明](../../lib/qml/README.md)。這不代表完整
+Qt／Quickshell 相容；獨立原生多視窗、分離分頁／layer-shell、任意 shader 仍有限制。
+一般網頁不會因此取得本地 QML 的檔案或程序權限。
 
 References: https://github.com/thisisgm/flea and https://github.com/wesleygrimes/omastorm
 
 ## Verification / 測試
 
 ```sh
-bun test test/wayland-frontend.test.js
+bun test test/wayland-frontend.test.js test/double-click.test.js test/wayland-urlbar.test.js
 # Optional integration with the existing sibling buninu-land checkout:
-BUNINU_TEST_WAYLAND=1 bun test test/wayland-frontend.test.js
+BUNINU_TEST_WAYLAND=1 bun test test/wayland-frontend.test.js test/wayland-scroll.test.js
 ```
 
 The integration test creates its own compositor/socket; it does not interrupt the
@@ -121,3 +129,15 @@ user's compositor. Checks SHM presentation, pointer click, keyboard and resize.
 
 Protocol XML retains upstream license notices. Transport/protocol code adapted
 from Buninu Land (MIT), see LICENSE-land. XML is interpreted at runtime with Bun.XML.
+
+Manual mouse/scroll test / 手動滑鼠與捲動測試：
+
+```sh
+bun index.js --wayland file://"$PWD"/test/manual-pointer-scroll.html
+# Omit --wayland to use the default Casty frontend.
+```
+
+The page includes vertical/horizontal/two-axis scroll boxes, button and double-click
+counters, a drag canvas, text controls and bounded event logs. It reports received
+modifiers without swapping wheel axes itself. 頁面不自行轉換滾輪方向，可從紀錄
+確認外層是否真的送來水平軸與修飾鍵；預設 Casty 路徑可省略 `--wayland`。
