@@ -991,6 +991,16 @@ Termux shell. These steps are self-contained and do not require the Flea setup.
    keeps the shell available for reconnection. This server-side `-r` is different
    from the CLI client's `--client -r PID`.
 
+   For on-screen Super, Alt and Ctrl keys, you can first build a minapk app:
+
+   ```sh
+   npx @drxiaozhi/minapk
+   ```
+
+   Install and open the generated APK. Inside the app, press **Volume Up**,
+   choose **Go to URL**, and enter the complete jsgotty URL. Use the app's
+   modifier keys for shortcuts; **long-press Alt to activate Super**.
+
 2. **Start Land inside that browser terminal** and leave it running:
 
    ```sh
