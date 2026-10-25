@@ -20,6 +20,7 @@ export function attachInput(client,window,context,onError) {
   if(!client.globals.has('wl_seat'))return;
   let pointer,keyboard,x=0,y=0,focused=false,keys=new Map(),mods=0,locked=0;
   let lastClick=null, clickCount=0;
+  const modifiers=()=>({modifiers:(mods&8?1:0)|(mods&4?2:0)|(mods&64?4:0)|(mods&1?8:0)});
   const active=()=>!window.closed&&!client.connection.closed;
   const invoke=(method,...args)=>{
     if(!active())return;
@@ -33,7 +34,7 @@ export function attachInput(client,window,context,onError) {
     if((caps&1)&&!pointer){pointer=client.object('wl_pointer',(name,args)=>{
       if(name==='enter'){focused=args[1]===window.surface;[x,y]=args.slice(2);}
       if(name==='leave'){focused=false;lastClick=null;clickCount=0;}
-      if(name==='motion'){[x,y]=args.slice(1);if(focused)invoke('move',x,y);}
+      if(name==='motion'){[x,y]=args.slice(1);if(focused)invoke('move',x,y,modifiers());}
 
       // Mouse-triggered copy also has a valid Wayland input serial.
       if(name==='button'&&focused&&client.clipboard)client.clipboard.serial=args[0];
@@ -47,7 +48,7 @@ export function attachInput(client,window,context,onError) {
             &&Math.abs(x-lastClick.x)<=12&&Math.abs(y-lastClick.y)<=12 ? clickCount+1 : 1;
           lastClick={time,button,x,y};
         }
-        const options={clickCount:clickCount||1};
+        const options={clickCount:clickCount||1,...modifiers()};
         if(context.pointerButton)invoke('pointerButton',x,y,button,state,options);
         else if(state===0&&button>=272&&button<=274)invoke('click',x,y,{...options,button:button===273?'right':button===274?'middle':'left'});
       }

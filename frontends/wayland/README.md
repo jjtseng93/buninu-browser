@@ -73,6 +73,10 @@ The producer's raw file is removed after consumption, including error paths.
 Pointer motion, left/right/middle clicks, double clicks, scrolling on both axes,
 basic XKB keymap symbols and modifiers. Right clicks dispatch `contextmenu`;
 non-primary clicks dispatch `auxclick` without left-click navigation or form actions.
+Press, movement and release are delivered separately; held-button state reaches
+mousemove/pointermove so HTML canvas and QML drag handlers can draw before release.
+Focus occurs on an uncancelled left press. Click/auxclick uses the common ancestor
+of the press and release targets; removing the press target prevents activation.
 The same page event handling is available through CDP/Casty. QML MouseArea and
 TapHandler receive accepted non-primary buttons. Middle click does not yet paste
 PRIMARY selection, and selecting text does not publish a PRIMARY clipboard.
@@ -90,7 +94,10 @@ Connection and window are separate objects, but the launcher currently opens one
 browser document/window. QML `ShellRoot` can group logical objects, but multiple independent native windows
 are not implemented.
 
-支援滑鼠移動、左／右／中鍵、雙擊及雙軸捲動。右鍵送出 contextmenu，非左鍵送出
+支援滑鼠移動、左／右／中鍵、雙擊及雙軸捲動。按下、移動與放開分別即時傳遞，
+mousemove／pointermove 保留按住狀態，讓 Canvas 與 QML 可在放開前處理拖曳。
+未取消的左鍵按下會取得焦點；click／auxclick 以按下與放開元素的共同祖先為目標，
+按下元素已被移除時不觸發點擊。右鍵送出 contextmenu，非左鍵送出
 auxclick，不執行左鍵導航或表單動作；CDP／Casty 也共用這些事件。QML MouseArea
 與 TapHandler 可收到允許的非左鍵按鈕。選取文字尚不發布 PRIMARY，中鍵也不會
 自動貼上 PRIMARY。尚非完整 XKB/IME；按鍵沿用 controller 的成對
@@ -118,9 +125,11 @@ References: https://github.com/thisisgm/flea and https://github.com/wesleygrimes
 ## Verification / 測試
 
 ```sh
-bun test test/wayland-frontend.test.js test/double-click.test.js test/wayland-urlbar.test.js
+bun test test/wayland-frontend.test.js test/double-click.test.js test/wayland-urlbar.test.js test/pointer-drag.test.js
 # Optional integration with the existing sibling buninu-land checkout:
-BUNINU_TEST_WAYLAND=1 bun test test/wayland-frontend.test.js test/wayland-scroll.test.js
+BUNINU_TEST_WAYLAND=1 bun test test/wayland-frontend.test.js test/wayland-scroll.test.js test/pointer-drag.test.js
+# Optional reference comparison with /usr/local/bin/chromium-headless-shell:
+BUNINU_TEST_CHROMIUM=1 bun test test/pointer-drag.test.js
 ```
 
 The integration test creates its own compositor/socket; it does not interrupt the

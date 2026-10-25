@@ -69,7 +69,7 @@ export class WaylandUrlBar {
   }
   async pointerButton(x,y,button,state,options={}) {
     if(button<272||button>274)return;
-    if(y<this.height||this.editor.dragging) {
+    if((y<this.height&&!this.pageButtons)||this.editor.dragging) {
       if(button!==272)return;
       const col=Math.max(1,Math.floor(x/this.cellWidth)+1);
       if(state) {
@@ -79,9 +79,12 @@ export class WaylandUrlBar {
       return;
     }
     if(state&&this.editor.editing)this.editor.cancelEditing();
+    const mask=button===272?1:button===273?2:4;
+    this.pageButtons=state?(this.pageButtons||0)|mask:(this.pageButtons||0)&~mask;
+    if(this.context.pointerButton)return this.context.pointerButton(x/this.zoom,(y-this.height)/this.zoom,button,state,options);
     if(!state)return this.context.click(x/this.zoom,(y-this.height)/this.zoom,button===272?options:{...options,button:button===273?"right":"middle"});
   }
-  move(x,y){if(this.editor.dragging){this.editor.pointerMove(Math.max(1,Math.floor(x/this.cellWidth)+1));return;}if(y>=this.height)return this.context.move(x/this.zoom,(y-this.height)/this.zoom);}
+  move(x,y,options={}){if(this.editor.dragging){this.editor.pointerMove(Math.max(1,Math.floor(x/this.cellWidth)+1));return;}if(y>=this.height||this.pageButtons)return this.context.move(x/this.zoom,(y-this.height)/this.zoom,options);}
   scroll(dx,dy,at){if(at?.y<this.height){if(this.editor.editing){if(dy<0)this.editor.historyUp();else this.editor.historyDown();}return;}return this.context.scroll(dx/this.zoom,dy/this.zoom,at?{x:at.x/this.zoom,y:(at.y-this.height)/this.zoom}:null);}
   async command(line) {
     const {name,arg,error}=parseCommand(line);if(error){this.flash(error);return;}
