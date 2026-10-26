@@ -13,7 +13,7 @@
 <section><h2>3. 雙向捲動</h2><div class="readout" id="both-state"></div><div id="both" class="box both"><div class="plane">左上角 (0, 0) — 每格約 100 px；寬 1800、高 1200。</div></div><button id="reset">重設三區捲動</button></section>
 <section><h2>4. 按鍵、雙擊與修飾鍵</h2><p>此按鈕攔截原生右鍵選單，只在這裡記錄 contextmenu。中鍵不捲頁。可按住修飾鍵再點擊。</p><button id="target">左鍵／右鍵／中鍵／雙擊這裡</button><div id="counts" class="readout"></div></section>
 <section><h2>5. 按住左鍵拖曳畫線</h2><p>手機可雙擊並按住第二下拖曳。放開後再移動不應畫線；也可測移出畫布後放開。按住狀態與座標列在下方。</p><canvas id="paint" width="1000" height="300"></canvas><div id="drag" class="readout">尚未按下</div><button id="clear-paint">清除畫布</button></section>
-<section><h2>6. 文字選取與編輯</h2><p>這段可拖曳選取：春天的河水流過城市，0123456789，The quick brown fox。</p><textarea>第一行：滑鼠點擊定位，Shift＋方向鍵選取。
+<section id="text-selection"><h2>6. 文字選取與編輯</h2><p>這段可拖曳選取：春天的河水流過城市，0123456789，The quick brown fox。</p><textarea>第一行：滑鼠點擊定位，Shift＋方向鍵選取。
 第二行：測試 Ctrl-C／Ctrl-V、原生長按貼上。
 第三行：這裡不自行實作 PRIMARY 選取或中鍵貼上。</textarea></section>
 <section><h2>事件紀錄（最多 40 筆）</h2><label><input id="moves" type="checkbox"> 記錄 mousemove（會產生大量事件）</label><button id="clear-log">清除紀錄</button><pre id="log" aria-live="off"></pre></section>
