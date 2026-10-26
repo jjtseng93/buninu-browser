@@ -52,7 +52,13 @@ export function attachInput(client,window,context,onError) {
         if(context.pointerButton)invoke('pointerButton',x,y,button,state,options);
         else if(state===0&&button>=272&&button<=274)invoke('click',x,y,{...options,button:button===273?'right':button===274?'middle':'left'});
       }
-      if(name==='axis'&&focused)invoke('scroll',args[1]===1?args[2]:0,args[1]===0?args[2]:0,{x,y});
+      if(name==='axis'&&focused){
+        // Browser scrolling consumes pixel deltas. Land maps 100 CDP pixels
+        // to 10 Wayland axis units; restore that scale on the client side.
+        // Preserve fractional movement and apply page zoom later in the toolbar.
+        const delta=args[2]*10;
+        invoke('scroll',args[1]===1?delta:0,args[1]===0?delta:0,{x,y});
+      }
     });client.request(seat,'get_pointer',pointer);}
     if((caps&2)&&!keyboard){keyboard=client.object('wl_keyboard',(name,args)=>{
 
