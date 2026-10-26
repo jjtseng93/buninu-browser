@@ -1,6 +1,6 @@
 {
   "name": "buninu-browser",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Buninu Browser is a browser engine written in JavaScript and WebAssembly for Bun.",
   "keywords": [
     "buninu",
