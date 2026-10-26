@@ -675,3 +675,18 @@ test("an out-of-flow box keeps its static position when the block around its pla
   (document) => { document.getElementById("edit").textContent = "a longer paragraph that wraps onto two lines"; });
   expect(rankedLayout(retained)).toEqual(rankedLayout(clean));
 });
+
+test("anonymous flex text items do not reuse their parent's intrinsic width", () => {
+  const { document, window } = parseHTMLDocument(`<body style="margin:0"><div style="display:flex">
+    <span style="display:flex"><a>hash</a>·<time>Today</time>!</span><b>History</b>
+  </div></body>`);
+  const tree = new RenderTreeBuilder().build(document, new StyleEngine().compute(document));
+  const engine = new LayoutEngine({ measureText: text => text.length * 10 });
+  for (const width of [500, 180, 500]) {
+    const layout = engine.layout(tree, { x:0, y:0, width });
+    expect(layout.fragments.map(f => [f.text, f.x, f.width])).toEqual([
+      ["hash", 0, 40], ["·", 40, 10], ["Today", 50, 50], ["!", 100, 10], ["History", 110, 70],
+    ]);
+  }
+  window.happyDOM.abort();
+});
