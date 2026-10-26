@@ -96,3 +96,9 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('real Wayland pointer draws o
   expect(await c.evaluate('document.getElementById("log").textContent')).toContain('mousedown');
  }finally{app?.close();land?.close();if(saved===undefined)delete process.env.XDG_RUNTIME_DIR;else process.env.XDG_RUNTIME_DIR=saved;rmSync(dir,{recursive:true,force:true})}
 },30000);
+
+test('pointer bursts preserve drawing points while batching raster work',async()=>{
+ const child=Bun.spawn([process.execPath,new URL('./fixtures/pointer-paint-batching.js',import.meta.url).pathname],{stdout:'pipe',stderr:'pipe'});
+ const [exit,stderr]=await Promise.all([child.exited,new Response(child.stderr).text()]);
+ expect(stderr).toBe('');expect(exit).toBe(0);
+},15000);
