@@ -2154,3 +2154,36 @@ test("the page scrolls over content that overflows a 100vh layout, not over clip
   expect(await evaluate(`(scrollTo(0, 99999), [scrollY, Math.round(document.getElementById("end").getBoundingClientRect().bottom)])`))
     .toEqual([2090 - 300, 300]);
 });
+
+test("NodeIterator includes its root, preserves direction, and skips rejected nodes without pruning", async () => {
+  await load('<div id="root"><p id="a"><b id="child"></b></p><!--note--><p id="b"></p></div>');
+  expect(await evaluate(`(() => {
+    const root = document.getElementById('root');
+    const filter = {acceptNode(n) {return n.id === 'a' ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT}};
+    const it = document.createNodeIterator(root, NodeFilter.SHOW_ELEMENT, filter);
+    const initial = [it instanceof NodeIterator,it.root === root,it.referenceNode === root,it.pointerBeforeReferenceNode,it.filter === filter];
+    const forward=[];let n;while(n=it.nextNode())forward.push(n.id);
+    const reverse=[];while(n=it.previousNode())reverse.push(n.id);
+    it.detach();
+    return JSON.stringify([initial,forward,reverse,it.nextNode().id]);
+  })()`)).toBe(JSON.stringify([[true,true,true,true,true],['root','child','b'],['b','child','root'],'root']));
+});
+
+test("NodeIterator survives sanitizer removals, reparenting, and rejected reentrant filters", async () => {
+  await load('<div id="root"><i id="a"><b id="child"></b></i><i id="b"></i><i id="c"></i></div>');
+  expect(await evaluate(`(() => {
+    const root=document.getElementById('root'),it=document.createNodeIterator(root,1);
+    it.nextNode();it.nextNode();it.nextNode();
+    root.firstChild.remove();
+    const removed=[it.referenceNode.id,it.nextNode().id];
+    it.previousNode();root.firstChild.remove();
+    const before=[it.referenceNode.id,it.pointerBeforeReferenceNode,it.nextNode().id];
+    document.body.appendChild(root.firstChild);
+    const moved=[it.referenceNode.id,it.nextNode()];
+    let error;const recur=document.createNodeIterator(root,1,()=>{try{recur.nextNode()}catch(e){error=e.name}return 1});
+    recur.nextNode();
+    const fresh=document.createNodeIterator(root,NodeFilter.SHOW_TEXT);
+    root.innerHTML='hello<b>world</b>';
+    return JSON.stringify([removed,before,moved,error,fresh.nextNode().data,fresh.nextNode().data]);
+  })()`)).toBe(JSON.stringify([['root','b'],['c',true,'c'],['root',null],'InvalidStateError','hello','world']));
+});
