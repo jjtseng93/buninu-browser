@@ -2197,3 +2197,34 @@ test("NodeIterator survives sanitizer removals, reparenting, and rejected reentr
     return JSON.stringify([removed,before,moved,error,fresh.nextNode().data,fresh.nextNode().data]);
   })()`)).toBe(JSON.stringify([['root','b'],['c',true,'c'],['root',null],'InvalidStateError','hello','world']));
 });
+
+// Expectations independently checked against Chromium Headless Shell.
+test("NodeIterator repairs an active filter cursor when the candidate or its ancestor is removed", async () => {
+  await load("<body></body>");
+  expect(await evaluate(`JSON.stringify((()=>{const results=[];for(const direction of ['nextNode','previousNode'])for(const remove of ['self','ancestor'])for(const verdict of [1,3]){
+ const root=document.createElement('div');root.id='root';root.innerHTML='<i id="a"></i><section id="parent"><b id="b"></b><b id="c"></b></section><i id="d"></i>';document.body.append(root);
+ let armed=false,once=false;const seen=[];const it=document.createNodeIterator(root,1,n=>{if(armed)seen.push(n.id);if(armed&&!once&&n.id==='b'){once=true;(remove==='self'?n:n.parentNode).remove();return verdict;}return 1});
+ if(direction==='previousNode')while(it.nextNode());armed=true;
+ const got=[];for(let n,k=0;k<15&&(n=it[direction]());k++)got.push(n.id);
+ results.push({direction,remove,verdict,seen,got,reference:it.referenceNode.id,before:it.pointerBeforeReferenceNode});root.remove();
+}return results.map(r=>[r.direction,r.remove,r.verdict,r.seen.join(','),r.got.join(','),r.reference,r.before])})())`)).toBe(JSON.stringify([
+    ["nextNode", "self", 1, "root,a,parent,b,c,d", "root,a,parent,b,c,d", "d", false],
+    ["nextNode", "self", 3, "root,a,parent,b,c,d", "root,a,parent,c,d", "d", false],
+    ["nextNode", "ancestor", 1, "root,a,parent,b,d", "root,a,parent,b,d", "d", false],
+    ["nextNode", "ancestor", 3, "root,a,parent,b,d", "root,a,parent,d", "d", false],
+    ["previousNode", "self", 1, "d,c,b,parent,a,root", "d,c,b,parent,a,root", "root", true],
+    ["previousNode", "self", 3, "d,c,b,parent,a,root", "d,c,parent,a,root", "root", true],
+    ["previousNode", "ancestor", 1, "d,c,b,a,root", "d,c,b,a,root", "root", true],
+    ["previousNode", "ancestor", 3, "d,c,b,a,root", "d,c,a,root", "root", true]
+  ]));
+});
+
+test("NodeIterator releases its active cursor after a filter throws", async () => {
+  await load('<div id="root"><b id="child"></b></div>');
+  expect(await evaluate(`(() => {
+    const root=document.getElementById('root');let first=true;
+    const it=document.createNodeIterator(root,1,()=>{if(first){first=false;throw Error('filter failed')}return 1});
+    let message;try{it.nextNode()}catch(e){message=e.message}
+    return [message,it.nextNode().id,it.nextNode().id].join(',');
+  })()`)).toBe('filter failed,root,child');
+});
