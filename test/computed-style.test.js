@@ -859,3 +859,15 @@ test("a linked style sheet's url()s resolve against the sheet", () => {
   )).toBe(`a { background: url(https://site.test/css/img/a.png) } b { background: url("https://site.test/b.png") } c { background: url(data:image/png;base64,AA) }
      d { background: url(https://cdn.test/d.png) } e { mask: url(#m) }`);
 });
+
+test("form controls default to readable dark text but author colors still win", () => {
+  const {document,window}=parseHTMLDocument(`<body style="color:lightblue"><textarea></textarea><input><button>Button</button><select><option>Option</option></select><textarea id="inherit" style="color:inherit"></textarea><input id="custom" style="color:red"></body>`);
+  try {
+    const styles=new StyleEngine().compute(document);
+    for(const e of document.querySelectorAll('textarea,input,button,select')) {
+      if(!e.id)expect(styles.get(e).color).toBe('rgba(0, 0, 0, 1)');
+    }
+    expect(styles.get(document.querySelector('#inherit')).color).toBe(styles.get(document.body).color);
+    expect(styles.get(document.querySelector('#custom')).color).toBe('rgba(255, 0, 0, 1)');
+  } finally {window.happyDOM.abort()}
+});
