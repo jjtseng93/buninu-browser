@@ -1997,14 +1997,24 @@ test("a click inside an iframe goes to the element under it in the frame's docum
 test("dynamic linked stylesheets fire load after their rules become available", async () => {
   await load(`<div id="target"></div><script>
     window.sheetLoaded = false;
+    window.sheetEvents = [];
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = '/slow.css';
-    link.onload = () => { window.sheetLoaded = getComputedStyle(document.body).color; };
+    window.styleTestLink = link;
+    link.onerror = () => sheetEvents.push('error');
+    link.onload = () => { sheetEvents.push('load'); window.sheetLoaded = getComputedStyle(document.body).color; };
     document.head.appendChild(link);
   </script>`);
   for (let i = 0; i < 60 && await evaluate('sheetLoaded') === false; i++) await Bun.sleep(25);
   expect(await evaluate('sheetLoaded')).toBe('rgba(255, 0, 0, 1)');
+  expect(await evaluate('sheetEvents.join()')).toBe('load');
+  await evaluate("styleTestLink.href='/missing.css'; window.eventsAfterHref=sheetEvents.join()");
+  expect(await evaluate('eventsAfterHref')).toBe('load');
+  expect(await waitFor("sheetEvents.join() === 'load,error'")).toBe(true);
+  await evaluate("styleTestLink.href='/slow.css'; window.eventsAfterHref=sheetEvents.join()");
+  expect(await evaluate('eventsAfterHref')).toBe('load,error');
+  expect(await waitFor("sheetEvents.join() === 'load,error,load'")).toBe(true);
 });
 
 test("decoded dynamic images report natural dimensions and fire load", async () => {
