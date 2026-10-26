@@ -2228,3 +2228,44 @@ test("NodeIterator releases its active cursor after a filter throws", async () =
     return [message,it.nextNode().id,it.nextNode().id].join(',');
   })()`)).toBe('filter failed,root,child');
 });
+
+test("NodeIterator repairs removals through proxy-backed select and form parents", async () => {
+  await load('<body></body>');
+  expect(await evaluate(`(() => {
+    const results=[];
+    for(const tag of ['div','select','form']) for(const outerRoot of [false,true])
+      for(const operation of ['remove','removeChild','innerHTML','reparent']) {
+        const outer=document.createElement('div'),parent=document.createElement(tag);
+        outer.append(parent);document.body.append(outer);
+        parent.innerHTML='<option id="a"></option><option id="b"></option>';
+        const it=document.createNodeIterator(outerRoot?outer:parent,1);
+        while(it.nextNode()?.id!=='a') {}
+        const child=parent.firstChild;
+        if(operation==='remove')child.remove();
+        else if(operation==='removeChild')parent.removeChild(child);
+        else if(operation==='innerHTML')parent.innerHTML='';
+        else outer.append(child);
+        results.push([it.referenceNode===parent,it.nextNode()?.id??null]);
+        outer.remove();
+      }
+    return JSON.stringify(results);
+  })()`)).toBe(JSON.stringify(Array.from({length:6},()=>[
+    [true,'b'],[true,'b'],[true,null],[true,'b']
+  ]).flat()));
+});
+
+test("NodeIterator validates nullable callback-interface filters at creation", async () => {
+  await load('<body></body>');
+  expect(await evaluate(`(() => {
+    const results=[];
+    for(const filter of [0,1,false,true,'','x',Symbol('filter'),1n]) {
+      try { document.createNodeIterator(document.body,0,filter);results.push('accepted'); }
+      catch(error) { results.push(error.name); }
+    }
+    for(const filter of [null,undefined,()=>1,{acceptNode(){return 1}},{}]) {
+      const it=document.createNodeIterator(document.body,0,filter);
+      results.push(it.filter===(filter??null) && it.nextNode()===null);
+    }
+    return JSON.stringify(results);
+  })()`)).toBe(JSON.stringify([...Array(8).fill('TypeError'),...Array(5).fill(true)]));
+});
