@@ -7,6 +7,7 @@ process.on("message", async (message) => {
   if (message?.type !== "call") return;
   const [argument] = message.params;
   switch (message.method) {
+    case "configuration": return process.send({ type: "result", id: message.id, result: { args: process.argv, secret: process.env.BUNINU_TEST_PRIVATE_ENV } });
     case "echo": return process.send({ type: "result", id: message.id, result: { pid: process.pid, argument } });
     case "hang": for (;;) {}
     case "fail": return process.send({ type: "result", id: message.id, error: "Error: page crashed\n    at somewhere" });

@@ -438,6 +438,24 @@ additional unreported downstream latency, such as Bluetooth output latency.
 With `BUNINU_LOG`, `media sync` records reported audio progress, the latest
 rendered video position, and the output queue/latency for diagnosis.
 
+### Render scheduling
+
+Set `BUNINU_RENDER_MIN_INTERVAL` to adjust the minimum delay before coalesced
+DOM/Canvas redraws. The default is 16 ms; try 8 ms for more frequent updates:
+
+```sh
+env BUNINU_RENDER_MIN_INTERVAL=8 bun index.js --wayland URL
+env BUNINU_RENDER_MIN_INTERVAL=8 bun index.js URL
+```
+
+Accepts integer milliseconds from 0 to 60000. Invalid values warn and fall back
+to 16 ms. Zero removes the minimum delay, but retains asynchronous coalescing
+and the adaptive delay based on the previous layout cost. This is not an FPS
+guarantee or Casty's capture interval; shorter waits can increase CPU usage.
+Restart the browser after changing it. The setting also applies to iframe
+renderers, and only its validated numeric value is forwarded to the renderer
+process; the ordinary renderer does not inherit the host environment.
+
 ### Diagnostics
 
 [`test/fixtures/browser-raw-demo.html`](test/fixtures/browser-raw-demo.html)
