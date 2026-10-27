@@ -7,6 +7,51 @@ const RET_ALLOW = 0x7fff0000;
 const RET_EPERM = 0x00050001;
 const RET_ENOSYS = 0x00050026;
 
+// Execute the encoded classic-BPF instructions against a seccomp_data record.
+// This checks actual jump destinations and argument loads, including the
+// architecture we cannot install on the current test machine.
+function filterVerdict(program, arch, syscall, args = []) {
+  const code = new DataView(encodeFilter(program)), data = new DataView(new ArrayBuffer(64));
+  data.setUint32(0, SYSCALL_NUMBERS[arch][syscall], true);
+  data.setUint32(4, arch === "x64" ? 0xc000003e : 0xc00000b7, true);
+  args.forEach((value, index) => data.setBigUint64(16 + index * 8, BigInt.asUintN(64, BigInt(value)), true));
+  let accumulator = 0, pc = 0;
+  for (let steps = 0; steps < program.length; steps++) {
+    const offset = pc * 8, op = code.getUint16(offset, true), value = code.getUint32(offset + 4, true);
+    const yes = code.getUint8(offset + 2), no = code.getUint8(offset + 3);
+    switch (op) {
+      case 0x20: accumulator = data.getUint32(value, true); pc++; break;
+      case 0x15: pc += 1 + (accumulator === value ? yes : no); break;
+      case 0x35: pc += 1 + (accumulator >= value ? yes : no); break;
+      case 0x45: pc += 1 + ((accumulator & value) !== 0 ? yes : no); break;
+      case RET: return value;
+      default: throw new Error(`unsupported BPF opcode ${op}`);
+    }
+  }
+  throw new Error("filter did not return a verdict");
+}
+
+test("signal filters allow this process but never let tkill target an arbitrary thread", () => {
+  const pid = 1234;
+  for (const arch of ["x64", "arm64"]) {
+    // Even explicitly including the signal syscalls in the unconditional
+    // allowlist must not bypass their target checks.
+    for (const allowed of [ALLOWED_SYSCALLS, [...ALLOWED_SYSCALLS, "kill", "tkill", "tgkill"]]) {
+      const program = buildFilter(arch, pid, allowed);
+      for (const name of ["kill", "tkill", "tgkill"]) {
+        expect(filterVerdict(program, arch, name, [pid, 0, 0])).toBe(RET_ALLOW);
+        for (const other of [pid + 1, 1, 0, -1]) {
+          expect(filterVerdict(program, arch, name, [other, 0, 0])).toBe(RET_EPERM);
+        }
+        expect(program.filter(([op, , , value]) => op === 0x15 && value === SYSCALL_NUMBERS[arch][name])).toHaveLength(1);
+      }
+      // Exercise the syscall-number reload after the restricted signal blocks.
+      expect(filterVerdict(program, arch, "read")).toBe(RET_ALLOW);
+      expect(filterVerdict(program, arch, "openat")).toBe(RET_EPERM);
+    }
+  }
+});
+
 test("builds an allowlist program that checks the architecture first and denies by default", () => {
   for (const arch of ["x64", "arm64"]) {
     const program = buildFilter(arch, 1234);
