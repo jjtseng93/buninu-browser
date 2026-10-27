@@ -85,6 +85,15 @@ test('normal CDP routes raw requests to the controller without changing standard
   expect([crop.readUInt32BE(16),crop.readUInt32BE(20)]).toEqual([7,4]);
   await cdp.send('Page.screencastFrameAck',{sessionId:event.params.sessionId});
   await cdp.send('Page.stopScreencast');
+  cdp.events.length=0;
+  const zero={x:0,y:0,width:0,height:0,scale:1};
+  await cdp.send('Page.startScreencast',{format:'png',clip:zero});
+  let notice;for(let i=0;i<100;i++){notice=cdp.events.find(e=>e.method==='Page.screencastFrame');if(notice)break;await Bun.sleep(20);}
+  expect(notice).toBeDefined();
+  const placeholder=Buffer.from(notice.params.data,'base64');
+  expect([placeholder.readUInt32BE(16),placeholder.readUInt32BE(20)]).toEqual([1,1]);
+  await cdp.send('Page.stopScreencast');
+  await expect(cdp.send('Page.captureScreenshot',{format:'png',clip:zero})).rejects.toThrow('Invalid screenshot clip');
   const png=await cdp.send('Page.captureScreenshot',{format:'png'});
   expect([...Buffer.from(png.data,'base64').subarray(0,4)]).toEqual([137,80,78,71]);
  }finally{cdp.close();server.stop(true);browser.close();}

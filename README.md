@@ -291,9 +291,9 @@ borrows a contiguous raster view instead of rescaling; encoded output uses
 the same crop. `Page.getLayoutMetrics` provides the viewport position so
 Casty can follow document scrolling.
 
-Casty also sends a private `clip` on `Page.startScreencast`. It takes precedence over fallback max limits and crops at native pixel density, without resizing. Width/height are CSS units; output pixels still follow device scale. This extension is not standard CDP.
+Casty also sends a private `clip` on `Page.startScreencast`. It takes precedence over fallback max limits and crops at native pixel density, without resizing. Width/height are CSS units; output pixels still follow device scale. This extension is not standard CDP. A clip with both width and height equal to zero requests update notifications only: the server sends a fixed 1×1 PNG placeholder without rendering or encoding a preview. Ordinary captureScreenshot still rejects zero-sized clips.
 
-Casty 也會在 `Page.startScreencast` 傳入私有 `clip`；優先於相容用的 max 限制，以原像素密度裁切、不縮放。寬高是 CSS 單位，實體像素仍隨 device scale 換算。此擴充不是標準 CDP。
+Casty 也會在 `Page.startScreencast` 傳入私有 `clip`；優先於相容用的 max 限制，以原像素密度裁切、不縮放。寬高是 CSS 單位，實體像素仍隨 device scale 換算。此擴充不是標準 CDP。寬高都為零時只發送更新通知：server 回傳固定 1×1 PNG 佔位資料，不渲染或編碼預覽；一般 captureScreenshot 仍拒絕零尺寸。
 
 標準 CDP `clip` 也適用於 raw 截圖；小數 CSS 尺寸保留到最後才換算成實體像素，
 避免字體大小改變後差一列而觸發 bunterm 縮放。`clip.scale: 1` 的全寬裁切

@@ -54,3 +54,29 @@ test('stopping a capture in flight drops its frame and a restarted stream gets i
     expect(f.frames()[0].params.data).toBe('new');
   }finally{f.close();}
 });
+
+test('zero-area screencast notifies without capture, while screenshots retain clip validation',async()=>{
+  const {captureViewport}=await import('../lib/paint/frame.js');
+  let calls=0;
+  const f=await fixture(options=>{
+    calls++;
+    if(options.clip?.width===0 || options.clip?.height===0)
+      captureViewport(null,0,0,8,6,options.clip);
+    return 'real-pixels';
+  });
+  const clip={x:0,y:0,width:0,height:0,scale:1};
+  try{
+    await f.cdp.send('Page.startScreencast',{format:'png',maxWidth:8,maxHeight:6,clip});
+    await until(()=>f.frames().length===1);f.frame();await until(()=>f.frames().length===2);
+    expect(calls).toBe(0);
+    for(const {params} of f.frames()){
+      const png=Buffer.from(params.data,'base64');expect(png.readUInt32BE(16)).toBe(1);expect(png.readUInt32BE(20)).toBe(1);
+    }
+    await expect(f.cdp.send('Page.captureScreenshot',{format:'png',clip})).rejects.toThrow('Invalid screenshot clip');
+    await f.cdp.send('Page.screencastFrameAck',{sessionId:f.frames()[0].params.sessionId});
+    f.frame();await until(()=>f.frames().length===3);expect(calls).toBe(1);
+    await f.cdp.send('Page.stopScreencast');
+    await f.cdp.send('Page.startScreencast',{format:'jpeg',clip:{...clip,width:8,height:6}});
+    await until(()=>f.frames().length===4);expect(f.frames()[3].params.data).toBe('real-pixels');expect(calls).toBe(2);
+  }finally{f.close();}
+});
