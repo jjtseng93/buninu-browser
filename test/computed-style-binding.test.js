@@ -8,6 +8,55 @@ beforeAll(async () => {
 });
 afterAll(() => renderer?.close());
 
+test("computed declarations stay live and only geometry reads flush layout", async () => {
+  const child = Bun.spawn([process.execPath, new URL("./fixtures/computed-style-lazy.js", import.meta.url).pathname],
+    { stdout:"pipe", stderr:"pipe" });
+  const [exit,stderr] = await Promise.all([child.exited,new Response(child.stderr).text()]);
+  expect(stderr).toBe("");
+  expect(exit).toBe(0);
+});
+
+test("stored computed declarations remain live inside the sandboxed page realm", async () => {
+  await renderer.call("loadDocument", { url:"https://page.test/",contentType:"text/html",status:200,
+    source:'<!doctype html><div id="box" style="width:100px;height:20px;color:red;--value:first"></div>' });
+  await renderer.call("whenLoaded");
+  const result = JSON.parse(await renderer.call("evaluate", `JSON.stringify((()=>{
+    const box=document.getElementById('box'),style=getComputedStyle(box);
+    const initial=[style.width,style.color,style.getPropertyValue('--value')];
+    box.style.width='160px';box.style.color='blue';box.style.setProperty('--value','second');
+    const changed=[style.width,style.color,style.getPropertyValue('--value')];
+    box.style.display='none';const hidden=style.display;box.style.display='block';
+    return [initial,changed,hidden,style.width];
+  })())`));
+  expect(result).toEqual([["100px","rgba(255, 0, 0, 1)","first"],
+    ["160px","rgba(0, 0, 255, 1)","second"],"none","160px"]);
+});
+
+test("computed property spellings stay consistent across declarations and live changes", async () => {
+  await renderer.call("loadDocument", { url:"https://page.test/",contentType:"text/html",status:200,
+    source:`<!doctype html><style>#one{-webkit-line-clamp:2}</style><div id="one" style="background-color:red;padding:2px 3px;--Tone:first;--tone:lower"></div>
+      <div id="two" style="background-color:blue;padding:7px"></div>` });
+  await renderer.call("whenLoaded");
+  const result = await renderer.call("evaluate", `(() => {
+    const one=document.getElementById('one'),a=getComputedStyle(one),b=getComputedStyle(document.getElementById('two'));
+    const names=Array.from({length:a.length},(_,i)=>a.item(i));
+    const read=style=>[style.backgroundColor,style.getPropertyValue('BACKGROUND-COLOR'),style.paddingLeft,
+      style.getPropertyValue('padding-left'),style.WebkitLineClamp,style.webkitLineClamp,style.getPropertyValue('-webkit-line-clamp')];
+    const initial=read(a),other=read(b);
+    one.style.backgroundColor='green';one.style.paddingLeft='9px';one.style.setProperty('--Tone','changed');
+    return {initial,other,changed:read(a),custom:[a.getPropertyValue('--Tone'),a.getPropertyValue('--tone')],
+      names:names.length===new Set(names).size&&names.includes('background-color')&&names.includes('-webkit-line-clamp'),
+      absent:['constructor','toString','unknown-property'].map(name=>a.getPropertyValue(name)),
+      stable:names.join('|')===Array.from({length:b.length},(_,i)=>b.item(i)).join('|')};
+  })()`);
+  expect(result).toEqual({
+    initial:["rgba(255, 0, 0, 1)","rgba(255, 0, 0, 1)","3px","3px","2","2","2"],
+    other:["rgba(0, 0, 255, 1)","rgba(0, 0, 255, 1)","7px","7px","none","none","none"],
+    changed:["rgba(0, 128, 0, 1)","rgba(0, 128, 0, 1)","9px","9px","2","2","2"],
+    custom:["changed","lower"],names:true,absent:["","",""],stable:true,
+  });
+});
+
 test("computed corner radii preserve percentages, elliptical axes and logical mappings", async () => {
   await renderer.call("loadDocument", {
     url: "https://page.test/", contentType: "text/html", status: 200,

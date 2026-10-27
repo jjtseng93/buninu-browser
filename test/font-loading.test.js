@@ -72,6 +72,83 @@ test("font sources try local/fetch alternatives and pending requests abort on do
   expect(aborted).toBe(1);
 });
 
+test("font indexes preserve subset order, case-insensitive families, and changed face lists", async () => {
+  const { CanvasKit, builtinTypefaces, fontCollection } = await loadGraphics();
+  const local = { sources: [{ local: builtinTypefaces[0].family }] };
+  const fonts = new DocumentFonts({ CanvasKit, builtins: builtinTypefaces, defaultCollection: fontCollection,
+    fetch: () => { throw new Error("local faces must not fetch"); } });
+  try {
+    const latin = face("Indexed", 400, [[0, 127]], local);
+    const capitals = face("iNDEXED", 400, [[65, 90]], local);
+    const cjk = face("Indexed", 400, [[0x4e00, 0x9fff]], local);
+    fonts.update([latin, capitals, cjk], [run("Aa中", ["INDEXED"])]);
+    await fonts.ready();
+    const latinAlias = fonts.resolve("indexed", 400, "normal", 97)[0];
+    const capitalsAlias = fonts.resolve("INDEXED", 400, "normal", 65)[0];
+    const cjkAlias = fonts.resolve("Indexed", 400, "normal", 0x4e2d)[0];
+    expect(new Set([latinAlias, capitalsAlias, cjkAlias]).size).toBe(3);
+    expect(fonts.resolve("iNdExEd", 400, "normal", 65)).toEqual([capitalsAlias, latinAlias]);
+    expect(fonts.resolve("indexed")).toEqual([cjkAlias, capitalsAlias, latinAlias]);
+
+    fonts.setFaces([cjk, capitals, latin]);
+    expect(fonts.resolve("Indexed", 400, "normal", 65)).toEqual([latinAlias, capitalsAlias]);
+    fonts.setFaces([cjk]);
+    expect(fonts.resolve("Indexed", 400, "normal", 65)).toEqual([]);
+    expect(fonts.resolve("Indexed", 400, "normal", 0x4e2d)).toEqual([cjkAlias]);
+    fonts.setFaces([]);
+    expect(fonts.hasUnicodeRanges).toBe(false);
+    expect(fonts.resolve("Indexed")).toEqual([]);
+    // Equivalent new descriptor objects still refer to the existing record.
+    fonts.setFaces([structuredClone(latin)]);
+    expect(fonts.resolve("Indexed", 400, "normal", 65)).toEqual([latinAlias]);
+    const returned = fonts.resolve("Indexed"); returned.length = 0;
+    expect(fonts.resolve("Indexed")).toEqual([latinAlias]);
+
+    // setFaces must also notice edits to an existing descriptor/array.
+    const mutable = [latin];
+    fonts.setFaces(mutable);
+    latin.family = "Renamed";
+    latin.unicodeRanges = [[0x400, 0x4ff]];
+    fonts.update(mutable, [run("Ж", ["renamed"])]);
+    await fonts.ready();
+    expect(fonts.resolve("Indexed")).toEqual([]);
+    expect(fonts.resolve("Renamed", 400, "normal", 65)).toEqual([]);
+    expect(fonts.resolve("Renamed", 400, "normal", 0x416)).toHaveLength(1);
+  } finally { fonts.dispose(); }
+});
+
+test("ranked faces observe aliases loaded later and changed font weights/styles", async () => {
+  const { CanvasKit, builtinTypefaces, fontCollection } = await loadGraphics();
+  const bytes = await Bun.file(new URL("../usr/share/fonts/DejaVuSansMono.ttf", import.meta.url)).bytes();
+  let finish;
+  const response = new Promise(resolve => { finish = resolve; });
+  const fonts = new DocumentFonts({ CanvasKit, builtins: builtinTypefaces, defaultCollection: fontCollection,
+    fetch: () => response });
+  try {
+    const regular = face("Delayed", 400, [[0, 127]]);
+    const medium = face("Delayed", 500, [[0, 127]]);
+    const italic = face("Delayed", 400, [[0, 127]], { style: "italic" });
+    fonts.update([regular, medium, italic], [run("a", ["Delayed"]), run("a", ["Delayed"], 500), run("a", ["Delayed"], 400, "italic")]);
+    expect(fonts.resolve("Delayed", 400, "normal", 65)).toEqual([]);
+    expect(fonts.resolve("Delayed", 450, "normal", 65)).toEqual([]);
+    expect(fonts.resolve("Delayed", 400, "italic", 65)).toEqual([]);
+    finish({ status: 200, body: bytes });
+    await fonts.ready();
+    const regularAlias = fonts.resolve("Delayed", 400, "normal", 65)[0];
+    const mediumAlias = fonts.resolve("Delayed", 500, "normal", 65)[0];
+    const italicAlias = fonts.resolve("Delayed", 400, "italic", 65)[0];
+    expect(new Set([regularAlias, mediumAlias, italicAlias]).size).toBe(3);
+    expect(fonts.resolve("Delayed", 450, "normal", 65)).toEqual([mediumAlias, regularAlias, italicAlias]);
+    expect(fonts.resolve("Delayed", 400, "italic", 65)).toEqual([italicAlias, regularAlias, mediumAlias]);
+    fonts.setFaces([medium]);
+    expect(fonts.resolve("Delayed", 400, "normal", 65)).toEqual([mediumAlias]);
+    // More style combinations than the bounded rank cache can hold must not
+    // change either a new lookup or one evicted earlier.
+    for (let weight = 1; weight <= 160; weight++) expect(fonts.resolve("Delayed", weight, "normal", 65)).toEqual([mediumAlias]);
+    expect(fonts.resolve("Delayed", 450, "normal", 65)).toEqual([mediumAlias]);
+  } finally { fonts.dispose(); }
+});
+
 test("loaded web font updates geometry, respects Unicode ranges, and resets on navigation", async () => {
   const bytes = await Bun.file(new URL("../usr/share/fonts/DejaVuSansMono.ttf", import.meta.url)).bytes();
   let finish;
