@@ -1,4 +1,7 @@
 import {test,expect} from 'bun:test';
+import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {VideoChannel,startVideoChannel} from '../lib/renderer/video-channel.js';
 
 test('video channel rejects late frames and reports from stopped/replaced presentations',()=>{
@@ -54,16 +57,22 @@ test('worker failure is latched before terminate synchronously emits close',()=>
   expect(channel.config).toBeNull();expect(channel.frame).toBeNull();
 });
 
-// Use the real Bun Worker lifecycle with a tiny script, avoiding decoder/WASM
-// startup. Restore the constructor before the first async continuation.
+// Use the real Bun Worker lifecycle with a tiny file, avoiding decoder/WASM
+// startup and page realms' scoped Blob URL hooks. Restore the constructor
+// before the first async continuation; each caller removes its own directory.
 function startLifecycleWorker(source,changed,report) {
   const Original=globalThis.Worker;
-  const url=URL.createObjectURL(new Blob([source],{type:'application/javascript'}));
+  const directory=mkdtempSync(join(tmpdir(),'buninu-video-lifecycle-'));
+  const path=join(directory,'worker.js');
   let worker,starting;
-  globalThis.Worker=class extends Original {constructor(){super(url);worker=this;}};
-  try {starting=startVideoChannel(changed,report);}
-  finally {globalThis.Worker=Original;}
-  return {worker,starting:starting.finally(()=>URL.revokeObjectURL(url))};
+  const dispose=()=>{worker?.terminate();rmSync(directory,{recursive:true,force:true});};
+  try {
+    writeFileSync(path,source);
+    globalThis.Worker=class extends Original {constructor(){super(path);worker=this;}};
+    try {starting=startVideoChannel(changed,report);}
+    finally {globalThis.Worker=Original;}
+    return {worker,starting,dispose};
+  } catch(error) {dispose();throw error;}
 }
 
 test('closing before ready rejects promptly instead of waiting for the startup timeout',async()=>{
@@ -77,7 +86,7 @@ test('closing before ready rejects promptly instead of waiting for the startup t
     ]);
     expect(result).toBe('Video worker closed (7)');
     expect(reports).toEqual([]);
-  }finally{clearTimeout(timer);fixture.worker.terminate();}
+  }finally{clearTimeout(timer);fixture.dispose();}
 },5000);
 
 test('closing after ready clears stale pixels and reports fallback exactly once',async()=>{
@@ -99,7 +108,7 @@ test('closing after ready clears stale pixels and reports fallback exactly once'
     channel.timing(1,1);channel.fail(new Error('later'));fixture.worker.terminate();
     await Bun.sleep(10);
     expect(reports).toHaveLength(1);
-  }finally{fixture.worker.terminate();}
+  }finally{fixture.dispose();}
 },5000);
 
 test('independent decoder transfers live pixels and retains measured-audio gating',async()=>{
