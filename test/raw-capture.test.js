@@ -1,6 +1,7 @@
-import {test,expect} from 'bun:test';
+import {test,expect,spyOn} from 'bun:test';
 import {readFileSync,existsSync,unlinkSync} from 'node:fs';
 import {dirname} from 'node:path';
+import {Server} from 'node:net';
 import {RendererHost} from '../lib/renderer/host.js';
 import {PacketReader,encodePacket,listenCompositor,connectCompositor} from '../lib/renderer/compositor-channel.js';
 import {RawFrames} from '../lib/paint/raw-frames.js';
@@ -100,11 +101,30 @@ test('normal CDP routes raw requests to the controller without changing standard
  expect(existsSync(directory)).toBe(false);
 },20000);
 
-test('closing during listener startup rejects promptly and a new start remains usable',async()=>{
- const host=new RendererHost();
- const pending=host.start();host.close();
+test('closing during listener startup releases the listener and only a new host remains usable',async()=>{
+ const host=new RendererHost(),listeners=[],closed=[];
+ const original=Server.prototype.listen;
+ const listening=spyOn(Server.prototype,'listen').mockImplementation(function(...args){
+  listeners.push(this);closed.push(new Promise(resolve=>this.once('close',resolve)));
+  return original.apply(this,args);
+ });
+ let pending;
+ try{pending=host.start();host.close();}finally{listening.mockRestore();}
  await expect(pending).rejects.toThrow('closed');
- try{await host.start();expect(host.pid).toBeGreaterThan(0);}finally{host.close();}
+ expect(listeners).toHaveLength(1);
+ // Cancellation rejects before listen() resolves. Its later continuation
+ // must close that newly-created listener instead of leaving a server alive.
+ await Promise.all(closed);
+ expect(listeners[0].listening).toBe(false);
+ await expect(host.start()).rejects.toThrow('Renderer is closed');
+ expect(host.pid).toBeNull();
+ const fresh=new RendererHost();
+ try{
+  await fresh.start();expect(fresh.pid).toBeGreaterThan(0);
+  await fresh.call('loadDocument',{url:'about:blank',source:'<body>fresh host</body>',contentType:'text/html'});
+  const png=await fresh.composite('screenshot',{format:'png'});
+  expect([...Buffer.from(png,'base64').subarray(0,4)]).toEqual([137,80,78,71]);
+ }finally{fresh.close();}
 },15000);
 
 for(const compositor of [true,false])test(`fractional CDP clips preserve exact physical dimensions and raw pixels (compositor=${compositor})`,async()=>{
