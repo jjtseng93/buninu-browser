@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { cropViewport, encodeImage, encodeImageBase64 } from '../lib/paint/frame.js';
+import { cropViewport, encodeImage, encodeImageBase64, rawFrame } from '../lib/paint/frame.js';
 import { FrameCaptureCache } from '../lib/paint/frame-cache.js';
 import { appendParagraphText } from '../lib/paint/paragraph-text.js';
 
@@ -101,3 +101,20 @@ test('paragraphs batch ordinary text while preserving whole emoji graphemes and 
   expect(runs[0].text).toBe(ordinary);
   expect(runs.at(-1)).toEqual({ text: ' end', emoji: false });
 });
+
+test('raw capture copies borrowed pixels but can consume private offset snapshots',async()=>{
+  const pixels=new Uint8Array([10,20,30,40, 50,60,70,80]);
+  expect([...rawFrame(pixels,2,1,'bgra').pixels]).toEqual([30,20,10,40,70,60,50,80]);
+  expect([...pixels]).toEqual([10,20,30,40,50,60,70,80]);
+  const bytes=new Uint8Array(16);bytes.set(pixels,4);
+  const frame=rawFrame(bytes.subarray(4,12),2,1,'bgra',{takeOwnership:true});
+  expect(frame.pixels.buffer).toBe(bytes.buffer);
+  expect([...frame.pixels]).toEqual([30,20,10,40,70,60,50,80]);
+  expect([...bytes.subarray(0,4)]).toEqual([0,0,0,0]);
+});
+
+test("raw screenshots accept already composed BGRA without converting it twice", () => {
+  const pixels = Uint8Array.of(3, 2, 1, 255);
+  expect(rawFrame(pixels, 1, 1, "bgra", {inputFormat:"bgra"}).pixels).toEqual(pixels);
+  expect(rawFrame(pixels, 1, 1, "rgba", {inputFormat:"bgra"}).pixels).toEqual(Uint8Array.of(1,2,3,255));
+ });
