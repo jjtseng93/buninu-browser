@@ -104,3 +104,67 @@ test('raw cropped captures own their buffers independently of recyclable frame l
   expect(tile.pixels.byteLength).toBe(20 * 40 * 4);
   expect(frame.pixels.byteLength).toBe(5 * 7 * 4);
 });
+
+test('opaque-run skipping initializes dirty allocations, including unaligned sources and preserved alpha', () => {
+  const allocate = Bun.allocUnsafe;
+  let allocations = 0;
+  Bun.allocUnsafe = size => { allocations++; return new Uint8Array(size).fill(0xa5); };
+  try {
+    for (const offset of [0, 1]) for (const rectHeight of [4, 30.2]) {
+      const {tile, frame} = fixture(20, 40, offset);
+      tile.videoLayer.rect.height = rectHeight;
+      const base = new Uint8Array(tile.videoLayer.base);
+      // A full-width crop borrows the base. Alternate channel order and crop
+      // origins to invalidate cached source views, while reusing the layer.
+      for (const format of ['rgba', 'bgra', 'rgba']) for (const y of [tile.y, tile.y + 4, tile.y]) {
+        compare(tile, frame, [tile.x, y, 16, 8], undefined, format);
+        frame.pixels[0] ^= 127;
+      }
+      expect(tile.videoLayer.base).toEqual(base);
+    }
+    expect(allocations).toBe(36);
+  } finally { Bun.allocUnsafe = allocate; }
+});
+
+test('an entirely opaque capture writes every channel while a capture without opaque runs copies every byte', () => {
+  const allocate = Bun.allocUnsafe;
+  Bun.allocUnsafe = size => new Uint8Array(size).fill(0xa5);
+  try {
+    for (const offset of [0, 1]) for (const opaque of [false, true]) {
+      const {tile, frame} = fixture(20, 40, offset);
+      tile.videoLayer.rect = {x:0, y:0, width:20, height:40};
+      tile.videoLayer.base.fill(0);
+      for (let i=3;i<tile.videoLayer.base.length;i+=4) tile.videoLayer.base[i] = 255;
+      tile.videoLayer.mask.fill(opaque ? 255 : 0);
+      for (const format of ['rgba', 'bgra']) compare(tile, frame, [tile.x, tile.y, 16, 8], undefined, format);
+    }
+  } finally { Bun.allocUnsafe = allocate; }
+});
+
+test('unexpected pooled allocations fall back to independently owned aligned capture bytes', () => {
+  const allocate = Bun.allocUnsafe, borrowed = [];
+  Bun.allocUnsafe = size => {
+    const pixels = new Uint8Array(size + 8).subarray(4, size + 4);
+    borrowed.push(pixels);
+    return pixels;
+  };
+  try {
+    const {tile, frame} = fixture(20, 40);
+    for (const format of ['rgba', 'bgra']) compare(tile, frame, [tile.x, tile.y, 16, 8], undefined, format);
+    expect(borrowed).toHaveLength(2);
+    // compare() detached the returned captures; the unexpected pool is intact.
+    expect(borrowed.every(pixels => pixels.byteLength === 20 * 10 * 4)).toBe(true);
+  } finally { Bun.allocUnsafe = allocate; }
+});
+
+test('partial-width and out-of-tile crops preserve the initialized crop fallback', () => {
+  const allocate = Bun.allocUnsafe;
+  Bun.allocUnsafe = () => { throw Error('noncontiguous crops already own their initialized pixels'); };
+  try {
+    const {tile, frame} = fixture(20, 40, 1);
+    for (const format of ['rgba', 'bgra']) {
+      compare(tile, frame, [tile.x + 1, tile.y, 12, 8], undefined, format);
+      compare(tile, frame, [tile.x - 4, tile.y - 3, 16, 8], undefined, format);
+    }
+  } finally { Bun.allocUnsafe = allocate; }
+});
