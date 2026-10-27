@@ -1186,6 +1186,41 @@ test("page RegExp instances can override their own toString without changing the
   expect(await evaluate("regexpOverride")).toEqual(["custom", "/other/"]);
 });
 
+test("import methods keep their names and receivers alongside real dynamic imports", async () => {
+  scripts.set("https://page.test/import-method.js", `
+    export class Module {
+      static import(value) { return this.prefix + value }
+      static prefix = 'module:';
+    }
+    export const answer = 42;
+  `);
+  await load(`<script>
+    class Registry extends HTMLElement {
+      static import(value) { return this.prefix + value }
+      static prefix = 'class:';
+    }
+    customElements.define('import-registry', Registry);
+    const object = { prefix: 'object:', import(value) { return this.prefix + value } };
+    window.importNames = [
+      Registry.import('a'), Registry . import /* gap */ ('b'),
+      object.import('c'), object . /* gap */ import ('d'),
+      customElements.get('import-registry').import.name,
+      Object.hasOwn(Registry, 'import'), Object.hasOwn(Registry, '__import__'),
+      Registry.import.toString(),
+    ];
+    Promise.all([
+      import /* gap */ ('./import-method.js'),
+      import\n('./import-method.js'),
+    ]).then(([a, b]) => { window.dynamicImportNames = [a.answer, a === b, a.Module.import('e')]; });
+  </script>`);
+  expect(await evaluate("importNames")).toEqual([
+    "class:a", "class:b", "object:c", "object:d", "import", true, false,
+    "import(value) { return this.prefix + value }",
+  ]);
+  await waitFor("typeof dynamicImportNames !== 'undefined'");
+  expect(await evaluate("dynamicImportNames")).toEqual([42, true, "module:e"]);
+});
+
 test("ES modules: graphs, live exports, JSON, import.meta, dynamic import, TLA, cycles, import maps", async () => {
   const base = "https://page.test/modules/";
   scripts.set(`${base}math.js`, `

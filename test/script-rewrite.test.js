@@ -15,6 +15,41 @@ test("HTML comment markers in JavaScript values are escaped without changing the
   expect(Function(`${escaped}; return [a, b.test('-->'), c]`)()).toEqual(["<!-- start -->", true, "<!-- 1 -->"]);
 });
 
+test("SES preparation protects import property names while leaving dynamic imports to the loader", () => {
+  const source = `class Module {
+    static import(value) { return this.prefix + value }
+    static prefix = "class:";
+    import(value) { return value }
+  }
+  const object = { prefix: "object:", import(value) { return this.prefix + value } };
+  result = [Module . import ("a"), object. /* gap */ import /* gap */ ("b"),
+    Module.import.name, Object.hasOwn(Module, "import"), new Module().import(7)];`;
+  const code = escapeSesHtmlComments(source);
+  const result = Function(`let result; ${code}; return result`)();
+  expect(result).toEqual(["class:a", "object:b", "import", true, 7]);
+  expect(restoreSourceText(code)).toBe(source);
+  const dynamic = `import /* module */ ("./module.js"); import\n("./other.js");`;
+  expect(escapeSesHtmlComments(dynamic)).toBe(dynamic);
+});
+
+test("SES preparation preserves import.meta alongside module methods and dynamic imports", async () => {
+  const source = `const registry = { import(value) { return value + 1 } };
+    export const meta = import.meta.url;
+    export const commentedMeta = import /* keyword */ .meta.url;
+    export const result = registry.import(6);
+    export const name = registry.import.name;
+    export const dynamic = (await import("data:text/javascript,export default 9")).default;`;
+  const code = escapeSesHtmlComments(source, "module");
+  expect(code).toContain("import.meta.url");
+  expect(code).toContain("import /* keyword */ .meta.url");
+  expect(restoreSourceText(code)).toBe(source);
+  const url = `data:text/javascript;base64,${Buffer.from(code).toString("base64")}`;
+  const module = await import(url);
+  expect(module.meta).toContain("data:text/javascript;base64,");
+  expect(module.commentedMeta).toBe(module.meta);
+  expect([module.result, module.name, module.dynamic]).toEqual([7, "import", 9]);
+});
+
 test("constructor reads go through the helper; writes, delete and optional chains do not", () => {
   expect(rewrite("var A = Object.getPrototypeOf(async function () {}).constructor;"))
     .toBe("var A = $buninu$constructor(Object.getPrototypeOf(async function () {}));");
