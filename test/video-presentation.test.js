@@ -1,6 +1,7 @@
 import { test, expect } from "bun:test";
 import { cropViewport, rawFrame } from "../lib/paint/frame.js";
 import { VideoPresentation, compositeVideo } from "../lib/renderer/video-presentation.js";
+import wasmpeg from "../vendor/wasmpeg/src/js/index.js";
 
 test("video predecode is bounded and waits for measured audio, skipping stale frames", async () => {
   let frames = 0, closed = 0;
@@ -139,6 +140,80 @@ test("reopening at a keyframe does not show the prefix before the resume positio
     expect(reports.some(report => report.time >= 1.9)).toBe(true);
     expect(reports.every(report => report.time === undefined || report.time >= 1.9)).toBe(true);
   } finally { video.stop(); }
+});
+
+test("discarded GOP frames use tiny output while the resume boundary keeps full-size pixels", async () => {
+  for (const time of [0.5, 0.51]) {
+    let at = 0;
+    const calls = [];
+    const video = new VideoPresentation({ decode: async () => ({ width: 8, height: 4, fps: 4,
+      seek() { at = 0; calls.length = 0; },
+      nextFrame(w, h) { calls.push([w, h]); return new Uint8Array(w * h * 4).fill(++at); },
+      close() {} }) }, () => {}, () => {});
+    try {
+      video.timing(20, time);
+      await video.open({ id: 10, time, hasAudio: true, audioId: 20, audioStart: 0 });
+      // The frame ending exactly at 0.5 is discarded, but the frame spanning
+      // 0.5–0.75 must keep its full image for both an exact and fractional seek.
+      expect(calls.slice(0, 2)).toEqual([[1, 1], [1, 1]]);
+      expect(calls.slice(2).length).toBeGreaterThan(0);
+      expect(calls.slice(2).every(([w, h]) => w === 8 && h === 4)).toBe(true);
+      expect(video.frame.time).toBe(0.5);
+      expect(video.frame.pixels[0]).toBe(3);
+      for (const frame of [video.frame, ...video.queue]) {
+        expect([frame.width, frame.height, frame.pixels.length]).toEqual([8, 4, 128]);
+      }
+    } finally { video.stop(); }
+  }
+});
+
+test("real interframe decoders preserve every displayed pixel after tiny GOP-prefix output", async () => {
+  await wasmpeg.load();
+  for (const [fixture, resume] of [["long-video.mp4", 15.125], ["mse-switch-large.mp4", 3.75]]) {
+    const bytes = new Uint8Array(await Bun.file(new URL(`./fixtures/${fixture}`, import.meta.url)).arrayBuffer());
+    const run = async fullPrefix => {
+      let smallFrames = 0;
+      const reports = [];
+      const engine = { decode: async () => {
+        const decoder = await wasmpeg.decode(bytes);
+        return { ...decoder, nextFrame(w, h) {
+          if (w === 1 && h === 1) {
+            smallFrames++;
+            // Reference: retain the old behavior, producing normal-sized
+            // RGBA even for frames which the presentation discards.
+            if (fullPrefix) return decoder.nextFrame(decoder.width, decoder.height);
+          }
+          return decoder.nextFrame(w, h);
+        } };
+      } };
+      const video = new VideoPresentation(engine, () => {}, report => reports.push(report));
+      const result = [];
+      const pump = () => {
+        for (let steps = 0; steps < 100 && !video.eof && video.nextTime <= video.time() + 0.75
+          && video.queue.length < video.limit; steps++) {
+          clearTimeout(video.timer);
+          video.step();
+        }
+        clearTimeout(video.timer);
+        expect(video.frame).not.toBeNull();
+        for (const frame of [video.frame, ...video.queue]) {
+          expect(frame.pixels.length).toBe(frame.width * frame.height * 4);
+        }
+        result.push([video.frame, ...video.queue]);
+      };
+      try {
+        video.timing(21, resume);
+        await video.open({ id: 11, time: resume, hasAudio: true, audioId: 21, audioStart: 0 });
+        pump();
+        video.timing(21, resume + 0.5);
+        pump();
+        expect(smallFrames).toBeGreaterThan(0);
+        expect(reports.some(report => report.error)).toBe(false);
+        return result;
+      } finally { video.stop(); }
+    };
+    expect(await run(false)).toEqual(await run(true));
+  }
 });
 
 test("a presentation keeps absolute epoch times and ends before replaced frames", async () => {
