@@ -49,3 +49,22 @@ test("linked sheet media can change without refetching and disabled sheets fetch
   expect(await read()).toBe("rgba(0, 0, 255, 1)");
   expect(requests).toEqual(["https://style.test/linked.css", "https://style.test/disabled.css"]);
 });
+
+test("cached discovery observes rel, sheet text, base URL and detached/reinserted sheets", async () => {
+  requests.length = 0;
+  await load(`<!doctype html><base href="/first/"><style id="inline">#target{color:red}</style>
+    <link id="linked" rel="preload" href="dynamic.css"><div id="target">Text</div>`);
+  expect(await read()).toBe("rgba(255, 0, 0, 1)");
+  expect(requests).toEqual([]);
+  await read("document.querySelector('base').href='/second/';document.getElementById('linked').rel='stylesheet'");
+  const deadline = Date.now() + 3000;
+  while (await read() !== "rgba(0, 0, 255, 1)" && Date.now() < deadline) await Bun.sleep(10);
+  expect(await read()).toBe("rgba(0, 0, 255, 1)");
+  expect(requests).toEqual(["https://style.test/second/dynamic.css"]);
+  expect(await read("document.getElementById('linked').rel='preload'")).toBe("rgba(255, 0, 0, 1)");
+  expect(await read("document.getElementById('inline').firstChild.data='#target{color:green}'")).toBe("rgba(0, 128, 0, 1)");
+  expect(await read("window.saved=document.getElementById('linked');saved.rel='stylesheet';saved.remove()"))
+    .toBe("rgba(0, 128, 0, 1)");
+  expect(await read("document.head.append(saved)")).toBe("rgba(0, 0, 255, 1)");
+  expect(requests).toHaveLength(1);
+});
