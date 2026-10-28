@@ -56,6 +56,35 @@ test("rel membership is refreshed synchronously without rescanning other resourc
   });
 });
 
+test("text and comment replacement preserves element discovery but stylesheet contents stay live", async () => {
+  await fixture(async ({ document, cache, queries }) => {
+    const counter = document.createElement("span");
+    document.body.append(counter);
+    const kinds = ["media", "images", "sheets", "frames"];
+    const lists = Object.fromEntries(kinds.map(kind => [kind, cache.get(kind)]));
+    const style = lists.sheets[0];
+    queries.length = 0;
+    for (let index = 0; index < 20; index++) {
+      counter.textContent = String(index);
+      const comment = document.createComment("counter");
+      counter.append(comment);
+      comment.remove();
+      style.textContent = `body { z-index: ${index} }`;
+      for (const kind of kinds) expect(cache.get(kind)).toBe(lists[kind]);
+      expect(cache.get("sheets")[0].textContent).toBe(`body { z-index: ${index} }`);
+    }
+    counter.textContent = "after delivery";
+    await Bun.sleep(10);
+    for (const kind of kinds) expect(cache.get(kind)).toBe(lists[kind]);
+    expect(queries).toEqual([]);
+    // An element removed through textContent still invalidates membership.
+    counter.append(lists.images[0]);
+    cache.get("images");
+    counter.textContent = "removed image";
+    expect(cache.get("images")).toEqual([]);
+  });
+});
+
 test("insert, remove and reattach are discovered before and after observer delivery", async () => {
   await fixture(async ({ document, cache }) => {
     const old = cache.get("images")[0];
