@@ -181,3 +181,73 @@ test('decoder sends only its latest pending frame and validates ACKs across stop
     for(const {frame}of frames)expect(frame.pixels.byteLength).toBe(frame.width*frame.height*4);
   }finally{worker.terminate();}
 },15000);
+
+test('same-presentation extension preserves the last frame and filters replaced sessions', () => {
+  const sent = [];
+  const channel = new VideoChannel({ addEventListener() {}, postMessage(message) { sent.push(message); } }, () => {}, () => {});
+  channel.open({ id: 7 });
+  const frame = channel.frame = { time: 2 };
+  channel.extend({ id: 6, revision: 0, generation: 2 });
+  expect(sent).toHaveLength(1);
+  channel.extend({ id: 7, revision: 0, generation: 2 });
+  expect(sent.at(-1)).toEqual({ type: 'extend', id: 7, revision: 0, generation: 2 });
+  expect(channel.frame).toBe(frame);
+  channel.stop();
+});
+
+test('real fMP4 snapshot extension preserves transfer ownership and sequential pixels across EOF', async () => {
+  const { default: wasmpeg } = await import('../vendor/wasmpeg/src/js/index.js');
+  await wasmpeg.load();
+  const bytes = await Bun.file(new URL('./fixtures/mse-switch-large.mp4', import.meta.url)).bytes();
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let end = 0;
+  while (end < bytes.length) {
+    const size = view.getUint32(end);
+    const type = String.fromCharCode(...bytes.subarray(end + 4, end + 8));
+    end += size;
+    if (type === 'mdat') break;
+  }
+  const oracle = await wasmpeg.decode(bytes);
+  const expected = [];
+  try {
+    let pixels;
+    while ((pixels = oracle.nextFrame(oracle.width, oracle.height))) expected.push(Bun.hash(pixels));
+  } finally { oracle.close(); }
+  const reports = [], frames = [];
+  const channel = await startVideoChannel(() => {
+    const { time, pixels } = channel.frame;
+    frames.push({ time, pixels, hash: Bun.hash(pixels) });
+  }, report => reports.push(report));
+  const until = async predicate => {
+    for (let i = 0; i < 200 && !predicate(); i++) await Bun.sleep(10);
+    expect(predicate()).toBe(true);
+  };
+  try {
+    channel.timing(9, 0);
+    channel.open({ id: 30, bytes: bytes.slice(0, end), snapshotId: 'video-epoch', generation: 1,
+      time: 0, hasAudio: true, audioId: 9, audioStart: 0 });
+    await until(() => frames.length > 0);
+    channel.timing(9, 1.3);
+    await until(() => reports.some(report => Number.isFinite(report.exhaustedAt)));
+    const exhausted = reports.find(report => Number.isFinite(report.exhaustedAt));
+    expect(exhausted.exhaustedAt).toBeCloseTo(2, 6);
+    const previous = channel.frame;
+    channel.extend({ id: 30, revision: 0, generation: 2, snapshotId: 'video-epoch',
+      bytes, boundary: exhausted.exhaustedAt });
+    expect(channel.frame).toBe(previous);
+    await until(() => reports.some(report => report.continued === 2));
+    for (let i = 14; i <= 60; i++) {
+      channel.timing(9, i / 10);
+      await Bun.sleep(15);
+    }
+    await until(() => reports.some(report => report.end >= 5.9));
+    expect(reports.some(report => report.error || report.continuationError)).toBe(false);
+    expect(reports.filter(report => report.continued).map(report => report.revision)).toEqual([1]);
+    expect(new Set(frames.map(frame => Math.round(frame.time * 10))).size).toBe(frames.length);
+    expect(frames.some(frame => Math.abs(frame.time - 2) < 1e-6)).toBe(true);
+    for (const frame of frames) {
+      expect(frame.pixels.byteLength).toBe(128 * 96 * 4);
+      expect(frame.hash).toBe(expected[Math.round(frame.time * 10)]);
+    }
+  } finally { channel.stop(); channel.worker.terminate(); }
+}, 15000);
