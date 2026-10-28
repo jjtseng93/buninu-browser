@@ -48,6 +48,25 @@ test('full cascades retain equal style, custom property and pseudo identities', 
   } finally { f.window.happyDOM.abort(); }
 });
 
+for (const incremental of [false, true]) {
+  test(`style identity comparison preserves signed-zero and NaN decisions (${incremental ? 'incremental' : 'full'})`, () => {
+    const f = fixture('<div id="zero" style="margin:0px">zero</div><div id="nan" style="width:calc(1e309 * 0px)">non-finite</div>');
+    try {
+      const zero = f.get('zero'), nan = f.get('nan');
+      const zeroStyle = f.engine.get(zero), nanStyle = f.engine.get(nan);
+      expect(Number.isNaN(nanStyle.width.px)).toBe(true);
+      expect(Number.isNaN(nanStyle.width.percent)).toBe(true);
+      zero.setAttribute('style', 'margin:-0px');
+      const fresh = new StyleEngine().compute(f.document, f.sheets);
+      expect(Object.is(fresh.get(zero).margin[0], -0)).toBe(true);
+      f.engine.compute(f.document, f.sheets, f.viewport, incremental ? new Set([zero, nan]) : null);
+      expect(f.engine.get(zero)).toBe(zeroStyle);
+      expect(f.engine.get(nan)).not.toBe(nanStyle);
+      expect(Number.isNaN(f.engine.get(nan).width.px)).toBe(true);
+    } finally { f.window.happyDOM.abort(); }
+  });
+}
+
 test('full cascades recompute media, viewport, root rem and font metric inputs', () => {
   let advance = 7;
   const f = fixture('<html style="font-size:2rem"><body><div id="parent" style="width:10vw;direction:rtl"><span id="child" style="font-size:50%;width:2rem;margin-inline-start:3px">text</span><i id="metric" style="width:10ch">metric</i></div></body></html>', [
