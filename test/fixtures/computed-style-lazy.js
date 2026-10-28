@@ -1,6 +1,24 @@
 import { strict as assert } from "node:assert";
 import { LayoutEngine } from "../../lib/layout/text-layout.js";
 import { createPageRenderer } from "../../lib/renderer/page-renderer.js";
+import { StyleEngine } from "../../lib/style/computed-style.js";
+
+// Observe expensive field serialization through the actual CSSOM path. The
+// immutable style and all returned values remain unchanged by this proxy.
+let observeSerialization = false, serializations = 0;
+const computed = StyleEngine.prototype.get, observedStyles = new WeakMap();
+StyleEngine.prototype.get = function (element) {
+  const style = computed.call(this, element);
+  if (!observeSerialization || element?.id !== "box") return style;
+  let observed = observedStyles.get(style);
+  if (!observed) observedStyles.set(style, observed = new Proxy(style, {
+    get(target, property, receiver) {
+      if (property === "fontFamily") serializations++;
+      return Reflect.get(target, property, receiver);
+    },
+  }));
+  return observed;
+};
 
 let layouts = 0;
 const layout = LayoutEngine.prototype.layout;
@@ -20,6 +38,24 @@ try {
       #child{width:50%;height:20px;padding:5%}</style><div id="box"><div id="child">Text</div></div>` });
   await renderer.whenLoaded();
   globalThis.__layoutCalls = () => layouts;
+  globalThis.__serializationCalls = () => serializations;
+  observeSerialization = true;
+  const repeated = await renderer.evaluate(`(() => {
+    const element=document.getElementById('box'),styles=[];
+    for(let i=0;i<40;i++) styles.push(getComputedStyle(element));
+    const values=styles.map(style=>[style.color,style.getPropertyValue('--tone')]);
+    const first=__serializationCalls();
+    element.style.setProperty('--tone','changed');
+    const custom=styles[0].getPropertyValue('--tone'),second=__serializationCalls();
+    const keys=Object.keys(styles[0]);
+    styles[0].getPropertyValue=()=> 'local override';
+    const independent=styles[1].getPropertyValue('--tone');
+    return {first,second,custom,independent,distinct:styles[0]!==styles[1],
+      keys:keys.includes('fontFamily')&&keys.includes('color'),
+      values:values.every(value=>value[0]==='rgba(255, 0, 0, 1)'&&value[1]==='red')};
+  })()`);
+  assert.deepEqual(repeated,{first:1,second:2,custom:'changed',independent:'changed',distinct:true,keys:true,values:true});
+  observeSerialization = false;
   const styles = await renderer.evaluate(`(() => {
     const box=document.getElementById('box'),style=getComputedStyle(box),start=__layoutCalls();
     window.savedStyle=style;
@@ -93,5 +129,7 @@ try {
 } finally {
   renderer.dispose();
   delete globalThis.__layoutCalls;
+  delete globalThis.__serializationCalls;
+  StyleEngine.prototype.get = computed;
   LayoutEngine.prototype.layout = layout;
 }
