@@ -67,6 +67,51 @@ test("computes the initial UA and inherited style subset", () => {
   window.happyDOM.abort();
 });
 
+test("explicit inheritance preserves serialized values, factors and fallback fields", () => {
+  const { document, window } = parseHTMLDocument('<div id="parent"><span id="child"><i id="small"></i></span></div>');
+  try {
+    document.querySelector('#parent').setAttribute('style', `background-color: rgb(20, 40, 60); font-family: "Two Words", "Comma, Face", serif;
+      font-size: 20px; font-weight: 600; font-style: italic; font-stretch: 87.5%; line-height: 1.25;
+      list-style-type: decimal; pointer-events: none; user-select: all; text-align: right; white-space: pre-wrap;
+      color-scheme: dark; opacity: .6; margin: 1px 2px 3px 4px`);
+    const names = ['background-color', 'font-family', 'font-size', 'font-weight', 'font-style', 'font-width',
+      'line-height', 'list-style-type', 'pointer-events', 'user-select', 'text-align', 'white-space',
+      'color-scheme', 'opacity', 'margin'];
+    document.querySelector('#child').setAttribute('style', names.map(name => `${name}:inherit`).join(';'));
+    document.querySelector('#small').setAttribute('style', 'font-size:10px;line-height:inherit');
+    const engine = new StyleEngine().compute(document);
+    expect(engine.get(document.querySelector('#child'))).toMatchObject({
+      backgroundColor: 'rgba(20, 40, 60, 1)', fontFamily: ['Two Words', 'Comma, Face', 'serif'],
+      fontSize: 20, fontWeight: 600, fontStyle: 'italic', fontStretch: 87.5,
+      lineHeight: 25, lineHeightFactor: 1.25, listStyleType: 'decimal', pointerEvents: 'none',
+      userSelect: 'all', textAlign: 'end', whiteSpace: 'pre-wrap', colorScheme: 'dark', opacity: .6,
+      margin: [1, 2, 3, 4],
+    });
+    expect(engine.get(document.querySelector('#small'))).toMatchObject({ fontSize: 10, lineHeight: 12.5, lineHeightFactor: 1.25 });
+  } finally { window.happyDOM.abort(); }
+});
+
+test("ordinary inheritance does not serialize unrelated font families", () => {
+  const { document, window } = parseHTMLDocument('<div id="parent"></div><span id="child"></span>');
+  try {
+    const parent = computeElementStyle(document.querySelector('#parent'));
+    let serialized = 0;
+    const fontFamily = new Proxy(parent.fontFamily, {
+      get(target, key, receiver) {
+        if (key === 'map') serialized++;
+        return Reflect.get(target, key, receiver);
+      },
+    });
+    const inherited = { ...parent, fontFamily };
+    const child = document.querySelector('#child');
+    expect(computeElementStyle(child, inherited).fontFamily).toBe(fontFamily);
+    expect(serialized).toBe(0);
+    child.setAttribute('style', 'font-family:inherit;line-height:inherit');
+    expect(computeElementStyle(child, inherited).fontFamily).toEqual(parent.fontFamily);
+    expect(serialized).toBe(1);
+  } finally { window.happyDOM.abort(); }
+});
+
 test(":empty includes text nodes, but ignores comments and empty text nodes", () => {
   const { document, window } = parseHTMLDocument('<span id="text">0</span><span id="space"> </span><span id="empty"><!--comment--></span>');
   const styles = new StyleEngine().compute(document, ['span:empty { display:none }']);
