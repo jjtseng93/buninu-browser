@@ -72,6 +72,17 @@ try {
     verify();
     assert.equal(engine.get(get('deep')).height, classes.includes('branch') ? 7 : 'auto');
   }
+  // Long ancestor and subject lists use the guarded deduplication path. Keep
+  // a distinct matching token after the repeated keys so it cannot be lost.
+  get('outer').className = Array(1000).fill('shared').join(' ');
+  get('branch').className = `${Array(1000).fill('shared').join(' ')} branch`;
+  get('deep').className = `${Array(1000).fill('target').join(' ')} alternate`;
+  get('after').className = Array(17).fill('target').join(' ');
+  get('later').className = Array(16).fill('target').join(' ');
+  engine.compute(duplicate.document, sheets, {}, new Set([get('outer'), get('other')]));
+  verify();
+  assert.equal(engine.get(get('deep')).height, 7);
+  assert.equal(engine.get(get('after')).height, 'auto');
   // Separate dirty roots build ancestor filters through repeated class keys.
   get('deep').style.width = '23px';
   get('later').style.width = '29px';
