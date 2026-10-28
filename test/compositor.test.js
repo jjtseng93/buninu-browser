@@ -2,6 +2,7 @@ import { afterAll, beforeAll, expect, test } from "bun:test";
 import { createBrowser } from "../lib/headless-shell.js";
 import { cropViewport, encodeImage, rgbaBitmap } from "../lib/paint/frame.js";
 import { RendererHost } from "../lib/renderer/host.js";
+import { NetworkService } from "../lib/network/network-service.js";
 
 const tallPage = `<!doctype html><title>tall</title><body style="margin:0">${
   Array.from({ length: 80 }, (_, index) => `<p style="margin:0;height:40px">line ${index}</p>`).join("")
@@ -27,7 +28,8 @@ test("frames: viewport crops fill uncovered areas, and Bun.Image encodes the BMP
 });
 
 test("the compositor answers screenshots and scrolling while the main thread is busy", async () => {
-  const host = new RendererHost({ timeout: 20_000 });
+  const frames = [];
+  const host = new RendererHost({ timeout: 20_000, onFrame: frame => frames.push(frame) });
   try {
     await host.start();
     await host.call("resize", 400, 300, 1);
@@ -42,6 +44,7 @@ test("the compositor answers screenshots and scrolling while the main thread is 
     await Bun.sleep(300);
     const started = performance.now();
     expect(await host.composite("scroll", 0, 120)).toEqual({ x: 0, y: 120 });
+    expect(frames.at(-1)?.scrollOffset).toEqual({ x: 0, y: 120 });
     const scrolled = await host.composite("screenshot");
     expect(performance.now() - started).toBeLessThan(1500);
     expect(scrolled).not.toBe(top);
@@ -56,9 +59,32 @@ test("the compositor answers screenshots and scrolling while the main thread is 
     await host.call("press", "End");
     const end = await host.composite("scrollOffset");
     expect(end.y).toBe(80 * 40 - 300);
+    expect(frames.at(-1)?.scrollOffset).toEqual(end);
   } finally {
     host.close();
   }
+}, 30_000);
+
+test("frame scroll snapshots follow the active renderer across origin replacement", async () => {
+  const browser = await createBrowser({ spareRenderer: false,
+    network: new NetworkService({fetch: async () => new Response(tallPage, {headers:{"content-type":"text/html"}})}) });
+  const {context} = browser, frames = [];
+  context.onFrame(frame => frames.push(frame));
+  try {
+    await context.resize(400, 300, 1);
+    await context.navigate("https://first.test/");
+    await context.scroll(0, 125.5);
+    expect(frames.at(-1)?.scrollOffset).toEqual({x:0,y:125.5});
+    await context.navigate("https://second.test/");
+    await context.screenshot();
+    const firstNewFrame = frames.length - 1;
+    expect(frames.at(-1)?.scrollOffset).toEqual({x:0,y:0});
+    await Bun.sleep(30);
+    expect(frames.slice(firstNewFrame).every(frame => frame?.scrollOffset?.y === 0)).toBe(true);
+    await context.scroll(0, 42.25);
+    expect(frames.at(-1)?.scrollOffset).toEqual({x:0,y:42.25});
+    expect(await context.scrollOffset()).toEqual(frames.at(-1).scrollOffset);
+  } finally { browser.close(); }
 }, 30_000);
 
 let server;
