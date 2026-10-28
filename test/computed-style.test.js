@@ -112,6 +112,47 @@ test("ordinary inheritance does not serialize unrelated font families", () => {
   } finally { window.happyDOM.abort(); }
 });
 
+test("immutable border and inset arrays are shared while descendant overrides stay isolated", () => {
+  const { document, window } = parseHTMLDocument('<div id="parent" style="border:3px solid red;inset:1px 2px 3px 4px"></div><span id="child"></span>');
+  try {
+    const parent = computeElementStyle(document.querySelector('#parent'));
+    const child = document.querySelector('#child');
+    const firstDefault = computeElementStyle(child), secondDefault = computeElementStyle(child);
+    for (const name of ['borderStyles', 'borderSpecifiedWidths', 'inset']) {
+      expect(firstDefault[name]).toBe(secondDefault[name]);
+      expect(Object.isFrozen(firstDefault[name])).toBe(true);
+    }
+    child.setAttribute('style', 'border:inherit;inset:inherit');
+    const inherited = computeElementStyle(child, parent);
+    for (const name of ['borderStyles', 'borderSpecifiedWidths', 'inset']) expect(inherited[name]).toBe(parent[name]);
+    child.setAttribute('style', 'border:inherit;inset:inherit;border-left-style:dashed;border-top-width:9px;right:12px');
+    const changed = computeElementStyle(child, inherited);
+    expect(changed).toMatchObject({borderStyles:['solid','solid','solid','dashed'], borderSpecifiedWidths:[9,3,3,3], inset:[1,12,3,4]});
+    expect(parent).toMatchObject({borderStyles:['solid','solid','solid','solid'], borderSpecifiedWidths:[3,3,3,3], inset:[1,2,3,4]});
+    for (const name of ['borderStyles', 'borderSpecifiedWidths', 'inset']) {
+      expect(changed[name]).not.toBe(parent[name]);
+      expect(Object.isFrozen(changed[name])).toBe(true);
+    }
+  } finally { window.happyDOM.abort(); }
+});
+
+test("inheriting mutable border and inset arrays copies without freezing caller-owned arrays", () => {
+  const { document, window } = parseHTMLDocument('<div id="parent"></div><span id="child" style="border:inherit;inset:inherit"></span>');
+  try {
+    const parent = {...computeElementStyle(document.querySelector('#parent')),
+      borderStyles:['solid','dotted','dashed','double'], borderSpecifiedWidths:[1,2,3,4], inset:[5,6,7,8]};
+    const child = computeElementStyle(document.querySelector('#child'), parent);
+    for (const name of ['borderStyles', 'borderSpecifiedWidths', 'inset']) {
+      expect(child[name]).toEqual(parent[name]);
+      expect(child[name]).not.toBe(parent[name]);
+      expect(Object.isFrozen(child[name])).toBe(true);
+      expect(Object.isFrozen(parent[name])).toBe(false);
+    }
+    parent.borderStyles[0]='hidden';parent.borderSpecifiedWidths[0]=99;parent.inset[0]=99;
+    expect(child).toMatchObject({borderStyles:['solid','dotted','dashed','double'], borderSpecifiedWidths:[1,2,3,4], inset:[5,6,7,8]});
+  } finally { window.happyDOM.abort(); }
+});
+
 test(":empty includes text nodes, but ignores comments and empty text nodes", () => {
   const { document, window } = parseHTMLDocument('<span id="text">0</span><span id="space"> </span><span id="empty"><!--comment--></span>');
   const styles = new StyleEngine().compute(document, ['span:empty { display:none }']);
