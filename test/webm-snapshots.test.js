@@ -3,6 +3,7 @@ import wasmpeg from '../vendor/wasmpeg/src/js/index.js';
 import { createMediaSourceScope } from '../lib/renderer/media-source.js';
 import { createWebMStream, ebmlHeader } from '../lib/media/webm-stream.js';
 import { advanceAudio } from '../lib/media/position-audio.js';
+import { createWebMAudioSnapshots } from '../lib/media/webm-snapshots.js';
 
 let fixture, elements, clusters, init;
 const join = parts => new Uint8Array(Bun.concatArrayBuffers(parts));
@@ -132,13 +133,13 @@ test.each([false,true])('continuous %s live Opus reopens with exact samples and 
   }
 });
 
-test('appending preserves lazy snapshots and updates the current suffix without another epoch',async()=>{
+test.each([false,true])('appending %s live Clusters preserves lazy snapshots and updates the current suffix without another epoch',async unknown=>{
   const c=context();c.append(init);
-  for(const cluster of clusters.slice(0,3))c.append(live(cluster.bytes));
+  for(const cluster of clusters.slice(0,3))c.append(unknown?live(cluster.bytes):cluster.bytes);
   const old=c.buffer._pipe.snapshotAt(5), initial=c.buffer._pipe.snapshotAt(0);
   // Do not read old.bytes until after append: the lazy copy must keep its
   // original packet boundary rather than consult the growing byte pipe.
-  for(const cluster of clusters.slice(3))c.append(live(cluster.bytes));
+  for(const cluster of clusters.slice(3))c.append(unknown?live(cluster.bytes):cluster.bytes);
   const fresh=c.buffer._pipe.snapshotAt(5);
   expect(fresh.id).toBe(old.id);expect(fresh.id).toBe(initial.id);
   expect(fresh.startTime).toBe(old.startTime);
@@ -242,4 +243,130 @@ test('a lazy fast snapshot retains its own run when later arrivals fill an earli
   const pcm=await decode(old.bytes), skip=Math.round(7.2*48000)-Math.round(old.startTime*48000);
   const offset=Math.round((7.2-3.981)*48000);
   expect(pcm.subarray(skip,skip+9600)).toEqual(expected.subarray(offset,offset+9600));
+});
+
+function ebmlElement(id, payload, width = 4) {
+  const size = new Uint8Array(width);
+  let value = payload.length;
+  for (let i = width - 1; i >= 0; i--) { size[i] = value & 255; value = Math.floor(value / 256); }
+  size[0] |= 1 << (8 - width);
+  return join([Uint8Array.from(id), size, payload]);
+}
+function childElements(bytes) {
+  const parent = ebmlHeader(bytes), result = [];
+  for (let at = parent.length; at < bytes.length;) {
+    const head = ebmlHeader(bytes, at), data = at + head.length, end = data + head.size;
+    result.push({id:head.id, at, data, end});
+    at = end;
+  }
+  return result;
+}
+function longFiniteCluster() {
+  const parts = [Uint8Array.from([0xe7,0x81,0])];
+  // Merge the existing real eight-second fixture into one finite Cluster.
+  // Only Block relative timestamps change; encoded Opus packets stay intact.
+  for (const cluster of clusters) {
+    const children = childElements(cluster.bytes), timestamp = children.find(item => item.id === 0xe7);
+    let origin = 0;
+    for (let at = timestamp.data; at < timestamp.end; at++) origin = origin * 256 + cluster.bytes[at];
+    for (const child of children.filter(item => item.id === 0xa3 || item.id === 0xa0)) {
+      const copy = cluster.bytes.slice(child.at, child.end);
+      const block = child.id === 0xa3 ? {data:ebmlHeader(copy).length} : childElements(copy).find(item => item.id === 0xa1);
+      let trackBytes = 1, mask = 0x80;
+      while (!(copy[block.data] & mask)) { trackBytes++; mask >>= 1; }
+      const view = new DataView(copy.buffer, copy.byteOffset + block.data + trackBytes, 2);
+      view.setInt16(0, view.getInt16(0) + origin);
+      parts.push(copy);
+    }
+  }
+  return ebmlElement([0x1f,0x43,0xb6,0x75], join(parts));
+}
+
+test('one long finite Opus Cluster reopens at packet granularity with exact PCM and unchanged preroll', async () => {
+  const cluster = longFiniteCluster(), original = cluster.slice(), c = context();
+  c.append(init); c.append(cluster); c.source.endOfStream();
+  const expected = await decode(fixture), pipe = c.buffer._pipe;
+  expect(await decode(pipe.snapshotAt(0).bytes)).toEqual(expected);
+  for (const target of [3, 6, 6.08, 7.2]) {
+    const snapshot = pipe.snapshotAt(target), prefix = target - snapshot.startTime;
+    expect(prefix).toBeGreaterThanOrEqual(1);
+    expect(prefix).toBeLessThanOrEqual(1.021);
+    const pcm = await decode(snapshot.bytes);
+    const skip = Math.round(target * 48000) - Math.round(snapshot.startTime * 48000);
+    expect(pcm.subarray(skip, skip + 9600)).toEqual(expected.subarray(Math.round(target * 48000), Math.round(target * 48000) + 9600));
+  }
+  expect(cluster).toEqual(original);
+});
+
+test.each([1, 2, 4, 8])('finite Cluster size field width %s becomes a valid unknown-size prefix without mutating input', width => {
+  const c = context(), originals = []; c.append(init);
+  for (let i = 0; i < 40; i++) {
+    const ordinary = syntheticCluster(i * 40);
+    const bytes = ebmlElement([0x1f,0x43,0xb6,0x75], ordinary.subarray(ebmlHeader(ordinary).length), width);
+    originals.push([bytes, bytes.slice()]); c.append(bytes);
+  }
+  const selected = c.buffer._pipe.snapshotAt(1.4);
+  expect(selected.startTime).toBeGreaterThan(0);
+  const emitted = createWebMStream().append(selected.bytes), blocks = emitted.filter(item => item.cluster);
+  expect(blocks.length).toBeGreaterThan(0);
+  expect(ebmlHeader(blocks[0].cluster.prefix[0])).toMatchObject({size:Infinity, length:4 + width});
+  expect(blocks.every(item => item.bytes[0] === 0xa3)).toBe(true);
+  for (const [bytes, original] of originals) expect(bytes).toEqual(original);
+});
+
+test('finite Cluster checksums, positional, encrypted and unknown metadata retain ordinary decoder bytes', () => {
+  const base = syntheticCluster(0), body = base.subarray(ebmlHeader(base).length);
+  for (const metadata of [[0xbf,0x84,0,0,0,0], [0xa7,0x81,0], [0xab,0x81,0], [0xaf,0x81,0], [0x80,0x80]]) {
+    const c = context(); c.append(init);
+    c.append(ebmlElement([0x1f,0x43,0xb6,0x75], join([body.subarray(0,4), Uint8Array.from(metadata), body.subarray(4)])));
+    const selected = c.buffer._pipe.snapshotAt(5);
+    expect(selected.id).toBe(0);
+    expect(selected.bytes).toBe(c.buffer._pipe.bytes());
+  }
+});
+
+test('finite BlockGroup, leading Void, truncation and track encodings preserve conservative boundaries', async () => {
+  const simple = syntheticCluster(0), body = simple.subarray(ebmlHeader(simple).length);
+  const group = ebmlElement([0xa0], ebmlElement([0xa1], body.subarray(6), 1), 1);
+  const c = context(); c.append(init);
+  for (let i = 0; i < 40; i++) {
+    const timestamp = Uint8Array.from([0xe7,0x82,i*40>>8,i*40&255]);
+    c.append(ebmlElement([0x1f,0x43,0xb6,0x75], join([Uint8Array.from([0xec,0x81,0]), timestamp, group])));
+  }
+  const selected = c.buffer._pipe.snapshotAt(1.4);
+  const blocks = createWebMStream().append(selected.bytes).filter(item => item.cluster);
+  expect(blocks.length).toBeGreaterThan(0);
+  expect(blocks.every(item => item.bytes[0] === 0xa0)).toBe(true);
+  expect(blocks[0].cluster.prefix.some(bytes => bytes[0] === 0xec)).toBe(true);
+
+  const index = createWebMAudioSnapshots();
+  for (const element of createWebMStream().append(init)) index.append(element);
+  index.append({id:0x1f43b675, bytes:simple.subarray(0,simple.length - 1)});
+  expect(index.at(5,()=>simple)).toMatchObject({id:0, startTime:0, bytes:simple});
+
+  const trackElement = elements.find(item => item.id === 0x1654ae6b);
+  const track = childElements(trackElement.bytes)[0];
+  const encodedTrack = ebmlElement([0xae], join([trackElement.bytes.subarray(track.data,track.end), Uint8Array.from([0x6d,0x80,0x80])]));
+  const encodedTracks = ebmlElement([0x16,0x54,0xae,0x6b], encodedTrack), encrypted = createWebMAudioSnapshots();
+  for (const element of createWebMStream().append(init)) encrypted.append(element.id === 0x1654ae6b ? {id:element.id,bytes:encodedTracks} : element);
+  encrypted.append({id:0x1f43b675,bytes:simple});
+  expect(encrypted.at(5,()=>simple)).toMatchObject({id:0,startTime:0,bytes:simple});
+});
+
+test('finite packet cuts retain a large immutable metadata prefix only once in the selected output', () => {
+  const padding = Uint8Array.from({length:4000*2},(_,i)=>i%2?0x80:0xec);
+  const parts = [padding, Uint8Array.from([0xe7,0x81,0])];
+  for(let i=0;i<1000;i++) {
+    // One 20ms Opus packet per Block; the payload is metadata-only here.
+    parts.push(Uint8Array.from([0xa3,0x85,0x81,i*20>>8,i*20&255,0x80,0x08]));
+  }
+  const bytes = ebmlElement([0x1f,0x43,0xb6,0x75],join(parts)), original=bytes.slice(), c=context();
+  c.append(init);c.append(bytes);
+  const selected=c.buffer._pipe.snapshotAt(18), parsed=createWebMStream().append(selected.bytes);
+  const blocks=parsed.filter(item=>item.cluster);
+  expect(selected.startTime).toBe(17);
+  expect(blocks.length).toBe(150);
+  expect(blocks[0].cluster.prefix.length).toBe(4002);
+  expect(selected.bytes.length).toBeLessThan(init.length+padding.length+7*151+32);
+  expect(bytes).toEqual(original);
 });
