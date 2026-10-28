@@ -27,6 +27,23 @@ test("idle work consumes its monotonic budget and yields", async () => {
   expect(result.didTimeout).toBeFalse();
 });
 
+test("a burst of idle work does not drain before an ordinary due timer", async () => {
+  const result = await evaluate(`new Promise(resolve => {
+    let completed = 0, whenTimer = null;
+    const finish = () => { if (completed === 16 && whenTimer !== null) resolve({completed, whenTimer}); };
+    for (let i = 0; i < 16; i++) requestIdleCallback(deadline => {
+      const start = performance.now();
+      while (deadline.timeRemaining() > 0 && performance.now() - start < 30) {}
+      completed++; finish();
+    });
+    setTimeout(() => { whenTimer = completed; finish(); }, 20);
+  })`);
+  expect(result.completed).toBe(16);
+  // Check task ordering, rather than imposing a real-clock upper bound on a
+  // slow CI machine. The old separate 1ms timers drain all sixteen first.
+  expect(result.whenTimer).toBeLessThan(16);
+});
+
 test("an expired timeout has no idle budget", async () => {
   const result = await evaluate(`new Promise(resolve => {
     requestIdleCallback(deadline => resolve({
@@ -51,6 +68,13 @@ test("zero timeout does not expire and cancellation prevents delivery", async ()
     while (performance.now() - start < 10) {}
   })`);
   expect(result).toEqual([false]);
+});
+
+test("a timeout above the host timer limit does not expire immediately", async () => {
+  const result = await evaluate(`new Promise(resolve => {
+    requestIdleCallback(deadline => resolve({didTimeout: deadline.didTimeout}), {timeout: 2147483648});
+  })`);
+  expect(result).toEqual({ didTimeout: false });
 });
 
 test("idle callbacks validate their Web IDL inputs", async () => {
