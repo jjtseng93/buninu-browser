@@ -125,3 +125,110 @@ test("navigation/disposal releases old discovery and base URLs are read from liv
     } finally { fresh.dispose(); }
   });
 });
+
+test("ordinary subtree edits retain resource lists and image edits only rescan images", async () => {
+  for (const delivered of [false, true]) await fixture(async ({ document, cache, queries }) => {
+    const container = document.createElement("div");
+    document.body.append(container);
+    const before = Object.fromEntries(["media", "images", "sheets", "frames"].map(kind => [kind, cache.get(kind)]));
+    queries.length = 0;
+    for (let index = 0; index < 3; index++) {
+      container.innerHTML = `<section><span>counter ${index}</span></section>`;
+      if (delivered) await Bun.sleep(10);
+      for (const kind of Object.keys(before)) expect(cache.get(kind)).toBe(before[kind]);
+    }
+    expect(queries).toEqual([]);
+    // Several connected insertion records overlap the same subtree.
+    let parent = container;
+    for (let index = 0; index < 100; index++) {
+      const child = document.createElement("div");
+      parent.append(child); parent = child;
+    }
+    const image = document.createElement("img");
+    parent.append(image);
+    if (delivered) await Bun.sleep(10);
+    expect(cache.get("images")).toEqual([...before.images, image]);
+    for (const kind of ["media", "sheets", "frames"]) expect(cache.get(kind)).toBe(before[kind]);
+    expect(queries).toEqual(["img"]);
+  });
+});
+
+test("removed subtrees still invalidate after their resource descendants are detached", async () => {
+  for (const delivered of [false, true]) await fixture(async ({ document, cache }) => {
+    const kinds = ["media", "images", "sheets", "frames"];
+    const original = Object.fromEntries(kinds.map(kind => [kind, [...cache.get(kind)]]));
+    const subtree = document.createElement("section");
+    subtree.innerHTML = '<div><img><audio></audio><style>p{color:blue}</style><iframe></iframe></div>';
+    document.body.append(subtree);
+    for (const kind of kinds) expect(cache.get(kind)).toHaveLength(original[kind].length + 1);
+    subtree.remove();
+    subtree.firstChild.replaceChildren();
+    subtree.replaceChildren();
+    if (delivered) await Bun.sleep(10);
+    for (const kind of kinds) expect(cache.get(kind)).toEqual(original[kind]);
+  });
+});
+
+test("detached rel edits, reordering and moves into shadow roots refresh old membership", async () => {
+  for (const delivered of [false, true]) await fixture(async ({ document, cache }) => {
+    const subtree = document.createElement("section");
+    subtree.innerHTML = '<link rel="alternate stylesheet"><img id="second">';
+    document.body.append(subtree);
+    const sheets = cache.get("sheets"), images = cache.get("images");
+    const link = subtree.firstChild, second = subtree.lastChild;
+    subtree.remove();
+    link.setAttribute("rel", "preload");
+    document.body.prepend(subtree);
+    if (delivered) await Bun.sleep(10);
+    expect(cache.get("sheets")).toEqual(sheets.filter(element => element !== link));
+    expect(cache.get("images")).toEqual([second, images[0]]);
+    const host = document.createElement("div");
+    document.body.append(host);
+    host.attachShadow({ mode: "open" }).append(second);
+    if (delivered) await Bun.sleep(10);
+    expect(cache.get("images")).toEqual([images[0]]);
+    document.body.append(second);
+    expect(cache.get("images")).toEqual([images[0], second]);
+  });
+});
+
+test("adopting resource subtrees updates discovery in both documents", async () => {
+  await fixture(async ({ document, cache }) => {
+    const other = parseHTMLDocument("<body></body>");
+    const next = createResourceElements(other.document);
+    try {
+      const image = cache.get("images")[0];
+      expect(next.get("images")).toEqual([]);
+      const container = document.createElement("section");
+      document.body.append(container); container.append(image);
+      cache.get("images");
+      other.document.body.append(container);
+      expect(cache.get("images")).toEqual([]);
+      expect(next.get("images")).toEqual([image]);
+      container.remove(); container.replaceChildren();
+      await Bun.sleep(10);
+      expect(next.get("images")).toEqual([]);
+    } finally { next.dispose(); await other.window.happyDOM.close(); }
+  });
+});
+
+test("foreign element tag names follow the same matching rules as discovery selectors", async () => {
+  await fixture(async ({ document, cache }) => {
+    const selectors = { media: "video, audio", images: "img", sheets: "style, link[rel~='stylesheet']", frames: "iframe" };
+    for (const kind of Object.keys(selectors)) cache.get(kind);
+    for (const namespace of ["http://www.w3.org/2000/svg", "urn:resource-test"]) {
+      for (const name of ["img", "IMG", "ImG", "x:img", "STYLE", "StYle", "LINK", "lInK", "aUdIo", "ViDeO", "IfRaMe"]) {
+        const node = document.createElementNS(namespace, name);
+        node.setAttribute("rel", "stylesheet");
+        document.body.append(node);
+        for (const [kind, selector] of Object.entries(selectors)) {
+          expect(cache.get(kind)).toEqual([...document.querySelectorAll(selector)]);
+        }
+        node.remove();
+        for (const [kind, selector] of Object.entries(selectors)) {
+          expect(cache.get(kind)).toEqual([...document.querySelectorAll(selector)]);
+        }
+      }
+    }
+  });
+});
