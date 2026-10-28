@@ -88,3 +88,48 @@ test("inline SVG is a replaced box with margins and vertical-align in the line",
   expect(items.find((item) => item.op === "drawSvg")).toMatchObject({ rect: { x: 0, width: 16, height: 16 } });
   window.happyDOM.abort();
 });
+
+test("unchanged SVG nodes and their containers survive unrelated content edits", () => {
+  const { document, window } = parseHTMLDocument(`<main><section><svg viewBox="0 0 24 24" width="24" height="24">
+    <g transform="translate(2 3)"><path d="M0 0h4v4z" fill="currentColor"/></g>
+  </svg></section><p>before</p></main>`);
+  try {
+    const styles = new StyleEngine().compute(document), builder = new RenderTreeBuilder();
+    const before = builder.build(document, styles);
+    expect(builder.build(document, styles).root).toBe(before.root);
+    document.querySelector("p").firstChild.data = "after";
+    const after = builder.build(document, styles);
+    for (const node of before.nodesById.values()) if (["SVG", "SECTION"].includes(node.tagName)) {
+      expect(after.nodesById.get(node.id)).toBe(node);
+    }
+    expect(after.root).not.toBe(before.root);
+  } finally { window.happyDOM.abort(); }
+});
+
+test("SVG reuse compares transform numbers exactly, including overflow", () => {
+  const { document, window } = parseHTMLDocument(`<svg width="24" height="24">
+    <g transform="scale(1e308) scale(1e308)"><path d="M0 0h4v4z"/></g></svg>`);
+  try {
+    const styles = new StyleEngine().compute(document), builder = new RenderTreeBuilder();
+    const icon = tree => [...tree.nodesById.values()].find(node => node.tagName === "SVG");
+    const before = icon(builder.build(document, styles));
+    document.querySelector("g").setAttribute("transform", "scale(1e308) scale(-1e308)");
+    const after = icon(builder.build(document, styles));
+    // JSON turns both infinities and NaN into null; those are not equal
+    // extracted matrices, even though their JSON representations coincide.
+    expect(JSON.stringify(after.svg)).toBe(JSON.stringify(before.svg));
+    expect(after).not.toBe(before);
+    expect(before.svg.shapes[0].matrix[0]).toBe(Infinity);
+    expect(after.svg.shapes[0].matrix[0]).toBe(-Infinity);
+    expect(icon(builder.build(document, styles))).toBe(after);
+  } finally { window.happyDOM.abort(); }
+});
+
+test("retained SVG layout and edited SVG paint match fresh renderer pixels", async () => {
+  const result = Bun.spawnSync([process.execPath, new URL("fixtures/svg-node-reuse.js", import.meta.url).pathname], {
+    stdout: "pipe", stderr: "pipe",
+  });
+  expect(new TextDecoder().decode(result.stderr)).toBe("");
+  expect(result.exitCode).toBe(0);
+  expect(new TextDecoder().decode(result.stdout)).toContain("SVG node reuse renderer oracle passed");
+}, 60_000);
