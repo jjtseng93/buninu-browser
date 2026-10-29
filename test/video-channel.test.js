@@ -75,7 +75,7 @@ function startLifecycleWorker(source,changed,report) {
   } catch(error) {dispose();throw error;}
 }
 
-test('closing before ready rejects promptly instead of waiting for the startup timeout',async()=>{
+test('closing before ready rejects promptly without a startup timeout',async()=>{
   const reports=[];
   const fixture=startLifecycleWorker('process.exit(7)',()=>{},report=>reports.push(report));
   let timer;

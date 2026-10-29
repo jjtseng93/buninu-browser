@@ -469,7 +469,13 @@ it to `buninu-browser.log` in the working directory, or set
 
 - page errors and page `console` output;
 - per-phase load timings;
-- renderer crashes and watchdog kills.
+- renderer crashes and explicitly enabled watchdog kills.
+
+Renderer and video-worker startup have no deadline. Document navigation also
+waits until completion, failure, or explicit close. The browser does not enable
+the renderer method watchdog by default: slow initialization or page work must
+not kill the renderer. Internal callers can opt into a method watchdog through
+`rendererTimeout`; this does not impose a startup or navigation deadline.
 
 Renderers cannot open files under seccomp, so the controller collects their
 output and writes the log.

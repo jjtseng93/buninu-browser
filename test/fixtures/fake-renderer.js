@@ -7,6 +7,15 @@ process.on("message", async (message) => {
   if (message?.type !== "call") return;
   const [argument] = message.params;
   switch (message.method) {
+    case "slow":
+      await Bun.sleep(200);
+      return process.send({ type: "result", id: message.id, result: "completed" });
+    case "showFragment":
+      await Bun.sleep(200);
+      return process.send({ type: "result", id: message.id, result: "positioned" });
+    case "loadDocument":
+      await Bun.sleep(argument.delay);
+      return process.send({ type: "result", id: message.id, result: "loaded" });
     case "configuration": return process.send({ type: "result", id: message.id, result: { args: process.argv, secret: process.env.BUNINU_TEST_PRIVATE_ENV } });
     case "echo": return process.send({ type: "result", id: message.id, result: { pid: process.pid, argument } });
     case "hang": for (;;) {}
@@ -24,4 +33,7 @@ process.on("message", async (message) => {
   }
 });
 process.on("disconnect", () => process.exit(0));
+const delay = Number(process.argv.find(arg => arg.startsWith('--ready-delay='))?.split('=')[1] ?? 0);
+if (process.argv.includes('--exit-before-ready')) process.exit(2);
+if (delay) await Bun.sleep(delay);
 process.send({ type: "ready" });
