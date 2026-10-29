@@ -96,9 +96,10 @@ the rest is passed on:
   argument goes to casty)
 - `--headless`: the engine alone, as
   a CDP endpoint
-- `--win32`, `--gtk`, `--appkit`,
-  `--qt`: native windowed frontends
-  (reserved, not implemented yet)
+- `--win32`: casty with a native Windows
+  window (Windows only)
+- `--gtk`, `--appkit`, `--qt`: native
+  windowed frontends (reserved, not implemented yet)
 - `--help`/`-h`, `--version`/`-V`,
   `--readme`: this launcher's help,
   version and backend details, and
