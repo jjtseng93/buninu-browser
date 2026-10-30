@@ -14,6 +14,7 @@
 ## Implementing the browser
 - Do not treat any website specially when refining browser features like layout css js. Fix the actual problem that all websites can benefit from.
 - If you don't know how to fix a specific bug, look at ../chromium implementation but don't copy LGPL code.
+- The graphics rendering of this browser should ensure CPU runs first. GPU acceleration must only be optional.
 
 ## Viewing files
 - No file is unviewable: every response the browser navigates to must show something, never a "cannot be shown" page
