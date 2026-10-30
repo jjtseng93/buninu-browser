@@ -50,12 +50,16 @@ npx buninu-browser github.com \
 # The engine alone, as a CDP
 # endpoint for any client
 npx buninu-browser --headless \
-  --remote-debugging-port=9222
+  --remote-debugging-port=9222 --window-size=1280,800
 
 # capture a page and exit
 npx buninu-browser --headless --screenshot=page.png \
   --window-size=1280,800 https://example.com
 ```
+
+`--window-size=WIDTH,HEIGHT` sets the initial viewport for both headless CDP
+and screenshot modes (default 800×600 CSS pixels, DPR 1). CDP clients can
+subsequently change it with `Emulation.setDeviceMetricsOverride`.
 
 Screenshot mode waits for the page's `load` event before capture. For content
 that appears later, add `--screenshot-wait=1000` (real milliseconds). The output

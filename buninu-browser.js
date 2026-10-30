@@ -50,7 +50,7 @@ Options:
   --chromium                      Use the previous desktop Chromium compatibility identity
                                   Last desktop identity flag wins; --mobile takes priority
   --screenshot[=FILE]             Capture one PNG and exit (default screenshot.png)
-  --window-size=WIDTH,HEIGHT      Viewport size for the screenshot (default 800,600)
+  --window-size=WIDTH,HEIGHT      Initial viewport size in CSS pixels (default 800,600)
   --screenshot-wait=MILLISECONDS  Wait after page load before capturing
   --version, -V                   Print the version
   --help, -h                      Print this help
