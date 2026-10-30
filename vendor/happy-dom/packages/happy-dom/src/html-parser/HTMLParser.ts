@@ -326,6 +326,17 @@ export default class HTMLParser {
 					break;
 			}
 
+			if (this.currentNode && this.readState === MarkupReadStateEnum.any &&
+				HTMLElementConfig[(<Element>this.currentNode)[PropertySymbol.localName]]?.contentModel === HTMLElementConfigContentModelEnum.rcdata) {
+				const tag = (<Element>this.currentNode)[PropertySymbol.localName];
+				const end = new RegExp('</' + tag + '(?=[\\t\\n\\f\\r />])[^>]*>', 'gi');
+				end.lastIndex = this.markupRegExp.lastIndex;
+				const closing = end.exec(html);
+				const text = html.slice(this.markupRegExp.lastIndex, closing?.index ?? html.length);
+				this.parseRawTextElementContent(tag, text);
+				this.markupRegExp.lastIndex = closing ? end.lastIndex : html.length;
+			}
+
 			lastIndex = this.markupRegExp.lastIndex;
 		}
 
@@ -601,7 +612,8 @@ export default class HTMLParser {
 			// Raw text elements (e.g. <script>) should be appended after the raw text has been added as content to the element.
 			// <html>, <head> and <body> are special elements with context constraints. They are already available in the document.
 			if (
-				(!config || config.contentModel !== HTMLElementConfigContentModelEnum.rawText) &&
+				(!config || (config.contentModel !== HTMLElementConfigContentModelEnum.rawText &&
+					config.contentModel !== HTMLElementConfigContentModelEnum.rcdata)) &&
 				this.nextElement !== documentElement &&
 				this.nextElement !== head &&
 				this.nextElement !== body
@@ -797,6 +809,11 @@ export default class HTMLParser {
 
 		// Plain text elements such as <script> and <style> should only contain text.
 		// Plain text elements should not decode entities. See #1564.
+		if (upperTagName === 'TEXTAREA' || upperTagName === 'TITLE') {
+			text = XMLEncodeUtility.decodeHTMLEntities(text.replace(/\r\n?/g, '\n').replace(/\0/g, '\uFFFD'));
+			// The tree builder ignores one leading LF in a textarea start tag.
+			if (upperTagName === 'TEXTAREA' && text.startsWith('\n')) text = text.slice(1);
+		}
 		this.currentNode![PropertySymbol.appendChild](this.rootDocument!.createTextNode(text), true);
 
 		const rawTextElement = this.currentNode;

@@ -78,7 +78,7 @@ export default <
 	},
 	textarea: {
 		className: 'HTMLTextAreaElement',
-		contentModel: HTMLElementConfigContentModelEnum.anyDescendants
+		contentModel: HTMLElementConfigContentModelEnum.rcdata
 	},
 	script: {
 		className: 'HTMLScriptElement',
@@ -499,7 +499,7 @@ export default <
 	},
 	title: {
 		className: 'HTMLTitleElement',
-		contentModel: HTMLElementConfigContentModelEnum.anyDescendants
+		contentModel: HTMLElementConfigContentModelEnum.rcdata
 	},
 	tr: {
 		className: 'HTMLTableRowElement',

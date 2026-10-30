@@ -169,3 +169,22 @@ test("global variable reads go through the script's global binding, keeping thei
   // A block-level function outside functions (Annex B) leaves the script's identifiers as written.
   expect(rewriteClassicScript("{ function b() {} } b(Q);").code).not.toContain("$buninu$g");
 });
+
+test('global-read rewrites preserve automatic semicolons and original function source', () => {
+  const source = `function convert() {
+    let a = input.value
+    output.value = a
+    if (a) output.extra = input.value
+    output.done = true
+    for (let i=0;i<1;i++) output.count = i
+    return
+    output.unreachable = true
+  }`;
+  const rewritten = rewriteClassicScriptSource(source);
+  const g = {input:{value:'text'},output:{},$buninu$self:x=>x};
+  g.$buninu$ref = referenceHelper(g);
+  Function('globalThis', 'input', 'output', `let convert; ${rewritten.code}; globalThis.convert=convert;`)(g,g.input,g.output);
+  g.convert();
+  expect(g.output).toEqual({value:'text',extra:'text',done:true,count:0});
+  expect(restoreSourceText(g.convert.toString())).toBe(source);
+});

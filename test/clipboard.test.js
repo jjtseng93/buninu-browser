@@ -52,3 +52,19 @@ test('clipboard read is one-shot, preserves empty/text values, and prefers xclip
  await Bun.sleep(30);expect(calls).toHaveLength(2);
  await expect(readClipboard({...options,which:()=>null})).rejects.toThrow('No working');
 });
+
+test('execCommand copy snapshots a temporary selected textarea and uses the existing host clipboard',async()=>{
+ const copies=[];const host=new RendererHost({clipboardWrite:async text=>{await Bun.sleep(10);copies.push(text);}});
+ try {
+  await host.call('loadDocument',{url:'http://clipboard.test/',contentType:'text/html',source:`<body style="margin:0"><button style="width:200px;height:60px" onclick="copyText()">Copy</button><script>
+  function copyText(){const field=document.createElement('textarea');field.value='line 1\\n中文 😀';document.body.append(field);field.select();window.copied=document.execCommand('copy');field.remove();}
+  </script>`});
+  await host.call('whenLoaded');
+  expect(await host.call('evaluate',`document.queryCommandSupported('copy')`)).toBe(true);
+  await host.call('evaluate','copyText()');expect(await host.call('evaluate','copied')).toBe(false);expect(copies).toEqual([]);
+  await host.call('click',30,20);
+  for(let i=0;i<40&&!copies.length;i++)await Bun.sleep(25);
+  expect(copies).toEqual(['line 1\n中文 😀']);
+  expect(await host.call('evaluate','copied')).toBe(true);
+ }finally{host.close();}
+},20000);
