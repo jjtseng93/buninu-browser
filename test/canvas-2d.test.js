@@ -1,6 +1,6 @@
 import { beforeAll, expect, test } from "bun:test";
 import CanvasKitInit from "../usr/lib/canvaskit/canvaskit.js";
-import { canvasContext, resetCanvas, setCanvasKit, disposeDocumentCanvases } from "../lib/renderer/canvas-2d.js";
+import { canvasResource, canvasContext, resetCanvas, setCanvasKit, disposeDocumentCanvases } from "../lib/renderer/canvas-2d.js";
 
 let CanvasKit;
 
@@ -134,4 +134,73 @@ test("discarding a document frees its connected and detached canvas pixel buffer
     CanvasKit._malloc = malloc;
     CanvasKit._free = free;
   }
+});
+
+
+test("CPU WebGL redraws moved geometry without painting outside its coverage", () => {
+  const node=canvas(64,64),gl=canvasContext(node,'webgl'),program=gl.createProgram();
+  for(const [type,source] of [[gl.VERTEX_SHADER,'attribute vec2 position; uniform float dx; varying vec3 color; void main(){color=vec3(1.0,0.0,0.0);gl_Position=vec4(position+vec2(dx,0.0),0.0,1.0);}'],
+    [gl.FRAGMENT_SHADER,'precision highp float; varying vec3 color; void main(){gl_FragColor=vec4(color,1.0);}']]){
+    const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);
+    expect(gl.getShaderInfoLog(shader)).toBe('');gl.attachShader(program,shader);
+  }
+  gl.linkProgram(program);gl.useProgram(program);
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-.75,-.5,-.25,-.5,-.5,.5]),gl.STATIC_DRAW);
+  const a=gl.getAttribLocation(program,'position');gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,2,gl.FLOAT,false,0,0);
+  const dx=gl.getUniformLocation(program,'dx');
+  const pixel=(x,y)=>Array.from(canvasResource(node).image.readPixels(x,y,{width:1,height:1,colorType:CanvasKit.ColorType.RGBA_8888,alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB}));
+  gl.clearColor(0,0,1,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
+  expect(pixel(16,32)).toEqual([255,0,0,255]);expect(pixel(48,32)).toEqual([0,0,255,255]);
+  gl.uniform1f(dx,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
+  expect(pixel(16,32)).toEqual([0,0,255,255]);expect(pixel(48,32)).toEqual([255,0,0,255]);
+  gl.uniform1f(dx,4);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
+  expect(pixel(48,32)).toEqual([0,0,255,255]);expect(gl.getError()).toBe(0);
+});
+
+test('CPU WebGL samples uploaded RGBA textures and preserves upload snapshots',()=>{
+ const node=canvas(16,16),gl=canvasContext(node,'webgl'),p=gl.createProgram();
+ for(const [kind,source] of [[gl.VERTEX_SHADER,'attribute vec2 p; varying vec2 uv; void main(){gl_Position=vec4(p,0.,1.);uv=(p+1.)*.5;}'],[gl.FRAGMENT_SHADER,'precision highp float; varying vec2 uv; uniform sampler2D image; void main(){gl_FragColor=texture2D(image,uv);}']]){
+  const s=gl.createShader(kind);gl.shaderSource(s,source);gl.compileShader(s);expect(gl.getShaderInfoLog(s)).toBe('');gl.attachShader(p,s);
+ }
+ gl.linkProgram(p);gl.useProgram(p);gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+ gl.bindTexture(gl.TEXTURE_2D,gl.createTexture());gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,2,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([255,0,0,255,0,0,255,255]));gl.drawArrays(gl.TRIANGLES,0,6);
+ const read=y=>Array.from(canvasResource(node).image.readPixels(8,y,{width:1,height:1,colorType:CanvasKit.ColorType.RGBA_8888,alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB}));
+ expect(read(2)).toEqual([0,0,255,255]);expect(read(13)).toEqual([255,0,0,255]);expect(gl.getError()).toBe(0);
+});
+
+test('cached background shading follows moving depth occluders and LEQUAL preserves coplanar copies',()=>{
+ const node=canvas(32,32),gl=canvasContext(node,'webgl'),p=gl.createProgram();
+ for(const [kind,source]of[[gl.VERTEX_SHADER,'attribute vec2 p;uniform float dx;uniform float z;void main(){gl_Position=vec4(p+vec2(dx,0.),z,1.);}'],[gl.FRAGMENT_SHADER,'precision highp float;uniform vec4 color;void main(){gl_FragColor=color;}']]){
+  const sh=gl.createShader(kind);gl.shaderSource(sh,source);gl.compileShader(sh);expect(gl.getShaderInfoLog(sh)).toBe('');gl.attachShader(p,sh);
+ }
+ gl.linkProgram(p);gl.useProgram(p);const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+ gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
+ const dx=gl.getUniformLocation(p,'dx'),z=gl.getUniformLocation(p,'z'),color=gl.getUniformLocation(p,'color');
+ const quad=(left,right,offset,depth,rgba)=>{gl.uniform1f(dx,offset);gl.uniform1f(z,depth);gl.uniform4fv(color,rgba);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([left,-1,right,-1,left,1,left,1,right,-1,right,1]),gl.STATIC_DRAW);gl.drawArrays(gl.TRIANGLES,0,6);};
+ const pixel=x=>Array.from(canvasResource(node).image.readPixels(x,16,{width:1,height:1,colorType:CanvasKit.ColorType.RGBA_8888,alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB}));
+ for(const offset of[0,1,0]){
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  quad(-1,0,offset,-.123456789,[1,0,0,1]);quad(-1,1,0,.3,[0,0,1,1]);
+  expect(pixel(offset?24:8)).toEqual([255,0,0,255]);expect(pixel(offset?8:24)).toEqual([0,0,255,255]);
+ }
+ gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+ quad(-1,1,0,.123456789,[1,0,0,1]);quad(-1,1,0,.123456789,[0,1,0,1]);
+ const image=canvasResource(node).image.readPixels(0,0,{width:32,height:32,colorType:CanvasKit.ColorType.RGBA_8888,alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB});
+ for(let i=0;i<image.length;i+=4)expect(Array.from(image.slice(i,i+4))).toEqual([0,255,0,255]);expect(gl.getError()).toBe(0);
+});
+
+test('texture alpha is unpremultiplied in both numeric and CanvasKit fragment paths',()=>{
+ for(const native of[false,true]){
+  const node=canvas(8,8),gl=canvasContext(node,'webgl'),p=gl.createProgram();
+  for(const [kind,source]of[[gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'],[gl.FRAGMENT_SHADER,`precision highp float;uniform sampler2D image;void main(){vec4 c=texture2D(image,vec2(.5));${native?'for(int i=0;i<1;i++){c.r+=0.;}':''}gl_FragColor=c;}`]]){
+   const sh=gl.createShader(kind);gl.shaderSource(sh,source);gl.compileShader(sh);expect(gl.getShaderInfoLog(sh)).toBe('');gl.attachShader(p,sh);
+  }
+  gl.linkProgram(p);gl.useProgram(p);gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+  gl.bindTexture(gl.TEXTURE_2D,gl.createTexture());gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([200,100,50,128]));
+  gl.clearColor(0,0,1,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,6);
+  const pixel=canvasResource(node).image.readPixels(2,2,{width:1,height:1,colorType:CanvasKit.ColorType.RGBA_8888,alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB});
+  for(let i=0;i<4;i++)expect(Math.abs(pixel[i]-[100,50,152,255][i])).toBeLessThanOrEqual(1);
+ }
 });
