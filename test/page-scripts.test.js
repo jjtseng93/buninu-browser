@@ -2304,3 +2304,18 @@ test("NodeIterator validates nullable callback-interface filters at creation", a
     return JSON.stringify(results);
   })()`)).toBe(JSON.stringify([...Array(8).fill('TypeError'),...Array(5).fill(true)]));
 });
+
+
+test("mouse offsets use target padding edges and CSS pixels, including bubbling and canvas scaling", async () => {
+  await load(`<body style="margin:0"><div id="parent"><canvas id="cv" width="1200" height="1200"
+    style="position:absolute;left:40px;top:30px;width:300px;height:300px;border:5px solid;padding:10px"></canvas></div>
+    <script>
+      window.offsets=[];
+      cv.onclick=e=>{window.lastMouse=e;offsets.push([e.offsetX,e.offsetY]);};
+      document.getElementById('parent').addEventListener('click',e=>offsets.push([e.offsetX,e.offsetY]));
+    </script>`);
+  await renderer.call("click", 75, 85);
+  expect(await evaluate("offsets")).toEqual([[30,50],[30,50]]);
+  expect(await evaluate("[lastMouse.offsetX,lastMouse.offsetY]")).toEqual([75,85]);
+  expect(await evaluate("(()=>{const e=new MouseEvent('click',{clientX:12,clientY:14});return [e.offsetX,e.offsetY]})()")).toEqual([12,14]);
+});

@@ -1,17 +1,26 @@
 <!doctype html><meta charset="utf-8"><title>CPU WebGL triangle</title>
 <style>body{background:#222;color:white}canvas{border:1px solid white}</style>
-<h1>CPU WebGL / CanvasKit</h1><canvas width="320" height="240"></canvas><pre id="result"></pre>
+<h1>CPU WebGL / CanvasKit</h1><p>Click left/right to move. Drag horizontally to rotate.</p><canvas draggable="true" width="320" height="240"></canvas><pre id="result"></pre>
 <script>
 const canvas=document.querySelector('canvas'),gl=canvas.getContext('webgl');
 function compile(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;}
 try{
  const p=gl.createProgram();
- gl.attachShader(p,compile(gl.VERTEX_SHADER,'attribute vec3 position; varying vec3 color; void main(){color=position*0.5+0.5;gl_Position=vec4(position,1.0);}'));
+ gl.attachShader(p,compile(gl.VERTEX_SHADER,'attribute vec3 position; uniform float dx; uniform float angle; varying vec3 color; void main(){color=position*0.5+0.5;vec2 p=mat2(cos(angle),sin(angle),-sin(angle),cos(angle))*position.xy;gl_Position=vec4(p+vec2(dx,0.0),position.z,1.0);}'));
  gl.attachShader(p,compile(gl.FRAGMENT_SHADER,'precision highp float; varying vec3 color;void main(){gl_FragColor=vec4(color,1.0);}'));
  gl.linkProgram(p);gl.useProgram(p);
  const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-.8,-.8,0,.8,-.8,0,0,.8,0]),gl.STATIC_DRAW);
  const a=gl.getAttribLocation(p,'position');gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,3,gl.FLOAT,false,0,0);
- gl.clearColor(.05,.1,.15,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
- document.querySelector('pre').textContent='error='+gl.getError();
+ let dx=0,angle=0,start=0;
+ const offset=gl.getUniformLocation(p,'dx'),rotation=gl.getUniformLocation(p,'angle');
+ function draw(){
+   gl.uniform1f(offset,dx);gl.uniform1f(rotation,angle);
+   gl.clearColor(.05,.1,.15,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
+   document.querySelector('pre').textContent=`offset=${dx.toFixed(2)} angle=${angle.toFixed(2)} error=${gl.getError()}`;
+ }
+ canvas.onclick=e=>{dx+=e.offsetX<canvas.clientWidth/2?-.1:.1;draw();};
+ canvas.ondragstart=e=>{start=e.offsetX;e.dataTransfer.setData('text/plain','rotate');};
+ canvas.ondragend=e=>{angle+=(e.offsetX-start)/100;draw();};
+ draw();
 }catch(e){document.querySelector('pre').textContent=e.stack;}
 </script>

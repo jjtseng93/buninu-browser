@@ -102,3 +102,36 @@ test('pointer bursts preserve drawing points while batching raster work',async()
  const [exit,stderr]=await Promise.all([child.exited,new Response(child.stderr).text()]);
  expect(stderr).toBe('');expect(exit).toBe(0);
 },15000);
+
+test('HTML draggable canvas emits offsets, protected text data and dragend without a click',async()=>{
+ const b=await createBrowser({spareRenderer:false}),server=CdpServer.create(b.context).listen(0),c=new CDP(`ws://127.0.0.1:${server.port}/devtools/browser/cdp-server`);
+ try{
+  await c.send('Page.navigate',{url:'data:text/html,'+encodeURIComponent(`<body style="margin:0"><canvas id="cv" draggable="true" width="300" height="300"></canvas><script>
+  window.events=[];window.cancelDrag=false;
+  cv.ondragstart=e=>{events.push([e.type,e.offsetX,e.offsetY,e instanceof DragEvent]);e.dataTransfer.setData('text/plain','drag');if(cancelDrag)e.preventDefault()};
+  cv.ondragover=e=>{events.push([e.type,e.dataTransfer.getData('text/plain')]);e.preventDefault()};
+  cv.ondrop=e=>events.push([e.type,e.dataTransfer.getData('text/plain')]);
+  cv.ondragend=e=>events.push([e.type,e.offsetX,e.offsetY]);
+  cv.onclick=()=>events.push(['click']);</script>`)});
+  const send=(type,x,y)=>c.send('Input.dispatchMouseEvent',{type,x,y,button:'left',clickCount:1});
+  await send('mousePressed',30,40);await send('mouseMoved',160,170);await send('mouseReleased',160,170);
+  expect(await c.evaluate('events')).toEqual([['dragstart',30,40,true],['dragover',''],['drop','drag'],['dragend',160,170]]);
+  await c.evaluate('events=[];cancelDrag=true');
+  await send('mousePressed',30,40);await send('mouseMoved',160,170);await send('mouseReleased',160,170);
+  expect((await c.evaluate('events')).some(e=>e[0]==='dragend')).toBe(false);
+  await c.evaluate('events=[];cancelDrag=false');
+  await send('mousePressed',30,40);await send('mouseMoved',160,170);
+  await c.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+  expect((await c.evaluate('events')).map(e=>e[0])).toEqual(['dragstart','dragover','dragend']);
+ }finally{c.close();server.stop(true);b.close()}
+},30000);
+
+test('CSS rotation transforms painting bounds and inversely maps pointer offsets',async()=>{
+ const b=await createBrowser({spareRenderer:false}),server=CdpServer.create(b.context).listen(0),c=new CDP(`ws://127.0.0.1:${server.port}/devtools/browser/cdp-server`);
+ try{
+  await c.send('Page.navigate',{url:'data:text/html,'+encodeURIComponent(`<style>body{margin:0}canvas{position:absolute;left:100px;top:100px;width:200px;height:100px;transform:rotate(90deg)}</style><canvas id="cv"></canvas><script>window.clicks=[];cv.onclick=e=>clicks.push([e.offsetX,e.offsetY]);</script>`)});
+  const r=await c.evaluate('cv.getBoundingClientRect().toJSON()');expect(r.left).toBeCloseTo(150);expect(r.top).toBeCloseTo(50);expect(r.width).toBeCloseTo(100);expect(r.height).toBeCloseTo(200);
+  for(const type of ['mousePressed','mouseReleased'])await c.send('Input.dispatchMouseEvent',{type,x:175,y:90,button:'left',clickCount:1});
+  const hits=await c.evaluate('clicks');expect(hits.length).toBe(1);expect(hits[0][0]).toBeCloseTo(40);expect(hits[0][1]).toBeCloseTo(75);
+ }finally{c.close();server.stop(true);b.close()}
+},30000);
