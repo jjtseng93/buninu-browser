@@ -127,6 +127,12 @@ CDP exposes `Page.javascriptDialogOpening`, `Page.javascriptDialogClosed`
 and `Page.handleJavaScriptDialog` for automation. Ordinary pointer and
 keyboard input can also operate the displayed dialog.
 
+File inputs also use a browser-owned chooser: click folders or enter a folder
+path, select files, then Open (or Cancel/Escape). Multiple selection and
+asynchronous `FileReader` are supported. Only selected file contents and names
+reach the page, not their host paths. The current chooser accepts at most
+32 MiB per selection; it does not yet filter the listing by `accept`.
+
 ### Websites with self-signed certificates
 
 To browse a website with an untrusted self-signed HTTPS certificate, set
@@ -378,6 +384,36 @@ Documents load in stages:
 `Page.navigate` returns at the first paint. `DOMContentLoaded` and `load`
 are reported over CDP when the page reaches them. Every visible change
 pushes a screencast frame.
+
+### Experimental CPU WebGL
+
+`canvas.getContext('webgl')` has a software-only triangle rendering subset for
+basic Three.js scenes. It uses the bundled CanvasKit shader compiler, with a
+bounded numeric JavaScript shader path for supported expressions. Unsupported
+numeric syntax keeps the CanvasKit path. It does not require a GPU or a new
+native dependency. Depth testing, perspective varyings and basic 2D image/canvas
+textures are supported; this is not a conformant or complete WebGL implementation
+(framebuffers, cube maps, mipmaps and general blending remain incomplete).
+
+The renderer defers unobserved draws, caches exact geometry/shading results while
+reapplying current depth, and skips polygon clipping for meshes wholly inside
+the view. CSS rotation, canvas-local pointer coordinates, HTML drag events and
+detached image loading use the ordinary browser paths rather than Three.js
+special cases.
+
+The interactive reference is the [Three.js stereo scene](https://drjohnjstest.blogspot.com/2023/11/3dsbsthreejsdemo.html).
+Run `bun test/manual-threejs-scene.js` for its buttons, prompt, orientation and
+drag checks. Pass a folder containing `floor.jpg` and `wall.jpg` to also exercise
+the file chooser and room textures; optional `小凱L.png` / `小凱R.png` exercise
+stereo-image import. A second argument sets the output directory. This network
+check is separate from `bun test`; Copy was also checked through the existing
+browser clipboard callback without replacing the user's clipboard.
+
+For completed-frame timings, run
+`bun test/manual-webgl-benchmark.js buninu /path/to/assets`; replace `buninu`
+with `chromium` for a reference (select a software Vulkan ICD when comparing CPU
+rendering). It records both canvas sizes, frame times and a screenshot. These
+timings exclude CDP screenshot encoding and terminal presentation.
 
 ### Mobile presentation
 
