@@ -41,7 +41,8 @@ test("a colour reads back stably, and one CanvasKit cannot parse is black", () =
   expect(sample(context, "rgba(1, 2, 3, 0.5)")).toEqual([1, 2, 3, 128]);
   expect(context.getImageData(0, 0, 1, 1).data.length).toBe(4);
   expect(context.getImageData(0, 0, 1, 1).data[3]).toBe(0);
-  expect(canvasContext(canvas(), "webgl")).toBeNull();
+  expect(canvasContext(canvas(), "webgl2")).toBeNull();
+  expect(canvasContext(canvas(), "webgl").getParameter(0x1F01)).toBe("CanvasKit CPU");
 });
 
 test("the same canvas keeps one context, and changing width clears it", () => {

@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><title>CPU WebGL triangle</title>
+<style>body{background:#222;color:white}canvas{border:1px solid white}</style>
+<h1>CPU WebGL / CanvasKit</h1><canvas width="320" height="240"></canvas><pre id="result"></pre>
+<script>
+const canvas=document.querySelector('canvas'),gl=canvas.getContext('webgl');
+function compile(type,source){const s=gl.createShader(type);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;}
+try{
+ const p=gl.createProgram();
+ gl.attachShader(p,compile(gl.VERTEX_SHADER,'attribute vec3 position; varying vec3 color; void main(){color=position*0.5+0.5;gl_Position=vec4(position,1.0);}'));
+ gl.attachShader(p,compile(gl.FRAGMENT_SHADER,'precision highp float; varying vec3 color;void main(){gl_FragColor=vec4(color,1.0);}'));
+ gl.linkProgram(p);gl.useProgram(p);
+ const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-.8,-.8,0,.8,-.8,0,0,.8,0]),gl.STATIC_DRAW);
+ const a=gl.getAttribLocation(p,'position');gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a,3,gl.FLOAT,false,0,0);
+ gl.clearColor(.05,.1,.15,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
+ document.querySelector('pre').textContent='error='+gl.getError();
+}catch(e){document.querySelector('pre').textContent=e.stack;}
+</script>
