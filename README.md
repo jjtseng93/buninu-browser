@@ -112,6 +112,21 @@ the rest is passed on:
 casty's and the engine's options:
 `--casty --help`, `--headless --help`.
 
+### JavaScript dialogs
+
+`alert()`, `confirm()` and `prompt()` show a browser-owned modal dialog in the
+page image, including through Casty and the Wayland frontend. For example,
+enter `javascript:alert(1+2)` in the address bar. Alert has an OK button;
+confirm and prompt also have Cancel. Enter accepts, Escape dismisses, and
+prompt initially selects its default text. Long messages scroll and their
+text can be selected and copied. Page scripts wait synchronously for the
+answer; confirm returns a boolean and a cancelled prompt returns `null`.
+The dialog lives in a separate renderer, outside the page's DOM and realm.
+
+CDP exposes `Page.javascriptDialogOpening`, `Page.javascriptDialogClosed`
+and `Page.handleJavaScriptDialog` for automation. Ordinary pointer and
+keyboard input can also operate the displayed dialog.
+
 ### Websites with self-signed certificates
 
 To browse a website with an untrusted self-signed HTTPS certificate, set

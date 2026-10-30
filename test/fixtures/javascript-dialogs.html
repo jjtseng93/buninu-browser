@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>JavaScript dialogs</title>
+<style>body{font:20px sans-serif;padding:24px}button{font:inherit;margin:8px;padding:12px}#result{white-space:pre-wrap}</style>
+<h1>Browser-owned dialogs</h1>
+<button onclick="alert(1+2)">alert(1+2)</button>
+<button onclick="alert(Array.from({length:200},(_,i)=>'Line '+(i+1)+' — 可以選取、複製和捲動的訊息').join('\n'))">Long selectable alert</button>
+<button onclick="document.getElementById('result').textContent='confirm: '+confirm('Continue?')">Confirm</button>
+<button onclick="document.getElementById('result').textContent='prompt: '+JSON.stringify(prompt('Your name','預設文字'))">Prompt</button>
+<pre id="result">Try Enter, Escape, Tab, mouse selection, copying, scrolling and resizing.</pre>
