@@ -237,3 +237,58 @@ test("an svg without width and height fills its container and keeps its viewBox'
   expect(run("#sized")).toMatchObject({ width: 10, height: 5 });
   expect(run("#bare")).toMatchObject({ width: 24, height: 150 });
 });
+
+test("aspect-ratio sizes bottom-anchored controls and centers a percentage-width grid child", () => {
+  const { box } = render(`<div class="stage"><div class="pad"><div class="knob"></div></div><button class="fire">!</button></div>`,
+    `* { box-sizing:border-box } .stage { position:relative; width:400px; height:300px }
+     .pad { position:absolute; left:20px; bottom:20px; width:150px; aspect-ratio:1; border:2px solid; display:grid; place-items:center }
+     .knob { width:42%; aspect-ratio:1 }
+     .fire { position:absolute; right:20px; bottom:20px; width:100px; aspect-ratio:1; border:2px solid; padding:4px }`);
+  expect(box('.pad')).toEqual({ x:20, y:130, width:150, height:150 });
+  expect(box('.knob').width).toBeCloseTo(61.32);
+  expect(box('.knob').height).toBeCloseTo(61.32);
+  expect(box('.knob').x).toBeCloseTo(64.34);
+  expect(box('.knob').y).toBeCloseTo(174.34);
+  expect(box('.fire')).toEqual({ x:280, y:180, width:100, height:100 });
+});
+
+test("aspect-ratio respects box-sizing, definite dimensions and height constraints", () => {
+  const { box } = render(`<div id="content"></div><div id="border"></div><div id="height"></div>
+    <div id="both"></div><div id="clamped"><div id="percent"></div></div>`,
+    `#content,#border { width:100px; aspect-ratio:2; padding:10px; border:2px solid }
+     #border { box-sizing:border-box }
+     #height { height:40px; aspect-ratio:2 }
+     #both { width:100px; height:30px; aspect-ratio:1 }
+     #clamped { width:100px; aspect-ratio:1; max-height:40px }
+     #percent { height:50% }`);
+  expect(box('#content')).toMatchObject({ width:124, height:74 });
+  expect(box('#border')).toMatchObject({ width:100, height:50 });
+  expect(box('#height')).toMatchObject({ width:80, height:40 });
+  expect(box('#both')).toMatchObject({ width:100, height:30 });
+  expect(box('#clamped').height).toBe(40);
+  expect(box('#percent').height).toBe(20);
+});
+
+test("grid normal alignment preserves an item's preferred ratio while explicit stretch can override it", () => {
+  const { box } = render(`<div class="grid"><div id="normal"></div></div><div class="grid"><div id="stretch"></div></div>`,
+    `.grid { display:grid; width:100px; height:200px } .grid>div { width:100px; aspect-ratio:1 }
+     #stretch { align-self:stretch }`);
+  expect(box('#normal')).toMatchObject({ width:100, height:100 });
+  expect(box('#stretch')).toMatchObject({ width:100, height:200 });
+});
+
+test("aspect-ratio preserves the automatic content minimum unless min-height allows overflow", () => {
+  const { box } = render(`<div class="ratio" id="auto"><div></div></div><div class="ratio" id="zero"><div></div></div>`,
+    `.ratio { width:100px; aspect-ratio:2 } .ratio>div { height:80px } #zero { min-height:0 }`);
+  expect(box('#auto').height).toBe(80);
+  expect(box('#zero').height).toBe(50);
+});
+
+test("replaced elements use an explicit aspect-ratio or their natural ratio with auto", () => {
+  const { box } = render(`<canvas id="override" width="200" height="100"></canvas>
+    <canvas id="natural" width="200" height="100"></canvas><canvas id="degenerate" width="200" height="100"></canvas>`,
+    `canvas { display:block; width:80px } #override { aspect-ratio:1 } #natural { aspect-ratio:auto 1 } #degenerate { aspect-ratio:0 / 1 }`);
+  expect(box('#override')).toMatchObject({ width:80, height:80 });
+  expect(box('#natural')).toMatchObject({ width:80, height:40 });
+  expect(box('#degenerate')).toMatchObject({ width:80, height:40 });
+});

@@ -957,3 +957,21 @@ test("form controls default to readable dark text but author colors still win", 
     expect(styles.get(document.querySelector('#custom')).color).toBe('rgba(255, 0, 0, 1)');
   } finally {window.happyDOM.abort()}
 });
+
+test("aspect-ratio parses ratios, auto fallback, inheritance and invalid declarations", () => {
+  const { document, window } = parseHTMLDocument(`<div id="a" style="aspect-ratio:16 / 9"><div id="b" style="aspect-ratio:inherit"></div><div id="c"></div></div>
+    <div id="auto" style="aspect-ratio:2 auto"></div><div id="zero" style="aspect-ratio:0 / 1"></div>
+    <div id="invalid" style="aspect-ratio:3 / 2;aspect-ratio:1 auto / 2;aspect-ratio:-1;aspect-ratio:1 / 2 / 3"></div>
+    <div id="reset" style="aspect-ratio:2;aspect-ratio:auto"></div>`);
+  try {
+    const styles = new StyleEngine().compute(document);
+    const ratio = id => styles.get(document.getElementById(id)).aspectRatio;
+    expect(ratio('a')).toEqual({ numerator:16, denominator:9, auto:false });
+    expect(ratio('b')).toEqual(ratio('a'));
+    expect(ratio('c')).toBeNull();
+    expect(ratio('auto')).toEqual({ numerator:2, denominator:1, auto:true });
+    expect(ratio('zero')).toEqual({ numerator:0, denominator:1, auto:false });
+    expect(ratio('invalid')).toEqual({ numerator:3, denominator:2, auto:false });
+    expect(ratio('reset')).toBeNull();
+  } finally { window.happyDOM.abort(); }
+});
