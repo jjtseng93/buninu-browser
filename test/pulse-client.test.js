@@ -384,3 +384,32 @@ test("timing rejection permits a retry and a late rejection after kill stays sil
     expect(times).toEqual([]);
   });
 });
+
+test('live audio adapts to slow renderer replies without a media reserve or an unbounded device queue',async()=>{
+  await playbackTimers(async({client,sent,advance})=>{
+    const requests=[];
+    client.playbackTiming=()=>({writeIndex:0,readIndex:0,sinkSeconds:0,playing:false});
+    const stream=await client.openPlayback({rate:500,channels:1,leadSeconds:.12,adaptiveLead:true,
+      onRequest:bytes=>requests.push(bytes),onTiming:()=>{}});
+    // Even a renderer that has not replied gets only a bounded live request.
+    expect(requests.reduce((a,b)=>a+b,0)).toBeLessThanOrEqual(170);
+    await advance(250);
+    stream.write(new Uint8Array(1000));
+    const total=()=>sent.reduce((a,p)=>a+p.bytes,0);
+    expect(total()).toBe(350); // 250 ms observed response + 100 ms headroom
+    await advance(2000);
+    expect(total()).toBe(350); // stale playback clock cannot flood the sink
+    expect(requests.reduce((a,b)=>a+b,0)).toBeLessThanOrEqual(500);
+    stream.kill();expect(stream.queued).toBe(0);
+    sent.length=0;
+    const slow=await client.openPlayback({rate:500,channels:1,leadSeconds:.12,adaptiveLead:true,
+      onRequest:()=>{},onTiming:()=>{}});
+    await advance(1500);slow.write(new Uint8Array(2000));
+    expect(total()).toBe(500); // even extreme stalls stop at half a second
+    slow.kill();sent.length=0;
+    const fast=await client.openPlayback({rate:500,channels:1,leadSeconds:.12,adaptiveLead:true,
+      onRequest:()=>{},onTiming:()=>{}});
+    fast.write(new Uint8Array(1000));expect(total()).toBe(120);
+    fast.kill();
+  });
+});
