@@ -8,18 +8,17 @@ import { createPageRenderer, loadGraphics } from '../../lib/renderer/page-render
 const { CanvasKit: kit } = await loadGraphics();
 lockdown({ errorTaming: 'safe', overrideTaming: 'severe', consoleTaming: 'unsafe',
   localeTaming: 'unsafe', stackFiltering: 'concise', reporting: 'none' });
-const malloc = kit._malloc, free = kit._free, makeSurface = kit.MakeSurface;
+const malloc = kit._malloc, free = kit._free, makeSurface = kit.MakeSurface, makeRasterDirectSurface = kit.MakeRasterDirectSurface;
 const allocations = new Map(), surfaces = new Set(), images = new Set();
 const errors = [];
 let reads = 0, failAt = Infinity;
 kit._malloc = size => { const pointer = malloc(size); allocations.set(pointer, size); return pointer; };
 kit._free = pointer => { allocations.delete(pointer); return free(pointer); };
-kit.MakeSurface = (...args) => {
-  const surface = makeSurface(...args);
+const trackSurface = surface => {
   if (!surface) return surface;
   surfaces.add(surface);
-  const dispose = surface.dispose.bind(surface), snapshot = surface.makeImageSnapshot.bind(surface);
-  surface.dispose = () => { surfaces.delete(surface); return dispose(); };
+  const releaseSurface = surface.delete.bind(surface), snapshot = surface.makeImageSnapshot.bind(surface);
+  surface.delete = () => { surfaces.delete(surface); return releaseSurface(); };
   surface.makeImageSnapshot = (...args) => {
     const image = snapshot(...args), release = image.delete.bind(image), read = image.readPixels.bind(image);
     images.add(image);
@@ -32,6 +31,8 @@ kit.MakeSurface = (...args) => {
   };
   return surface;
 };
+kit.MakeSurface = (...args) => trackSurface(makeSurface(...args));
+kit.MakeRasterDirectSurface = (...args) => trackSurface(makeRasterDirectSurface(...args));
 const liveBytes = () => [...allocations.values()].reduce((sum, size) => sum + size, 0);
 let warmBytes;
 try {
@@ -107,4 +108,5 @@ try {
   kit._malloc = malloc;
   kit._free = free;
   kit.MakeSurface = makeSurface;
+  kit.MakeRasterDirectSurface = makeRasterDirectSurface;
 }

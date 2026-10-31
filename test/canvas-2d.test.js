@@ -38,7 +38,8 @@ test("a colour reads back stably, and one CanvasKit cannot parse is black", () =
   expect(context.fillStyle).toBe("#000000");
   expect(sample(context, "not-a-color")).toEqual([0, 0, 0, 255]);
   expect(sample(context, "red")).toEqual([255, 0, 0, 255]);
-  expect(sample(context, "rgba(1, 2, 3, 0.5)")).toEqual([1, 2, 3, 128]);
+  // Like Chromium, an 8-bit premultiplied backing store rounds RGB at low alpha.
+  expect(sample(context, "rgba(1, 2, 3, 0.5)")).toEqual([2, 2, 4, 128]);
   expect(context.getImageData(0, 0, 1, 1).data.length).toBe(4);
   expect(context.getImageData(0, 0, 1, 1).data[3]).toBe(0);
   expect(canvasContext(canvas(), "webgl2")).toBeNull();
@@ -256,4 +257,36 @@ test('drawImage honors smoothing and zero destination width',()=>{
   expect(blended[0]).toBeGreaterThan(0);expect(blended[2]).toBeGreaterThan(0);
   ctx.drawImage(source,0,2,0,1);
   expect([...ctx.getImageData(0,2,1,1).data]).toEqual([0,0,0,0]);
+});
+
+test('pixel-aligned pattern blits match shader fills including clips, alpha and repetition limits',()=>{
+  const source=canvas(3,3),src=canvasContext(source,'2d');
+  src.fillStyle='rgba(200,40,20,.5)';src.fillRect(0,0,3,3);
+  src.fillStyle='blue';src.fillRect(1,1,1,1);
+  for(const repetition of ['repeat','repeat-x','repeat-y','no-repeat']){
+    const outputs=[];
+    for(const smooth of [false,true]){
+      const target=canvas(8,6),ctx=canvasContext(target,'2d');
+      ctx.fillStyle='green';ctx.fillRect(0,0,8,6);
+      ctx.imageSmoothingEnabled=smooth;ctx.globalAlpha=.6;
+      const pattern=ctx.createPattern(source,repetition);
+      pattern.setTransform({a:1,b:0,c:0,d:1,e:-1,f:1});ctx.fillStyle=pattern;
+      ctx.save();ctx.beginPath();ctx.rect(1,1,6,4);ctx.clip();ctx.translate(1,-1);
+      ctx.fillRect(8,7,-12,-10);ctx.restore();
+      outputs.push([...ctx.getImageData(0,0,8,6).data]);
+    }
+    expect(outputs[0]).toEqual(outputs[1]);
+  }
+});
+
+test('a failed Canvas context constructor releases its raster and restores the factory',()=>{
+  const makeCanvas=CanvasKit.MakeCanvas,makeSurface=CanvasKit.MakeSurface,free=CanvasKit.Free;
+  let released=0;
+  CanvasKit.Free=allocation=>{released++;return free(allocation);};
+  CanvasKit.MakeCanvas=(width,height)=>{CanvasKit.MakeSurface(width,height);throw Error('context construction failed');};
+  try{
+    expect(()=>canvasContext(canvas(4,4),'2d')).toThrow('context construction failed');
+    expect(released).toBe(1);
+    expect(CanvasKit.MakeSurface).toBe(makeSurface);
+  }finally{CanvasKit.MakeCanvas=makeCanvas;CanvasKit.Free=free;}
 });

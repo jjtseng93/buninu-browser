@@ -41,3 +41,22 @@ for(const direct of [false,true])test(`independent viewer ACK, stop and disconne
     }
   }finally{for(const c of clients)c.ws.close();server.stop(true);}
 });
+
+test('a key-up received during slow key-down IPC is not overwritten by its completion',async()=>{
+  const calls=[];let release;
+  const server=CdpServer.create({press:(key,options)=>{
+    calls.push([key,options.eventType]);
+    if(calls.length===1)return new Promise(resolve=>{release=resolve});
+  }}).listen(0);
+  let client;
+  try{
+    client=await connect(`ws://127.0.0.1:${server.port}/devtools/browser/cdp-server`);
+    const {targetId}=await client.send('Target.createTarget',{url:'about:blank'});
+    const {sessionId}=await client.send('Target.attachToTarget',{targetId,flatten:true});
+    const send=type=>client.send('Input.dispatchKeyEvent',{type,key:'w',code:'KeyW'},sessionId);
+    const down=send('keyDown');await until(()=>calls.length===1);
+    await send('keyUp');release();await down;
+    await send('keyDown');await send('keyUp');
+    expect(calls).toEqual([['w','keydown'],['w','keyup'],['w','keydown'],['w','keyup']]);
+  }finally{release?.();client?.ws.close();server.stop(true);}
+});

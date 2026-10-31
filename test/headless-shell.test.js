@@ -224,6 +224,15 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
         await view.cdp('Input.dispatchKeyEvent', {type,key:' ',code:'Space',windowsVirtualKeyCode:32,text:type==='char'?' ':undefined});
       }
     }
+    await view.evaluate(`window.heldKey=false;window.heldEvents=[];
+      document.addEventListener('keydown',e=>{if(e.code==='KeyW'){heldKey=true;heldEvents.push('down');e.preventDefault()}});
+      document.addEventListener('keyup',e=>{if(e.code==='KeyW'){heldKey=false;heldEvents.push('up')}});`);
+    await view.cdp('Input.dispatchKeyEvent',{type:'keyDown',key:'w',code:'KeyW',windowsVirtualKeyCode:87});
+    expect(await view.evaluate('heldKey')).toBe(true);
+    expect(await view.evaluate('new Promise(resolve=>requestAnimationFrame(()=>resolve(heldKey)))')).toBe(true);
+    await view.cdp('Input.dispatchKeyEvent',{type:'keyUp',key:'w',code:'KeyW',windowsVirtualKeyCode:87});
+    expect(await view.evaluate('heldKey')).toBe(false);
+    expect(await view.evaluate('heldEvents')).toEqual(['down','up']);
     expect(await view.evaluate('spaceKeys')).toEqual(Array.from({length:6},()=>[32,32]));
     expect(await view.evaluate('scrollY')).toBe(0);
     await view.cdp("Input.dispatchMouseEvent", {

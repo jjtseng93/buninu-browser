@@ -7,9 +7,9 @@ import {captureViewport} from '../../lib/paint/frame.js';
 const {CanvasKit:kit} = await loadGraphics();
 lockdown({errorTaming:'safe',overrideTaming:'severe',consoleTaming:'unsafe',localeTaming:'unsafe',stackFiltering:'concise',reporting:'none'});
 let readbacks = 0, checks = 0;
-const makeSurface = kit.MakeSurface;
-kit.MakeSurface = (...args) => {
-  const surface = makeSurface(...args), snapshot = surface.makeImageSnapshot.bind(surface);
+const makeSurface = kit.MakeSurface, makeRasterDirectSurface=kit.MakeRasterDirectSurface;
+const trackSurface = surface => {
+  const snapshot = surface.makeImageSnapshot.bind(surface);
   surface.makeImageSnapshot = () => {
     const image = snapshot(), read = image.readPixels.bind(image);
     image.readPixels = (...args) => { readbacks++; return read(...args); };
@@ -17,6 +17,8 @@ kit.MakeSurface = (...args) => {
   };
   return surface;
 };
+kit.MakeSurface=(...args)=>trackSurface(makeSurface(...args));
+kit.MakeRasterDirectSurface=(...args)=>trackSurface(makeRasterDirectSurface(...args));
 const source = `<style>body{margin:0;background:#182331;color:white;height:500px}
 #wrap{position:absolute;left:12px;top:14px;width:160px;height:90px;overflow:hidden;border-radius:13px}
 video{display:block;width:160px;height:90px}#caption{position:absolute;left:5px;top:55px;background:#6548;font:12px sans-serif}
