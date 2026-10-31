@@ -494,7 +494,7 @@ additional unreported downstream latency, such as Bluetooth output latency.
 With `BUNINU_LOG`, `media sync` records reported audio progress, the latest
 rendered video position, and the output queue/latency for diagnosis.
 
-### Web Audio synthesis
+### Web Audio synthesis and sample playback
 
 The initial [Web Audio](https://www.w3.org/TR/webaudio-1.1/) subset provides
 `AudioContext` (`webkitAudioContext` is an alias), `OscillatorNode`, `GainNode`
@@ -502,8 +502,21 @@ and `AudioParam` scheduling. Sine, square, sawtooth and triangle oscillators
 are synthesized in JavaScript in 128-sample blocks. Connected voices share
 one stereo PCM stream per context through the existing audio output above;
 no GPU or additional native library is needed. Suspend, close and navigation
-release the context's output. Buffer sources, offline contexts, filters and
-AudioWorklets are not implemented yet.
+release the context's output. `AudioBuffer`, `createBuffer()`,
+`decodeAudioData()` and `AudioBufferSourceNode` support decoded sample playback,
+offsets, duration, looping, rate/detune and ended events. Compressed audio uses
+the existing WASM decoder and is resampled to the context rate; the current
+software graph downmixes buffer channels before stereo output. Offline contexts,
+filters and AudioWorklets are not implemented yet.
+
+[Clumsy Bird](https://ellisonleao.github.io/clumsy-bird/) is an interactive
+reference for sample playback, Canvas image patterns, detached image dimensions
+and page-local primitive prototype extensions. Start with a click or Space;
+Space also makes the bird fly. The page remains under SES and the renderer's
+seccomp policy; shared host prototypes are not unfrozen. Prototype extension
+methods belong to the page and are discarded on navigation. The live check
+`bun test/manual-clumsy-bird.js buninu /tmp/clumsy-bird` records menu and gameplay
+screenshots and verifies pointer/Space input with the ordinary headless backend.
 
 The interactive reference is the [text-to-numbered musical notation page](https://drjohnjstest.blogspot.com/2023/10/text-to-numbered-musical-notation.html).
 Its Play button and two-part playback use changing oscillator frequencies.

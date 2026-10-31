@@ -94,7 +94,7 @@ test("gradient and pattern facades hide native shaders while style identity and 
   expect(context.strokeStyle).toBe(gradient);
   const radial = context.createRadialGradient(0, 0, 0, 1, 1, 2);
   expect(Object.keys(radial)).toEqual(["addColorStop"]);
-  const pattern = context.createPattern({}, "repeat");
+  const pattern = context.createPattern(node, "repeat");
   expect(Object.keys(pattern)).toEqual(["setTransform"]);
   for (const name of ["Td", "qf", "pe", "ie", "oe"]) expect(pattern[name]).toBeUndefined();
   resetCanvas(node);
@@ -203,4 +203,20 @@ test('texture alpha is unpremultiplied in both numeric and CanvasKit fragment pa
   const pixel=canvasResource(node).image.readPixels(2,2,{width:1,height:1,colorType:CanvasKit.ColorType.RGBA_8888,alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB});
   for(let i=0;i<4;i++)expect(Math.abs(pixel[i]-[100,50,152,255][i])).toBeLessThanOrEqual(1);
  }
+});
+
+test('patterns snapshot actual image sources and survive source drawing and bitmap resets',()=>{
+ const document={},source={...canvas(2,2),ownerDocument:document},target={...canvas(4,4),ownerDocument:document};
+ const src=canvasContext(source,'2d'),dst=canvasContext(target,'2d');
+ try{
+  src.fillStyle='red';src.fillRect(0,0,2,2);
+  const pattern=dst.createPattern(source,'repeat');
+  src.fillStyle='blue';src.fillRect(0,0,2,2);resetCanvas(source);
+  dst.fillStyle=pattern;dst.fillRect(0,0,4,4);
+  expect([...dst.getImageData(3,3,1,1).data]).toEqual([255,0,0,255]);
+  resetCanvas(target);dst.fillStyle=pattern;dst.fillRect(0,0,4,4);
+  expect([...dst.getImageData(3,3,1,1).data]).toEqual([255,0,0,255]);
+  expect(()=>dst.createPattern({},'repeat')).toThrow(TypeError);
+  expect(()=>dst.createPattern(source,'invalid')).toThrow();
+ }finally{disposeDocumentCanvases(document);}
 });

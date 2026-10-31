@@ -2336,3 +2336,26 @@ test("mouse offsets use target padding edges and CSS pixels, including bubbling 
   expect(await evaluate('checkpointLog')).toEqual(['nested', 'after nested', 'outer', 'outer', null]);
   expect(await evaluate('document.currentScript')).toBeNull();
 });
+
+test('primitive and literal extension methods stay page-local without exposing host capabilities',async()=>{
+ await load(`<script>
+ Number.prototype.pageClamp=function(a,b){return Math.max(a,Math.min(b,this));};
+ Number.prototype.strictReceiver=function(){'use strict';return [typeof this,this];};
+ String.prototype.pageSuffix=function(){return this+'!';};
+ Boolean.prototype.pageToggle=function(){return !this.valueOf();};
+ Array.prototype.pageDrop=function(){return this.pop();};
+ Function.prototype.pageInvoke=function(...args){return this.apply(null,args);};
+ </script><script>
+ window.primitiveResults=[(300).pageClamp(0,255),(-1)['pageClamp'](0,255),'test'.pageSuffix(),true.pageToggle(),[4,5].pageDrop(),(x=>x+1).pageInvoke(3),(2).strictReceiver(),(1).constructor===Number,'a'.constructor===String];
+ window.keyReads=0;const key={[Symbol.toPrimitive](){keyReads++;return 'pageClamp'}};
+ primitiveResults.push((5)[key](1,3),keyReads,eval("(3).pageClamp(0,2)"),Object(1) instanceof Number,new Number(1) instanceof Number);
+ window.escapeResults=[typeof Bun,typeof process,typeof require,Function('return typeof Bun')(),Function('return typeof process')(),(async()=>{}).constructor('return typeof Bun')() instanceof Promise];
+ window.sharedFrozen=[Object.isFrozen(Object.getPrototypeOf(function(){})),Object.isFrozen(Object.getPrototypeOf([]))];
+ </script>`);
+ expect(JSON.parse(await evaluate('JSON.stringify(primitiveResults)'))).toEqual([255,0,'test!',false,5,4,['number',2],true,true,3,1,2,true,true]);
+ expect(JSON.parse(await evaluate('JSON.stringify(escapeResults)'))).toEqual(['undefined','undefined','undefined','undefined','undefined',true]);
+ expect(JSON.parse(await evaluate('JSON.stringify(sharedFrozen)'))).toEqual([true,true]);
+ // A navigation reuses the renderer but must not retain any of these extensions.
+ await load('<script>window.clean=[typeof (1).pageClamp,typeof "a".pageSuffix,typeof true.pageToggle,typeof [].pageDrop,typeof (function(){}).pageInvoke,typeof Bun,typeof process];</script>');
+ expect(JSON.parse(await evaluate('JSON.stringify(clean)'))).toEqual(Array(7).fill('undefined'));
+});

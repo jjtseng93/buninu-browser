@@ -95,3 +95,39 @@ test('multiple sources mix in one stream and cycles cannot recurse indefinitely'
     expect(f.api.webkitAudioContext).toBe(f.api.AudioContext);
   }finally{f.dispose();}
 });
+
+test('sample buffers play through the existing PCM graph with looping, rate and ended events',async()=>{
+ const f=setup(),c=f.context;
+ try{
+  const b=c.createBuffer(1,4,8000);b.copyToChannel(new Float32Array([0,.25,.5,.75]),0);
+  expect([...b.getChannelData(0)]).toEqual([0,.25,.5,.75]);expect(b.duration).toBe(.0005);
+  const copy=new Float32Array(3);b.copyFromChannel(copy,0,1);expect([...copy]).toEqual([.25,.5,.75]);
+  expect(()=>b.getChannelData(1)).toThrow();
+  const node=c.createBufferSource();let ended=0;node.buffer=b;node.onended=()=>ended++;
+  node.loop=true;node.loopStart=1/8000;node.loopEnd=3/8000;
+  node.connect(c.destination);node.start();
+  const pcm=f.pull(8);expect([...pcm.filter((_,i)=>i%2===0)]).toEqual([0,8192,16384,8192,16384,8192,16384,8192]);
+  node.stop(c.currentTime);f.pull(128);await Bun.sleep(10);expect(ended).toBe(1);
+  const faster=c.createBufferSource();faster.buffer=b;faster.playbackRate.value=2;faster.connect(c.destination);faster.start();
+  expect([...f.pull(128).filter((_,i)=>i%2===0)].filter(x=>x!==0)).toEqual([16384]);
+  expect(()=>faster.start()).toThrow();
+ }finally{f.dispose();}
+});
+
+test('decodeAudioData detaches input, resamples samples, completes callbacks and closes the decoder',async()=>{
+ let closed=0,success=0,failures=0;
+ const scope=createWebAudioScope({decodeAudio:async bytes=>{
+  if(bytes[0]===0)throw Error('invalid compressed sound');
+  let first=true;return {sampleRate:16000,channels:1,nextSamples(){if(!first)return null;first=false;return new Float32Array([0,.25,.5,.75,1,.75,.5,.25]);},close(){closed++;}};
+ }});
+ const c=new scope.api.AudioContext({sampleRate:8000});
+ try{
+  const input=new Uint8Array([1]).buffer;
+  const pending=c.decodeAudioData(input,b=>{success++;expect(b.sampleRate).toBe(8000);});
+  expect(input.byteLength).toBe(0);
+  const b=await pending;expect([...b.getChannelData(0)]).toEqual([0,.5,1,.5]);expect(success).toBe(1);expect(closed).toBe(1);
+  await expect(c.decodeAudioData(new Uint8Array([0]).buffer,null,e=>{failures++;expect(e.name).toBe('EncodingError');})).rejects.toMatchObject({name:'EncodingError'});
+  expect(failures).toBe(1);
+  await expect(c.decodeAudioData(new Uint8Array([1]))).rejects.toThrow('ArrayBuffer');
+ }finally{scope.dispose();}
+});

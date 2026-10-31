@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import {
-  escapeSesHtmlComments, prepareDirectEvalSource, restoreSourceText, rewriteClassicScript, rewriteConstructorReads,
+  escapeSesHtmlComments, prepareDirectEvalSource, restoreSourceText, rewriteClassicScript, rewriteMemberReads, rewriteConstructorReads,
   referenceHelper, rewriteClassicScriptSource, rewriteDirectEval,
 } from "../lib/renderer/script-rewrite.js";
 
@@ -134,7 +134,7 @@ test("the classic-script pipeline parses once when earlier rewrites change nothi
     "return 1;",
   ];
   for (const source of sources) {
-    const stepwise = rewriteClassicScript(rewriteConstructorReads(rewriteDirectEval(source).code).code);
+    const stepwise = rewriteClassicScript(rewriteMemberReads(rewriteConstructorReads(rewriteDirectEval(source).code).code).code);
     expect(rewriteClassicScriptSource(source)).toEqual(stepwise);
   }
   const direct = rewriteDirectEval("var s = 'eval(1)';");
@@ -181,10 +181,31 @@ test('global-read rewrites preserve automatic semicolons and original function s
     output.unreachable = true
   }`;
   const rewritten = rewriteClassicScriptSource(source);
-  const g = {input:{value:'text'},output:{},$buninu$self:x=>x};
+  const g = {input:{value:'text'},output:{},$buninu$self:x=>x,$buninu$member:(o,k,c)=>c&&typeof o[k]==='function'?o[k].bind(o):o[k]};
   g.$buninu$ref = referenceHelper(g);
-  Function('globalThis', 'input', 'output', `let convert; ${rewritten.code}; globalThis.convert=convert;`)(g,g.input,g.output);
+  Function('globalThis', 'input', 'output', '$buninu$member', `let convert; ${rewritten.code}; globalThis.convert=convert;`)(g,g.input,g.output,g.$buninu$member);
   g.convert();
   expect(g.output).toEqual({value:'text',extra:'text',done:true,count:0});
   expect(restoreSourceText(g.convert.toString())).toBe(source);
+});
+
+test('member adaptation preserves source, call order, computed keys, parentheses and assignment patterns',()=>{
+ const samples=[
+  'function f(a){return(a.x).y(a.z)}',
+  'function f(a){return a /* property comment */ .\\u0062(a[/* index comment */ a.key])}',
+  'function f(a){return(a,b).x}',
+  'function f(a){return new (a.Ctor)(a.x)}',
+  'function f(a){return a[a.key](a.x)}',
+  'function f(a){({x:a.x=2,...a.rest}=a.source);[a.y]=a.values;return a.x}',
+  'function f(a){a.x++;delete a.x;for(a.x of a.values){};return a?.x}',
+  'class C extends B{#x=1;f(){return super.f(this.#x)}}',
+ ];
+ for(const source of samples){const result=rewriteMemberReads(source);expect(restoreSourceText(result.code)).toBe(source);expect(()=>Function('$buninu$member','B',result.code)).not.toThrow();}
+ const calls=[];
+ const receiver={get fn(){calls.push('get');return function(x){calls.push(this===receiver?'this':'wrong');return x;};}};
+ const key={ [Symbol.toPrimitive](hint){calls.push(hint);return 'fn';}};
+ const read=(o,k,call)=>{const f=o[k];return call?(...args)=>Reflect.apply(f,o,args):f;};
+ const source='return receiver[key]((calls.push("arg"),42))';
+ expect(Function('$buninu$member','receiver','key','calls',rewriteMemberReads(source.replace('return ','')).code.replace(/^/,'return '))(read,receiver,key,calls)).toBe(42);
+ expect(calls).toEqual(['string','get','arg','this']);
 });
