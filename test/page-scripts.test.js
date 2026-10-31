@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { RendererHost } from "../lib/renderer/host.js";
+import { supportsFrameCheckpoint } from "../lib/renderer/animation-frames.js";
 
 /**
  * Page JavaScript runs in a real renderer process (seccomp + SES lockdown),
@@ -2318,4 +2319,20 @@ test("mouse offsets use target padding edges and CSS pixels, including bubbling 
   expect(await evaluate("offsets")).toEqual([[30,50],[30,50]]);
   expect(await evaluate("[lastMouse.offsetX,lastMouse.offsetY]")).toEqual([75,85]);
   expect(await evaluate("(()=>{const e=new MouseEvent('click',{clientX:12,clientY:14});return [e.offsetX,e.offsetY]})()")).toEqual([12,14]);
+});
+
+(supportsFrameCheckpoint() ? test : test.skip)("classic script cleanup drains promise jobs before restoring currentScript", async () => {
+  await load(`<script id="outer">
+    var checkpointLog = [];
+    const nested = document.createElement('script');
+    nested.id = 'nested';
+    nested.textContent = "checkpointLog.push(document.currentScript.id); Promise.resolve().then(() => checkpointLog.push(document.currentScript?.id ?? null));";
+    document.head.appendChild(nested);
+    checkpointLog.push('after nested');
+    Promise.resolve().then(() => Promise.resolve().then(() => checkpointLog.push(document.currentScript?.id ?? null)));
+    setTimeout(() => checkpointLog.push(document.currentScript?.id ?? null), 0);
+  </script>`);
+  await Bun.sleep(50);
+  expect(await evaluate('checkpointLog')).toEqual(['nested', 'after nested', 'outer', 'outer', null]);
+  expect(await evaluate('document.currentScript')).toBeNull();
 });
