@@ -494,6 +494,27 @@ additional unreported downstream latency, such as Bluetooth output latency.
 With `BUNINU_LOG`, `media sync` records reported audio progress, the latest
 rendered video position, and the output queue/latency for diagnosis.
 
+### Web Audio synthesis
+
+The initial [Web Audio](https://www.w3.org/TR/webaudio-1.1/) subset provides
+`AudioContext` (`webkitAudioContext` is an alias), `OscillatorNode`, `GainNode`
+and `AudioParam` scheduling. Sine, square, sawtooth and triangle oscillators
+are synthesized in JavaScript in 128-sample blocks. Connected voices share
+one stereo PCM stream per context through the existing audio output above;
+no GPU or additional native library is needed. Suspend, close and navigation
+release the context's output. Buffer sources, offline contexts, filters and
+AudioWorklets are not implemented yet.
+
+The interactive reference is the [text-to-numbered musical notation page](https://drjohnjstest.blogspot.com/2023/10/text-to-numbered-musical-notation.html).
+Its Play button and two-part playback use changing oscillator frequencies.
+To run the live reference test, including a screenshot:
+
+```sh
+bun test/manual-numbered-music.js buninu /tmp/numbered-music
+# Optional comparison; requires /usr/local/bin/chromium-headless-shell.
+bun test/manual-numbered-music.js chromium /tmp/numbered-music-chromium
+```
+
 ### Render scheduling
 
 Set `BUNINU_RENDER_MIN_INTERVAL` to adjust the minimum delay before coalesced
