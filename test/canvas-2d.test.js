@@ -220,3 +220,40 @@ test('patterns snapshot actual image sources and survive source drawing and bitm
   expect(()=>dst.createPattern(source,'invalid')).toThrow();
  }finally{disposeDocumentCanvases(document);}
 });
+
+test('pattern sampling follows the drawing context and survives save/restore and reset',()=>{
+  const source=canvas(2,1),src=canvasContext(source,'2d');
+  src.fillStyle='red';src.fillRect(0,0,1,1);
+  src.fillStyle='blue';src.fillRect(1,0,1,1);
+  const target=canvas(8,2),ctx=canvasContext(target,'2d');
+  const pattern=src.createPattern(source,'repeat');
+  pattern.setTransform({a:4,b:0,c:0,d:1,e:0,f:0});
+  ctx.fillStyle=pattern;
+  expect(ctx.imageSmoothingEnabled).toBe(true);
+  expect(ctx.imageSmoothingQuality).toBe('low');
+  ctx.imageSmoothingEnabled=false;
+  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.restore();
+  expect(ctx.imageSmoothingEnabled).toBe(false);
+  expect(ctx.imageSmoothingQuality).toBe('low');
+  ctx.fillRect(0,0,8,1);
+  expect([...ctx.getImageData(3,0,1,1).data]).toEqual([255,0,0,255]);
+  ctx.imageSmoothingEnabled=true;ctx.fillRect(0,1,8,1);
+  const blended=ctx.getImageData(3,1,1,1).data;
+  expect(blended[0]).toBeGreaterThan(0);expect(blended[2]).toBeGreaterThan(0);
+  resetCanvas(target);
+  expect(ctx.imageSmoothingEnabled).toBe(true);
+  expect(ctx.imageSmoothingQuality).toBe('low');
+});
+
+test('drawImage honors smoothing and zero destination width',()=>{
+  const source=canvas(2,1),src=canvasContext(source,'2d');
+  src.fillStyle='red';src.fillRect(0,0,1,1);src.fillStyle='blue';src.fillRect(1,0,1,1);
+  const target=canvas(8,3),ctx=canvasContext(target,'2d',{resolveImage:canvasResource});
+  ctx.imageSmoothingEnabled=false;ctx.drawImage(source,0,0,8,1);
+  expect([...ctx.getImageData(3,0,1,1).data]).toEqual([255,0,0,255]);
+  ctx.imageSmoothingEnabled=true;ctx.drawImage(source,0,1,8,1);
+  const blended=ctx.getImageData(3,1,1,1).data;
+  expect(blended[0]).toBeGreaterThan(0);expect(blended[2]).toBeGreaterThan(0);
+  ctx.drawImage(source,0,2,0,1);
+  expect([...ctx.getImageData(0,2,1,1).data]).toEqual([0,0,0,0]);
+});
