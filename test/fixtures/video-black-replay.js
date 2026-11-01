@@ -118,9 +118,9 @@ for (const alpha of [255,127]) {
     await repaint('incomplete-shared-frame',"document.getElementById('marker').style.background='lime'");
     seed(candidate,alpha,4);
     // Controls alone currently need a separate layout invalidation to refresh
-    // their display-list bit, so force geometry here to exercise the fallback.
-    await repaint('controls',"document.getElementById('v').controls=true;document.getElementById('marker').style.width='26px'",false);
-    assert.equal(candidate.tile.videoLayer,null);
+    // their display-list bit, so force geometry here to exercise the layer.
+    await repaint('controls',"document.getElementById('v').controls=true;document.getElementById('marker').style.width='26px'");
+    assert.ok(candidate.tile.videoLayer,'controls retain independent video presentation');
     await mutate("document.getElementById('v').controls=false;document.getElementById('marker').style.width='27px'");
     for (const client of clients) await layer(client);seed(candidate,alpha);
     await repaint('controls-restored',"document.getElementById('marker').style.background='cyan'");

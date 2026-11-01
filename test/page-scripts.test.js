@@ -1741,7 +1741,9 @@ test("a video starts from a prefix while the rest of the file is still downloadi
   await evaluate("document.getElementById('v').play()");
   expect(dripFinished).toBe(false);
   expect(await evaluate(`(() => { const v = document.getElementById('v');
-    return !v.paused && v.readyState >= 1 && v.currentTime > 0 && v.networkState === 2; })()`)).toBe(true);
+    // The first presented frame has timestamp zero; wall time alone
+    // must not advance a silent video before its next picture.
+    return !v.paused && v.readyState >= 1 && v.videoWidth > 0 && v.currentTime >= 0 && v.networkState === 2; })()`)).toBe(true);
   const deadline = Date.now() + 4000;
   while (!dripFinished && Date.now() < deadline) await Bun.sleep(50);
   expect(dripFinished).toBe(true);
@@ -2386,4 +2388,14 @@ test('CanvasRenderingContext2D has a page-local prototype for feature detection 
  })()`)).toBe('true,true,function,255');
  await load('<canvas id="surface"></canvas>');
  expect(await evaluate('typeof CanvasRenderingContext2D.prototype.redBox')).toBe('undefined');
+});
+
+test('decoded video dimensions invalidate retained intrinsic layout without a DOM mutation',async()=>{
+ await load('<video id="intrinsicVideo" src="/video.mp4"></video><div id="afterVideo">after</div>');
+ const before=await evaluate('intrinsicVideo.getBoundingClientRect().width');
+ expect(before).toBe(300);
+ await evaluate('intrinsicVideo.play().then(()=>intrinsicVideo.pause())');
+ const size=await evaluate(`(()=>{const r=intrinsicVideo.getBoundingClientRect();return [intrinsicVideo.videoWidth,intrinsicVideo.videoHeight,r.width,r.height]})()`);
+ expect(size[0]).toBeGreaterThan(0);expect(size[1]).toBeGreaterThan(0);
+ expect(size[2]).toBe(size[0]);expect(size[3]).toBe(size[1]);
 });
