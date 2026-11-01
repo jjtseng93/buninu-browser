@@ -1,8 +1,27 @@
 diff --git a/games/breakout/index.html b/games/breakout/index.html
-index 3fc45d2..60057e5 100644
+index 3fc45d2..1b11750 100644
 --- a/games/breakout/index.html
 +++ b/games/breakout/index.html
-@@ -331,10 +331,11 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+@@ -240,6 +240,10 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+   let score=0,lives=MAX_LIVES;
+   let paddleX,ballX,ballY,ballVX,ballVY;
+   let bricks=[];
++  const staticLayer=document.createElement('canvas');
++  staticLayer.width=W;staticLayer.height=H;
++  const staticContext=staticLayer.getContext('2d');
++  let staticLayerDirty=true;
+   let particles=[];
+   let ballSpeed=4.5;
+   let ballLaunched=false;
+@@ -250,6 +254,7 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+   let highScore=0;
+
+   function initBricks(){
++    staticLayerDirty=true;
+     bricks=[];
+     for(let r=0;r<BRICK_ROWS;r++){
+       for(let c=0;c<BRICK_COLS;c++){
+@@ -331,10 +336,11 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
    }
 
    // ---- UPDATE ----
@@ -16,7 +35,38 @@ index 3fc45d2..60057e5 100644
        if(Math.abs(paddleX-target)>2){
          if(paddleX<target) paddleX+=Math.min(speed,target-paddleX);
          else paddleX-=Math.min(speed,paddleX-target);
-@@ -605,8 +606,12 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+@@ -386,6 +392,7 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+       const bx=b.x,by=b.y,bw=b.w,bh=b.h;
+       if(ballX+BALL_SIZE>bx&&ballX<bx+bw&&ballY+BALL_SIZE>by&&ballY<by+bh){
+         b.alive=false;
++        staticLayerDirty=true;
+         const cx=bx+bw/2,cy=by+bh/2;
+         emitParticles(cx,cy,12,b.color.fill);
+         sfxBrick(330+b.row*60);
+@@ -462,7 +469,7 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+   }
+
+   // ---- DRAW ----
+-  function draw(){
++  function redrawStaticLayer(ctx){
+     ctx.clearRect(0,0,W,H);
+
+     // Grid dots
+@@ -490,6 +497,13 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+       ctx.restore();
+     }
+
++  }
++
++  function draw(){
++    if(staticLayerDirty){redrawStaticLayer(staticContext);staticLayerDirty=false;}
++    ctx.clearRect(0,0,W,H);
++    ctx.drawImage(staticLayer,0,0);
++
+     // Paddle
+     ctx.save();
+     ctx.shadowColor='rgba(255,107,107,0.5)';
+@@ -605,8 +619,12 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
    }
 
    // ---- LOOP ----

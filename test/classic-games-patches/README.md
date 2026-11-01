@@ -40,7 +40,9 @@ git -C ../Classic-Games apply ../buninu-browser/test/classic-games-patches/0001-
 - Breakout limits mouse-follow movement to 8 pixels per animation frame,
   making the paddle lag at low FPS. Use 480 pixels per second, preserving
   its 60 Hz speed; cap elapsed time at 100 ms to avoid a large resume jump.
-  Ball and particle physics retain their existing behavior.
+  Ball and particle physics retain their existing behavior. Cache the dot
+  background and brick shadows/gradients in an offscreen Canvas; invalidate
+  it on board initialization and each destroyed brick, retaining the same pixels.
 
 These patches never replace browser behavior with a game-specific exception.
 The hosted upstream originals will still contain their own bugs until their
@@ -101,11 +103,16 @@ the manual runner gives observations enough time to finish.
 ```sh
 bun test/manual-breakout-paddle.js ../Classic-Games buninu
 bun test/manual-breakout-paddle.js ../Classic-Games chromium
+bun test/manual-breakout-static.js ../Classic-Games buninu
+bun test/manual-breakout-static.js ../Classic-Games chromium
 ```
 
 This separate timing check supplies controlled RAF timestamps to the actual
 game. At 15, 60 and 120 FPS, 400 ms must move its paddle 192 pixels. A
 one-second frame gap must contribute at most 100 ms of catch-up movement.
+The static-layer check compares the initial Canvas pixels and the pixels
+after destroying a brick with the unpatched upstream source from the checkout's
+HEAD. They must match exactly while idle brick draws fall from 60 to zero.
 The ordinary sixteen-game runner above still uses real-time CDP input.
 
 ## Hextris
