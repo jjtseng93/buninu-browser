@@ -60,3 +60,20 @@ test('a key-up received during slow key-down IPC is not overwritten by its compl
     expect(calls).toEqual([['w','keydown'],['w','keyup'],['w','keydown'],['w','keyup']]);
   }finally{release?.();client?.ws.close();server.stop(true);}
 });
+
+test('CDP keeps independent held keys and matches releases even when modifiers change',async()=>{
+ const calls=[];
+ const server=CdpServer.create({press:async(key,options)=>calls.push([key,options.eventType])}).listen(0);
+ let client;
+ try{
+  client=await connect(`ws://127.0.0.1:${server.port}/devtools/browser/cdp-server`);
+  const {targetId}=await client.send('Target.createTarget',{url:'about:blank'});
+  const {sessionId}=await client.send('Target.attachToTarget',{targetId,flatten:true});
+  const send=(type,key,modifiers=0)=>client.send('Input.dispatchKeyEvent',{type,key,code:'Key'+key.toUpperCase(),modifiers},sessionId);
+  await send('keyDown','a');await send('keyDown','b',1);await send('keyUp','a');
+  await send('char','b',1); // A's release must not make B's char a second press.
+  await client.send('Input.dispatchKeyEvent',{type:'char',text:'b'},sessionId); // code may be omitted
+  await send('keyUp','b',0);await send('keyDown','b',1);await send('keyUp','b');
+  expect(calls).toEqual([['a','keydown'],['b','keydown'],['a','keyup'],['b','keyup'],['b','keydown'],['b','keyup']]);
+ }finally{client?.ws.close();server.stop(true);}
+});
