@@ -192,7 +192,7 @@ test('live audio catches up after repeated long paint tasks instead of slowing i
   o.connect(c.destination);o.start();
   f.outputs[0].listener({event:'request',bytes:8000*2*4});
   const started=performance.now();
-  painting=setInterval(()=>{const end=performance.now()+85;while(performance.now()<end){}},16);
+  painting=setInterval(()=>{const end=performance.now()+140;while(performance.now()<end){}},16);
   await Bun.sleep(700);
   clearInterval(painting);
   const elapsed=(performance.now()-started)/1000;
