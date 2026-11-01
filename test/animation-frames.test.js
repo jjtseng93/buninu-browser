@@ -65,3 +65,18 @@ test("actual SES frame callbacks match the browser callback order and lifecycle"
   expect({ code, error }).toEqual({ code: 0, error: "" });
   expect(out).toContain("animation frame ordering and lifecycle passed");
 }, 15000);
+
+frameTest('presentation follows all frame microtasks and precedes scheduling the next frame',()=>{
+ let now=0,wake=null,value='initial';const paints=[],delays=[];
+ const timers={schedule(callback,delay){wake=callback;delays.push(delay);return 1},cancel(){wake=null},dispose(){wake=null}};
+ const frames=createAnimationFrames({now:()=>now,frameTimers:timers,invoke:callback=>callback(),afterFrame(){
+  paints.push(value);now+=25;
+  if(paints.length===1)frames.request(()=>{value='next'});
+ }});
+ frames.request(()=>{value='callback';Promise.resolve().then(()=>{value='microtask'})});
+ let callback=wake;wake=null;now=16;callback();
+ expect(paints).toEqual(['microtask']);expect(delays).toEqual([16,0]);
+ callback=wake;wake=null;callback();expect(paints).toEqual(['microtask','next']);
+ frames.request(()=>frames.dispose());callback=wake;wake=null;callback();
+ expect(paints).toEqual(['microtask','next']);expect(wake).toBeNull();
+});

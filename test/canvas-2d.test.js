@@ -290,3 +290,36 @@ test('a failed Canvas context constructor releases its raster and restores the f
     expect(CanvasKit.MakeSurface).toBe(makeSurface);
   }finally{CanvasKit.MakeCanvas=makeCanvas;CanvasKit.Free=free;}
 });
+
+test('drawImage ignores fill color and shaders while preserving globalAlpha and fill state',()=>{
+ const document={},source={ownerDocument:document,width:2,height:1},target={ownerDocument:document,width:2,height:1};
+ const src=canvasContext(source,'2d'),ctx=canvasContext(target,'2d',{resolveImage:canvasResource});
+ try{
+  src.fillStyle='red';src.fillRect(0,0,2,1);
+  const gradient=ctx.createLinearGradient(0,0,2,0);gradient.addColorStop(0,'transparent');gradient.addColorStop(1,'blue');
+  const pattern=ctx.createPattern(source,'repeat');
+  for(const style of ['rgba(0,0,255,0)', 'rgba(0,0,255,.25)',gradient,pattern]){
+   ctx.clearRect(0,0,2,1);ctx.fillStyle=style;const before=ctx.fillStyle;ctx.globalAlpha=1;ctx.drawImage(source,0,0);
+   expect([...ctx.getImageData(0,0,1,1).data]).toEqual([255,0,0,255]);expect(ctx.fillStyle).toBe(before);
+   ctx.clearRect(0,0,2,1);ctx.globalAlpha=.5;ctx.drawImage(source,0,0,2,1);
+   expect([...ctx.getImageData(0,0,1,1).data]).toEqual([255,0,0,128]);
+   ctx.save();ctx.fillStyle='green';ctx.restore();ctx.clearRect(0,0,2,1);ctx.drawImage(source,0,0);
+   expect([...ctx.getImageData(0,0,1,1).data]).toEqual([255,0,0,128]);
+  }
+ }finally{disposeDocumentCanvases(document)}
+});
+
+test('image paints keep blend state across restore without constructing fill-pattern shaders',()=>{
+ const document={},source={ownerDocument:document,width:2,height:1},target={ownerDocument:document,width:2,height:1};
+ const src=canvasContext(source,'2d'),ctx=canvasContext(target,'2d',{resolveImage:canvasResource});
+ const make=CanvasKit.Image.prototype.makeShaderOptions;let shaders=0;
+ try{
+  src.fillStyle='red';src.fillRect(0,0,2,1);ctx.fillStyle=ctx.createPattern(source,'repeat');
+  CanvasKit.Image.prototype.makeShaderOptions=function(...args){shaders++;return make.apply(this,args)};
+  for(let i=0;i<3;i++){ctx.save();ctx.globalAlpha=.5;ctx.globalCompositeOperation='copy';ctx.drawImage(source,0,0);ctx.restore();}
+  expect(shaders).toBe(0);
+  expect([...ctx.getImageData(0,0,1,1).data]).toEqual([255,0,0,128]);
+  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.drawImage(source,0,0);
+  expect([...ctx.getImageData(0,0,1,1).data]).toEqual([255,0,0,255]);
+ }finally{CanvasKit.Image.prototype.makeShaderOptions=make;disposeDocumentCanvases(document)}
+});
