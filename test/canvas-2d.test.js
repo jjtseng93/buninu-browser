@@ -340,3 +340,45 @@ test('roundRect draws rounded corners, mirrors negative dimensions and rejects i
  context.clearRect(0,0,40,40);context.beginPath();context.roundRect(2,2,10,10,50);context.fill();
  expect(context.getImageData(7,7,1,1).data[3]).toBeGreaterThan(200);
 });
+
+test('cached radial rectangles preserve transforms, clip, alpha and mutable stops',()=>{
+ for(const scale of [1,1.5]){
+  const a=canvas(40,40),b=canvas(40,40),ca=canvasContext(a,'2d'),cb=canvasContext(b,'2d');
+  const gradients=[];
+  for(const c of [ca,cb]){
+   c.translate(.25,.5);c.scale(scale,scale);
+   c.beginPath();c.rect(1,2,20,18);c.clip();
+   const g=c.createRadialGradient(9,10,0,9,10,20);
+   g.addColorStop(0,'red');g.addColorStop(1,'transparent');c.fillStyle=g;gradients.push(g);
+  }
+  for(let i=0;i<3;i++){
+   if(i===2)for(const g of gradients)g.addColorStop(.5,'blue');
+   for(const c of [ca,cb]){c.clearRect(-5,-5,60,60);c.globalAlpha=.4;}
+   ca.fillRect(.5,1.25,22,20);
+   cb.beginPath();cb.rect(.5,1.25,22,20);cb.fill();
+   const x=ca.getImageData(0,0,40,40).data,y=cb.getImageData(0,0,40,40).data;
+   for(let j=0;j<x.length;j+=4){
+    expect(Math.abs(x[j+3]-y[j+3])).toBeLessThanOrEqual(1);
+    for(let k=0;k<3;k++)expect(Math.abs(x[j+k]*x[j+3]/255-y[j+k]*y[j+3]/255)).toBeLessThanOrEqual(2);
+   }
+  }
+  for(const node of [a,b]){node.width=1;resetCanvas(node);}
+ }
+});
+
+test('vertical gradient strips match full shading under scaling and clipping',()=>{
+ for(const scale of [1,1.5]){
+  const nodes=[canvas(36,36),canvas(36,36)],contexts=nodes.map(n=>canvasContext(n,'2d'));
+  for(const c of contexts){
+   c.scale(scale,scale);c.beginPath();c.rect(2,3,18,17);c.clip();
+   const g=c.createLinearGradient(0,0,0,24);g.addColorStop(0,'red');g.addColorStop(.4,'rgba(0,255,0,.4)');g.addColorStop(1,'blue');c.fillStyle=g;c.globalAlpha=.6;
+  }
+  contexts[0].fillRect(0,0,24,24);contexts[1].beginPath();contexts[1].rect(0,0,24,24);contexts[1].fill();
+  const [x,y]=contexts.map(c=>c.getImageData(0,0,36,36).data);
+  for(let j=0;j<x.length;j+=4){
+   expect(Math.abs(x[j+3]-y[j+3])).toBeLessThanOrEqual(1);
+   for(let k=0;k<3;k++)expect(Math.abs(x[j+k]*x[j+3]/255-y[j+k]*y[j+3]/255)).toBeLessThanOrEqual(2);
+  }
+  for(const n of nodes){n.width=1;resetCanvas(n);}
+ }
+});
