@@ -1222,6 +1222,22 @@ test("import methods keep their names and receivers alongside real dynamic impor
   expect(await evaluate("dynamicImportNames")).toEqual([42, true, "module:e"]);
 });
 
+test("dynamic module imports preserve grouped specifiers after property rewriting", async () => {
+  scripts.set("https://page.test/grouped-dependency.js", "export const answer=42;");
+  scripts.set("https://page.test/grouped-main.js", `
+    let reads=0;
+    const entry={get module(){reads++;return './grouped-dependency.js'}};
+    const a=await import(entry.module);
+    const b=await import((entry.module));
+    const c=await import /* comment */ (((entry.module)));
+    const d=await import /* comment */ ('./grouped-dependency.js');
+    window.groupedImports=[a.answer,a===b,b===c,c===d,reads];
+  `);
+  await load('<script type="module" src="./grouped-main.js"></script>');
+  await waitFor("typeof groupedImports !== 'undefined'");
+  expect(await evaluate("groupedImports")).toEqual([42,true,true,true,3]);
+});
+
 test("ES modules: graphs, live exports, JSON, import.meta, dynamic import, TLA, cycles, import maps", async () => {
   const base = "https://page.test/modules/";
   scripts.set(`${base}math.js`, `
