@@ -16,6 +16,14 @@ test('file input opens browser-owned picker, selects files, and FileReader emits
   const action=async value=>{await c.evaluate(`window.__fileAction=${JSON.stringify(value)}`);await c.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Shift'});await c.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Shift'});};
   await action({kind:'browse',path:dir});
   expect(await c.evaluate('document.body.textContent.includes("one.txt")')).toBe(true);
+  const point=await c.evaluate(`(()=>{const b=document.querySelector('button.entry');const r=b.getBoundingClientRect();return {x:r.x+20,y:r.y+r.height/2}})()`);
+  // Casty lets modal input bypass the page's blocked input turn. Down/up
+  // requests may overlap: one click must consume its picker action once.
+  for(const expected of ['one.txt','']) {
+    await Promise.all(['mousePressed','mouseReleased'].map(type=>c.send('Input.dispatchMouseEvent',{type,...point,button:'left',clickCount:1})));
+    expect(b.context.dialogState?.type).toBe('file');
+    expect(await c.evaluate('document.getElementById("chosen").textContent')).toBe(expected);
+  }
   await action({kind:'select',index:0});await action({kind:'select',index:1});await action({kind:'open'});
   for(let i=0;i<100;i++){if(await c.evaluate('window.text!==undefined'))break;await Bun.sleep(10);}
   expect(await c.evaluate('clickReturned')).toBe(true);expect(await c.evaluate('names')).toEqual(['one.txt','two.txt']);
