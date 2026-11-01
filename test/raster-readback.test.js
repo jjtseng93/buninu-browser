@@ -38,3 +38,17 @@ test("raster readback reuses native scratch while published shared frames stay i
   }
   expect(releases).toBe(allocations);
 });
+
+test('partial raster readback patches an immutable previous frame and rejects invalid regions',async()=>{
+ const {CanvasKit:kit}=await loadGraphics();const surface=kit.MakeSurface(8,6);
+ const capture=new RasterReadback(kit,{shared:true});
+ const read=options=>{const image=surface.makeImageSnapshot();try{return capture.read(image,8,6,options)}finally{image.delete()}};
+ try{
+  surface.getCanvas().clear(kit.Color(255,0,0,1));const first=read(),saved=first.slice();
+  const paint=new kit.Paint();try{paint.setColor(kit.Color(0,0,255,0.5));paint.setBlendMode(kit.BlendMode.Src);surface.getCanvas().drawRect(kit.XYWHRect(2,1,3,2),paint)}finally{paint.delete()}
+  const full=read(),partial=read({previous:first,region:{x:2,y:1,width:3,height:2}});
+  expect(partial).toEqual(full);expect(first).toEqual(saved);expect(partial.buffer).not.toBe(first.buffer);
+  for(const region of [{x:-1,y:0,width:2,height:2},{x:0,y:0,width:0,height:2},{x:7,y:0,width:2,height:2},{x:0.5,y:0,width:2,height:2}])
+   expect(read({previous:first,region})).toEqual(full);
+ }finally{capture.dispose();surface.dispose()}
+});

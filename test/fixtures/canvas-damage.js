@@ -24,6 +24,29 @@ try{
   r.resize(401,300,1);r.resize(400,300,1);
   assert.deepEqual(await pixels(),partial,'partial pixels must match a full repaint, including transparency, clipping and occlusion');
  }
+ // A changing coordinate/status label must not disable local canvas damage.
+ await r.evaluate("document.querySelector('p').id='status'");await pixels();
+ for(const text of ['Dragging 123, 456','Short','拖曳 8, 9','Italic fj']){
+  traces.length=0;
+  await r.evaluate(`document.getElementById('status').textContent=${JSON.stringify(text)};ctx.fillStyle='red';ctx.fillRect(10,10,20,20)`);
+  const partial=await pixels();
+  assert.ok(traces.some(s=>s.includes('canvas damage')),'status text and canvas share partial repaint');
+  r.resize(401,300,1);r.resize(400,300,1);
+  assert.deepEqual(await pixels(),partial,'status replacement clears old glyphs and matches full repaint');
+ }
+ // Changed font metrics / wrapping retain the complete-paint fallback.
+ traces.length=0;
+ await r.evaluate("document.getElementById('status').style.fontSize='30px';ctx.fillRect(0,0,5,5)");
+ const restyled=await pixels();
+ assert.ok(!traces.some(s=>s.includes('canvas damage')),'changed fonts must not use text damage');
+ r.resize(401,300,1);r.resize(400,300,1);assert.deepEqual(await pixels(),restyled);
+ // Italic overhang and fractional raster scaling must preserve the same pixels.
+ await r.evaluate("document.getElementById('status').style.fontStyle='italic'");
+ r.resize(400,300,1.5);await pixels();traces.length=0;
+ await r.evaluate("document.getElementById('status').textContent='fj';ctx.clearRect(0,0,120,100)");
+ const italic=await pixels();assert.ok(traces.some(s=>s.includes('canvas damage')));
+ r.resize(401,300,1.5);r.resize(400,300,1.5);assert.deepEqual(await pixels(),italic);
+ r.resize(400,300,1);
  // Geometry/transform changes must fall back, then remain pixel-correct.
  traces.length=0;
  await r.evaluate("document.querySelector('.clip').style.transform='scale(1.2)';ctx.fillRect(0,0,80,80)");
