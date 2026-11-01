@@ -1,6 +1,10 @@
 # AGENTS
 
 ## General
+- Never EVER EVER EVER EVER use hardlinks.
+- Hardlinks are not allowed.
+- Using hardlinks is utterly harmful.
+- .
 - This project only uses pure JavaScript +/- WASM.
 - Native bindings are generally not allowed in the headless shell itself
   * In the future when it is wrapped into a full browser on each platform, the frontend should stay as thin wrappers just enough to draw rendered content from the headlesss shell
