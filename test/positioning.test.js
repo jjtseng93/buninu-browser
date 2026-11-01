@@ -304,3 +304,18 @@ test('absolute left/right and explicit width resolve auto margins before CSS tra
  expect(box('.right').x).toBe(30);
  expect(box('.large').x).toBe(10);
 });
+
+test('backface-hidden card faces respect preserve-3d rotations and remain correct after a flip',()=>{
+ for(const flipped of [false,true]){
+  const {layout,tree}=render('<div class="card"><div class="back">back</div><div class="front">front</div></div>',`
+   .card{position:relative;width:100px;height:100px;transform-style:preserve-3d;${flipped?'transform:rotateY(180deg)':''}}
+   .back,.front{position:absolute;inset:0;backface-visibility:hidden}
+   .back{background:blue}.front{background:red;transform:rotateY(180deg)}
+  `);
+  const list=buildDisplayList(layout,tree);
+  const colors=list.items.filter(item=>item.op==='fillRect').map(item=>item.color);
+  expect(colors).toContain(flipped?'rgba(255, 0, 0, 1)':'rgba(0, 0, 255, 1)');
+  expect(colors).not.toContain(flipped?'rgba(0, 0, 255, 1)':'rgba(255, 0, 0, 1)');
+  expect(list.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual([flipped?'front':'back']);
+ }
+});

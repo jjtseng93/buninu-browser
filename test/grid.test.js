@@ -309,3 +309,16 @@ test("an item stretches to its area by default and justify-items can center it",
   expect(render(grid("grid-template-columns: 8px; justify-items: center", "<i>ab</i>")).item(0))
     .toEqual({ left: 3, top: 0, width: 2, height: 1 });
 });
+
+test('fractional rows fill a definite aspect-ratio grid even when cells are empty',()=>{
+ const {items}=render(grid('width:100px;aspect-ratio:1;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px', '<i></i><i></i><i></i><i></i>'),100);
+ expect(items()).toEqual([
+  {left:0,top:0,width:46,height:46},{left:54,top:0,width:46,height:46},
+  {left:0,top:54,width:46,height:46},{left:54,top:54,width:46,height:46},
+ ]);
+});
+
+test('fractional row sizing respects fixed tracks and intrinsic minimum heights',()=>{
+ const {items}=render(grid('width:40px;height:100px;grid-template-columns:40px;grid-template-rows:20px 1fr 2fr;row-gap:10px','<i></i><i></i><i></i>'),40);
+ expect(items().map(item=>item.height)).toEqual([20,20,40]);
+});
