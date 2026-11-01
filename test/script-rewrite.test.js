@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import {
   escapeSesHtmlComments, prepareDirectEvalSource, restoreSourceText, rewriteClassicScript, rewriteMemberReads, rewriteConstructorReads,
-  referenceHelper, rewriteClassicScriptSource, rewriteDirectEval,
+  referenceHelper, rewriteClassicScriptSource, rewriteModuleSource, rewriteDirectEval,
 } from "../lib/renderer/script-rewrite.js";
 
 // The comment each constructor rewrite leaves for restoreSourceText.
@@ -208,4 +208,22 @@ test('member adaptation preserves source, call order, computed keys, parentheses
  const source='return receiver[key]((calls.push("arg"),42))';
  expect(Function('$buninu$member','receiver','key','calls',rewriteMemberReads(source.replace('return ','')).code.replace(/^/,'return '))(read,receiver,key,calls)).toBe(42);
  expect(calls).toEqual(['string','get','arg','this']);
+});
+
+test('member adaptation preserves ASI before reparsing local calls in scripts and modules',()=>{
+ const source=`function local($) {
+  var diff = (7-2)
+  $('box').css('value',diff)
+  var receiver = {value:3}
+  receiver.read = function(){return this.value}
+  return receiver.read()
+ }`;
+ for(const rewrite of [rewriteMemberReads,source=>({code:rewriteModuleSource(source)})]){
+  const code=rewrite(source).code;
+  const values=[],$=()=>({css:(key,value)=>values.push([key,value])});
+  const member=(object,key,call)=>call&&typeof object[key]==='function'?object[key].bind(object):object[key];
+  const fn=Function('$buninu$member',`${code}; return local;`)(member);
+  expect(fn($)).toBe(3);expect(values).toEqual([['value',5]]);
+  expect(restoreSourceText(fn.toString())).toBe(source);
+ }
 });

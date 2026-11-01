@@ -327,6 +327,7 @@ export default class HTMLParser {
 			}
 
 			if (this.currentNode && this.readState === MarkupReadStateEnum.any &&
+				(<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.html &&
 				HTMLElementConfig[(<Element>this.currentNode)[PropertySymbol.localName]]?.contentModel === HTMLElementConfigContentModelEnum.rcdata) {
 				const tag = (<Element>this.currentNode)[PropertySymbol.localName];
 				const end = new RegExp('</' + tag + '(?=[\\t\\n\\f\\r />])[^>]*>', 'gi');
@@ -478,12 +479,14 @@ export default class HTMLParser {
 
 		const tagName = this.nextElement![PropertySymbol.tagName]!;
 		const lowerTagName = tagName.toLowerCase();
-		const config = HTMLElementConfig[lowerTagName];
+		const config = this.nextElement![PropertySymbol.namespaceURI] === NamespaceURI.html
+			? HTMLElementConfig[lowerTagName] : undefined;
 		let previousCurrentNode: Node | null = null;
 
 		while (previousCurrentNode !== this.rootNode) {
 			const parentLowerTagName = (<Element>this.currentNode)[PropertySymbol.tagName]?.toLowerCase();
-			const parentConfig = parentLowerTagName ? HTMLElementConfig[parentLowerTagName] : null;
+			const parentConfig = parentLowerTagName && (<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.html
+				? HTMLElementConfig[parentLowerTagName] : null;
 
 			if (previousCurrentNode === this.currentNode) {
 				throw new Error(

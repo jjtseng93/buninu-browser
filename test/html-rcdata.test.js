@@ -23,3 +23,13 @@ test('textarea parsing also works inside HTML fragments without changing script 
   expect(document.querySelector('textarea').value).toBe('<div>&</div>');
   expect(document.querySelector('script').textContent).toBe('"<div>&amp;</div>"');
 });
+
+test('SVG title remains foreign content and does not swallow following SVG or HTML siblings',()=>{
+ const {document,window}=parseHTMLDocument('<div><svg><title>Share &amp; score</title><g><text><tspan>label</tspan></text></g></svg><button id="after">play</button></div>');
+ try{
+  expect(document.querySelector('svg title').textContent).toBe('Share & score');
+  expect(document.querySelector('svg g tspan').textContent).toBe('label');
+  expect(document.getElementById('after').textContent).toBe('play');
+  expect(document.querySelector('svg title').namespaceURI).toBe('http://www.w3.org/2000/svg');
+ }finally{window.happyDOM.close();}
+});

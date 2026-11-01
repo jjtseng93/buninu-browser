@@ -37,6 +37,13 @@ git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0005-inv
 git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0006-parse-css-escapes-in-selectors.patch
 ```
 
+The incremental `0007-scope-content-models-to-html-namespace.patch` applies to
+our current vendored parser (including its RCDATA compatibility fixes):
+
+```sh
+git -C vendor/happy-dom apply ../../patches/happy-dom/0007-scope-content-models-to-html-namespace.patch
+```
+
 ## Patch manifest
 
 | Patch | Modified upstream file | Reason | Verification |
@@ -74,3 +81,12 @@ Keep each local Happy DOM change in a separate numbered patch and add it to
 this table with its reason and focused test. When updating Happy DOM, regenerate
 and re-check the queue against the new pinned commit before changing the version
 record in `THIRD_PARTY_NOTICES.md`.
+
+### `0007`: HTML content models do not apply to SVG
+
+`HTMLParser.ts` must use HTML content-model rules and the RCDATA fast path
+only for nodes in the HTML namespace. Treating an SVG `<title>` as HTML
+RCDATA repeatedly consumed later markup without closing the lowercase SVG
+node, deleting following controls and preventing Hextris initialization.
+Validation: `bun test test/html-rcdata.test.js`; live game
+<https://hextris.io/>. The same rule preserves SVG title text and following SVG/HTML siblings.
