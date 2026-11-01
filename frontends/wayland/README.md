@@ -8,8 +8,8 @@ bun index.js --wayland https://example.com --window-size=800,600
 ```
 
 Uses the existing browser controller and renderer. No Qt, libwayland, native addon,
-new dependency, PNG encoding, or base64. Only libc is loaded, because Bun sockets
-cannot send/receive SCM_RIGHTS ancillary file descriptors. Linux/Android 64-bit only.
+new dependency, PNG encoding, or base64. Linux/Android 64-bit uses libc for
+SCM_RIGHTS ancillary file descriptors. Windows uses the named mapping transport below.
 The default launcher remains Casty. External integration blocks in index.js are
 marked `wayland handle`; the frontend lives entirely in this directory.
 
@@ -150,3 +150,36 @@ The page includes vertical/horizontal/two-axis scroll boxes, button and double-c
 counters, a drag canvas, text controls and bounded event logs. It reports received
 modifiers without swapping wheel axes itself. 頁面不自行轉換滾輪方向，可從紀錄
 確認外層是否真的送來水平軸與修飾鍵；預設 Casty 路徑可省略 `--wayland`。
+
+## Windows named mappings / Windows 具名共享記憶體 (unstable)
+
+**unstable.** Experimental Windows-to-Windows transport; native Windows verification is still
+required. Start Land with `bun index.js --win32` in the Land directory, then run
+`bun index.js --wayland URL` here with `WAYLAND_DISPLAY=wayland-buninu` (or the
+socket name printed by Land). Both processes must use the same Windows session
+and runtime directory: `XDG_RUNTIME_DIR`, then `TMPDIR`, then system temp.
+For example, in PowerShell before starting each process:
+
+```powershell
+$env:XDG_RUNTIME_DIR = $env:TEMP
+$env:WAYLAND_DISPLAY = "wayland-buninu"
+```
+
+Only `process.platform === 'win32'` imports the Windows backend and loads
+`kernel32.dll`. `CreateFileMappingW` / `OpenFileMappingW` / `MapViewOfFile` provide
+pagefile-backed `Local\buninu-wayland-UUID` resources. No per-frame pixel file,
+PNG, base64 or pixel socket upload is used. Wayland bytes and FD argument order
+stay unchanged inside a versioned socket envelope carrying mapping descriptors.
+An ACK retains the sender's mapping handle until the receiver has opened it.
+Existing commit/release synchronization protects reusable pixel buffers. Keymaps
+use byte mappings; bounded clipboard pipes use mappings with an atomic length
+and EOF header. Disconnection releases pending handles and queued resources.
+This envelope is private to these two Windows implementations; it is not the
+standard SCM_RIGHTS wire transport. Linux/Android continue to use that original
+transport, and Windows does not advertise DMA-BUF support.
+
+Windows 驗證：在本專案執行 `bun test test/wayland-win32-resources.test.js`，
+測試跨程序共享像素、剪貼板 pipe 的 EOF，以及原本 socket 路徑上的具名資源傳遞。
+其他平台會略過這些原生測試；封裝、分段收送、ACK 和清理測試可在各平台執行：
+`bun test test/wayland-win32-wire.test.js`。PowerShell 剪貼板沿用原有 jsmdcui
+函式，仍優先嘗試 xclip，失敗才 fallback。

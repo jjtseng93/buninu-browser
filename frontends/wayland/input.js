@@ -1,4 +1,4 @@
-import {readSync} from 'node:fs';
+import {readSync} from './resource-io.js';
 import {libc} from './transport.js';
 
 // A deliberately bounded XKB subset, not a replacement for libxkbcommon.

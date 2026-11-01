@@ -1,5 +1,5 @@
 // A standard wl_data_device text client. Only explicit copy/paste transfers bytes.
-import {readSync, writeSync} from 'node:fs';
+import {readSync, writeSync} from './resource-io.js';
 import {libc} from './transport.js';
 const mimeTypes=['text/plain;charset=utf-8','text/plain','UTF8_STRING','STRING'];
 const limit=1024*1024;

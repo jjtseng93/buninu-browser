@@ -1,13 +1,14 @@
 import {join,isAbsolute} from 'node:path';
 import {tmpdir} from 'node:os';
-import {openSync,closeSync,ftruncateSync,unlinkSync,writeSync} from 'node:fs';
-import {connectUnix} from './transport.js';
+import {openSync,ftruncateSync,unlinkSync} from 'node:fs';
+import {closeSync,writeSync} from './resource-io.js';
+import {connectUnix,libc} from './transport.js';
 import {interfaces,decode,encodeRequest} from './protocol.js';
 
 export class WaylandClient {
   constructor(path) {
     const display=process.env.WAYLAND_DISPLAY || 'wayland-0';
-    this.connection=connectUnix(path || (isAbsolute(display)?display:join(process.env.XDG_RUNTIME_DIR||tmpdir(),display)));
+    this.connection=connectUnix(path || (isAbsolute(display)?display:join(process.env.XDG_RUNTIME_DIR||process.env.TMPDIR||tmpdir(),display)));
     this.objects=new Map();this.nextId=2;this.globals=new Map();this.waiters=new Set();
     this.objects.set(1,{iface:'wl_display',event:(name,args)=>{
       if(name==='error')throw Error(`Wayland error ${args.join(': ')}`);
@@ -70,9 +71,10 @@ export class WaylandWindow {
     for(const b of [...this.buffers])if(!b.busy&&(b.width!==width||b.height!==height))this.disposeBuffer(b);
     let b=this.buffers.find(b=>!b.busy);
     if(!b){
-      const path=join(process.env.XDG_RUNTIME_DIR||tmpdir(),`buninu-shm-${process.pid}-${crypto.randomUUID()}`);
-      const fd=openSync(path,'wx+',0o600);unlinkSync(path);
-      try{ftruncateSync(fd,size);
+      const path=join(process.env.XDG_RUNTIME_DIR||process.env.TMPDIR||tmpdir(),`buninu-shm-${process.pid}-${crypto.randomUUID()}`);
+      const fd=process.platform==='win32'?libc.createMapping(size):openSync(path,'wx+',0o600);
+      if(process.platform!=='win32')unlinkSync(path);
+      try{if(process.platform!=='win32')ftruncateSync(fd,size);
         b={fd,width,height,busy:false};const pool=c.object('wl_shm_pool');c.request(c.shm,'create_pool',pool,fd,size);
         b.id=c.object('wl_buffer',(event)=>{if(event==='release'){b.busy=false;this.onReady?.();}});
         c.request(pool,'create_buffer',b.id,0,width,height,width*4,1);c.request(pool,'destroy');this.buffers.push(b);
