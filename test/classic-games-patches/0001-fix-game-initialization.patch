@@ -1,15 +1,48 @@
+diff --git a/games/breakout/index.html b/games/breakout/index.html
+index 3fc45d2..60057e5 100644
+--- a/games/breakout/index.html
++++ b/games/breakout/index.html
+@@ -331,10 +331,11 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+   }
+
+   // ---- UPDATE ----
+-  function update(){
++  function update(elapsed){
+     if(state==='playing'&&mouseX!==null){
+       const target=mouseX-PADDLE_W/2;
+-      const speed=8;
++      // Preserve 8px/frame at 60 Hz without slowing mouse tracking at low FPS.
++      const speed=480*elapsed;
+       if(Math.abs(paddleX-target)>2){
+         if(paddleX<target) paddleX+=Math.min(speed,target-paddleX);
+         else paddleX-=Math.min(speed,paddleX-target);
+@@ -605,8 +606,12 @@ canvas{display:block;width:100%;height:100%;object-fit:contain;touch-action:mani
+   }
+
+   // ---- LOOP ----
+-  function loop(){
+-    update();
++  let lastFrameTime=null;
++  function loop(time=performance.now()){
++    // Bound catch-up after a background tab or a long suspended frame.
++    const elapsed=lastFrameTime===null?1/60:Math.min(0.1,Math.max(0,(time-lastFrameTime)/1000));
++    lastFrameTime=time;
++    update(elapsed);
+     updateParticles();
+     draw();
+     animId=requestAnimationFrame(loop);
 diff --git a/games/mine/index.html b/games/mine/index.html
 index 01e972d..91b0e32 100644
 --- a/games/mine/index.html
 +++ b/games/mine/index.html
 @@ -415,6 +415,8 @@ board.addEventListener('click',e=>{
- 
+
  board.addEventListener('contextmenu',e=>{
    e.preventDefault();
 +  if(paused||over||won)return;
 +  const g=getCell(e);if(g)toggleFlag(g.row,g.col);
  });
- 
+
  board.addEventListener('mousedown',e=>{
 diff --git a/games/puzzle15/index.html b/games/puzzle15/index.html
 index 42f278e..5b0fa02 100644
@@ -23,23 +56,23 @@ index 42f278e..5b0fa02 100644
 +        if(grid[r][c]===val)return{row:r,col:c};
      return null;
    }
- 
+
 diff --git a/games/snake/index.html b/games/snake/index.html
 index 2f6919e..af005eb 100644
 --- a/games/snake/index.html
 +++ b/games/snake/index.html
 @@ -166,8 +166,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-acti
- 
+
    // ---- DIRECTIONS ----
    const UP={x:0,y:-1},DOWN={x:0,y:1},LEFT={x:-1,y:0},RIGHT={x:1,y:0};
 -  const opposite={};
 -  opposite[UP]=DOWN;opposite[DOWN]=UP;opposite[LEFT]=RIGHT;opposite[RIGHT]=LEFT;
 +  const opposite=new Map([[UP,DOWN],[DOWN,UP],[LEFT,RIGHT],[RIGHT,LEFT]]);
- 
+
    // ---- PARTICLES ----
    let particles=[];
 @@ -684,8 +683,8 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-acti
- 
+
    // ---- INPUT ----
    function setDirection(dir){
 -    if(!opposite[dir])return;
@@ -48,7 +81,7 @@ index 2f6919e..af005eb 100644
 +    if(dir===opposite.get(direction))return;
      nextDirection=dir;
    }
- 
+
 diff --git a/games/space/index.html b/games/space/index.html
 index b980c91..d567d68 100644
 --- a/games/space/index.html
@@ -56,7 +89,7 @@ index b980c91..d567d68 100644
 @@ -1113,13 +1113,6 @@ function setupTouch(c){
    });
  }
- 
+
 -canvas.addEventListener('mousemove',e=>{
 -if(game.state!=='playing'||paused||!game.player.alive)return;
 -const rect=canvas.getBoundingClientRect();

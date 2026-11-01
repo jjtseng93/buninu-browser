@@ -13,7 +13,7 @@ The tested upstream revision is
 
 ## Upstream game fixes
 
-`0001-fix-game-initialization.patch` fixes five bugs in the game sources,
+`0001-fix-game-initialization.patch` fixes six bugs in the game sources,
 separately from browser compatibility. Apply it once:
 
 ```sh
@@ -36,6 +36,11 @@ git -C ../Classic-Games apply ../buninu-browser/test/classic-games-patches/0001-
 - Typing Test handles P/M shortcuts on `document` even while editing its
   text field, cancelling ordinary typing. Ignore letter shortcuts in editable
   controls while preserving Escape pause/resume and shortcuts outside them.
+
+- Breakout limits mouse-follow movement to 8 pixels per animation frame,
+  making the paddle lag at low FPS. Use 480 pixels per second, preserving
+  its 60 Hz speed; cap elapsed time at 100 ms to avoid a large resume jump.
+  Ball and particle physics retain their existing behavior.
 
 These patches never replace browser behavior with a game-specific exception.
 The hosted upstream originals will still contain their own bugs until their
@@ -90,6 +95,18 @@ This is a functional compatibility check, not a completed campaign for each
 game or an end-to-end Casty/Kitty FPS benchmark. Sudoku's synchronous puzzle
 generation can take noticeably longer in the instrumented JS environment;
 the manual runner gives observations enough time to finish.
+
+## Breakout paddle timing
+
+```sh
+bun test/manual-breakout-paddle.js ../Classic-Games buninu
+bun test/manual-breakout-paddle.js ../Classic-Games chromium
+```
+
+This separate timing check supplies controlled RAF timestamps to the actual
+game. At 15, 60 and 120 FPS, 400 ms must move its paddle 192 pixels. A
+one-second frame gap must contribute at most 100 ms of catch-up movement.
+The ordinary sixteen-game runner above still uses real-time CDP input.
 
 ## Hextris
 
