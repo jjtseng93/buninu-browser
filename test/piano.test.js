@@ -2,7 +2,7 @@ import { test, expect } from "bun:test";
 import { PIANO_KEYS, PIANO_DO, pianoNote, pianoTone, PianoMixer } from "../lib/audio/piano.js";
 
 test("piano keyboard mapping is editable in one table", () => {
-  expect(Object.keys(PIANO_KEYS)).toHaveLength(61);
+  expect(Object.keys(PIANO_KEYS)).toHaveLength(66);
   expect(PIANO_DO).toBe(69);
   expect(PIANO_KEYS[" "]).toBe(60);
   expect(pianoNote(" ")).toBe(69);
@@ -16,7 +16,16 @@ test("piano keyboard mapping is editable in one table", () => {
   expect(pianoNote("/", "Slash")).toBe(71);
   expect(pianoNote("Unidentified", "KeyJ")).toBe(71);
   expect(pianoNote("!", "Digit1")).toBe(45);
-  expect(pianoNote("Escape")).toBeNull();
+  expect(pianoNote("Escape", "Escape")).toBe(35);
+  expect(pianoNote("`", "Backquote")).toBe(42);
+  expect(pianoNote("Tab", "Tab")).toBe(47);
+  expect(pianoNote("CapsLock", "CapsLock")).toBe(50);
+  expect(pianoNote("Shift", "ShiftLeft")).toBe(54);
+  expect(pianoNote("Shift", "ShiftRight")).toBeNull();
+  expect(pianoNote("Alt", "AltRight")).toBe(52);
+  expect(pianoNote("AltGraph")).toBe(52);
+  expect(pianoNote("Alt", "AltLeft")).toBeNull();
+  expect(pianoNote("Backspace")).toBeNull();
 });
 
 test("piano tone is 48 kHz mono PCM with a nonzero, decaying sound", () => {

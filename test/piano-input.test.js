@@ -14,7 +14,9 @@ test("CDP raw keydown uses the physical key even with an empty text field", () =
   expect(notes.at(-1)).toBe(38);
   expect(handlePianoInput(input, { key: " ", code: "Space", text: " ", repeat: true }, play)).toBe(true);
   expect(notes).toHaveLength(4);
-  expect(handlePianoInput(input, { key: "Tab", code: "Tab", text: "" }, play)).toBe(false);
+  expect(handlePianoInput(input, { key: "Tab", code: "Tab", text: "" }, play)).toBe(true);
+  expect(notes.at(-1)).toBe(47);
+  expect(handlePianoInput(input, { key: "Shift", code: "ShiftRight", text: "" }, play)).toBe(false);
 });
 
 test("piano consumes batched terminal/IME text and plays every mapped note", () => {
@@ -32,8 +34,19 @@ test("piano consumes repeats without retriggering and supports shifted physical 
   expect(handlePianoInput(input, { key: "J", code: "KeyJ", modifiers: 8 }, play)).toBe(true);
   expect(handlePianoInput(input, { key: "j", modifiers: 2 }, play)).toBe(true);
   expect(notes).toEqual([71]);
-  expect(handlePianoInput(input, { key: "Tab" }, play)).toBe(false);
+  expect(handlePianoInput(input, { key: "Alt", code: "AltLeft", modifiers: 1 }, play)).toBe(false);
   expect(handlePianoInput(input, { key: "Backspace" }, play)).toBe(false);
+});
+
+test("left-hand control keys and AltGr play even while reporting their own modifier", () => {
+  const notes = [];
+  const play = n => notes.push(n);
+  for (const [key, code] of [["Escape", "Escape"], ["`", "Backquote"], ["Tab", "Tab"], ["CapsLock", "CapsLock"]])
+    expect(handlePianoInput(input, { key, code }, play)).toBe(true);
+  expect(handlePianoInput(input, { key: "Shift", code: "ShiftLeft", modifiers: 8 }, play)).toBe(true);
+  expect(handlePianoInput(input, { key: "AltGraph", code: "AltRight", modifiers: 3 }, play)).toBe(true);
+  expect(handlePianoInput(input, { key: "Alt", code: "AltRight", modifiers: 1 }, play)).toBe(true);
+  expect(notes).toEqual([35, 42, 47, 50, 54, 52, 52]);
 });
 
 test("ordinary, disabled and readonly editors are unaffected", () => {
