@@ -94,6 +94,7 @@ export async function playClassicGame(c,game) {
   await click('#notesBtn');const before=await pixels();await click('#hintBtn');await sleep(120);check(before!==await pixels(),'hint fills a cell');break;
  }
  case 'connect4':{
+  check(await read(`(()=>{const cols=[...document.querySelectorAll('.col')];return cols.length===7&&cols.every((col,index)=>{const cells=[...col.querySelectorAll('.cell')].map(e=>e.getBoundingClientRect()),r=col.getBoundingClientRect();return cells.length===6&&cells.every((cell,i)=>cell.width>0&&Math.abs(cell.x-cells[0].x)<1&&(!i||cell.bottom<=cells[i-1].top))&&(!index||r.left>=cols[index-1].getBoundingClientRect().right)})})()`),'seven non-overlapping columns contain six vertically reversed cells');
   for(const col of [0,1,0,1,0,1,0]){await click('.col',col);await sleep(450);}
   check(await wait('document.getElementById("gameOverOverlay").classList.contains("show")'),'four connected discs trigger the winner overlay');
   check(await read('Number(document.getElementById("scoreRed").textContent)===1'),'winning round updates score');break;

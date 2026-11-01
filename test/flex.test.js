@@ -159,3 +159,29 @@ test("justify-content distributes a column container's extra height (min-height 
     done();
   }
 });
+
+test('reverse flex directions reflect items without reversing descendants',()=>{
+ for(const direction of ['row-reverse','column-reverse']){
+  const column=direction.startsWith('column');
+  const f=flex('<div id="root"><div id="a"><div id="nested"></div></div><div id="b"></div></div>',
+   `#root{display:flex;flex-flow:${direction} nowrap;width:100px;height:100px;gap:5px} #a,#b{width:20px;height:20px;flex-shrink:0} #nested{width:5px;height:5px}`);
+  try{
+   const a=f.rect('#a'),b=f.rect('#b'),n=f.rect('#nested');
+   expect(column?a.top:a.left).toBe(80);
+   expect(column?b.top:b.left).toBe(55);
+   expect(n.top).toBe(a.top);expect(n.left).toBe(a.left);
+  }finally{f.done()}
+ }
+});
+
+test('column-reverse resolves intrinsic height, spacing and physical margins',()=>{
+ const f=flex('<div id="root"><div id="a"></div><div id="b"></div></div>',
+ '#root{display:flex;flex-direction:column-reverse;width:30px;gap:5px} #a{height:10px;margin-top:3px;margin-bottom:7px} #b{height:20px}');
+ try{expect(f.rect('#root').height).toBe(45);expect(f.rect('#a').top).toBe(28);expect(f.rect('#b').top).toBe(0)}finally{f.done()}
+});
+
+test('column-reverse preserves the sign of child transform translations',()=>{
+ const f=flex('<div id="root"><div id="a"></div><div id="b"></div></div>',
+ '#root{display:flex;flex-direction:column-reverse;width:40px;height:100px} #a,#b{height:20px} #a{transform:translateY(-30px)}');
+ try{expect(f.rect('#a').top).toBe(50);expect(f.rect('#b').top).toBe(60)}finally{f.done()}
+});

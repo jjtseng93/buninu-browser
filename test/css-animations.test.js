@@ -54,3 +54,30 @@ test('cascade retains shorthand and longhand timing with vendor aliases',()=>{
  expect(style.cssAnimations[0].delay).toBe('0s');expect(style.cssAnimationLonghands).toEqual({duration:['3s']});
  }finally{window.happyDOM.close();}
 });
+
+test('transform keyframes animate a drop and bounce with easing per segment',()=>{
+ const t=timeline();
+ t.animation.setSheets(['@keyframes drop{0%{transform:translateY(-300px);opacity:0}60%{transform:translateY(8px)}80%{transform:translateY(-4px)}100%{transform:translateY(0);opacity:1}}'],{});
+ t.style.transform=null;t.style.cssAnimations=animationShorthand('drop 1s ease-in forwards');
+ try{
+  expect(t.animation.sample(t.element,t.style).transform.y).toBe(-300);
+  t.setTime(600);expect(t.animation.sample(t.element,t.style).transform.y).toBe(8);
+  t.setTime(700);const y=t.animation.sample(t.element,t.style).transform.y;
+  expect(y).toBeLessThan(8);expect(y).toBeGreaterThan(2);
+  t.setTime(800);expect(t.animation.sample(t.element,t.style).transform.y).toBe(-4);
+  t.setTime(1000);expect(t.animation.sample(t.element,t.style).transform.y).toBe(0);
+  expect(t.style.transform).toBeNull();
+ }finally{t.animation.dispose()}
+});
+
+test('transform interpolation preserves percentage translations and underlying endpoints',()=>{
+ const t=timeline();
+ t.animation.setSheets(['@keyframes move{to{transform:translateX(100%) scale(2)}}'],{});
+ t.style.transform=null;t.style.cssAnimations=animationShorthand('move 1s linear both');
+ try{
+  t.animation.sample(t.element,t.style);t.setTime(500);
+  const value=t.animation.sample(t.element,t.style).transform;
+  expect(value.scaleX).toBe(1.5);expect(value.x.kind).toBe('sum');
+  t.setTime(1000);expect(t.animation.sample(t.element,t.style).transform.x).toEqual({unit:'%',value:100});
+ }finally{t.animation.dispose()}
+});
