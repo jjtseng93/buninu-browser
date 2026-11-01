@@ -29,3 +29,14 @@ test("short clips drain and piano stays interactive", () => {
   expect(piano.request(0, 0, 0, 120)).toBe(120);
   expect(piano.request(0, 120, 0, 120)).toBe(0);
 });
+
+
+test('live synthesis prepares a small reserve while server credits are delayed, without startup gating',()=>{
+ const live=new PlaybackBuffer(1000,2,.12,.12);
+ expect(live.ready(20,0,false)).toBe(true);
+ expect(live.request(0,0,0,0)).toBe(120);
+ expect(live.request(0,120,0,0)).toBe(0);
+ expect(live.request(20,0,40,0)).toBe(60);
+ expect(live.request(20,60,40,0)).toBe(0);
+ expect(live.request(0,0,200,0)).toBe(0);
+});

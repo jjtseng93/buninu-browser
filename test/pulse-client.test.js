@@ -223,7 +223,7 @@ test("measured device progress governs the media clock and bounded audio queue t
 // Keep the real connection/open/close path, but drive only the playback
 // intervals with a virtual monotonic clock. Latency responses are controlled
 // at the client boundary; the test above covers their wire representation.
-async function playbackTimers(run) {
+async function playbackTimers(run, {credit = 1e7} = {}) {
   const { createServer } = await import("node:net");
   const server = createServer(socket => {
     let input = Buffer.alloc(0);
@@ -235,7 +235,7 @@ async function playbackTimers(run) {
         input = input.subarray(20 + length);
         if (channel !== 0xffffffff) continue;
         const command = body.readUInt32BE(1), tag = body.readUInt32BE(6);
-        const extra = command === 3 ? [0x4c, ...u32(1), 0x4c, ...u32(1), 0x4c, ...u32(1e7)] : [];
+        const extra = command === 3 ? [0x4c, ...u32(1), 0x4c, ...u32(1), 0x4c, ...u32(credit)] : [];
         const reply = Buffer.from([0x4c, ...u32(2), 0x4c, ...u32(tag), ...extra]);
         socket.write(Buffer.concat([header(reply.length, 0xffffffff), reply]));
       }
@@ -385,14 +385,14 @@ test("timing rejection permits a retry and a late rejection after kill stays sil
   });
 });
 
-test('live audio adapts to slow renderer replies without a media reserve or an unbounded device queue',async()=>{
+test('live audio adapts to slow renderer replies with a bounded live reserve and device queue',async()=>{
   await playbackTimers(async({client,sent,advance})=>{
     const requests=[];
     client.playbackTiming=()=>({writeIndex:0,readIndex:0,sinkSeconds:0,playing:false});
     const stream=await client.openPlayback({rate:500,channels:1,leadSeconds:.12,adaptiveLead:true,
       onRequest:bytes=>requests.push(bytes),onTiming:()=>{}});
     // Even a renderer that has not replied gets only a bounded live request.
-    expect(requests.reduce((a,b)=>a+b,0)).toBeLessThanOrEqual(170);
+    expect(requests.reduce((a,b)=>a+b,0)).toBeLessThanOrEqual(320);
     await advance(250);
     stream.write(new Uint8Array(1000));
     const total=()=>sent.reduce((a,p)=>a+p.bytes,0);
@@ -412,4 +412,24 @@ test('live audio adapts to slow renderer replies without a media reserve or an u
     fast.write(new Uint8Array(1000));expect(total()).toBe(120);
     fast.kill();
   });
+});
+
+
+test('live synthesis prepares PCM even after server credits are exhausted',async()=>{
+ await playbackTimers(async({client,sent,advance})=>{
+  const requests=[];
+  client.playbackTiming=()=>({writeIndex:100,readIndex:100,sinkSeconds:0,playing:false});
+  const stream=await client.openPlayback({rate:500,channels:1,leadSeconds:.12,adaptiveLead:true,
+   onRequest:bytes=>requests.push(bytes),onTiming:()=>{}});
+  expect(requests).toEqual([320]);
+  stream.write(new Uint8Array(320));
+  expect(sent.reduce((n,p)=>n+p.bytes,0)).toBe(100);
+  await advance(50);
+  // No new server credits, but device consumption leaves room for the live
+  // producer to refill its reserve before those credits eventually arrive.
+  expect(requests).toEqual([320,100]);
+  await advance(200);
+  expect(requests).toEqual([320,100]); // outstanding demand is not duplicated
+  stream.kill();
+ },{credit:100});
 });
