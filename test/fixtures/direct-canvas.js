@@ -76,5 +76,21 @@ try{
  await r.evaluate("c.style.transform='none';document.querySelector('span').textContent='changed'");
  const changedDom=await pixels();
  await r.evaluate("c.style.transform='translate(0px,0px)'");assert.deepEqual(await pixels(),changedDom,'DOM cache invalidates when overlay text changes');
+ // Ancestor overflow and rounded clips rasterize only the changing Canvas,
+ // retaining static DOM caches and matching the native full-page painter.
+ await r.evaluate(`document.body.innerHTML='<div id="clip" style="position:absolute;left:5px;top:7px;width:44px;height:36px;overflow:hidden;border-radius:8px"><canvas id="clipped" width="64" height="48" style="position:absolute;left:-3px;top:-2px"></canvas></div>';window.c=document.getElementById('clipped');window.ctx=c.getContext('2d');ctx.fillStyle='rgba(240,30,80,.7)';ctx.fillRect(0,0,64,48)`);
+ for(const dpr of [1,1.5,2]){
+  r.resize(64,48,dpr);
+  for(const position of ['left:-3px;top:-2px','left:3.25px;top:2.5px']){
+   await r.evaluate(`c.style.cssText='position:absolute;${position}';ctx.fillStyle='rgba(30,220,80,.7)';ctx.fillRect(1,1,5,5)`);
+   traces.length=0;await r.evaluate("ctx.fillRect(2,2,2,2)");const clipped=await pixels();
+   const inside=(Math.round(15*dpr)*Math.round(64*dpr)+Math.round(15*dpr))*4;
+   assert.notDeepEqual([...clipped.slice(inside,inside+4)],[25,106,179,255],'clipped Canvas content is painted, not just its background');
+   assert.ok(traces.some(s=>s.includes('direct canvas composition')),'clipped Canvas retains direct composition');
+   assert.ok(!traces.some(s=>s.includes('DOM layers rebuilt')),'clipped Canvas updates reuse DOM layers');
+   await r.evaluate("c.style.transform='translate(0px,0px)'");
+   assert.deepEqual(await pixels(),clipped,`rounded overflow clip at DPR ${dpr}, ${position} matches Skia`);
+  }
+ }
  console.log('direct canvas composition passed');
 }finally{r.dispose()}

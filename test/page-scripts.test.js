@@ -2359,3 +2359,15 @@ test('primitive and literal extension methods stay page-local without exposing h
  await load('<script>window.clean=[typeof (1).pageClamp,typeof "a".pageSuffix,typeof true.pageToggle,typeof [].pageDrop,typeof (function(){}).pageInvoke,typeof Bun,typeof process];</script>');
  expect(JSON.parse(await evaluate('JSON.stringify(clean)'))).toEqual(Array(7).fill('undefined'));
 });
+
+test('CanvasRenderingContext2D has a page-local prototype for feature detection and method extensions',async()=>{
+ await load('<canvas id="surface" width="20" height="20"></canvas>');
+ expect(await evaluate(`(()=>{
+  const ctx=document.getElementById('surface').getContext('2d');
+  CanvasRenderingContext2D.prototype.redBox=function(){this.fillStyle='red';this.fillRect(0,0,20,20)};
+  ctx.redBox();
+  return [ctx instanceof CanvasRenderingContext2D,Object.getPrototypeOf(ctx)===CanvasRenderingContext2D.prototype,typeof CanvasRenderingContext2D.prototype.roundRect,ctx.getImageData(5,5,1,1).data[0]].join(',');
+ })()`)).toBe('true,true,function,255');
+ await load('<canvas id="surface"></canvas>');
+ expect(await evaluate('typeof CanvasRenderingContext2D.prototype.redBox')).toBe('undefined');
+});

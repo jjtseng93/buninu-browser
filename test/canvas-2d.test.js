@@ -323,3 +323,20 @@ test('image paints keep blend state across restore without constructing fill-pat
   expect([...ctx.getImageData(0,0,1,1).data]).toEqual([255,0,0,255]);
  }finally{CanvasKit.Image.prototype.makeShaderOptions=make;disposeDocumentCanvases(document)}
 });
+
+test('roundRect draws rounded corners, mirrors negative dimensions and rejects invalid radii',()=>{
+ const context=canvasContext(canvas(40,40),'2d');
+ expect('roundRect' in context).toBe(true);
+ context.fillStyle='red';context.beginPath();context.roundRect(2,2,30,30,8);context.fill();
+ expect(context.getImageData(2,2,1,1).data[3]).toBe(0);
+ expect([...context.getImageData(17,17,1,1).data]).toEqual([255,0,0,255]);
+ expect(context.getImageData(17,3,1,1).data[3]).toBeGreaterThan(200);
+ context.clearRect(0,0,40,40);context.beginPath();context.roundRect(32,2,-30,30,[{x:8,y:12},0,0,0]);context.fill();
+ expect(context.getImageData(31,2,1,1).data[3]).toBe(0);
+ expect(context.getImageData(2,2,1,1).data[3]).toBeGreaterThan(200);
+ expect(()=>context.roundRect(0,0,20,20,-1)).toThrow(RangeError);
+ expect(()=>context.roundRect(0,0,20,20,[])).toThrow(RangeError);
+ expect(()=>context.roundRect(0,0,20,20,[1,2,3,4,5])).toThrow(RangeError);
+ context.clearRect(0,0,40,40);context.beginPath();context.roundRect(2,2,10,10,50);context.fill();
+ expect(context.getImageData(7,7,1,1).data[3]).toBeGreaterThan(200);
+});
