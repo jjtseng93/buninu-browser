@@ -292,3 +292,15 @@ test("replaced elements use an explicit aspect-ratio or their natural ratio with
   expect(box('#natural')).toMatchObject({ width:80, height:40 });
   expect(box('#degenerate')).toMatchObject({ width:80, height:40 });
 });
+
+test('absolute left/right and explicit width resolve auto margins before CSS transforms',()=>{
+ const {box}=render('<div class="both"></div><div class="left"></div><div class="right"></div><div class="large"></div>',`
+  .both,.left,.right,.large{position:absolute;left:10px;right:30px;width:100px;height:20px}
+  .both{margin:0 auto}.left{margin-left:auto;margin-right:20px}.right{margin-left:20px;margin-right:auto}
+  .large{width:500px;margin:0 auto}
+ `);
+ expect(box('.both').x).toBe(140);
+ expect(box('.left').x).toBe(250);
+ expect(box('.right').x).toBe(30);
+ expect(box('.large').x).toBe(10);
+});
