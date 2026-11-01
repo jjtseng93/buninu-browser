@@ -25,6 +25,19 @@ try{
   assert.deepEqual(await pixels(),direct,'direct copy/blend must match Skia pixel for pixel');
   assert.ok(!traces.some(s=>s.includes('direct canvas composition')),'transform keeps native fallback');
  }
+ // A single Canvas need not fill the page: keep surrounding background and
+ // the native nearest-sampling pixel-center rule for fractional placement.
+ r.resize(96,80,1);
+ for(const [x,y] of [[0,0],[8,5],[8.12,5.24],[8.49,5.49],[8.51,5.51],[-9.2,-4.7],[60.2,50.8]]){
+  await r.evaluate(`c.style.cssText='position:absolute;left:${x}px;top:${y}px';ctx.clearRect(0,0,64,48);ctx.fillStyle='rgba(240,20,80,.5)';ctx.fillRect(1,1,40,30)`);
+  traces.length=0;const placed=await pixels();
+  // evaluate may have already published the direct frame.
+  await r.evaluate("ctx.fillRect(1,1,1,1)");const updated=await pixels();
+  assert.ok(traces.some(s=>s.includes('direct canvas composition')),'inset/partially clipped canvas uses direct composition');
+  await r.evaluate("c.style.transform='translate(0px,0px)'");
+  assert.deepEqual(await pixels(),updated,`placed canvas at ${x},${y} matches Skia`);
+ }
+ r.resize(64,48,1);await r.evaluate("c.style.cssText=''");
  // A high-DPI canvas can still be passed through when bitmap pixels match
  // the tile's physical dimensions, with no CSS resampling.
  r.resize(64,48,2);
@@ -36,7 +49,7 @@ try{
  r.resize(64,48,1);await r.evaluate("c.width=64;c.height=48;c.style.cssText=''");
  // Returning from direct pixels to Skia must repaint the retained surface in
  // full; it cannot apply damage to the surface from before the bypass.
- for(const css of ['opacity:.5','border-radius:8px','width:32px']){
+ for(const css of ['opacity:.5','border-radius:8px']){
   await r.evaluate("c.style.cssText='';ctx.fillStyle='blue';ctx.fillRect(0,0,64,48)");await pixels();
   traces.length=0;await r.evaluate(`c.style.cssText=${JSON.stringify(css)}`);
   const fallback=await pixels();
@@ -45,6 +58,23 @@ try{
   assert.deepEqual(await pixels(),fallback,'fallback after direct output matches full repaint');
  }
  await r.evaluate("c.style.cssText='';document.body.insertAdjacentHTML('beforeend','<span style=\"position:absolute;left:4px;top:4px;background:yellow\">overlay</span>')");
- traces.length=0;await pixels();assert.ok(!traces.some(s=>s.includes('direct canvas composition')),'foreground content cannot be omitted');
+ traces.length=0;await r.evaluate("ctx.fillStyle='red';ctx.fillRect(1,1,2,2)");
+ const overlay=await pixels();assert.ok(traces.some(s=>s.includes('direct canvas composition')),'foreground DOM is a cached layer');
+ await r.evaluate("c.style.transform='translate(0px,0px)'");assert.deepEqual(await pixels(),overlay,'foreground layer preserves paint order');
+ await r.evaluate("c.style.cssText='width:32px'");traces.length=0;
+ await r.evaluate("ctx.clearRect(0,0,64,48);ctx.fillStyle='blue';ctx.fillRect(0,0,32,48)");
+ const scaled=await pixels();assert.ok(traces.some(s=>s.includes('direct canvas composition')),'scaled Canvas uses Land sampler');
+ await r.evaluate("c.style.transform='translate(0px,0px)'");assert.deepEqual(await pixels(),scaled,'Land scaling matches Skia');
+ // Cached DOM layers stay out of the frame loop, but DOM mutations invalidate
+ // them. Multiple translucent canvases retain their original paint order.
+ await r.evaluate("c.style.cssText='';document.body.insertAdjacentHTML('beforeend','<canvas id=second width=20 height=10 style=\"position:absolute;left:8px;top:12px\"></canvas>');var second=document.getElementById('second');var other=second.getContext('2d');other.fillStyle='rgba(0,240,50,.5)';other.fillRect(0,0,20,10)");
+ await pixels();traces.length=0;
+ await r.evaluate("ctx.fillStyle='blue';ctx.fillRect(0,0,64,48)");const multiple=await pixels();
+ assert.ok(traces.some(s=>s.includes('direct canvas composition')));
+ assert.ok(!traces.some(s=>s.includes('DOM layers rebuilt')),'unchanged DOM layers are reused across Canvas updates');
+ await r.evaluate("c.style.transform='translate(0px,0px)'");assert.deepEqual(await pixels(),multiple,'multiple translucent layers match Skia');
+ await r.evaluate("c.style.transform='none';document.querySelector('span').textContent='changed'");
+ const changedDom=await pixels();
+ await r.evaluate("c.style.transform='translate(0px,0px)'");assert.deepEqual(await pixels(),changedDom,'DOM cache invalidates when overlay text changes');
  console.log('direct canvas composition passed');
 }finally{r.dispose()}

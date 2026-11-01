@@ -1,29 +1,39 @@
-// The pixel blend from buninu-land's direct-compositor.ts, used without its
-// Wayland scene/viewport machinery. Channels are symmetric, so the same math
-// handles browser RGBA words as well as Land's BGRA words. Input is premultiplied;
-// a fully opaque result is also valid ordinary RGBA for existing frame consumers.
-const littleEndian=new Uint8Array(new Uint32Array([1]).buffer)[0]===1;
-function blend(p: number, q: number, alpha: number): number {
-  const inverse = 255 - alpha;
-  const blue = Math.min(255, (p & 255) + Math.round(((q & 255) * inverse) / 255));
-  const green = Math.min(255, ((p >> 8) & 255) + Math.round((((q >> 8) & 255) * inverse) / 255));
-  const red = Math.min(255, ((p >> 16) & 255) + Math.round((((q >> 16) & 255) * inverse) / 255));
-  return (0xff000000 | (red << 16) | (green << 8) | blue) >>> 0;
+// Browser adapter only. All pixel composition and sampling use Land unchanged.
+import {createDirectComposer, type DirectSurface} from '../../vendor/land-renderer/direct-compositor.ts';
+export interface CanvasLayer {
+  pixels: Uint8Array; width: number; height: number;
+  x: number; y: number; drawWidth: number; drawHeight: number;
 }
-export function compositeCanvasOverOpaque(pixels: Uint8Array, background: readonly number[]): void {
-  if(littleEndian&&pixels.byteOffset%4===0){
-    const words=new Uint32Array(pixels.buffer,pixels.byteOffset,pixels.byteLength/4);
-    const bg=(0xff000000|(background[2]!<<16)|(background[1]!<<8)|background[0]!)>>>0;
-    for(let i=0;i<words.length;i++){
-      const p=words[i]!,alpha=p>>>24;
-      if(alpha!==255)words[i]=alpha===0?bg:blend(p,bg,alpha);
-    }
-  }else{
-    for(let i=0;i<pixels.length;i+=4){
-      const alpha=pixels[i+3]!;
-      if(alpha===255)continue;
-      for(let c=0;c<3;c++)pixels[i+c]=Math.min(255,pixels[i+c]!+Math.round(background[c]!*(255-alpha)/255));
-      pixels[i+3]=255;
-    }
+export class CanvasComposer {
+  private surfaces: DirectSurface[] = [];
+  private positions = new WeakMap<DirectSurface,{x:number;y:number}>();
+  private buffers = new WeakMap<Uint8Array,NonNullable<DirectSurface["pixels"]>>();
+  private base: {key:string;surface:DirectSurface} | null = null;
+  private readonly direct = createDirectComposer({input:{x:0,y:0,pointer:false},wm:{
+    renderSurfaces:()=>this.surfaces,origin:surface=>this.positions.get(surface)!,
+  }});
+  private surface(layer: CanvasLayer): DirectSurface {
+    let pixels=this.buffers.get(layer.pixels);
+    if(!pixels||pixels.width!==layer.width||pixels.height!==layer.height){pixels={bytes:layer.pixels,width:layer.width,height:layer.height,stride:layer.width*4,format:0};this.buffers.set(layer.pixels,pixels);}
+    const surface:DirectSurface={pixels,
+      scale:1,transform:0,viewportDestination:[layer.drawWidth,layer.drawHeight]};
+    this.positions.set(surface,{x:layer.x,y:layer.y});
+    return surface;
   }
+  compose(width:number,height:number,background:readonly number[],layers:CanvasLayer[]):Uint8Array {
+    const key=[width,height,...background].join('/');
+    if(this.base?.key!==key){
+      const pixels=new Uint8Array(width*height*4);
+      // Browser RGBA and Land BGRA use identical alpha and blend operations.
+      // Supplying an opaque RGBA base also hides Land's default desktop color.
+      const words=new Uint32Array(pixels.buffer);
+      const color=new Uint8Array([background[0]!,background[1]!,background[2]!,255]);
+      words.fill(new Uint32Array(color.buffer)[0]!);
+      this.base={key,surface:this.surface({pixels,width,height,x:0,y:0,drawWidth:width,drawHeight:height})};
+    }
+    this.surfaces=[this.base.surface,...layers.map(layer=>this.surface(layer))];
+    const out=this.direct.compose(width,height);
+    return new Uint8Array(out.buffer,out.byteOffset,out.byteLength);
+  }
+  close():void {this.direct.close();this.surfaces=[];this.base=null;this.positions=new WeakMap();this.buffers=new WeakMap();}
 }
