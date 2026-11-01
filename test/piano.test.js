@@ -22,8 +22,8 @@ test("piano keyboard mapping is editable in one table", () => {
   expect(pianoNote("CapsLock", "CapsLock")).toBe(50);
   expect(pianoNote("Shift", "ShiftLeft")).toBe(54);
   expect(pianoNote("Shift", "ShiftRight")).toBeNull();
-  expect(pianoNote("Alt", "AltRight")).toBe(52);
-  expect(pianoNote("AltGraph")).toBe(52);
+  expect(pianoNote("Alt", "AltRight")).toBe(64);
+  expect(pianoNote("AltGraph")).toBe(64);
   expect(pianoNote("Alt", "AltLeft")).toBeNull();
   expect(pianoNote("Backspace")).toBeNull();
 });

@@ -46,7 +46,7 @@ test("left-hand control keys and AltGr play even while reporting their own modif
   expect(handlePianoInput(input, { key: "Shift", code: "ShiftLeft", modifiers: 8 }, play)).toBe(true);
   expect(handlePianoInput(input, { key: "AltGraph", code: "AltRight", modifiers: 3 }, play)).toBe(true);
   expect(handlePianoInput(input, { key: "Alt", code: "AltRight", modifiers: 1 }, play)).toBe(true);
-  expect(notes).toEqual([35, 42, 47, 50, 54, 52, 52]);
+  expect(notes).toEqual([35, 42, 47, 50, 54, 64, 64]);
 });
 
 test("ordinary, disabled and readonly editors are unaffected", () => {
