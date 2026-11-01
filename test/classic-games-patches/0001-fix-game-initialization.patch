@@ -1,0 +1,94 @@
+diff --git a/games/mine/index.html b/games/mine/index.html
+index 01e972d..91b0e32 100644
+--- a/games/mine/index.html
++++ b/games/mine/index.html
+@@ -415,6 +415,8 @@ board.addEventListener('click',e=>{
+ 
+ board.addEventListener('contextmenu',e=>{
+   e.preventDefault();
++  if(paused||over||won)return;
++  const g=getCell(e);if(g)toggleFlag(g.row,g.col);
+ });
+ 
+ board.addEventListener('mousedown',e=>{
+diff --git a/games/puzzle15/index.html b/games/puzzle15/index.html
+index 42f278e..5b0fa02 100644
+--- a/games/puzzle15/index.html
++++ b/games/puzzle15/index.html
+@@ -188,7 +188,7 @@ h1{
+   function findTile(val){
+     for(let r=0;r<gridSize;r++)
+       for(let c=0;c<gridSize;c++)
+-        if(grid[r][c]===val)return{r,c};
++        if(grid[r][c]===val)return{row:r,col:c};
+     return null;
+   }
+ 
+diff --git a/games/snake/index.html b/games/snake/index.html
+index 2f6919e..af005eb 100644
+--- a/games/snake/index.html
++++ b/games/snake/index.html
+@@ -166,8 +166,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-acti
+ 
+   // ---- DIRECTIONS ----
+   const UP={x:0,y:-1},DOWN={x:0,y:1},LEFT={x:-1,y:0},RIGHT={x:1,y:0};
+-  const opposite={};
+-  opposite[UP]=DOWN;opposite[DOWN]=UP;opposite[LEFT]=RIGHT;opposite[RIGHT]=LEFT;
++  const opposite=new Map([[UP,DOWN],[DOWN,UP],[LEFT,RIGHT],[RIGHT,LEFT]]);
+ 
+   // ---- PARTICLES ----
+   let particles=[];
+@@ -684,8 +683,8 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated;touch-acti
+ 
+   // ---- INPUT ----
+   function setDirection(dir){
+-    if(!opposite[dir])return;
+-    if(dir===opposite[nextDirection])return;
++    if(!opposite.has(dir))return;
++    if(dir===opposite.get(direction))return;
+     nextDirection=dir;
+   }
+ 
+diff --git a/games/space/index.html b/games/space/index.html
+index b980c91..d567d68 100644
+--- a/games/space/index.html
++++ b/games/space/index.html
+@@ -1113,13 +1113,6 @@ function setupTouch(c){
+   });
+ }
+ 
+-canvas.addEventListener('mousemove',e=>{
+-if(game.state!=='playing'||paused||!game.player.alive)return;
+-const rect=canvas.getBoundingClientRect();
+-const x=(e.clientX-rect.left)/canvas.clientWidth*W;
+-game.player.x=clamp(x,game.player.w/2+5,W-game.player.w/2-5);
+-});
+-
+ document.addEventListener('visibilitychange',()=>{
+ if(document.hidden&&game&&game.state==='playing')paused=true;
+ });
+@@ -1152,6 +1145,12 @@ function loop(){update();draw();rafId=requestAnimationFrame(loop)}
+ canvas=document.getElementById('c');
+ canvas.width=W;canvas.height=H;
+ ctx=canvas.getContext('2d');
++canvas.addEventListener('mousemove',e=>{
++if(game.state!=='playing'||paused||!game.player.alive)return;
++const rect=canvas.getBoundingClientRect();
++const x=(e.clientX-rect.left)/canvas.clientWidth*W;
++game.player.x=clamp(x,game.player.w/2+5,W-game.player.w/2-5);
++});
+ setupTouch(canvas);
+ try{audio.init()}catch(e){}
+ resize();
+diff --git a/games/typing/index.html b/games/typing/index.html
+index 17bf35b..bad31b2 100644
+--- a/games/typing/index.html
++++ b/games/typing/index.html
+@@ -634,6 +634,7 @@ document.getElementById('pauseOverlay').addEventListener('click',e=>{if(e.target
+ // ===== Keyboard =====
+ document.addEventListener('keydown',e=>{
+ if(e.repeat)return;const k=e.key;
++if(k!=='Escape'&&(e.target.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)))return;
+ if((k==='p'||k==='P'||k==='Escape')&&isRunning){e.preventDefault();if(isPaused)resumeGame();else pauseGame();return}
+ if(k==='m'||k==='M'){e.preventDefault();if(!audioCtx)initAudio();toggleMute();return}
+ if((k===' '||k==='Enter')&&!isRunning){e.preventDefault();if(!audioCtx)initAudio();startGame();return}
