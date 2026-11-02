@@ -60,6 +60,37 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Browser SHM, pointer, keyboa
   expect(Number(await app.browser.context.evaluate('animationTick'))).toBeGreaterThan(2);
   await app.browser.context.evaluate('clearInterval(animationTimer)');
   app.toolbar.editor.cancelEditing();
+  // Model Win32's raw key + WM_CHAR through Casty's no-shortcuts adapter,
+  // Land and the real Wayland client, including the inner address editor.
+  const {EventEmitter}=await import('node:events');
+  const {startInputHandling}=await import('../../casty/lib/input.js');
+  const {UrlBar,PromptHistory}=await import('../../casty/lib/urlbar.js');
+  const outerClient=new EventEmitter();
+  outerClient.send=async(method,p)=>{
+    if(method==='Input.dispatchKeyEvent')return land.context.dispatchKeyEvent(p);
+    if(method==='Input.insertText')return land.context.type(p.text);
+    return {};
+  };
+  const outerBar=new UrlBar({history:new PromptHistory(null)});outerBar.native=true;outerBar.render=()=>{};
+  const outer=startInputHandling(outerClient,1,1,1,{'ctrl+u':'back','ctrl+k':'forward'},()=>{},null,{},
+    {noShortcuts:true,native:{urlBar:outerBar,quit(){}}});
+  const physical=async(key,code,modifiers=0,text=null)=>{
+    const info={key,code,keyCode:key.toUpperCase().charCodeAt(0),modifiers,eventType:1};
+    await outer.dispatchNative('',info);
+    if(text!==null)await outer.dispatchNativeText(text,info);
+    await outer.dispatchNative('',{...info,eventType:3});
+  };
+  try{
+    app.toolbar.open(false,'headtail');app.toolbar.editor.moveCursor(4);
+    await physical('u','KeyU',2);await wait(()=>app.toolbar.editor.text==='tail');
+    await physical('k','KeyK',2);await wait(()=>app.toolbar.editor.text==='');
+    await physical('u','KeyU',2);await wait(()=>app.toolbar.editor.text==='head');
+    await physical('k','KeyK',2);await wait(()=>app.toolbar.editor.text==='headtail');
+    await physical('a','KeyA',0,'a');
+    await wait(()=>app.toolbar.editor.text.length>8);await Bun.sleep(50);
+    expect(app.toolbar.editor.text).toBe('headatail');
+    app.toolbar.editor.cancelEditing();
+  }finally{outer.dispose();}
   // A JavaScript URL must present its modal while execution is blocked.
   let alertDone=false;
   const beforeAlert=presents;
