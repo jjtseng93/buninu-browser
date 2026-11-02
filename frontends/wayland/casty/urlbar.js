@@ -141,6 +141,7 @@ export class UrlBar {
 
   // Update current URL and re-render (if not editing)
   setUrl(url) {
+    if (url !== this.currentUrl) this._suspendedEdit = null;
     this.currentUrl = url;
     this._dirty = true;
     if (!this.editing) this.render();
@@ -251,11 +252,25 @@ export class UrlBar {
     this._lastClick = { time: 0, zone: null };
     this._scrollX = 0;
     this._resetHistory();
+    const suspended = this._suspendedEdit;
+    this._suspendedEdit = null;
+    if (text === null && suspended?.mode === this.mode) Object.assign(this, suspended);
     this.render();
     let resolve;
     const promise = new Promise(r => { resolve = r; });
     this._resolve = resolve;
     return promise;
+  }
+
+  // Page focus suspends the draft; preserve cut boundaries for Ctrl-U/K.
+  suspendEditing() {
+    if (!this.editing) return;
+    const draft = {};
+    for (const key of ['mode', 'text', 'cursor', 'selectionAnchor', '_scrollX', '_historyIndex', '_savedInput']) {
+      draft[key] = this[key];
+    }
+    this._finishEditing(null);
+    this._suspendedEdit = draft;
   }
 
   // Leave editing as if Escape was pressed
@@ -265,6 +280,7 @@ export class UrlBar {
 
   // End editing mode
   _finishEditing(result) {
+    this._suspendedEdit = null;
     this.editing = false;
     this._drag = null;
     hideCursor();

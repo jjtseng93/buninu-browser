@@ -53,9 +53,11 @@ export class WaylandUrlBar {
   async press(key,options={}) {
     const m=options.modifiers||0,name=toKeyName({key,modifiers:m});
     if(this.editor.editing) {
-      if(name==='ctrl+c'||name==='alt+c')await this.clipboard.write(this.editor.selectedText||this.editor.text);
+      const action=name==='ctrl+c'?'copy':this.bindings[name];
+      if(action==='quit'){this.quit();return;}
+      if(action==='copy')await this.clipboard.write(this.editor.selectedText||this.editor.text);
       else if(name==='ctrl+x') {if(this.editor.selectedText){await this.clipboard.write(this.editor.selectedText);this.editor._clearIfSelected();this.editor.render();}}
-      else if(name==='ctrl+v')this.editor.insertText((await this.clipboard.read()).replace(/[\r\n]+/g,' '));
+      else if(action==='paste')this.editor.insertText((await this.clipboard.read()).replace(/[\r\n]+/g,' '));
       else this.editor.handleInput(editorKey(key,m));
       return;
     }
@@ -78,7 +80,7 @@ export class WaylandUrlBar {
       }else this.editor.pointerUp();
       return;
     }
-    if(state&&this.editor.editing)this.editor.cancelEditing();
+    if(state&&this.editor.editing)this.editor.suspendEditing();
     const mask=button===272?1:button===273?2:4;
     this.pageButtons=state?(this.pageButtons||0)|mask:(this.pageButtons||0)&~mask;
     if(this.context.pointerButton)return this.context.pointerButton(x/this.zoom,(y-this.height)/this.zoom,button,state,options);

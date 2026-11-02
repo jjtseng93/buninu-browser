@@ -59,3 +59,41 @@ test('Wayland toolbar forwards right/middle page clicks but ignores them on chro
   expect(clicks.map(c=>c[2].button)).toEqual(['right','middle']);
  }finally{bar.dispose()}
 });
+
+test('Wayland address Ctrl-U/K survive page focus, and Escape/navigation discard only the draft',async()=>{
+ const bar=new WaylandUrlBar({pointerButton(){}},{history});
+ try{
+  bar.updateURL('https://example.com/');bar.open(false,'前😀後尾');
+  bar.editor.moveCursor(2);
+  await bar.press('u',{modifiers:2});await bar.press('k',{modifiers:2});
+  expect(bar.editor.text).toBe('');
+  await bar.pointerButton(40,80,272,1);await bar.pointerButton(40,80,272,0);
+  bar.open();expect(bar.editor.text).toBe('');expect(bar.editor.cursor).toBe(0);
+  await bar.press('u',{modifiers:2});await bar.press('k',{modifiers:2});
+  expect(bar.editor.text).toBe('前😀後尾');
+  await bar.press('Escape');bar.open();expect(bar.editor.text).toBe('https://example.com/');
+  bar.editor._setText('draft');await bar.press('u',{modifiers:2});
+  await bar.pointerButton(40,80,272,1);await bar.pointerButton(40,80,272,0);
+  bar.updateURL('https://new.example/');bar.open();
+  expect(bar.editor.text).toBe('https://new.example/');expect(bar.editor._savedHead).toBe('draft');
+ }finally{bar.dispose();}
+});
+
+test('Wayland address copy/paste/quit honor Casty bindings without forwarding to the page',async()=>{
+ let copied='',quit=0,reads=0;
+ const bar=new WaylandUrlBar({press(){throw Error('Editor key leaked to page');}},{history,close:()=>quit++,
+  clipboard:{write:async text=>copied=text,read:async()=>{reads++;return '中😀';}}});
+ try{
+  bar.open(false,'abcdef');bar.editor.moveCursor(2);bar.editor.moveCursor(4,true);
+  await bar.press('c',{modifiers:2});expect(copied).toBe('cd');
+  await bar.press('v',{modifiers:2});expect(bar.editor.text).toBe('ab中😀ef');
+  bar.editor.moveCursor(2);await bar.press('v',{modifiers:2});expect(bar.editor.text).toBe('ab中😀中😀ef');
+  await bar.press('c',{modifiers:2});expect(copied).toBe(bar.editor.text);
+  // Remapped editor actions use the same configuration as page actions.
+  bar.bindings['ctrl+y']='copy';bar.bindings['ctrl+b']='paste';bar.bindings['ctrl+j']='quit';
+  await bar.press('y',{modifiers:2});expect(copied).toBe(bar.editor.text);
+  await bar.press('b',{modifiers:2});expect(reads).toBe(3);
+  await bar.press('q',{modifiers:2});expect(quit).toBe(1);
+  await bar.press('j',{modifiers:2});expect(quit).toBe(2);
+ }finally{bar.dispose();}
+});
