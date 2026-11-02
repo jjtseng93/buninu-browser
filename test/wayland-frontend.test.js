@@ -60,6 +60,22 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Browser SHM, pointer, keyboa
   expect(Number(await app.browser.context.evaluate('animationTick'))).toBeGreaterThan(2);
   await app.browser.context.evaluate('clearInterval(animationTimer)');
   app.toolbar.editor.cancelEditing();
+  // A JavaScript URL must present its modal while execution is blocked.
+  let alertDone=false;
+  const beforeAlert=presents;
+  const alert=app.toolbar.navigate('javascript:alert(1)').then(()=>{alertDone=true;});
+  await wait(()=>Boolean(app.browser.context.dialogState));
+  await wait(()=>presents>beforeAlert);
+  expect(alertDone).toBe(false);
+  expect(await app.browser.context.evaluate('document.getElementById("message").textContent')).toBe('1');
+  await app.toolbar.press('Enter');await alert;
+  expect(app.browser.context.dialogState).toBe(null);
+  // Ordinary navigation can also block on a load-time alert.
+  const beforeLoadAlert=presents;
+  const loading=app.toolbar.navigate('data:text/html,'+encodeURIComponent('<script>alert("load")</script><p>loaded</p>'));
+  await wait(()=>Boolean(app.browser.context.dialogState));
+  await wait(()=>presents>beforeLoadAlert);
+  await app.toolbar.press('Enter');await loading;
   const before=app.window.width;land.context.resize(900,700,1);
   await wait(()=>app.window.width!==before&&surface().pixels.width===app.window.width);
   expect(JSON.parse(await app.browser.context.evaluate('JSON.stringify([innerWidth,innerHeight])'))).toEqual([app.window.width,app.window.height-32]);

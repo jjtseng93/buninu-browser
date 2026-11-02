@@ -54,7 +54,7 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
     // qml handle end
 
     const draw=async()=>{
-      if(closed||!ready||navigating||busy||!dirty||!window.available)return;
+      if(closed||!ready||(navigating&&!browser.context.dialogState)||busy||!dirty||!window.available)return;
       busy=true;dirty=false;const generation=navigation;let path;
       try{
         const w=window.width,h=window.height,bar=toolbar?Math.min(BAR_HEIGHT,h-1):0,z=toolbar?.zoom||1;
@@ -84,6 +84,9 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
     // not enter this path and continues to present page animation normally.
     const navigate=browser.context.navigate;
     browser.context.navigate=async function(...args){
+      // JavaScript URLs execute in the current page and may await a modal
+      // answer. They must not suspend the frames that display that modal.
+      if (String(args[0]).trimStart().toLowerCase().startsWith('javascript:')) return navigate.apply(this,args);
       navigation++;navigating++;
       try{return await navigate.apply(this,args);}
       finally{navigating--;pageDirty=true;dirty=true;if(ready&&!closed)void draw();}

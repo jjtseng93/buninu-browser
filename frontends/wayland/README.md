@@ -24,12 +24,16 @@ provides horizontal scrolling, Shift-arrow and mouse-drag selection, double-clic
 history/submit gestures, and Ctrl+C / Alt+C copying plus Ctrl+V insertion (replacing
 selected text). Escape cancels editing; `q` quits. `help` lists applicable commands;
 CDP and terminal transport commands are omitted. QML applications have no bar.
+`size` reports the current page viewport in CSS pixels; `sh <command>` runs a
+shell command on the browser host and displays its output in the bar.
 
 一般網頁頂部有 32 像素高的網址列。點網址或按 Alt+L 編輯，點 `@` 或按 Ctrl+E
 進入 `cmd>`；Tab 切換模式。沿用 Casty 的水平捲動、Shift 方向鍵與滑鼠拖曳選取、
 雙擊歷史／送出操作，以及 Ctrl+C／Alt+C 複製、Ctrl+V 插入（有選取時取代選取）。
 Escape 取消編輯，`q` 退出；`help` 列出適用命令，不包含 CDP 與終端傳輸命令。
 QML 應用不顯示網址列。
+`size` 顯示目前頁面 viewport 的 CSS 像素寬高；`sh <command>` 在瀏覽器所在的主機
+執行 shell 命令，並將輸出顯示於網址列。
 
 Editing the address bar never pauses page frame updates. Only chrome-only changes
 reuse the latest page frame. The cached bar is rasterized separately; raw BGRA

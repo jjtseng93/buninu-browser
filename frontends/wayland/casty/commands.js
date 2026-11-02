@@ -2,6 +2,8 @@
 // Each command maps to an action in input.js; `help` lists them.
 
 export const COMMANDS = [
+  { name: 'sh', aliases: [], usage: 'sh <command>', help: 'Run a command on the browser host and show its output' },
+  { name: 'size', aliases: [], usage: 'size', help: 'Show the current viewport width and height' },
   { name: 'open', aliases: ['o', 'go'], usage: 'open <url|query>', help: 'Open a URL or search' },
   { name: 'back', aliases: ['b'], usage: 'back', help: 'Go back' },
   { name: 'forward', aliases: ['f'], usage: 'forward', help: 'Go forward' },

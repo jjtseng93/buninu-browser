@@ -97,3 +97,31 @@ test('Wayland address copy/paste/quit honor Casty bindings without forwarding to
   await bar.press('j',{modifiers:2});expect(quit).toBe(2);
  }finally{bar.dispose();}
 });
+
+test('Wayland size reports the engine viewport and sh executes on the frontend host',async()=>{
+ const bar=new WaylandUrlBar({viewport:{width:1234,height:567}},{history});
+ try{
+  await bar.command('size');expect(bar.editor._status).toBe('Viewport: 1234×567 CSS px');
+  await bar.command('size extra');expect(bar.editor._status).toBe('Usage: size');
+  await bar.command('sh');expect(bar.editor._status).toBe('Usage: sh <command>');
+  await bar.command('sh echo wayland-shell-ok');expect(bar.editor._status).toBe('wayland-shell-ok');
+  expect(WAYLAND_COMMANDS.some(c=>c.name==='readonly')).toBe(false);
+ }finally{bar.dispose();}
+});
+
+test('clicking an unchanged address selects its full URL again, while changed drafts resume',async()=>{
+ const bar=new WaylandUrlBar({pointerButton(){}},{history});
+ const click=async(x,y)=>{await bar.pointerButton(x,y,272,1);await bar.pointerButton(x,y,272,0);};
+ try{
+  bar.updateURL('https://example.com/');
+  await click(80,10);expect(bar.editor.selectedText).toBe(bar.editor.currentUrl);
+  await bar.press('ArrowRight');expect(bar.editor.selectedText).toBe('');
+  await click(80,80);await click(80,10);
+  expect(bar.editor.selectedText).toBe(bar.editor.currentUrl);
+  await bar.press('ArrowRight');await bar.press('x');
+  await click(80,80);await click(80,10);
+  expect(bar.editor.text).toBe('https://example.com/x');
+  expect(bar.editor.cursor).toBe(bar.editor.text.length);
+  expect(bar.editor.selectedText).toBe('');
+ }finally{bar.dispose();}
+});

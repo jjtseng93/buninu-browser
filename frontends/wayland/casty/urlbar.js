@@ -265,6 +265,11 @@ export class UrlBar {
   // Page focus suspends the draft; preserve cut boundaries for Ctrl-U/K.
   suspendEditing() {
     if (!this.editing) return;
+    // An unchanged URL is not a draft: reopening should select the full URL.
+    if (this.mode === 'url' && this.text === this.currentUrl) {
+      this._finishEditing(null);
+      return;
+    }
     const draft = {};
     for (const key of ['mode', 'text', 'cursor', 'selectionAnchor', '_scrollX', '_historyIndex', '_savedInput']) {
       draft[key] = this[key];

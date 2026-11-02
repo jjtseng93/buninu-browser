@@ -10,6 +10,7 @@ import {downloadPage} from './casty/download.js';
 import {HintMode} from './casty/hints.js';
 import {findInPage,toggleEruda} from './casty/page-commands.js';
 import {readClipboard,writeClipboard} from '../../lib/clipboard.js';
+import {shellCommand} from './casty/shell-command.js';
 
 export const BAR_HEIGHT=32;
 export const WAYLAND_COMMANDS=COMMANDS.filter(c=>!['cdp','kitty','pixelmouse'].includes(c.name));
@@ -44,7 +45,7 @@ export class WaylandUrlBar {
     return this;
   }
   updateURL(url){if(url!==this.editor.currentUrl)this.editor.setUrl(url||'about:blank');}
-  flash(text){clearTimeout(this.statusTimer);this.editor.setStatus(String(text));this.editor.render();this.statusTimer=setTimeout(()=>{this.editor.clearStatus();this.editor.render();},5000);}
+  flash(text,duration=5000){clearTimeout(this.statusTimer);this.editor.setStatus(String(text));this.editor.render();this.statusTimer=setTimeout(()=>{this.editor.clearStatus();this.editor.render();},duration);}
   open(command=false,text=null){if(this.editor.editing)this.editor.cancelEditing();this.editor.startEditing({command,text}).then(result=>{
     if(result?.mode==='cmd')return this.command(result.line);
     if(result?.url)return this.navigate(result.url);
@@ -91,7 +92,17 @@ export class WaylandUrlBar {
   async command(line) {
     const {name,arg,error}=parseCommand(line);if(error){this.flash(error);return;}
     if(!WAYLAND_COMMANDS.some(c=>c.name===name)){this.flash(`${name} is not used by the Wayland frontend`);return;}
-    if(name==='open'){const url=toURL(arg);if(url)await this.navigate(url);else this.flash('Bookmark not found');}
+    if(name==='size'){
+      if(arg.trim()){this.flash('Usage: size');return;}
+      const {width,height}=this.context.viewport;
+      this.flash(`Viewport: ${width}×${height} CSS px`,8000);
+    }
+    else if(name==='sh'){
+      if(!arg.trim()){this.flash('Usage: sh <command>');return;}
+      this.flash('Running shell command…',8000);
+      try{this.flash(await shellCommand(arg),15000);}catch(error){this.flash(`Shell: ${error.message}`,15000);}
+    }
+    else if(name==='open'){const url=toURL(arg);if(url)await this.navigate(url);else this.flash('Bookmark not found');}
     else if(name==='bookmark'){const match=searchBookmarks(arg)[0];if(match)await this.navigate(match.url);else this.flash('Bookmark not found');}
     else if(name==='help')this.flash(WAYLAND_COMMANDS.map(c=>c.usage).join(' · '));
     else if(name==='find'){const result=await findInPage(this.client,arg);this.flash(result.error||`${result.text}: ${result.total?result.index+1:0}/${result.total}`);}
