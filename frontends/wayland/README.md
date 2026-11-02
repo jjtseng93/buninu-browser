@@ -183,3 +183,22 @@ Windows 驗證：在本專案執行 `bun test test/wayland-win32-resources.test.
 其他平台會略過這些原生測試；封裝、分段收送、ACK 和清理測試可在各平台執行：
 `bun test test/wayland-win32-wire.test.js`。PowerShell 剪貼板沿用原有 jsmdcui
 函式，仍優先嘗試 xclip，失敗才 fallback。
+
+## Socket discovery / Socket 搜尋順序
+
+An explicit frontend socket path is used exactly as supplied. Otherwise,
+`WAYLAND_DISPLAY` selects the socket name (or absolute path), with no fallback
+to another name. Without it, try `wayland-buninu` first and `wayland-0` second.
+Relative names use `XDG_RUNTIME_DIR`, then `TMPDIR`, then system temp; an explicit
+runtime directory is never replaced by a search in other directories. Failed
+connections list all attempted paths and explain how to export both variables.
+
+明確指定的 socket 路徑優先；否則尊重 `WAYLAND_DISPLAY`，不擅自改連其他名稱。
+未設定時依序嘗試 `wayland-buninu`、`wayland-0`。相對名稱的目錄依序採用
+`XDG_RUNTIME_DIR`、`TMPDIR`、系統暫存目錄；已指定的 runtime 目錄不會被替換。
+失敗時會列出實際嘗試的路徑，並提示：
+
+```sh
+export XDG_RUNTIME_DIR=/path/to/runtime
+export WAYLAND_DISPLAY=wayland-buninu
+```
