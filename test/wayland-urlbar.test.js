@@ -125,3 +125,19 @@ test('clicking an unchanged address selects its full URL again, while changed dr
   expect(bar.editor.selectedText).toBe('');
  }finally{bar.dispose();}
 });
+
+
+test('opening address click tolerates stationary motion before release without losing select-all',async()=>{
+ const bar=new WaylandUrlBar({},{history});
+ try{
+  bar.updateURL('https://example.com/');
+  await bar.pointerButton(80,10,272,1);
+  bar.move(80,10);bar.move(81,10);
+  await bar.pointerButton(81,10,272,0);
+  expect(bar.editor.selectedText).toBe(bar.editor.currentUrl);
+  await bar.pointerButton(80,10,272,1);bar.move(120,10);
+  await bar.pointerButton(120,10,272,0);
+  expect(bar.editor.selectedText.length).toBeGreaterThan(0);
+  expect(bar.editor.selectedText).not.toBe(bar.editor.currentUrl);
+ }finally{bar.dispose();}
+});

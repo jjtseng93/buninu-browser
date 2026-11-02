@@ -406,6 +406,9 @@ export class UrlBar {
     if (!this._drag) return;
     const index = this._pointerIndex(col) ?? 0;
     if (index !== this._drag.anchor || col !== this._drag.col) this._drag.moved = true;
+    // Motion can be reported at the press position; it is not a drag and
+    // must not collapse the select-all established by the opening click.
+    if (!this._drag.moved) return;
     this.selectionAnchor = this._drag.anchor;
     this.cursor = index;
     this.render();
