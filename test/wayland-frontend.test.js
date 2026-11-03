@@ -89,6 +89,13 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Browser SHM, pointer, keyboa
     await physical('a','KeyA',0,'a');
     await wait(()=>app.toolbar.editor.text.length>8);await Bun.sleep(50);
     expect(app.toolbar.editor.text).toBe('headatail');
+    const cursor=app.toolbar.editor.cursor;
+    const left={key:'ArrowLeft',code:'ArrowLeft',keyCode:37,modifiers:0,eventType:1};
+    await outer.dispatchNative('',left);
+    await wait(()=>app.toolbar.editor.cursor<cursor-1);
+    await outer.dispatchNative('',{...left,eventType:3});
+    await Bun.sleep(50);const releasedCursor=app.toolbar.editor.cursor;
+    await Bun.sleep(120);expect(app.toolbar.editor.cursor).toBe(releasedCursor);
     app.toolbar.editor.cancelEditing();
   }finally{outer.dispose();}
   // A JavaScript URL must present its modal while execution is blocked.

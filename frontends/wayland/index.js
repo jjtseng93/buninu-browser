@@ -18,10 +18,10 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
   chrome ??= !/\.qml(?:[?#]|$)/i.test(url);
   // qml handle end
 
-  let browser,client,window,off,titleTimer,toolbar,closed=false,busy=false,dirty=true,ready=false;
+  let browser,client,window,off,titleTimer,toolbar,stopInput,closed=false,busy=false,dirty=true,ready=false;
   let pageDirty=true,pageBytes,pageSize='',navigation=0,navigating=0;
   let resolveDone;const done=new Promise(resolve=>resolveDone=resolve);
-  const close=()=>{if(closed)return;closed=true;clearInterval(titleTimer);off?.();toolbar?.dispose();try{window?.close();}finally{client?.close();browser?.close();resolveDone();}};
+  const close=()=>{if(closed)return;closed=true;clearInterval(titleTimer);off?.();stopInput?.();toolbar?.dispose();try{window?.close();}finally{client?.close();browser?.close();resolveDone();}};
   const fail=e=>{console.error(`Wayland frontend: ${e.message}`);close();};
   try{
     client=new WaylandClient(socket);await client.initialize();
@@ -113,7 +113,7 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
       pointerButton:(...args)=>toolbar.pointerButton(...args).catch(e=>toolbar.flash(e.message)),
       move:(...args)=>toolbar.move(...args),scroll:(...args)=>toolbar.scroll(...args),
     }:browser.context;
-    attachInput(client,window,input,fail);
+    stopInput=attachInput(client,window,input,fail);
     await browser.context.resize(width,height,1);await browser.context.navigate(url);ready=true;draw();
     // qml handle begin: send initial window size hints
     await syncQmlConstraints();
