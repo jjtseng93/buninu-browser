@@ -2399,3 +2399,55 @@ test('decoded video dimensions invalidate retained intrinsic layout without a DO
  expect(size[0]).toBeGreaterThan(0);expect(size[1]).toBeGreaterThan(0);
  expect(size[2]).toBe(size[0]);expect(size[3]).toBe(size[1]);
 });
+
+test('page member keys preserve primitive conversions, symbols and observable object coercion',async()=>{
+ await load(`<script>
+ const values={'0':'zero','NaN':'nan','Infinity':'infinity','-Infinity':'negative infinity','1':'one','true':'yes','false':'no','null':'null key','undefined':'undefined key'};
+ const symbol=Symbol('key');values[symbol]='symbol';
+ window.converted=[values[-0],values[NaN],values[Infinity],values[-Infinity],values[1n],values[true],values[false],values[null],values[undefined],values[symbol]];
+ window.conversions=[];
+ const objectKey={ [Symbol.toPrimitive](hint){conversions.push(hint);return symbol;} };
+ converted.push(values[objectKey]);
+ const callableKey=function(){};callableKey[Symbol.toPrimitive]=hint=>{conversions.push(hint);return '1';};
+ converted.push(values[callableKey]);
+ const bad={ [Symbol.toPrimitive](){throw new RangeError('key failed');} };
+ try{values[bad];}catch(error){converted.push(error.name,error.message);}
+ const invalid={ [Symbol.toPrimitive](){return {};} };
+ try{values[invalid];}catch(error){converted.push(error.name);}
+ const bytes=new Uint8Array([7,8,9]);converted.push(bytes[0],bytes[1],bytes[2],bytes[3]);
+ </script>`);
+ expect(JSON.parse(await evaluate('JSON.stringify(converted)'))).toEqual(['zero','nan','infinity','negative infinity','one','yes','no','null key','undefined key','symbol','symbol','one','RangeError','key failed','TypeError',7,8,9,null]);
+ expect(JSON.parse(await evaluate('JSON.stringify(conversions)'))).toEqual(['string','string']);
+});
+
+test('object member fast reads preserve proxy traps and page-local array inheritance',async()=>{
+ await load(`<script>
+ window.traps=[];
+ const target={get x(){traps.push('getter');return undefined;}};
+ const proxy=new Proxy(target,{get(o,k,r){traps.push('get:'+String(k));return Reflect.get(o,k,r);},getOwnPropertyDescriptor(o,k){traps.push('own:'+String(k));return Reflect.getOwnPropertyDescriptor(o,k);}});
+ window.fastValues=[proxy.x,proxy[0]];
+ const objectKey={[Symbol.toPrimitive](hint){traps.push('key:'+hint);return 'x';}};
+ fastValues.push(proxy[objectKey]);
+ Array.prototype[77]='inherited';
+ fastValues.push([][77]);
+ Object.defineProperty(Array.prototype,'78',{get(){return this.length+5;},configurable:true});
+ fastValues.push([1,2][78]);
+ const revocable=Proxy.revocable({},{});revocable.revoke();
+ try{revocable.proxy.x;}catch(error){fastValues.push(error.name);}
+ </script>`);
+ expect(JSON.parse(await evaluate('JSON.stringify(fastValues)'))).toEqual([null,null,null,'inherited',7,'TypeError']);
+ expect(JSON.parse(await evaluate('JSON.stringify(traps)'))).toEqual(['get:x','getter','own:x','get:0','own:0','key:string','get:x','getter','own:x']);
+});
+
+test("primitive string reads preserve UTF-16 indices, coercion and prototype fallbacks", async () => {
+  await load('<!doctype html><p>strings</p>');
+  expect(await evaluate(`(() => {
+    let zeroReads=0,farReads=0,keyReads=0;
+    Object.defineProperty(String.prototype,'0',{configurable:true,get:function(){'use strict';zeroReads++;return typeof this;}});
+    Object.defineProperty(String.prototype,'99',{configurable:true,get:function(){'use strict';farReads++;return typeof this;}});
+    const key={[Symbol.toPrimitive](hint){keyReads++;if(hint!=='string')throw Error('wrong hint');return '1';}};
+    const s='a😀';
+    const values=[s.length,s[0],s[-0],s[1].charCodeAt(0),s[2].charCodeAt(0),s[key],s[99],s['99'],''[0]];
+    return {values,zeroReads,farReads,keyReads,boxed:[new String('ab').length,new String('ab')[0]]};
+  })()`)).toEqual({values:[3,'a','a',55357,56832,'\ud83d','string','string','string'],zeroReads:1,farReads:2,keyReads:1,boxed:[2,'a']});
+});
