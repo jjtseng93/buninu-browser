@@ -2518,3 +2518,16 @@ test("primitive string reads preserve UTF-16 indices, coercion and prototype fal
     return {values,zeroReads,farReads,keyReads,boxed:[new String('ab').length,new String('ab')[0]]};
   })()`)).toEqual({values:[3,'a','a',55357,56832,'\ud83d','string','string','string'],zeroReads:1,farReads:2,keyReads:1,boxed:[2,'a']});
 });
+
+test('borrowed same-origin iframe platform operations use the actual receiver', async () => {
+  await load('<iframe></iframe>');
+  expect(await evaluate(`(async()=>{
+    const child=document.querySelector('iframe').contentWindow;
+    const getter=Object.getOwnPropertyDescriptor(child.Navigator.prototype,'userAgent').get;
+    const value=getter.call(navigator);
+    const status=await child.navigator.permissions.query.call(navigator.permissions,{name:'notifications'});
+    let forged;try{getter.call({});}catch(e){forged=e.name;}
+    return [value===navigator.userAgent,status.state,forged];
+  })()`)).toEqual([true,'prompt','TypeError']);
+});
+
