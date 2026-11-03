@@ -2519,6 +2519,21 @@ test("primitive string reads preserve UTF-16 indices, coercion and prototype fal
   })()`)).toEqual({values:[3,'a','a',55357,56832,'\ud83d','string','string','string'],zeroReads:1,farReads:2,keyReads:1,boxed:[2,'a']});
 });
 
+
+test('user activation follows trusted input, is visible inside handlers and resets on navigation', async () => {
+  await load('<input id="pick" type="file"><script>window.states=[];document.addEventListener("keydown",e=>states.push([e.isTrusted,navigator.userActivation.isActive,navigator.userActivation.hasBeenActive]));</script>');
+  expect(await evaluate('[navigator.userActivation.isActive,navigator.userActivation.hasBeenActive]')).toEqual([false,false]);
+  await evaluate('document.dispatchEvent(new KeyboardEvent("keydown",{key:"a",bubbles:true}))');
+  expect(await evaluate('states')).toEqual([[false,false,false]]);
+  expect(await evaluate('(()=>{try{pick.showPicker();return "no error"}catch(e){return e.name}})()')).toBe('NotAllowedError');
+  await renderer.call('press','a',{code:'KeyA'});
+  expect(await evaluate('states.at(-1)')).toEqual([true,true,true]);
+  await evaluate('pick.showPicker()');
+  expect(await evaluate('[navigator.userActivation.isActive,navigator.userActivation.hasBeenActive]')).toEqual([false,true]);
+  await load('<p>new document</p>');
+  expect(await evaluate('navigator.userActivation.hasBeenActive')).toBe(false);
+});
+
 test('borrowed same-origin iframe platform operations use the actual receiver', async () => {
   await load('<iframe></iframe>');
   expect(await evaluate(`(async()=>{
@@ -2530,7 +2545,6 @@ test('borrowed same-origin iframe platform operations use the actual receiver', 
     return [value===navigator.userAgent,status.state,forged];
   })()`)).toEqual([true,'prompt','TypeError']);
 });
-
 
 test('page event and worker timestamps use coarsened independent monotonic timelines', async () => {
   scripts.set('https://page.test/clock-worker.js', `onmessage=e=>{
