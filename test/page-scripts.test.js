@@ -2378,28 +2378,6 @@ test('primitive and literal extension methods stay page-local without exposing h
  expect(JSON.parse(await evaluate('JSON.stringify(clean)'))).toEqual(Array(7).fill('undefined'));
 });
 
-test('CanvasRenderingContext2D has a page-local prototype for feature detection and method extensions',async()=>{
- await load('<canvas id="surface" width="20" height="20"></canvas>');
- expect(await evaluate(`(()=>{
-  const ctx=document.getElementById('surface').getContext('2d');
-  CanvasRenderingContext2D.prototype.redBox=function(){this.fillStyle='red';this.fillRect(0,0,20,20)};
-  ctx.redBox();
-  return [ctx instanceof CanvasRenderingContext2D,Object.getPrototypeOf(ctx)===CanvasRenderingContext2D.prototype,typeof CanvasRenderingContext2D.prototype.roundRect,ctx.getImageData(5,5,1,1).data[0]].join(',');
- })()`)).toBe('true,true,function,255');
- await load('<canvas id="surface"></canvas>');
- expect(await evaluate('typeof CanvasRenderingContext2D.prototype.redBox')).toBe('undefined');
-});
-
-test('decoded video dimensions invalidate retained intrinsic layout without a DOM mutation',async()=>{
- await load('<video id="intrinsicVideo" src="/video.mp4"></video><div id="afterVideo">after</div>');
- const before=await evaluate('intrinsicVideo.getBoundingClientRect().width');
- expect(before).toBe(300);
- await evaluate('intrinsicVideo.play().then(()=>intrinsicVideo.pause())');
- const size=await evaluate(`(()=>{const r=intrinsicVideo.getBoundingClientRect();return [intrinsicVideo.videoWidth,intrinsicVideo.videoHeight,r.width,r.height]})()`);
- expect(size[0]).toBeGreaterThan(0);expect(size[1]).toBeGreaterThan(0);
- expect(size[2]).toBe(size[0]);expect(size[3]).toBe(size[1]);
-});
-
 test('page member keys preserve primitive conversions, symbols and observable object coercion',async()=>{
  await load(`<script>
  const values={'0':'zero','NaN':'nan','Infinity':'infinity','-Infinity':'negative infinity','1':'one','true':'yes','false':'no','null':'null key','undefined':'undefined key'};
@@ -2437,6 +2415,95 @@ test('object member fast reads preserve proxy traps and page-local array inherit
  </script>`);
  expect(JSON.parse(await evaluate('JSON.stringify(fastValues)'))).toEqual([null,null,null,'inherited',7,'TypeError']);
  expect(JSON.parse(await evaluate('JSON.stringify(traps)'))).toEqual(['get:x','getter','own:x','get:0','own:0','key:string','get:x','getter','own:x']);
+});
+
+test('Permissions and Clipboard promise methods reject invalid receivers without synchronous throws',async()=>{
+ await load('<p>Promise Web APIs</p>');
+ const rows=await evaluate(`(async()=>{
+  const rows=[];let reads=0;
+  const descriptor={get name(){reads++;return 'notifications';}};
+  for(const [name,fn,self,args]of [
+   ['query',navigator.permissions.query,{},[descriptor]],
+   ['query-null',navigator.permissions.query,null,[descriptor]],
+   ['query-missing',navigator.permissions.query,navigator.permissions,[{}]],
+   ['query-invalid',navigator.permissions.query,navigator.permissions,[{name:'not-a-permission'}]],
+   ['readText',navigator.clipboard.readText,{},[]],
+   ['writeText',navigator.clipboard.writeText,{},['not sent to host']],
+  ]){
+   const row={name};
+   try{const result=Reflect.apply(fn,self,args);row.promise=result instanceof Promise;try{await result;row.resolved=true;}catch(error){row.rejection=error.name;}}
+   catch(error){row.syncError=error.name;}
+   rows.push(row);
+  }
+  const status=await navigator.permissions.query(descriptor);
+  return {rows,reads,status:[status.name,status.state,status instanceof PermissionStatus]};
+ })()`);
+ expect(rows.rows).toEqual(['query','query-null','query-missing','query-invalid','readText','writeText'].map(name=>({name,promise:true,rejection:'TypeError'})));
+ expect(rows.reads).toBe(1);
+ expect(rows.status).toEqual(['notifications','prompt',true]);
+});
+
+test('CanvasRenderingContext2D has a page-local prototype for feature detection and method extensions',async()=>{
+ await load('<canvas id="surface" width="20" height="20"></canvas>');
+ expect(await evaluate(`(()=>{
+  const ctx=document.getElementById('surface').getContext('2d');
+  CanvasRenderingContext2D.prototype.redBox=function(){this.fillStyle='red';this.fillRect(0,0,20,20)};
+  ctx.redBox();
+  return [ctx instanceof CanvasRenderingContext2D,Object.getPrototypeOf(ctx)===CanvasRenderingContext2D.prototype,typeof CanvasRenderingContext2D.prototype.roundRect,ctx.getImageData(5,5,1,1).data[0]].join(',');
+ })()`)).toBe('true,true,function,255');
+ await load('<canvas id="surface"></canvas>');
+ expect(await evaluate('typeof CanvasRenderingContext2D.prototype.redBox')).toBe('undefined');
+});
+
+test('decoded video dimensions invalidate retained intrinsic layout without a DOM mutation',async()=>{
+ await load('<video id="intrinsicVideo" src="/video.mp4"></video><div id="afterVideo">after</div>');
+ const before=await evaluate('intrinsicVideo.getBoundingClientRect().width');
+ expect(before).toBe(300);
+ await evaluate('intrinsicVideo.play().then(()=>intrinsicVideo.pause())');
+ const size=await evaluate(`(()=>{const r=intrinsicVideo.getBoundingClientRect();return [intrinsicVideo.videoWidth,intrinsicVideo.videoHeight,r.width,r.height]})()`);
+ expect(size[0]).toBeGreaterThan(0);expect(size[1]).toBeGreaterThan(0);
+ expect(size[2]).toBe(size[0]);expect(size[3]).toBe(size[1]);
+});
+
+test("inline style distinguishes supported CSS, ordinary expandos and present indices", async () => {
+  await load('<!doctype html><div id="box"></div>');
+  expect(await evaluate(`(() => {
+    const s=document.getElementById('box').style;
+    const initial=[typeof s.unknownProperty, 'unknownProperty' in s,typeof s['--tone'],typeof s[0],0 in s];
+    s.unknownProperty={value:42};s['--tone']='expando';s.color='red';s.setProperty('--actual','value');
+    const middle=[s.unknownProperty.value,'unknownProperty' in s,s['--tone'],s.getPropertyValue('--tone'),s.getPropertyValue('--actual'),s[0],0 in s,2 in s];
+    delete s.unknownProperty;delete s['--tone'];
+    return {initial,middle,after:[typeof s.unknownProperty,'unknownProperty' in s,typeof s['--tone']],css:s.cssText};
+  })()`)).toEqual({initial:['undefined',false,'undefined','undefined',false],middle:[42,true,'expando','','value','color',true,false],after:['undefined',false,'undefined'],css:'color: red; --actual: value;'});
+});
+
+
+test("CSS.supports ignores JavaScript expandos on inline declarations", async () => {
+  await load('<!doctype html><div id="box"></div>');
+  expect(await evaluate(`(() => {
+    const s=document.body.style;
+    s.customFeature='value';s['--expando']='value';s.anchorName='--anchor';
+    return [CSS.supports('customFeature','value'),CSS.supports('--expando','value'),
+      CSS.supports('anchor-name','--anchor'),CSS.supports('color','red'),s.customFeature];
+  })()`)).toEqual([false,false,false,true,'value']);
+});
+
+test("isSecureContext reflects document trust and initial iframe inheritance", async () => {
+  for(const [url,secure] of [['https://page.test/',true],['http://page.test/',false],
+    ['http://127.0.0.2/',true]]) {
+    await renderer.call('loadDocument',{url,source:'<!doctype html><p>context</p>',contentType:'text/html',status:200});
+    await renderer.call('whenLoaded');
+    expect(await evaluate(`(() => {const f=document.createElement('iframe');document.body.append(f);
+      const before=isSecureContext;try{window.isSecureContext=!before;}catch{}
+      return [isSecureContext,f.contentWindow.isSecureContext];})()`)).toEqual([secure,secure]);
+  }
+  // Opaque top-level documents are checked directly; their cross-frame SOP
+  // access is a separate concern from computing the secure-context flag.
+  for(const url of ['about:blank','data:text/html,context']) {
+    await renderer.call('loadDocument',{url,source:'<!doctype html><p>context</p>',contentType:'text/html',status:200});
+    await renderer.call('whenLoaded');
+    expect(await evaluate('isSecureContext')).toBe(false);
+  }
 });
 
 test("primitive string reads preserve UTF-16 indices, coercion and prototype fallbacks", async () => {
