@@ -1,6 +1,7 @@
 // Isolated because host scripting installs browser globals in this process.
 import {strict as assert} from 'node:assert';
 import {createPageRenderer} from '../../lib/renderer/page-renderer.js';
+import {compositeVideo} from '../../lib/renderer/video-presentation.js';
 const sleep=Bun.sleep, report=text=>process.stdout.write(text+'\n');
 const errors=[],frames=[],messages=[];
 let seeked=0;
@@ -42,7 +43,17 @@ try{
   const before=frames.length;
   await sleep(140);
   assert.ok(frames.length>before,'native controls/local playback continue repainting');
-  assert.equal(frames.at(-1).videoLayer,null,'native controls retain the normal rendering path');
+  // Native controls can now remain above an independently composed video.
+  // Check the foreground pause icon rather than requiring the old fallback.
+  const tile=frames.at(-1),pixels=new Uint8Array(20*12*4);
+  for(let i=0;i<pixels.length;i+=4)pixels.set([200,100,50,255],i);
+  const composed=compositeVideo(tile,{width:20,height:12,pixels});
+  const [controlX,controlY]=await renderer.evaluate(`(() => {
+    const r=document.getElementById('native').getBoundingClientRect();
+    return [r.left+13,r.top+r.height-15];
+  })()`);
+  assert.ok(pixel(composed,controlX,controlY).slice(0,3).every(value=>value>230),
+    'native pause control remains visible above video pixels');
   await renderer.evaluate('document.getElementById("native").pause()');
   assert.deepEqual(errors,[]);report('media repaint integration passed');
 }finally{renderer.dispose();}
