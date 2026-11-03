@@ -55,7 +55,7 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
 
     const draw=async()=>{
       if(closed||!ready||(navigating&&!browser.context.dialogState)||busy||!dirty||!window.available)return;
-      busy=true;dirty=false;const generation=navigation;let path;
+      busy=true;dirty=false;const generation=navigation,dialog=browser.context.dialogState;let path;
       try{
         const w=window.width,h=window.height,bar=toolbar?Math.min(BAR_HEIGHT,h-1):0,z=toolbar?.zoom||1;
         const size=`${w}:${h}:${z}`;
@@ -64,6 +64,7 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
           if(pageSize!==size)await browser.context.resize(w/z,(h-bar)/z,z);
           const frame=JSON.parse(await browser.context.screenshot({format:'bgra'}));path=frame.path;
           if(closed||generation!==navigation)return;
+          if(dialog!==browser.context.dialogState){pageDirty=true;dirty=true;return;}
           if(frame.transport!=='file'||frame.format!=='bgra'||frame.stride!==frame.width*4)throw Error('Unexpected raw frame');
           const pixels=readFileSync(path);
           if(frame.width===w&&frame.height===h-bar)pageBytes=pixels;
@@ -77,7 +78,14 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
         const parts=toolbar?[toolbar.pixels(w).subarray(0,w*bar*4),pageBytes]:pageBytes;
         if(!closed&&!window.present(parts,w,h))dirty=true;
         if(!closed){const title=String(await browser.context.title()||'Buninu Browser');if(generation===navigation&&!closed)client.request(window.toplevel,'set_title',title);}
-      }catch(e){if(!closed&&generation===navigation)fail(e);}finally{if(path)try{unlinkSync(path);}catch{}busy=false;if(!closed&&dirty&&window.available)setTimeout(draw,0);}
+      }catch(e){
+        if(!closed&&generation===navigation){
+          // Dismissing a modal retires its renderer while a capture may still
+          // be pending. Retry the current page instead of closing the window.
+          if(dialog!==browser.context.dialogState){pageDirty=true;dirty=true;}
+          else fail(e);
+        }
+      }finally{if(path)try{unlinkSync(path);}catch{}busy=false;if(!closed&&dirty&&window.available)setTimeout(draw,0);}
     };
     // Actual navigation may replace the renderer. Ignore work from the old
     // document and resume drawing once navigation settles. Editing chrome does
@@ -114,7 +122,11 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
       move:(...args)=>toolbar.move(...args),scroll:(...args)=>toolbar.scroll(...args),
     }:browser.context;
     stopInput=attachInput(client,window,input,fail);
-    await browser.context.resize(width,height,1);await browser.context.navigate(url);ready=true;draw();
+    await browser.context.resize(width,height,1);
+    // Input and presentation are ready before the initial navigation finishes:
+    // a synchronous load-time dialog needs both in order to let it finish.
+    ready=true;
+    await browser.context.navigate(url);draw();
     // qml handle begin: send initial window size hints
     await syncQmlConstraints();
     // qml handle end

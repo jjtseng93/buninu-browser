@@ -114,6 +114,27 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Browser SHM, pointer, keyboa
   await wait(()=>Boolean(app.browser.context.dialogState));
   await wait(()=>presents>beforeLoadAlert);
   await app.toolbar.press('Enter');await loading;
+  // A capture can fail after its modal renderer is retired. Simulate that
+  // completion order explicitly instead of depending on renderer timing.
+  const normalCapture=app.browser.context.screenshot;
+  let rejectCapture,modalCaptureStarted=false;
+  const beforeRetiredModal=presents;
+  app.browser.context.screenshot=(...args)=>{
+    if(app.browser.context.dialogState&&!modalCaptureStarted){
+      modalCaptureStarted=true;
+      return new Promise((_resolve,reject)=>{rejectCapture=reject;});
+    }
+    return normalCapture(...args);
+  };
+  try{
+    const retiredModal=app.toolbar.navigate('javascript:alert("retire capture")');
+    await wait(()=>modalCaptureStarted);
+    await app.toolbar.press('Enter');
+    rejectCapture(Error('compositor closed'));
+    await retiredModal;
+    await wait(()=>presents>beforeRetiredModal);
+    expect(Boolean(app.window.closed)).toBe(false);
+  }finally{app.browser.context.screenshot=normalCapture;}
   const before=app.window.width;land.context.resize(900,700,1);
   await wait(()=>app.window.width!==before&&surface().pixels.width===app.window.width);
   expect(JSON.parse(await app.browser.context.evaluate('JSON.stringify([innerWidth,innerHeight])'))).toEqual([app.window.width,app.window.height-32]);
@@ -135,3 +156,35 @@ test('Wayland input queued around close never calls the disposed renderer',async
  window.closed=true;reject(Error('Renderer closed'));pointer('motion',[2,4,5]);
  await Bun.sleep(0);expect(calls).toBe(1);expect(errors).toBe(0);
 });
+
+// The initial URL must be able to display a modal before launch() resolves.
+test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('initial Wayland navigation presents a synchronous alert and accepts real keyboard input',async()=>{
+ const {mkdtempSync,rmSync}=await import('node:fs');
+ const {start}=await import('../../buninu-land/compositor.js');
+ const {launch}=await import('../frontends/wayland/index.js');
+ const dir=mkdtempSync('/tmp/buninu-initial-alert-'),old=process.env.XDG_RUNTIME_DIR;
+ process.env.XDG_RUNTIME_DIR=dir;let land,app,launching,launched=false;
+ const until=async fn=>{for(let i=0;i<750;i++){if(fn())return;await Bun.sleep(20);}throw Error('Initial alert did not present');};
+ try{
+  land=await start(['--remote-debugging-port=0','--window-size=640,480']);
+  launching=launch({socket:dir+'/wayland-buninu',width:640,height:448,
+    url:'data:text/html,'+encodeURIComponent('<script>alert("initial");document.title="Alert answered";</script><p>Ready</p>')});
+  launching.then(value=>{app=value;launched=true;},()=>{});
+  await until(()=>land.compositor.wm.renderSurfaces().some(s=>s.pixels));
+  expect(launched).toBe(false);
+  // Non-background pixels demonstrate an actual dialog frame, not just a
+  // mapped xdg_toplevel. Dismiss through the compositor's Wayland keyboard.
+  const surface=land.compositor.wm.renderSurfaces().find(s=>s.pixels);
+  expect(surface.pixels.width).toBeGreaterThan(0);
+  await land.context.dispatchKeyEvent({type:'rawKeyDown',key:'Enter',code:'Enter'});
+  await land.context.dispatchKeyEvent({type:'keyUp',key:'Enter',code:'Enter'});
+  await until(()=>launched);
+  app=await launching;
+  expect(await app.browser.context.title()).toBe('Alert answered');
+  expect(app.browser.context.dialogState).toBe(null);
+ }finally{
+  app?.close();land?.close();await launching?.catch(()=>{});
+  if(old===undefined)delete process.env.XDG_RUNTIME_DIR;else process.env.XDG_RUNTIME_DIR=old;
+  rmSync(dir,{recursive:true,force:true});
+ }
+},30000);

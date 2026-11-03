@@ -30,8 +30,9 @@ class PixelEditor extends UrlBar {
 export class WaylandUrlBar {
   constructor(context,{changed=()=>{},close=()=>{},clipboard=null,history=new PromptHistory()}={}) {
     this.context=context;this.changed=changed;this.quit=close;this.height=BAR_HEIGHT;
+    this.lifetime=new AbortController();this.disposed=false;
     this.clipboard=clipboard||{read:readClipboard,write:writeClipboard};
-    this.editor=new PixelEditor(()=>{this.dirty=true;this.caret=true;changed();},history);
+    this.editor=new PixelEditor(()=>{if(this.disposed)return;this.dirty=true;this.caret=true;changed();},history);
     this.bindings=loadKeyBindings();this.zoom=1;this.width=0;this.cellWidth=10;this.cache=new Map();
     this.client={send:(method,params)=>this.send(method,params)};
     this.hints=new HintMode(changed);
@@ -45,7 +46,7 @@ export class WaylandUrlBar {
     return this;
   }
   updateURL(url){if(url!==this.editor.currentUrl)this.editor.setUrl(url||'about:blank');}
-  flash(text,duration=5000){clearTimeout(this.statusTimer);this.editor.setStatus(String(text));this.editor.render();this.statusTimer=setTimeout(()=>{this.editor.clearStatus();this.editor.render();},duration);}
+  flash(text,duration=5000){if(this.disposed)return;clearTimeout(this.statusTimer);this.editor.setStatus(String(text));this.editor.render();this.statusTimer=setTimeout(()=>{this.editor.clearStatus();this.editor.render();},duration);}
   open(command=false,text=null){if(this.editor.editing)this.editor.cancelEditing();this.editor.startEditing({command,text}).then(result=>{
     if(result?.mode==='cmd')return this.command(result.line);
     if(result?.url)return this.navigate(result.url);
@@ -100,7 +101,7 @@ export class WaylandUrlBar {
     else if(name==='sh'){
       if(!arg.trim()){this.flash('Usage: sh <command>');return;}
       this.flash('Running shell command…',8000);
-      try{this.flash(await shellCommand(arg),15000);}catch(error){this.flash(`Shell: ${error.message}`,15000);}
+      try{this.flash(await shellCommand(arg,{signal:this.lifetime.signal}),15000);}catch(error){this.flash(`Shell: ${error.message}`,15000);}
     }
     else if(name==='open'){const url=toURL(arg);if(url)await this.navigate(url);else this.flash('Bookmark not found');}
     else if(name==='bookmark'){const match=searchBookmarks(arg)[0];if(match)await this.navigate(match.url);else this.flash('Bookmark not found');}
@@ -171,5 +172,5 @@ export class WaylandUrlBar {
     for(let i=0;i<this.bytes.length;i+=4){const red=this.bytes[i];this.bytes[i]=this.bytes[i+2];this.bytes[i+2]=red;}
     this.dirty=false;return this.bytes;
   }
-  dispose(){clearInterval(this.timer);clearTimeout(this.statusTimer);clearInterval(this.editor._spinTimer);this.editor.cancelEditing();for(const p of this.cache.values())p.delete();this.cache.clear();this.surface?.delete();}
+  dispose(){if(this.disposed)return;this.disposed=true;this.lifetime.abort();clearInterval(this.timer);clearTimeout(this.statusTimer);clearInterval(this.editor._spinTimer);this.editor.cancelEditing();for(const p of this.cache.values())p.delete();this.cache.clear();this.surface?.delete();}
 }
