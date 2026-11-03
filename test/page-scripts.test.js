@@ -2531,3 +2531,22 @@ test('borrowed same-origin iframe platform operations use the actual receiver', 
   })()`)).toEqual([true,'prompt','TypeError']);
 });
 
+
+test('page event and worker timestamps use coarsened independent monotonic timelines', async () => {
+  scripts.set('https://page.test/clock-worker.js', `onmessage=e=>{
+    performance.mark('worker-only');postMessage({origin:performance.timeOrigin,now:performance.now(),stamp:e.timeStamp});
+  };`);
+  await load('<script>window.clockResult=null;</script>');
+  await Bun.sleep(30);
+  await evaluate(`window.parentOrigin=performance.timeOrigin;
+    window.eventTimes=[performance.now(),new Event('test').timeStamp,performance.now()];
+    window.worker=new Worker('clock-worker.js');worker.onmessage=e=>clockResult=e.data;worker.postMessage(1);`);
+  await waitFor('window.clockResult');
+  const values=await evaluate('({times:eventTimes,result:clockResult,parent:parentOrigin,entries:performance.getEntriesByName("worker-only").length})');
+  expect(values.result.origin).toBeGreaterThan(values.parent);
+  expect(values.entries).toBe(0);
+  expect(values.times[1]).toBeGreaterThanOrEqual(values.times[0]);
+  expect(values.times[1]).toBeLessThanOrEqual(values.times[2]);
+  for(const value of [...values.times,values.result.now,values.result.stamp]) expect(Math.abs(value*10-Math.round(value*10))).toBeLessThan(1e-7);
+  await evaluate('worker.terminate()');
+});
