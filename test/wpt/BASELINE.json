@@ -1,0 +1,1156 @@
+{
+  "recordedAt": "2026-11-04T09:23:50.559Z",
+  "state": "Interrupted; not a completed full-suite run",
+  "signature": {
+    "revision": "f6789b0b5c0034ab9a7c87c9f651bf135719015d",
+    "browserRevision": "d11f21bfb2a58b0fedd4207d6de1f652dd9d5791",
+    "caseRunner": "c95523234f85c724a27b7bc9b8bd6cb49b9598c26a1ae3bc4a7ba7b5bd7817b3",
+    "runner": "cef1c214eebee9dc3797a3cc4e12afa524ada1a8507c2be273fd1cded9ad6e66",
+    "manifestHash": "1fe3c02097b9602af27d96e5ae2e96b96555b612efa4debb29cf05966a4ade15",
+    "domainsHash": "96e1af0d0e940edaa536b74de1d7b83175b52429e066f3fb98f018556387ced6",
+    "shard": "0/1",
+    "runtime": {
+      "platform": "android",
+      "arch": "arm64",
+      "bun": "1.4.4",
+      "revision": "da867c60bf0bcbf9d6d36994f8ca0efa42075115"
+    },
+    "timeout": 20000,
+    "longTimeout": 75000
+  },
+  "resultsSha256": "a36005e5326a3334f6235b3ba9d95dc923a8f92029b7574aea69d82d9f5b7819",
+  "manifestTypes": {
+    "aamtest": 190,
+    "crashtest": 2089,
+    "manual": 3047,
+    "print-reftest": 448,
+    "reftest": 29116,
+    "test262": 53814,
+    "testharness": 39877,
+    "visual": 2714,
+    "wdspec": 658
+  },
+  "completed": 16337,
+  "remaining": 23540,
+  "classification": {
+    "fail": 9329,
+    "pass": 1648,
+    "harness-error": 4074,
+    "unsupported-infrastructure": 435,
+    "incomplete": 851
+  },
+  "eligible": 15902,
+  "testedPassPercent": 10.363476292290278,
+  "wholeManifestVerifiedPassPercent": 1.24892954309489,
+  "wholeManifestCases": 131953,
+  "reportedSubtests": 850680,
+  "passedSubtests": 58270,
+  "limitations": {
+    "testdriver: set_permission": 81,
+    "testdriver: bidi.log.entry_added.subscribe": 5,
+    "Unmapped host: web-platform.test.": 4,
+    "Unmapped host: evil.com": 2,
+    "testdriver: delete_all_cookies": 19,
+    "testdriver: get_named_cookie": 1,
+    "testdriver: get_computed_role": 22,
+    "testdriver: action_sequence": 196,
+    "testdriver: clear_device_posture": 4,
+    "testdriver: set_virtual_wallet_behavior": 4,
+    "testdriver: send_keys": 1,
+    "PAC proxy setup: /fedcm/support/proxy.sub.pac": 82,
+    "testdriver: set_fedcm_delay_enabled": 1,
+    "testdriver: reset_fedcm_cooldown": 1,
+    "Unmapped host: bad-port.wpt": 2,
+    "PAC proxy setup: /common/proxy-all.sub.pac": 3,
+    "Unmapped host: www.web-platform.test.": 2,
+    "Unmapped host: www.not-web-platform.test.": 2,
+    "testdriver: bidi.permissions.set_permission": 9,
+    "testdriver: get_global_privacy_control": 1,
+    "testdriver: set_global_privacy_control": 2,
+    "testdriver: create_window": 1
+  },
+  "groups": {
+    "FileAPI": {
+      "pass": 15,
+      "harness-error": 57,
+      "fail": 41
+    },
+    "accelerometer": {
+      "fail": 7,
+      "pass": 1,
+      "harness-error": 4
+    },
+    "accessibility": {
+      "fail": 1
+    },
+    "accname": {
+      "fail": 20,
+      "harness-error": 1
+    },
+    "acid": {
+      "fail": 1
+    },
+    "ai": {
+      "fail": 181,
+      "harness-error": 7
+    },
+    "ambient-light": {
+      "pass": 1,
+      "fail": 7,
+      "harness-error": 2
+    },
+    "animation-worklet": {
+      "fail": 15,
+      "harness-error": 9
+    },
+    "apng": {
+      "fail": 1
+    },
+    "audio-output": {
+      "fail": 7,
+      "unsupported-infrastructure": 1,
+      "harness-error": 2
+    },
+    "audio-session": {
+      "fail": 3
+    },
+    "autoplay-policy-detection": {
+      "fail": 2,
+      "harness-error": 1
+    },
+    "background-fetch": {
+      "unsupported-infrastructure": 12,
+      "harness-error": 3,
+      "fail": 1
+    },
+    "background-sync": {
+      "fail": 1,
+      "harness-error": 1
+    },
+    "badging": {
+      "fail": 4,
+      "harness-error": 4
+    },
+    "battery-status": {
+      "fail": 12,
+      "harness-error": 5
+    },
+    "beacon": {
+      "fail": 9,
+      "pass": 6,
+      "harness-error": 2
+    },
+    "bluetooth": {
+      "fail": 154,
+      "pass": 1
+    },
+    "captured-mouse-events": {
+      "fail": 4
+    },
+    "clear-site-data": {
+      "harness-error": 8,
+      "fail": 6,
+      "pass": 1
+    },
+    "client-hints": {
+      "fail": 87,
+      "harness-error": 34,
+      "pass": 11
+    },
+    "clipboard-apis": {
+      "unsupported-infrastructure": 46,
+      "fail": 13,
+      "pass": 2
+    },
+    "close-watcher": {
+      "fail": 67,
+      "harness-error": 1
+    },
+    "compat": {
+      "fail": 11,
+      "pass": 3
+    },
+    "compression": {
+      "harness-error": 60,
+      "fail": 8,
+      "pass": 10
+    },
+    "compute-pressure": {
+      "harness-error": 39,
+      "fail": 6
+    },
+    "connection-allowlist": {
+      "fail": 55,
+      "pass": 14,
+      "harness-error": 18,
+      "incomplete": 1
+    },
+    "console": {
+      "unsupported-infrastructure": 5,
+      "fail": 2,
+      "harness-error": 7,
+      "pass": 5
+    },
+    "contacts": {
+      "fail": 1
+    },
+    "container-timing": {
+      "fail": 29
+    },
+    "content-dpr": {
+      "fail": 1
+    },
+    "content-index": {
+      "fail": 2,
+      "harness-error": 3
+    },
+    "content-security-policy": {
+      "pass": 119,
+      "harness-error": 327,
+      "fail": 485,
+      "incomplete": 7,
+      "unsupported-infrastructure": 4
+    },
+    "contenteditable": {
+      "fail": 2
+    },
+    "cookies": {
+      "unsupported-infrastructure": 19,
+      "fail": 20,
+      "pass": 15,
+      "harness-error": 35
+    },
+    "cookiestore": {
+      "fail": 38,
+      "harness-error": 38
+    },
+    "core-aam": {
+      "unsupported-infrastructure": 1
+    },
+    "cors": {
+      "fail": 15,
+      "pass": 4,
+      "harness-error": 8
+    },
+    "cpu-performance": {
+      "fail": 1
+    },
+    "credential-management": {
+      "fail": 10,
+      "harness-error": 5,
+      "pass": 1
+    },
+    "css": {
+      "fail": 5063,
+      "pass": 963,
+      "harness-error": 1808,
+      "unsupported-infrastructure": 108,
+      "incomplete": 203
+    },
+    "custom-elements": {
+      "fail": 156,
+      "pass": 14,
+      "incomplete": 3,
+      "unsupported-infrastructure": 1,
+      "harness-error": 22
+    },
+    "delegated-ink": {
+      "fail": 4,
+      "harness-error": 1
+    },
+    "density-size-correction": {
+      "fail": 1,
+      "harness-error": 1
+    },
+    "deprecation-reporting": {
+      "pass": 1,
+      "harness-error": 1
+    },
+    "device-bound-session-credentials": {
+      "harness-error": 27,
+      "pass": 1,
+      "fail": 4
+    },
+    "device-memory": {
+      "pass": 1,
+      "fail": 1,
+      "harness-error": 2
+    },
+    "device-posture": {
+      "unsupported-infrastructure": 4,
+      "fail": 1
+    },
+    "digital-credentials": {
+      "fail": 13,
+      "unsupported-infrastructure": 4,
+      "harness-error": 9,
+      "pass": 2
+    },
+    "direct-sockets": {
+      "fail": 4
+    },
+    "document-picture-in-picture": {
+      "fail": 20,
+      "pass": 1,
+      "harness-error": 1
+    },
+    "document-policy": {
+      "harness-error": 3,
+      "fail": 7
+    },
+    "dom": {
+      "pass": 186,
+      "fail": 405,
+      "harness-error": 176,
+      "unsupported-infrastructure": 18,
+      "incomplete": 18
+    },
+    "domparsing": {
+      "fail": 68,
+      "pass": 11,
+      "harness-error": 12
+    },
+    "domxpath": {
+      "fail": 32,
+      "harness-error": 2
+    },
+    "dpub-aam": {
+      "unsupported-infrastructure": 1
+    },
+    "ecmascript": {
+      "pass": 2
+    },
+    "editing": {
+      "fail": 539,
+      "unsupported-infrastructure": 67,
+      "harness-error": 35,
+      "pass": 50,
+      "incomplete": 18
+    },
+    "element-timing": {
+      "fail": 52
+    },
+    "encoding": {
+      "pass": 26,
+      "fail": 650,
+      "harness-error": 79,
+      "incomplete": 584
+    },
+    "encoding-detection": {
+      "fail": 44,
+      "harness-error": 31
+    },
+    "encrypted-media": {
+      "fail": 72,
+      "harness-error": 28
+    },
+    "entries-api": {
+      "fail": 4
+    },
+    "event-timing": {
+      "fail": 69,
+      "unsupported-infrastructure": 3,
+      "harness-error": 3,
+      "pass": 1
+    },
+    "eventsource": {
+      "fail": 63,
+      "harness-error": 46
+    },
+    "eyedropper": {
+      "unsupported-infrastructure": 1,
+      "fail": 1
+    },
+    "fedcm": {
+      "unsupported-infrastructure": 82
+    },
+    "fenced-frame": {
+      "pass": 4,
+      "fail": 4,
+      "harness-error": 1
+    },
+    "fetch": {
+      "fail": 310,
+      "harness-error": 552,
+      "incomplete": 2,
+      "pass": 74,
+      "unsupported-infrastructure": 6
+    },
+    "file-system-access": {
+      "fail": 4,
+      "harness-error": 6
+    },
+    "focus": {
+      "harness-error": 33,
+      "fail": 4,
+      "pass": 2
+    },
+    "font-access": {
+      "unsupported-infrastructure": 9,
+      "harness-error": 2,
+      "fail": 1
+    },
+    "forced-colors-mode": {
+      "fail": 12,
+      "pass": 3
+    },
+    "fs": {
+      "fail": 29,
+      "harness-error": 73
+    },
+    "fullscreen": {
+      "fail": 72,
+      "harness-error": 13,
+      "unsupported-infrastructure": 4,
+      "pass": 1
+    },
+    "gamepad": {
+      "fail": 4,
+      "harness-error": 2
+    },
+    "generic-sensor": {
+      "unsupported-infrastructure": 1,
+      "fail": 2
+    },
+    "geolocation": {
+      "fail": 5,
+      "unsupported-infrastructure": 17,
+      "pass": 1
+    },
+    "geolocation-sensor": {
+      "pass": 1
+    },
+    "gpc": {
+      "unsupported-infrastructure": 3,
+      "fail": 1,
+      "harness-error": 3
+    },
+    "graphics-aria": {
+      "unsupported-infrastructure": 1
+    },
+    "gyroscope": {
+      "pass": 1,
+      "fail": 7,
+      "harness-error": 2
+    },
+    "hr-time": {
+      "pass": 5,
+      "fail": 7,
+      "harness-error": 6
+    },
+    "hsts": {
+      "harness-error": 1
+    },
+    "html": {
+      "fail": 242,
+      "harness-error": 412,
+      "pass": 88,
+      "incomplete": 15,
+      "unsupported-infrastructure": 1
+    },
+    "html-aam": {
+      "fail": 20,
+      "unsupported-infrastructure": 16
+    },
+    "html-media-capture": {
+      "fail": 2
+    }
+  },
+  "patchSeries": {
+    "count": 16,
+    "appliedToProduction": false,
+    "note": "Retests represent different cumulative patch stages, not a uniform full rerun."
+  },
+  "targetedRetests": [
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSGroupingRule-insertRule-computed.html",
+      "artifact": "CSSGroupingRule-insertRule-computed-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeArtifact": "CSSGroupingRule-insertRule-computed-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-cssRules.html",
+      "artifact": "CSSStyleSheet-constructable-cssRules-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeArtifact": "CSSStyleSheet-constructable-cssRules-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-invalidation.html",
+      "artifact": "CSSStyleSheet-constructable-invalidation-after.json",
+      "after": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 3
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "beforeArtifact": "CSSStyleSheet-constructable-invalidation-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-replace-cssRules.html",
+      "artifact": "CSSStyleSheet-constructable-replace-cssRules-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "incomplete",
+        "passed": 0,
+        "reported": 2
+      },
+      "beforeArtifact": "CSSStyleSheet-constructable-replace-cssRules-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-replace-on-regular-sheet.html",
+      "artifact": "CSSStyleSheet-constructable-replace-on-regular-sheet-after.json",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "beforeArtifact": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-insertRule-computed.html",
+      "artifact": "CSSStyleSheet-insertRule-computed-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeArtifact": "CSSStyleSheet-insertRule-computed-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-remove.html",
+      "artifact": "CharacterData-remove-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0
+      },
+      "beforeArtifact": "CharacterData-remove-saved-baseline.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/ChildNode-after.html",
+      "artifact": "ChildNode-after-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 45,
+        "reported": 45
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 13,
+        "reported": 45
+      },
+      "beforeArtifact": "ChildNode-after-saved-baseline.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/ChildNode-before.html",
+      "artifact": "ChildNode-before-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 45,
+        "reported": 45
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 17,
+        "reported": 45
+      },
+      "beforeArtifact": "ChildNode-before-saved-baseline.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/DocumentType-remove.html",
+      "artifact": "DocumentType-remove-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4
+      },
+      "beforeArtifact": "DocumentType-remove-saved-baseline.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/StyleSheetList-constructable.html",
+      "artifact": "StyleSheetList-constructable-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeArtifact": "StyleSheetList-constructable-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/adoptedstylesheets-observablearray-removal.html",
+      "artifact": "adoptedstylesheets-observablearray-removal-after.json",
+      "after": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 12
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12
+      },
+      "beforeArtifact": "adoptedstylesheets-observablearray-removal-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-appendData.html",
+      "artifact": "character-append-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 14,
+        "reported": 14
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 14
+      },
+      "beforeArtifact": "character-append-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-deleteData.html",
+      "artifact": "character-delete-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 18
+      },
+      "beforeArtifact": "character-delete-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-insertData.html",
+      "artifact": "character-insert-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 18
+      },
+      "beforeArtifact": "character-insert-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-replaceData.html",
+      "artifact": "character-replace-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 34,
+        "reported": 34
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 34
+      },
+      "beforeArtifact": "character-replace-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-substringData.html",
+      "artifact": "character-substring-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 28,
+        "reported": 28
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 28
+      },
+      "beforeArtifact": "character-substring-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom-view/checkVisibility.html",
+      "artifact": "check-visibility-after.json",
+      "after": {
+        "classification": "fail",
+        "passed": 12,
+        "reported": 21
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 21
+      },
+      "beforeArtifact": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-color/parsing/color-computed.html",
+      "artifact": "color-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 16,
+        "reported": 16
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 16
+      },
+      "beforeArtifact": "color-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text-decor/parsing/text-decoration-color-computed.html",
+      "artifact": "decoration-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "beforeArtifact": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-writing-modes/parsing/direction-computed.html",
+      "artifact": "direction-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2
+      },
+      "beforeArtifact": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/insertRule-no-index.html",
+      "artifact": "insertRule-no-index-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2
+      },
+      "beforeArtifact": "insertRule-no-index-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-computed.html",
+      "artifact": "justify-self-after.json",
+      "after": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 22
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 22
+      },
+      "beforeArtifact": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-conditional/js/CSS-supports-L3.html",
+      "artifact": "supports-l3-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 17,
+        "reported": 17
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 17
+      },
+      "beforeArtifact": "supports-l3-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Text-splitText.html",
+      "artifact": "text-split-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6
+      },
+      "beforeArtifact": "text-split-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Text-wholeText.html",
+      "artifact": "text-whole-after.json",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeArtifact": "text-whole-before.json"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Element-webkitMatchesSelector.html",
+      "artifact": "webkit-matches-after.json",
+      "after": {
+        "classification": "fail",
+        "passed": 621,
+        "reported": 669
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 669
+      },
+      "beforeArtifact": "webkit-matches-saved-baseline.json"
+    }
+  ],
+  "patchedEstimate": {
+    "method": "Replace matching baseline case outcomes with the latest saved targeted results; assume unretested cases unchanged.",
+    "caveat": "Mixed patch stages and runtimes; no uniform post-patch full run or regression guarantee. No extrapolation to untested cases.",
+    "matchedRetests": 27,
+    "changedCases": [
+      {
+        "case": "/css/cssom/CSSGroupingRule-insertRule-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/CSSStyleSheet-constructable-cssRules.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/CSSStyleSheet-constructable-replace-cssRules.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/CSSStyleSheet-insertRule-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/CharacterData-remove.html",
+        "before": "harness-error",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/ChildNode-after.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/ChildNode-before.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/DocumentType-remove.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/StyleSheetList-constructable.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/CharacterData-appendData.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/CharacterData-deleteData.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/CharacterData-insertData.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/CharacterData-replaceData.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/CharacterData-substringData.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-color/parsing/color-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-text-decor/parsing/text-decoration-color-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-writing-modes/parsing/direction-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/insertRule-no-index.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-conditional/js/CSS-supports-L3.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/Text-splitText.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/Text-wholeText.html",
+        "before": "fail",
+        "after": "pass"
+      }
+    ],
+    "classification": {
+      "fail": 9309,
+      "pass": 1669,
+      "harness-error": 4073,
+      "unsupported-infrastructure": 435,
+      "incomplete": 851
+    },
+    "eligible": 15902,
+    "passed": 1669,
+    "testedPassPercent": 10.495535152810968,
+    "wholeManifestVerifiedPassPercentEstimate": 1.2648443006221912
+  }
+}

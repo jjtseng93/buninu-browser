@@ -1,0 +1,11 @@
+{
+  "server_host": "127.0.0.1",
+  "check_subdomains": false,
+  "ports": {
+    "http": [18000, 18001],
+    "https": [18443, 18444],
+    "ws": [18888],
+    "wss": [18889]
+  },
+  "logging": {"level": "warning"}
+}
