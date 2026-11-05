@@ -186,7 +186,10 @@ test("detached rel edits, reordering and moves into shadow roots refresh old mem
     document.body.append(host);
     host.attachShadow({ mode: "open" }).append(second);
     if (delivered) await Bun.sleep(10);
-    expect(cache.get("images")).toEqual([images[0]]);
+    // Shadow resources participate in loading, but follow document resources.
+    expect(cache.get("images")).toHaveLength(2);
+    expect(cache.get("images")[0]).toBe(images[0]);
+    expect(cache.get("images")[1]).toBe(second);
     document.body.append(second);
     expect(cache.get("images")).toEqual([images[0], second]);
   });
