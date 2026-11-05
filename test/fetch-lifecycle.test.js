@@ -112,8 +112,10 @@ test('XMLHttpRequest reports body errors after headers and clears the failed res
   active.delete('https://page.test/xhr-body-error');
   await until(async () => (await evaluate('xhrEvents')).includes('loadend'));
   expect(await evaluate('xhrEvents')).toEqual(['error', 'loadend']);
+  // Text response modes return an empty string after a network error.
+  // https://xhr.spec.whatwg.org/#the-response-attribute
   expect(await evaluate('[xhr.readyState, xhr.status, xhr.statusText, xhr.responseURL, xhr.response, xhr.responseText, xhr.getAllResponseHeaders()]'))
-    .toEqual([4, 0, '', '', null, '', '']);
+    .toEqual([4, 0, '', '', '', '', '']);
 });
 
 test('XMLHttpRequest abort after headers reports abort even with a configured timeout', async () => {
@@ -145,17 +147,24 @@ test('XMLHttpRequest binary response types preserve arbitrary bytes and return t
       request.open('GET', '/binary');
       request.responseType = ${JSON.stringify(responseType)};
       request.onload = async () => {
-        const value = request.response;
-        const bytes = request.responseType === 'blob' ? await value.arrayBuffer() : value;
-        resolve({ bytes: [...new Uint8Array(bytes)], isArrayBuffer: value instanceof ArrayBuffer,
-          isBlob: value instanceof Blob, type: value.type ?? null, responseText: request.responseText,
-          contentType: request.getResponseHeader('content-type') });
+        try {
+          const value = request.response;
+          const bytes = request.responseType === 'blob' ? await value.arrayBuffer() : value;
+          // Non-text modes must reject responseText, even after successful load.
+          // https://xhr.spec.whatwg.org/#the-responsetext-attribute
+          let responseTextError = null;
+          try { void request.responseText; }
+          catch (error) { responseTextError = { name: error.name, domException: error instanceof DOMException }; }
+          resolve({ bytes: [...new Uint8Array(bytes)], isArrayBuffer: value instanceof ArrayBuffer,
+            isBlob: value instanceof Blob, type: value.type ?? null, responseTextError,
+            contentType: request.getResponseHeader('content-type') });
+        } catch (error) { reject(error); }
       };
       request.onerror = () => reject(new Error('binary request failed'));
       request.send();
     })`);
     expect(result).toEqual({ bytes: [...binaryBody], isArrayBuffer: responseType === 'arraybuffer',
       isBlob: responseType === 'blob', type: responseType === 'blob' ? 'application/octet-stream' : null,
-      responseText: '', contentType: 'application/octet-stream' });
+      responseTextError: { name: 'InvalidStateError', domException: true }, contentType: 'application/octet-stream' });
   }
 });
