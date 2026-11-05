@@ -624,6 +624,19 @@ test('document HTMLCollections stay live and expose names without Array methods'
   })()`)).toBe(true);
 });
 
+test('NodeList snapshots and live name queries have distinct mutation behavior', async () => {
+  await load('<div name="query" id="one"></div>');
+  expect(await evaluate(`(() => {
+    const snapshot=document.querySelectorAll('[name]'), live=document.getElementsByName('query');
+    const added=document.createElement('p');added.name='ignored';added.setAttribute('name','query');document.body.append(added);
+    const before=snapshot instanceof NodeList && live instanceof NodeList && snapshot.length===1 && live.length===2;
+    document.getElementById('one').removeAttribute('name');
+    const after=live.length===1 && live.item(0)===added && snapshot.length===1;
+    Object.defineProperty(snapshot,'length',{value:0});
+    return before && after && [...snapshot].length===0 && snapshot.item(0).id==='one';
+  })()`)).toBe(true);
+});
+
 test("an unfocused page exposes an empty Selection", async () => {
   await load(`<p>text</p>`);
   expect(await evaluate("[getSelection().type, getSelection().rangeCount, getSelection().toString()].join(',')"))
