@@ -5218,6 +5218,216 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/bottom-invalid.html",
+      "artifact": "/tmp/css-inset-after-5.json",
+      "artifactSha256": "37feba5ebc347844ee2984b143e984222beb74a523e0990422d48e771592df23",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/bottom-valid.html",
+      "artifact": "/tmp/css-inset-after-9.json",
+      "artifactSha256": "87dca8036f04663004b551fbca6e56286c1cb1b34077a5fa84920b1f505fd29e",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/inset-computed.html",
+      "artifact": "/tmp/css-inset-after-0.json",
+      "artifactSha256": "5b23682b03a4ee9ac546676c7469de3065214334f2994b45fe709360b1c25e75",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/inset-invalid.html",
+      "artifact": "/tmp/css-inset-after-1.json",
+      "artifactSha256": "1daf8f627b8c4bbfb56ad284b7eb9fdff17b03c60b271b556a6b077910eb1834",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 22,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/inset-valid.html",
+      "artifact": "/tmp/css-inset-after-2.json",
+      "artifactSha256": "9372cee226a3192b9537e773f18811dd1fd3a3335ff90277d992cfcf6d811a45",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 50,
+        "reported": 50,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 40,
+        "reported": 50,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/left-invalid.html",
+      "artifact": "/tmp/css-inset-after-6.json",
+      "artifactSha256": "a12b5747e2d9a8ab9e1db28f664ad867ebded3ccad59d0cd491fa4a9897b6afb",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/left-valid.html",
+      "artifact": "/tmp/css-inset-after-10.json",
+      "artifactSha256": "8c9d602e474e2e0cd9210ab9c9c8b863a59d76e9be775d8544452caeea9255c9",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-position/parsing/position-computed.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/34.json",
       "artifactSha256": "79d5271506cf2b058c2cd608de919df2d2b5f2d9a519de346525d96b280bf824",
@@ -5301,6 +5511,126 @@
         "classification": "pass",
         "passed": 5,
         "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/right-invalid.html",
+      "artifact": "/tmp/css-inset-after-4.json",
+      "artifactSha256": "1d3ab9973032551338fccfa165d521b35e062134a528cb12c5cfdb587822cc55",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/right-valid.html",
+      "artifact": "/tmp/css-inset-after-8.json",
+      "artifactSha256": "f573f773ef12fd1df478da766c4d74f0f6f1d9a24e501b3544cf6834eab21fdf",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/top-invalid.html",
+      "artifact": "/tmp/css-inset-after-3.json",
+      "artifactSha256": "b8249e13f016bfa43a57c7ba4cbad82d497d52380a73d62cce0b62c059d1624c",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/top-valid.html",
+      "artifact": "/tmp/css-inset-after-7.json",
+      "artifactSha256": "8cb1f26ac60ab11be8dc03988d95bbf48435dcaf5ba9bc6639525c964aef6742",
+      "stage": "Physical/logical inset grammar and positioning",
+      "browserRevision": "513b9c9581e6eb93983c9203fd07887d278ceb11",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -7618,6 +7948,96 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/selectors/invalidation/enabled-disabled.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-1-after.json",
+      "artifactSha256": "c4d1bbdf0abc1e16345e3ef261ad029a3abb06391d083258e7880a5eac09bb0c",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/selectors/invalidation/option-disabled-when-ancestor-changes.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-7-after.json",
+      "artifactSha256": "ef758891052e760ecbde47cc544dedbf6d39ff450b36872e6f0c535e329c2840",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/selectors/pseudo-enabled-disabled.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-0-after.json",
+      "artifactSha256": "35593bee364e6f8a7243cc13f64e58f89bdf507825d322518ef8d2c503337a6b",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/custom-elements/reactions/DOMTokenList.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/75.json",
       "artifactSha256": "a2e9ed1d2161857ea219f43c9c6f2de488bd5777c801bc0b10c8fd9ee0d6f920",
@@ -8759,13 +9179,13 @@
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createElement-namespace.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/113.json",
-      "artifactSha256": "0662a6e0bed60d3a833cb1e7bc6b4f84c34d6cafd5c70e2089c1ecf38b9c3e1e",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/xml-iframe-final-Document-createElement-namespace.html.json",
+      "artifactSha256": "1716208438323e0e31cf16e62a01d71c1d1dfdb4afec3a83d1d96ea707bfa544",
+      "stage": "Active ordinary XML iframe documents and presentation",
+      "browserRevision": "a89f3ffc55b9fb9e318f5aeb3b0ecf27bc58f978",
       "after": {
-        "classification": "fail",
-        "passed": 21,
+        "classification": "pass",
+        "passed": 51,
         "reported": 51,
         "done": true,
         "harnessStatus": 0,
@@ -8785,17 +9205,17 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createElement.html",
-      "artifact": "/tmp/element-factories-final-0.json",
-      "artifactSha256": "1c4112553f6a041dec284e7ad9613e6bddc87346e26709974fd40cf654797ee5",
-      "stage": "Namespace-aware creation and element cloning",
-      "browserRevision": "b161837dd973c5b3c86f8120677bc642bc7f954f",
+      "artifact": "/tmp/xml-iframe-final-Document-createElement.html.json",
+      "artifactSha256": "bf81c0878a64d44c3bc8baf407c35fca3082d187500126bb06f70a0503a748bc",
+      "stage": "Active ordinary XML iframe documents and presentation",
+      "browserRevision": "a89f3ffc55b9fb9e318f5aeb3b0ecf27bc58f978",
       "after": {
-        "classification": "fail",
-        "passed": 98,
+        "classification": "pass",
+        "passed": 147,
         "reported": 147,
         "done": true,
         "harnessStatus": 0,
@@ -8815,17 +9235,17 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createElementNS.html",
-      "artifact": "/tmp/element-factories-final-1.json",
-      "artifactSha256": "da95b81f4f51525d81e210a7fb0628a40a66f88b19fe149820b22cdfbee60644",
-      "stage": "Namespace-aware creation and element cloning",
-      "browserRevision": "b161837dd973c5b3c86f8120677bc642bc7f954f",
+      "artifact": "/tmp/xml-iframe-final-Document-createElementNS.html.json",
+      "artifactSha256": "d4aef7cf183db0750c3c65702551dddbddaf3cfddb09b61788d276532852d3b8",
+      "stage": "Active ordinary XML iframe documents and presentation",
+      "browserRevision": "a89f3ffc55b9fb9e318f5aeb3b0ecf27bc58f978",
       "after": {
-        "classification": "fail",
-        "passed": 401,
+        "classification": "pass",
+        "passed": 596,
         "reported": 596,
         "done": true,
         "harnessStatus": 0,
@@ -8845,7 +9265,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createProcessingInstruction-xhtml.xhtml",
@@ -12568,6 +12988,126 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-fieldset-element/disabled-001.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-5-after.json",
+      "artifactSha256": "0c1515072b3768a63f71a7bdb5c7e0ed94426483895a37dfcd2f3cfd99be2989",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-fieldset-element/disabled-002.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-6-after.json",
+      "artifactSha256": "194878946321f55692b0e82277f4a11e1697154327f17e88d1a5381799bdff67",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-fieldset-element/disabled-003.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-2-after.json",
+      "artifactSha256": "0b8c74f2cd17b76322ba1a6c7204fc2ba356e6d0a768786ca48922abd8315942",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-fieldset-element/disabled-nested-legend.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-3-after.json",
+      "artifactSha256": "abda1039a60c38e93f943009ec532f0150e8dfb4ac064843f9e508b8fa3044e0",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-form-element/form-attribute-form-owner.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/form-association-0-after.json",
       "artifactSha256": "52992df3f646b9e41531e407879c8e6c1458922c7fd7b4730514632f7e1bcd09",
@@ -12776,6 +13316,36 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-disabled-fieldset-dynamic.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-4-after.json",
+      "artifactSha256": "92da8c5dc07121b901571d4fc622fcbf734b452ffa037594836db33b2a4fa6c2",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "unsupported-infrastructure",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-step-float.html",
@@ -14188,6 +14758,36 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/customizable-select/option-disabled-optgroup-wrapper.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-disabled-8-after.json",
+      "artifactSha256": "dc8a315400116a11791037d535ea2d04c45331f4c4a295378a40ad30710f7d3c",
+      "stage": "Inherited form disabled state and input activation",
+      "browserRevision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/option-selectedness-script-mutation.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/215.json",
       "artifactSha256": "ac16f7d0d5206b1e2f54d4e39bff88bc0f801d842cd7017277d0da11ff4b88e5",
@@ -15508,6 +16108,246 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern-constructor.any.html",
+      "artifact": "/tmp/urlpattern-final-0.json",
+      "artifactSha256": "a891c8b13d48f58db0e17cdea1e7b10e2c2658c7048b67fcef8d2aac543183e6",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern-constructor.any.worker.html",
+      "artifact": "/tmp/urlpattern-final-3.json",
+      "artifactSha256": "63de57bb9e6cf79cad2d4c62481db16466682ffa878b8eb122fd7ff4bc50bda5",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern-detached-frame-regexp.html",
+      "artifact": "/tmp/urlpattern-final-1.json",
+      "artifactSha256": "8c278d689317ed72f95aeb684ae70600e5f7730d3567da415660b85d7aeb4e1c",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern-empty-regexp-group.html",
+      "artifact": "/tmp/urlpattern-final-2.json",
+      "artifactSha256": "c98c6eac6e0c7a260ee0de8f00c6097dbce1c387fa6e28dbdf318b049126c34a",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern-hasregexpgroups.any.html",
+      "artifact": "/tmp/urlpattern-final-4.json",
+      "artifactSha256": "f9ebee7fc044a15511adffa6980409b4141e25c698561b10cabd35f3e53eda77",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern-hasregexpgroups.any.worker.html",
+      "artifact": "/tmp/urlpattern-final-6.json",
+      "artifactSha256": "e436b9e807fa9f531e8f95e46df159ed35a3163cc0efe2ca30cc4e2e32ac8117",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern.any.html",
+      "artifact": "/tmp/urlpattern-final-5.json",
+      "artifactSha256": "43d2c886e5eae62446382d5426154dfb7359be709b4fc57f1b3fd8194931abb9",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "fail",
+        "passed": 368,
+        "reported": 370,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 370,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/urlpattern/urlpattern.any.worker.html",
+      "artifact": "/tmp/urlpattern-final-8.json",
+      "artifactSha256": "8a7e4f7e6d1de5096f0291809fc09b4aff180cad4cb6dca5be55df1b72708287",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/open-during-abort-event.htm",
       "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-open-during-abort-event-after.json",
       "artifactSha256": "91f84983914979099eb111ff43f252a002a4f28e2e45be6d12393737a45be307",
@@ -16136,33 +16976,93 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "https://web-platform.test:18443/urlpattern/urlpattern.https.any.html",
+      "artifact": "/tmp/urlpattern-final-7.json",
+      "artifactSha256": "75ecf85e5947ea3aef09df1e9e1a7f6217b45772df37ba70b5e77645dfae381f",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "fail",
+        "passed": 368,
+        "reported": 370,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 370,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "https://web-platform.test:18443/urlpattern/urlpattern.https.any.worker.html",
+      "artifact": "/tmp/urlpattern-final-9.json",
+      "artifactSha256": "1f7be953e33b4b7f388363603e30aab5c21c2f70033fd82efe81f3c234fbca2c",
+      "stage": "Realm-local URLPattern interface using Bun parser",
+      "browserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+      "after": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T13:19:45.961759+00:00",
-    "throughBrowserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+    "recordedAt": "2026-11-05T14:06:58.018853+00:00",
+    "throughBrowserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 413,
-    "totalMatchedRetests": 457,
+    "additionalMatchedRetests": 443,
+    "totalMatchedRetests": 487,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 301,
-    "cumulativeNetGain": 336,
-    "gainedFullPass": 336,
+    "mainlineNetGain": 322,
+    "cumulativeNetGain": 357,
+    "gainedFullPass": 357,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21066,
-      "pass": 4306,
+      "fail": 21044,
+      "pass": 4327,
       "harness-error": 11439,
-      "unsupported-infrastructure": 1457,
+      "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4306,
-    "testedPassPercent": 11.20770432066632,
+    "passed": 4327,
+    "testedPassPercent": 11.262363352420614,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.2632831386933225,
+    "wholeManifestVerifiedPassPercent": 3.279197896220624,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -17321,6 +18221,171 @@
         "artifact": "/tmp/css-padding-after-6.json",
         "stage": "Padding grammar, pending CSSOM and percentage geometry",
         "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-0.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-1.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-2.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-3.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-4.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-5.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-6.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-7.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-8.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-9.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/css-inset-after-10.json",
+        "stage": "Physical/logical inset grammar and positioning",
+        "revision": "513b9c9581e6eb93983c9203fd07887d278ceb11"
+      },
+      {
+        "artifact": "/tmp/xml-iframe-final-Document-createElement.html.json",
+        "stage": "Active ordinary XML iframe documents and presentation",
+        "revision": "a89f3ffc55b9fb9e318f5aeb3b0ecf27bc58f978"
+      },
+      {
+        "artifact": "/tmp/xml-iframe-final-Document-createElementNS.html.json",
+        "stage": "Active ordinary XML iframe documents and presentation",
+        "revision": "a89f3ffc55b9fb9e318f5aeb3b0ecf27bc58f978"
+      },
+      {
+        "artifact": "/tmp/xml-iframe-final-Document-createElement-namespace.html.json",
+        "stage": "Active ordinary XML iframe documents and presentation",
+        "revision": "a89f3ffc55b9fb9e318f5aeb3b0ecf27bc58f978"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-0-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-1-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-2-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-3-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-4-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-5-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-6-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-7-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-disabled-8-after.json",
+        "stage": "Inherited form disabled state and input activation",
+        "revision": "8c0617d7ea84cef6e56d1c2e271d5f7532c54073"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-0.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-1.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-2.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-3.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-4.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-5.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-6.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-7.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-8.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/urlpattern-final-9.json",
+        "stage": "Realm-local URLPattern interface using Bun parser",
+        "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
       }
     ],
     "previousLedgerRegressions": [
@@ -17411,7 +18476,7 @@
       "The 249-case audit used one clean revision and four workers, verified by before/after source fingerprints. Later focused results replace only their exact URLs and carry separate revision identifiers.",
       "The 120-second controller budget does not change official testharness deadlines. Three long NodeList stress cases passed their assertions but exceeded the harness deadline under four-worker load; the original failures remain recorded.",
       "Global ErrorEvent reporting is now enabled: script registration errors are visible to the ordinary testharness. Passing artifacts were also checked for missing frozen-baseline subtest names.",
-      "The XML/SVG constructor and worker cases remain incomplete. Real XHTML navigation now passes its separately recorded cases; unrelated incomplete cases are not counted as complete passes.",
+      "Real XHTML and ordinary XML iframe navigation now pass their separately recorded factory cases. Unrelated incomplete SVG and worker cases, including four URLPattern worker wrappers, are not counted as complete passes.",
       "The frozen baseline ran on Android ARM64, while this retest runs Linux ARM64 with a different Bun canary revision. Timing and runtime differences remain.",
       "The whole-manifest number is a mixed-results estimate against all 131,953 cases, not a fresh full-manifest run."
     ]
