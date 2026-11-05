@@ -54,6 +54,7 @@ git -C vendor/happy-dom apply ../../patches/happy-dom/0007-scope-content-models-
 | `0004-insert-adjacent-html-in-order.patch` | `packages/happy-dom/src/nodes/element/Element.ts` | `insertAdjacentHTML` inserted the parsed nodes one at a time, which reversed their order at `afterbegin` and `afterend`; insert the parsed fragment as a whole. | `bun test test/page-scripts.test.js` (`insertAdjacentHTML keeps the order of the inserted nodes at every position`) |
 | `0005-invalidate-matches-on-structure-changes.patch` | `packages/happy-dom/src/query-selector/QuerySelector.ts` | `Element.matches()` cached results that were invalidated only by changes to the elements the matcher visited, so structural pseudo-classes and sibling combinators stayed stale after a child list change, and `:has()` after any change in the subtree; register the parent of every visited element, and do not cache `:has()` matches. | `bun test test/happy-dom-matches.test.js` |
 | `0006-parse-css-escapes-in-selectors.patch` | `packages/happy-dom/src/query-selector/SelectorParser.ts` | The group scan treated a comma, space, quote, or parenthesis that belonged to a CSS escape (`\,`, `\31 `, `\"`, `\(`) as a combinator or grouping character, and a type selector stopped at the first backslash, so `\64 iv` and `my\-el` did not parse. Escapes are consumed first (CSS Syntax §4.3.7) and a type selector is unescaped with the existing `cssUnescape` before it is uppercased. Identifiers, classes, and attribute values already accepted a backslash; this patch does not change how those are decoded. | `bun test test/page-scripts.test.js -t "selectors with CSS escapes"` |
+| `0008-serialize-cdata-sections.patch` | `packages/happy-dom/src/xml-serializer/XMLSerializer.ts` | Preserve CDATA sections in the existing recursive XML serializer, including nested nodes and namespace state. | `bun test test/cdata-section.test.js` |
 
 ### `0006` against upstream `SelectorParser.ts`
 
@@ -90,3 +91,16 @@ RCDATA repeatedly consumed later markup without closing the lowercase SVG
 node, deleting following controls and preventing Hextris initialization.
 Validation: `bun test test/html-rcdata.test.js`; live game
 <https://hextris.io/>. The same rule preserves SVG title text and following SVG/HTML siblings.
+
+### `0008`: XML CDATA serialization
+
+The project DOM adapter supplies genuine CDATA nodes. The XML serializer uses a
+private recursive method, so its type switch needs one local branch to emit the
+CDATA delimiters without escaping its data. HTML fragment serialization remains
+in the project adapter and escapes CDATA as ordinary text.
+
+```sh
+git -C vendor/happy-dom apply --check ../../patches/happy-dom/0008-serialize-cdata-sections.patch
+git -C vendor/happy-dom apply ../../patches/happy-dom/0008-serialize-cdata-sections.patch
+git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0008-serialize-cdata-sections.patch
+```
