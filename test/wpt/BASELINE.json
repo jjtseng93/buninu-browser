@@ -4469,10 +4469,10 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-delay-computed.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/1.json",
-      "artifactSha256": "31286c5a3afd75cdc6b80122d4bb4221ef0fa364ca12ec0d689ba80e789ce2fe",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/wpt-relative-math/review-final-3.json",
+      "artifactSha256": "640b51d484944fc7a8f6cd070fbeaf317c8ebd712e0e87cb3da16ce2b310ee48",
+      "stage": "Relative numeric CSS math and stable symbolic serialization",
+      "browserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
       "after": {
         "classification": "fail",
         "passed": 3,
@@ -4619,10 +4619,10 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-duration-computed.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/6.json",
-      "artifactSha256": "1673f50471242118562abeba87c3c45117b3b640c6274ad49ca39259a5c8e582",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/wpt-relative-math/review-final-4.json",
+      "artifactSha256": "c4851dc02ed3c71c5250f284c5d39e0d295bca97b4c0d8a581015dd4b173a8bf",
+      "stage": "Relative numeric CSS math and stable symbolic serialization",
+      "browserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
       "after": {
         "classification": "fail",
         "passed": 8,
@@ -4769,10 +4769,10 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-iteration-count-computed.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/11.json",
-      "artifactSha256": "97ca392b4de6770a27d9d7ef2d2d3ca99a69aa9362ae52cf88bbb5a62f37522a",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/wpt-relative-math/review-final-5.json",
+      "artifactSha256": "d9479e33ace00465d28d77067e50597dfb4a17a6de37b27e7d2136def5829acb",
+      "stage": "Relative numeric CSS math and stable symbolic serialization",
+      "browserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
       "after": {
         "classification": "fail",
         "passed": 1,
@@ -6629,13 +6629,13 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-fonts/font-weight-sign-function.html",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-6-after.json",
-      "artifactSha256": "cb3dcdf3215fafc116c158b134bcab34908657a841642ef20446bde44b717386",
-      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
-      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "artifact": "/tmp/wpt-relative-math/review-final-0.json",
+      "artifactSha256": "78be743249c2c362885d8026afee6bb3fb997669f22916c53d328d676f75c6f1",
+      "stage": "Relative numeric CSS math and stable symbolic serialization",
+      "browserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
       "after": {
-        "classification": "fail",
-        "passed": 0,
+        "classification": "pass",
+        "passed": 3,
         "reported": 3,
         "done": true,
         "harnessStatus": 0,
@@ -6655,7 +6655,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/css-fonts/getComputedStyle-fontFamily.html",
@@ -6779,10 +6779,10 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-fonts/parsing/font-weight-computed.html",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-3-after.json",
-      "artifactSha256": "944a1e1d8c3b43bd2f9d25a54f9cd77f0af0d4be3d6d65c0540c817edde7bf2b",
-      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
-      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "artifact": "/tmp/wpt-relative-math/review-final-1.json",
+      "artifactSha256": "8db500b7b830e52577d9f10f6a9a40de24f1f9683853dc072a0e991231dc01db",
+      "stage": "Relative numeric CSS math and stable symbolic serialization",
+      "browserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
       "after": {
         "classification": "fail",
         "passed": 57,
@@ -6839,13 +6839,13 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-fonts/parsing/font-weight-valid.html",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-2-after.json",
-      "artifactSha256": "e26ea0f58aa8b77e3924f389b5454e931d00b470f5362404ccb38dbc79fc3a3b",
-      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
-      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "artifact": "/tmp/wpt-relative-math/review-final-2.json",
+      "artifactSha256": "d27e2a5c06c3be82f32cff97b108dab891138f5330225a3f2f5f50df5621d7b5",
+      "stage": "Relative numeric CSS math and stable symbolic serialization",
+      "browserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
       "after": {
-        "classification": "fail",
-        "passed": 21,
+        "classification": "pass",
+        "passed": 22,
         "reported": 22,
         "done": true,
         "harnessStatus": 0,
@@ -6865,7 +6865,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/css-fonts/variations/font-weight-lighter-bolder.html",
@@ -13108,6 +13108,216 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-attribute-nodes.html",
+      "artifact": "/tmp/wpt-range-roots/after-0.json",
+      "artifactSha256": "4c104e0805f35ffe4a356f689ea2b8c5314f92bf1287d4c69e52316ef1821ecc",
+      "stage": "Range ordinary-tree roots and page IDL boundaries",
+      "browserRevision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60",
+      "after": {
+        "classification": "pass",
+        "passed": 26,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-cloneContents-in-ShadowRoot.html",
+      "artifact": "/tmp/wpt-range-roots/after-1.json",
+      "artifactSha256": "cbd05c5e7e958cd5a52a5d1e684a0c33ceec960ae5dd24907378d1fb09eb5303",
+      "stage": "Range ordinary-tree roots and page IDL boundaries",
+      "browserRevision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-comparePoint-2.html",
+      "artifact": "/tmp/wpt-range-roots/after-5.json",
+      "artifactSha256": "6b589996f28f6bfb1a77eff345ee60df1590ba2a09450dfa26ad71a79e0d44c2",
+      "stage": "Range ordinary-tree roots and page IDL boundaries",
+      "browserRevision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-deleteContents-in-ShadowRoot.html",
+      "artifact": "/tmp/wpt-range-roots/after-2.json",
+      "artifactSha256": "5934773d2fe62892c97bdfc508777df583183d4ff5d3847efb6d729a043ab282",
+      "stage": "Range ordinary-tree roots and page IDL boundaries",
+      "browserRevision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-extractContents-in-ShadowRoot.html",
+      "artifact": "/tmp/wpt-range-roots/after-3.json",
+      "artifactSha256": "d16e069f275e513baf51def9476f2b121df10234367c8db69987bacfe43c832b",
+      "stage": "Range ordinary-tree roots and page IDL boundaries",
+      "browserRevision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-intersectsNode-binding.html",
+      "artifact": "/tmp/wpt-range-roots/after-6.json",
+      "artifactSha256": "644bf1b4aecc4c930c9ff2f37c49c2b6b37ca82be553b86f67f7d0ac0e8d7fb8",
+      "stage": "Range ordinary-tree roots and page IDL boundaries",
+      "browserRevision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-intersectsNode-shadow.html",
+      "artifact": "/tmp/wpt-range-roots/after-4.json",
+      "artifactSha256": "31a3407dafcd10052ae175379ab5e8b356d6a5aa4ae255fc7e7dc9d7751a9dd6",
+      "stage": "Range ordinary-tree roots and page IDL boundaries",
+      "browserRevision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/ranges/Range-mutations-normalize.html",
       "artifact": "/tmp/wpt-node-normalize/final-2.json",
       "artifactSha256": "689f0abcb04bd0f0e5216d00d11108fc0072d0c2f1e49ba9c0b0292c85cdb4e4",
@@ -17339,13 +17549,13 @@
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/common-HTMLOptionsCollection-add.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/212.json",
-      "artifactSha256": "d5b03b6392d1a4352c14c43add616e852facc8e3b33f1496f89f096caebd2102",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/wpt-select-indexed/after-0.json",
+      "artifactSha256": "00e1fb8031b2895eeb619d67a887514381dd26eb3afa863f857faf5b5b4009e9",
+      "stage": "Select indexed operations and multiple-state reset",
+      "browserRevision": "413dada0968ff9b4bee7874e2cf7612e7d52cedb",
       "after": {
-        "classification": "fail",
-        "passed": 1,
+        "classification": "pass",
+        "passed": 3,
         "reported": 3,
         "done": true,
         "harnessStatus": 0,
@@ -17365,7 +17575,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/common-HTMLOptionsCollection-namedItem.html",
@@ -17399,13 +17609,13 @@
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/common-HTMLOptionsCollection.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/214.json",
-      "artifactSha256": "2d79b60cc18d2d71337903536edafe365d7ef79bfa0823b6b115cb523f6ef1e6",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/wpt-select-indexed/after-1.json",
+      "artifactSha256": "462a449f5247c589a1e23fcbe45bbbfa47ea86c9d9b032d7f078cd193cbddcde",
+      "stage": "Select indexed operations and multiple-state reset",
+      "browserRevision": "413dada0968ff9b4bee7874e2cf7612e7d52cedb",
       "after": {
-        "classification": "fail",
-        "passed": 5,
+        "classification": "pass",
+        "passed": 8,
         "reported": 8,
         "done": true,
         "harnessStatus": 0,
@@ -17425,7 +17635,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/customizable-select/option-disabled-optgroup-wrapper.html",
@@ -17549,13 +17759,13 @@
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-multiple.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/218.json",
-      "artifactSha256": "c8f7ea11017273b161239a0758893dce2c2accba79b1f0ad00edc9ab88ba1457",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/wpt-select-indexed/after-2.json",
+      "artifactSha256": "59f50f8db1405e52767e3638b179a46b370bc7b98f6a57e4f02e99859274ab1c",
+      "stage": "Select indexed operations and multiple-state reset",
+      "browserRevision": "413dada0968ff9b4bee7874e2cf7612e7d52cedb",
       "after": {
-        "classification": "fail",
-        "passed": 2,
+        "classification": "pass",
+        "passed": 3,
         "reported": 3,
         "done": true,
         "harnessStatus": 0,
@@ -17575,7 +17785,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-named-getter.html",
@@ -21209,30 +21419,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T20:03:48.662699+00:00",
-    "throughBrowserRevision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a",
+    "recordedAt": "2026-11-05T20:28:13.760375+00:00",
+    "throughBrowserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 582,
-    "totalMatchedRetests": 626,
+    "additionalMatchedRetests": 589,
+    "totalMatchedRetests": 633,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 439,
-    "cumulativeNetGain": 474,
-    "gainedFullPass": 475,
+    "mainlineNetGain": 451,
+    "cumulativeNetGain": 486,
+    "gainedFullPass": 487,
     "lostFullPass": 1,
     "classification": {
-      "fail": 20934,
-      "pass": 4444,
+      "fail": 20922,
+      "pass": 4456,
       "harness-error": 11432,
       "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4444,
-    "testedPassPercent": 11.566892243623112,
+    "passed": 4456,
+    "testedPassPercent": 11.598125976054138,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.367865831015589,
+    "wholeManifestVerifiedPassPercent": 3.376959978174047,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -23286,6 +23496,86 @@
         "artifact": "/tmp/wpt-node-normalize/final-2.json",
         "stage": "Live ranges and exclusive Text normalization",
         "revision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a"
+      },
+      {
+        "artifact": "/tmp/wpt-select-indexed/after-0.json",
+        "stage": "Select indexed operations and multiple-state reset",
+        "revision": "413dada0968ff9b4bee7874e2cf7612e7d52cedb"
+      },
+      {
+        "artifact": "/tmp/wpt-select-indexed/after-1.json",
+        "stage": "Select indexed operations and multiple-state reset",
+        "revision": "413dada0968ff9b4bee7874e2cf7612e7d52cedb"
+      },
+      {
+        "artifact": "/tmp/wpt-select-indexed/after-2.json",
+        "stage": "Select indexed operations and multiple-state reset",
+        "revision": "413dada0968ff9b4bee7874e2cf7612e7d52cedb"
+      },
+      {
+        "artifact": "/tmp/wpt-range-roots/after-0.json",
+        "stage": "Range ordinary-tree roots and page IDL boundaries",
+        "revision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60"
+      },
+      {
+        "artifact": "/tmp/wpt-range-roots/after-1.json",
+        "stage": "Range ordinary-tree roots and page IDL boundaries",
+        "revision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60"
+      },
+      {
+        "artifact": "/tmp/wpt-range-roots/after-2.json",
+        "stage": "Range ordinary-tree roots and page IDL boundaries",
+        "revision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60"
+      },
+      {
+        "artifact": "/tmp/wpt-range-roots/after-3.json",
+        "stage": "Range ordinary-tree roots and page IDL boundaries",
+        "revision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60"
+      },
+      {
+        "artifact": "/tmp/wpt-range-roots/after-4.json",
+        "stage": "Range ordinary-tree roots and page IDL boundaries",
+        "revision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60"
+      },
+      {
+        "artifact": "/tmp/wpt-range-roots/after-5.json",
+        "stage": "Range ordinary-tree roots and page IDL boundaries",
+        "revision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60"
+      },
+      {
+        "artifact": "/tmp/wpt-range-roots/after-6.json",
+        "stage": "Range ordinary-tree roots and page IDL boundaries",
+        "revision": "0d7eb0e184f1345935509fd9d8d30e13d6022f60"
+      },
+      {
+        "artifact": "/tmp/wpt-relative-math/review-final-0.json",
+        "stage": "Relative numeric CSS math and stable symbolic serialization",
+        "revision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0"
+      },
+      {
+        "artifact": "/tmp/wpt-relative-math/review-final-1.json",
+        "stage": "Relative numeric CSS math and stable symbolic serialization",
+        "revision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0"
+      },
+      {
+        "artifact": "/tmp/wpt-relative-math/review-final-2.json",
+        "stage": "Relative numeric CSS math and stable symbolic serialization",
+        "revision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0"
+      },
+      {
+        "artifact": "/tmp/wpt-relative-math/review-final-3.json",
+        "stage": "Relative numeric CSS math and stable symbolic serialization",
+        "revision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0"
+      },
+      {
+        "artifact": "/tmp/wpt-relative-math/review-final-4.json",
+        "stage": "Relative numeric CSS math and stable symbolic serialization",
+        "revision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0"
+      },
+      {
+        "artifact": "/tmp/wpt-relative-math/review-final-5.json",
+        "stage": "Relative numeric CSS math and stable symbolic serialization",
+        "revision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0"
       }
     ],
     "previousLedgerRegressions": [

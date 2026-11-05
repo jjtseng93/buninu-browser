@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `74605de`
+## Mainline targeted estimate through `2d0a80a`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **626 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **633 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,444 / 38,420 = 11.56689%.**
-- **Estimated whole-manifest passing share: 4,444 / 131,953 = 3.36787%.**
-- Cumulative gain over the frozen baseline: **474 complete files**, or **+1.23373 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **439 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
+- **Estimated tested-case pass rate: 4,456 / 38,420 = 11.59813%.**
+- **Estimated whole-manifest passing share: 4,456 / 131,953 = 3.37696%.**
+- Cumulative gain over the frozen baseline: **486 complete files**, or **+1.26497 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **451 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
 
 ### Uniform audit and subsequent fixes
 
@@ -496,6 +496,14 @@ Relative to the ledger through `70aab18`, this round adds **14 freshly demonstra
 - `74605de`: normalize exclusive Text descendants while preserving live Range/Selection boundaries, **+3 freshly fixed complete files** (+0.00781 percentage points). `Node-normalize.html`, `Node-normalize-2.html` and `Range-mutations-normalize.html` improve from fresh 3/4, 0/2 and 0/4 to 4/4, 2/2 and 4/4; all pass again on the final working tree with unchanged registered assertions. The frozen first-file result was 2/4 and remains the ledger's baseline comparison. Iterative traversal preserves the first nonempty Text identity, UTF-16 offsets, parent-index boundaries and existing observer/iterator/style hooks; weak registries also cover selection-created and retained cloned ranges. Fifty-one related tests / 831 assertions and 139 independent native review checks pass. This is a normalization fix, not a claim that all Range mutation operations are implemented.
 
 Together these parts add **12 freshly demonstrated fixes** and **four evidence-only passes**, a net **+16 complete files** (+0.04164 percentage points) over the ledger through `04800ed`. They update 25 distinct URLs, 24 newly included in the ledger, and passing files retain the frozen baseline's registered assertions. These targeted results were collected in a concurrent working tree; functional commits remain separate. The partial-repaint correctness commit `c583b21` and CSSOM performance commit `0d05346` have their own regression coverage and contribute no claimed WPT gain here.
+
+### Select indices, ordinary Range roots and relative numeric CSS
+
+- `413dada`: expose live indexed operations on page select elements through the existing options collection, and reset selection when `multiple` is added or removed, **+3 freshly fixed complete files** (+0.00781 percentage points). Three official files improve from fresh 1/3, 6/8 and 2/3 to 3/3, 8/8 and 3/3. Wrappers retain node identity, receiver semantics and page Array iteration; removing `multiple` retains the first selected option. Sixty-four related tests / 586 assertions and independent Chromium comparisons pass. Nonconfigurable indexed descriptors retain the existing options-collection limitation; the separate `moveBefore` case still fails and is not counted as fixed.
+- `0d7eb0e`: compare Range boundaries by ordinary tree root rather than `ownerDocument`, **+7 freshly fixed complete files** (+0.01822 percentage points). Seven official files improve from 21/43 to 43/43 assertions, while eight previously passing files retain 112/112. Attr, detached and ShadowRoot boundaries collapse and compare within their actual trees; cloned/extracted fragments derive their document from the current start node even after adoption. Native overrides load before normalize tracking, and page bindings preserve conversion order, error realms and author exception identity. Twenty-three local tests / 378 assertions and 54,430 independent comparison checks pass. General live-range mutations, cross-shadow Selection, contextual fragment parsing and Range geometry remain separate.
+- `2d0a80a`: validate relative typed numeric math before resolving actual font/root/viewport bases in the cascade and Canvas text, **+2 freshly fixed complete files** (+0.00521 percentage points). `font-weight-sign-function.html` improves from 0/3 to 3/3 and `font-weight-valid.html` from 21/22 to 22/22. Six official files retain their exact registered tests; the other four stay nonpasses. Symbolic serialization preserves arithmetic precedence, repeated CSSOM writes and negative zero without an extra source-storage layer. Negative zero uses an arithmetic form rather than claiming byte-identical Chromium CSSOM serialization. One hundred eighteen local tests / 3,029 assertions pass; independent review checks 2,500 expressions in 12,500 contexts and verifies the signed-zero fix. Missing container-query geometry and animation timelines remain explicit limitations.
+
+These parts add **12 freshly demonstrated complete passes**, or **+0.03123 percentage points** among eligible cases, over the ledger through `74605de`. They update 16 exact URLs, seven newly included, bringing the ledger to 633 distinct cases. Every final passing artifact retains the frozen baseline's registered assertions; the fresh before/after name multisets also match. Tests used the concurrent working tree, with separate functional commits. The frozen full-run and historical patch-series estimates remain unchanged.
 
 ### Registration and scope limitations
 
