@@ -41,6 +41,18 @@ test('step arithmetic preserves decimal multiples, tiny steps and temporal scale
   ]) expect(inputStepMismatch(value,base,step,scale)).toBe(mismatch);
 });
 
+test('time numeric serialization is canonical while valid string values preserve their spelling', () => {
+  const {window,document}=parseHTMLDocument('<input type=time>');
+  try {
+    const input=document.querySelector('input');
+    for(const [number,text] of [[0,'00:00'],[43200000,'12:00'],[86340000,'23:59'],[3720100,'01:02:00.1'],[3723000,'01:02:03']]) {
+      input.valueAsNumber=number;expect(input.value).toBe(text);
+    }
+    input.value='12:00:00.000';expect(input.value).toBe('12:00:00.000');
+    input.value='01:02:00.100';expect(input.value).toBe('01:02:00.100');
+  } finally {window.happyDOM.close();}
+});
+
 test('initial values, resets and type changes sanitize without corrupting dirty value state', () => {
   const {window,document}=parseHTMLDocument('<form><input type=date value=invalid><input type=month value=2001-01 max=2000-01><input type=number value=1abc></form>');
   try {
