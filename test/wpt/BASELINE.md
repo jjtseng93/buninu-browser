@@ -379,3 +379,18 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 - `../wpt-run/patches/README.md`: patch scope, validation and known limitations.
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
+
+## Mainline targeted estimate through `74c131d`
+
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **235 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+
+- **Estimated tested-case pass rate: 4,125 / 38,420 = 10.73660%.**
+- **Estimated whole-manifest passing share: 4,125 / 131,953 = 3.12611%.**
+- Cumulative gain over the frozen baseline: **155 complete files**, or **+0.40344 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **120 files**. Matched pass-to-nonpass regressions: **0**.
+
+The mainline accounting through `129fe0d` added 96 complete passes: 87 reported with implementation commits, three previously fixed computed-style cases newly recorded, and six newly verified exact-query encoding variants. The last nine are additional evidence, not newly implemented behavior. Subsequent opacity work adds three complete files; select options add eleven, including all 73 assertions in `form-validation-willValidate.html`. XHR decoding adds nine newly repaired files; a chunked-response retest adds one more against the frozen baseline, without attributing that earlier improvement to the decoding change.
+
+The old apparent 67/67 pass in that form test is excluded: execution had stopped before six tests were registered. The corrected 73/73 artifact replaces it only after the select implementation was committed. All passing artifacts in this ledger were audited against the baseline's registered subtest names; none loses a previously registered assertion. This check cannot establish completeness when both runs abort at the same point. Global script-error propagation is being audited separately.
+
+This remains a **mixed-results estimate**, combining successive mainline stages and Linux ARM64 runtimes with the Android baseline. It is not a full rerun; unretested cases are assumed unchanged, so regressions elsewhere remain possible. Exact artifacts, hashes, runtimes, before/after counts and exclusions are recorded in `BASELINE.json`.

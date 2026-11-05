@@ -2425,5 +2425,5629 @@
     "testedPassPercent": 10.424258198854764,
     "wholeManifestCases": 131953,
     "wholeManifestVerifiedPassPercent": 3.035171614135336
+  },
+  "mainlineTargetedRetests": [
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/FileReader-event-handler-attributes.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-FileReader-event-handler-attributes.any.html.json",
+      "artifactSha256": "fbfd601fcbfee9d7edae021470594dc3d0165f0b5212b3cb7444d49d719a5029",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/FileReader-multiple-reads.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-FileReader-multiple-reads.any.html.json",
+      "artifactSha256": "2a69196e2999c0d29ec471f690bf21413ee63d5853c139cddf99e4abafc360e4",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 7,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_abort.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_abort.any.html.json",
+      "artifactSha256": "4da0a7678373091b76f15ad78f0b6aa3014f29dc669c3fba656791bd1b1b1b49",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_error.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_error.any.html.json",
+      "artifactSha256": "ee14afc5b10e115861fddc0c1736f7a30c46ae1df48e4fc7d1b5a29aefb2fb77",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_events.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_events.any.html.json",
+      "artifactSha256": "56d6acf04c1393e5a9eaa558b8baf1d7d073aec7b3001d69b09ebadba2e2fe73",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_readAsArrayBuffer.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_readAsArrayBuffer.any.html.json",
+      "artifactSha256": "f724a47b50cb83d6128472b78c8092fabf9b70eb886fed2cded2643b0b7f6bc3",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_readAsBinaryString.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_readAsBinaryString.any.html.json",
+      "artifactSha256": "ad1562503d044aa8b3f8c13a7dc082b50a600e53cc755958f4677f6808d7bc95",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_readAsDataURL.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_readAsDataURL.any.html.json",
+      "artifactSha256": "6b41be250b45601a79718eb231df7a0001c94f8c6934f630fc20dfeb07114046",
+      "stage": "FileReader",
+      "after": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_readAsText.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_readAsText.any.html.json",
+      "artifactSha256": "3ef34d012983338e60c1aad3f956c4dcbc8e0faa95177cccedc8a7d9dc0ffe75",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_readystate.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_readystate.any.html.json",
+      "artifactSha256": "bbec5f175d1a5257c0ae763020039cef3e0f6b35e194406b32416dd6508e54df",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_result.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/filereader-after-filereader_result.any.html.json",
+      "artifactSha256": "bd92e0f3430590c7a07a58ca11dab3c6ac5f46e7f03271a081f4d40665be53f7",
+      "stage": "FileReader",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 8,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-delay-computed.html",
+      "artifact": "/tmp/css-animation-delay-computed-numeric-after.json",
+      "artifactSha256": "6bb25fbe2defb5d43f05802dc60816d705c9da982b957bb434b80667a4c2b8bf",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-delay-invalid.html",
+      "artifact": "/tmp/css-animation-delay-invalid-numeric-after.json",
+      "artifactSha256": "23bd4155a42b96ae44fa7be916fb3bcce11fec88829ea5ceaa4209e512db2280",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-delay-valid.html",
+      "artifact": "/tmp/css-animation-delay-valid-numeric-after.json",
+      "artifactSha256": "2b8c65d59764c47117caeecdf1510ad1f3bba77b87cd32f3d04f5e5f4c3ef0fe",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-direction-invalid.html",
+      "artifact": "/tmp/css-animation-direction-invalid-after.json",
+      "artifactSha256": "1ad4b4a12f115e9d9188692e4eda31d075745b3d96d8ad4c474ba53d429fef66",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-direction-valid.html",
+      "artifact": "/tmp/css-animation-direction-valid-after.json",
+      "artifactSha256": "77a3e3fc84c9bb971e159d0b64cda13ac0b0181f15c9beafd8d666be7b412172",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-duration-computed.html",
+      "artifact": "/tmp/css-animation-duration-computed-numeric-after.json",
+      "artifactSha256": "5d840fdf22aa7ba74851d5cbca7faea2f4f8a61872c9e2667fc012a7963f86a1",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "fail",
+        "passed": 8,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-duration-invalid.html",
+      "artifact": "/tmp/css-animation-duration-invalid-numeric-after.json",
+      "artifactSha256": "22701e9896303f832dcbd39577893bfb6f63834b54d2bf10bca9939af80184c8",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-duration-valid.html",
+      "artifact": "/tmp/css-animation-duration-valid-numeric-after.json",
+      "artifactSha256": "1ca565166b8aa643c50bb3add03671cb036133b21452b2148675c6109f2fbdaa",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-fill-mode-invalid.html",
+      "artifact": "/tmp/css-animation-fill-mode-invalid-after.json",
+      "artifactSha256": "5d5ea966e0ad0583594087582d32613046f80862e2bc224b93e97eab05470f10",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-fill-mode-valid.html",
+      "artifact": "/tmp/css-animation-fill-mode-valid-after.json",
+      "artifactSha256": "f507676ef0e91212fd11e427494785d4e2da1fb429f698db528bbb04fa40b89a",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-iteration-count-computed.html",
+      "artifact": "/tmp/css-animation-iteration-count-computed-numeric-after.json",
+      "artifactSha256": "cf4f65da4aac834a2861ea48db0d1c8fcd61ca34d03b4e7c3fdf93b2c894446f",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-iteration-count-invalid.html",
+      "artifact": "/tmp/css-animation-iteration-count-invalid-numeric-after.json",
+      "artifactSha256": "1b4df84d5af8af071cde97bdb3e20ccdebc2438da9bbe4c8fa4bbb8d8ebd8d9e",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-iteration-count-valid.html",
+      "artifact": "/tmp/css-animation-iteration-count-valid-numeric-after.json",
+      "artifactSha256": "7da4e387cf44ec9c9240de3faf1c6aa6a58804a43d6d50b61f788657cc62ba1f",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-play-state-invalid.html",
+      "artifact": "/tmp/css-animation-play-state-invalid-after.json",
+      "artifactSha256": "e6a38948a4d23d0b37f80df1fd35d8b1dd163fee424005eb4307dba6557f723f",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-play-state-valid.html",
+      "artifact": "/tmp/css-animation-play-state-valid-after.json",
+      "artifactSha256": "e6b8ddf8bd51a8fdf1e2ffa5fd8341cabf77045a0de68a66a33aa1daa4a60c5d",
+      "stage": "CSS animation",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-color/parsing/opacity-computed.html",
+      "artifact": "/tmp/css-opacity-computed-after.json",
+      "artifactSha256": "cad0f1893946c8f5c6c76fb1419de12283152a5dfc0e84dc18d8b44de4d748fd",
+      "stage": "CSS opacity",
+      "after": {
+        "classification": "pass",
+        "passed": 30,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 10,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-color/parsing/opacity-invalid.html",
+      "artifact": "/tmp/css-opacity-invalid-after.json",
+      "artifactSha256": "eddc1dd4653ece7da2884e92dbe5f029872bd269cd9f5b3d36788fb2bf230b4f",
+      "stage": "CSS opacity",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-color/parsing/opacity-valid.html",
+      "artifact": "/tmp/css-opacity-valid-after.json",
+      "artifactSha256": "8b6fa8a9b1b162b1ba82fb46d956e5e0654c4296ba42009aabdf286465f61bf0",
+      "stage": "CSS opacity",
+      "after": {
+        "classification": "pass",
+        "passed": 30,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-direction-computed.html",
+      "artifact": "/tmp/css-layout-after-css-flexbox-flex-direction-computed.json",
+      "artifactSha256": "d1da331f1af4897804b510e92d0afdd2d97fe5a8e6dfdfcebdcaaf4ba8c70b59",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-direction-invalid.html",
+      "artifact": "/tmp/css-layout-after-css-flexbox-flex-direction-invalid.json",
+      "artifactSha256": "ea87bdde585b1884de464e8dbcdc879b372e3affe43736fcab91305678e7a708",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-direction-valid.html",
+      "artifact": "/tmp/css-layout-after-css-flexbox-flex-direction-valid.json",
+      "artifactSha256": "dacc78e1f0fd7587c3ddb7acc00cc573ed34b8967fa2eab7fed0cb88decbf37c",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-grow-computed.html",
+      "artifact": "/tmp/css-flex-factor-flex-grow-computed-after.json",
+      "artifactSha256": "dca5c573502168035912aceb71d00aedc76de68c963ac9d970f25c3222a702b8",
+      "stage": "CSS flex factors",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-grow-invalid.html",
+      "artifact": "/tmp/css-flex-factor-flex-grow-invalid-after.json",
+      "artifactSha256": "e2841cefa573c7a85ace337d7f4e6f7ef97de143460a04cf5b6d3021d9ae5901",
+      "stage": "CSS flex factors",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-grow-valid.html",
+      "artifact": "/tmp/css-flex-factor-flex-grow-valid-after.json",
+      "artifactSha256": "206ec038edc863cfa4814be6ab33de7d80bd7392ccfea59eadc96d9cf6c6b762",
+      "stage": "CSS flex factors",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-shrink-computed.html",
+      "artifact": "/tmp/css-flex-factor-flex-shrink-computed-after.json",
+      "artifactSha256": "ca03b6ea084375070640b321f2f84c7f4892a80d8da202f7dcfcc057b14607b7",
+      "stage": "CSS flex factors",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-shrink-invalid.html",
+      "artifact": "/tmp/css-flex-factor-flex-shrink-invalid-after.json",
+      "artifactSha256": "edc901bb1e0b816ec0b1e86c7d2029fae0858fdb75ce9b8ff991ea1ddd27b01f",
+      "stage": "CSS flex factors",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-flexbox/parsing/flex-shrink-valid.html",
+      "artifact": "/tmp/css-flex-factor-flex-shrink-valid-after.json",
+      "artifactSha256": "5a79cc52c07135550b6a5b69551ad99371e05ae37b6a37a8eb807cd32a47e84a",
+      "stage": "CSS flex factors",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/position-computed.html",
+      "artifact": "/tmp/css-layout-after-css-position-position-computed.json",
+      "artifactSha256": "f423198e3539cce3e5d98f4d0d1438e79b40f563690a379a39d1455f9a389965",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/position-invalid.html",
+      "artifact": "/tmp/css-layout-after-css-position-position-invalid.json",
+      "artifactSha256": "c3020930ca4aaa95ee4b269ebb5726af0d21c269f6072af39d9dff9d303d3c1f",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-position/parsing/position-valid.html",
+      "artifact": "/tmp/css-layout-after-css-position-position-valid.json",
+      "artifactSha256": "5b1fa384b9f1a58c6639ce90044179148b9c2dc874c1ce132c05dbf911886946",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/box-sizing-computed.html",
+      "artifact": "/tmp/css-layout-after-css-sizing-box-sizing-computed.json",
+      "artifactSha256": "1248b45b82809d926f1169b00758782cd8d5272171dafeb3b19395b1b210d919",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/box-sizing-invalid.html",
+      "artifact": "/tmp/css-layout-after-css-sizing-box-sizing-invalid.json",
+      "artifactSha256": "6c6eeb1964b733bc3eb5f797c981b0181aa00972097a4a8741163028f32921d8",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/box-sizing-valid.html",
+      "artifact": "/tmp/css-layout-after-css-sizing-box-sizing-valid.json",
+      "artifactSha256": "a2a3a578ffa063f8008b055031e0b1c0a159d0bb4f4a82506c1433a6a12cb6fe",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/overflow-wrap/word-wrap-alias.html",
+      "artifact": "/tmp/css-text-word-wrap-alias-after.json",
+      "artifactSha256": "81a15fdd5cf69f4998ed24a6044c28084c65f4b31582ee5d6c4cf28c4b0a6579",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/overflow-wrap-computed.html",
+      "artifact": "/tmp/css-text-overflow-wrap-computed-after.json",
+      "artifactSha256": "8a91ba8eef054aec27b6a3755e69cd7ba1ccc877013ea1a85237d2c2e433fe47",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/overflow-wrap-invalid.html",
+      "artifact": "/tmp/css-text-overflow-wrap-invalid-after.json",
+      "artifactSha256": "0243d42976ba0bfcf5c332ce4a950be11e8486418d100f621ee090b9ea3e9976",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/overflow-wrap-valid.html",
+      "artifact": "/tmp/css-text-overflow-wrap-valid-after.json",
+      "artifactSha256": "b2585eaef2b039d6d4ea0df5c96507f25b38807c03536fb94f71ccb5e3f8d8d3",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/word-break-computed.html",
+      "artifact": "/tmp/css-text-word-break-computed-after.json",
+      "artifactSha256": "94f08ea6ad008bb813071fe6aac4b462dff775798bbf7dfe0dca131c5261926b",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/word-break-invalid.html",
+      "artifact": "/tmp/css-text-word-break-invalid-after.json",
+      "artifactSha256": "5a82f35abb6b33b091eafe914cb7b16e7cb53d6c8b2f5e3aa2cbafb0a7b99a47",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/word-break-valid.html",
+      "artifact": "/tmp/css-text-word-break-valid-after.json",
+      "artifactSha256": "503ea76682a958de8dc804170d9dfc48f42dc573144170a76f5a3418efa4f02d",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/word-wrap-computed.html",
+      "artifact": "/tmp/css-text-word-wrap-computed-after.json",
+      "artifactSha256": "2d6792dbdbed8e4eeb0f4b20a504a991a2fb4cd126f8689d06c565d5927e2ce3",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/word-wrap-invalid.html",
+      "artifact": "/tmp/css-text-word-wrap-invalid-after.json",
+      "artifactSha256": "29e5f9f0827a71248f2f90108a7cd2a1b91119fcb02777c674a76735803cb273",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text/parsing/word-wrap-valid.html",
+      "artifact": "/tmp/css-text-word-wrap-valid-after.json",
+      "artifactSha256": "19e04a2046b59c176247cfc08a69f72e8b935b81fea494120417d3ec951749ca",
+      "stage": "CSS text wrapping",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-ui/parsing/box-sizing-computed.html",
+      "artifact": "/tmp/css-layout-after-css-ui-box-sizing-computed.json",
+      "artifactSha256": "3a83aad202990976bcb2ed4f019bbff02f980ccb229ed88097c6bfc74ae64b1d",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-ui/parsing/box-sizing-invalid.html",
+      "artifact": "/tmp/css-layout-after-css-ui-box-sizing-invalid.json",
+      "artifactSha256": "f9d704b9ae158e1a3aaf799d6329b4547813189e28e350f2597850659aed332f",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-ui/parsing/box-sizing-valid.html",
+      "artifact": "/tmp/css-layout-after-css-ui-box-sizing-valid.json",
+      "artifactSha256": "216306d6887d03b4c485b4ffb15c8c69de2524d41aa89df4689c15ece161be77",
+      "stage": "CSS layout keywords",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/style-attr-stray-braces.tentative.html",
+      "artifact": "/tmp/css-stray-after.json",
+      "artifactSha256": "d451bd7ce8f4d1f4a2955861c317d3e73701074173909932a2c97f580dee89e1",
+      "stage": "CSS declaration recovery",
+      "after": {
+        "classification": "pass",
+        "passed": 16,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 14,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-as-prototype.html",
+      "artifact": "/tmp/collection-HTMLCollection-as-prototype.html.json",
+      "artifactSha256": "f5bdf718ea5b1084974a0eb5679d1a5de99fa3f2cff63f258cfbfe60cbf98128",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-delete.html",
+      "artifact": "/tmp/collection-HTMLCollection-delete.html.json",
+      "artifactSha256": "4b46f7cfec6fcc1e3f50b95853bec883a11a459d87bf55273162af29dd897bf8",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-empty-name.html",
+      "artifact": "/tmp/collection-HTMLCollection-empty-name.html.json",
+      "artifactSha256": "29527133a31f3afc0b4f2051c5ab2a3c9b779dc35fe638f12c2e80bedcaf16d5",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-iterator.html",
+      "artifact": "/tmp/collection-iterator-after.json",
+      "artifactSha256": "329c67a80d6d36a62b21fad429a2aba2786ff9f2869da54c3a5f0bede81d4304",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-live-item-removal.html",
+      "artifact": "/tmp/collection-HTMLCollection-live-item-removal.html.json",
+      "artifactSha256": "f36c309b250658efb4366e5475315392133f7cd2848b2728538aef2c8f245c11",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-live-mutations.window.html",
+      "artifact": "/tmp/collection-HTMLCollection-live-mutations.window.html.json",
+      "artifactSha256": "d31d36835a11f9f3237ceb23171dab4371c3e2c0948a642d5a6fa319cc4562aa",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-own-props.html",
+      "artifact": "/tmp/collection-HTMLCollection-own-props.html.json",
+      "artifactSha256": "2e004b0e8478e02cab6667f07a07d0cf8408c6e7b92c175417cbcd5a38a29025",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-supported-property-indices.html",
+      "artifact": "/tmp/collection-HTMLCollection-supported-property-indices.html.json",
+      "artifactSha256": "867db91786419de2059dc7ee58752f8486ce9c078708af8da7854462c2b340d6",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/collections/HTMLCollection-supported-property-names.html",
+      "artifact": "/tmp/collection-HTMLCollection-supported-property-names.html.json",
+      "artifactSha256": "d84f655d4a1b1ad46a6381d0077382b00c7fb48ac50fb6ce1ee67a2c6b0b8a11",
+      "stage": "HTMLCollection",
+      "after": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-cancelBubble.html",
+      "artifact": "/tmp/event-cleanup-4.json",
+      "artifactSha256": "440a74ca1eb4150f452dc6b5dbda488236de630d31df14fc7cabcfaafabe169f",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-defaultPrevented-after-dispatch.html",
+      "artifact": "/tmp/event-cleanup-3.json",
+      "artifactSha256": "609b09264df19d8b572ed82dfc5de0b3d982f85c0cbe6d622193315b9382b7ef",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-dispatch-multiple-cancelBubble.html",
+      "artifact": "/tmp/event-cleanup-2.json",
+      "artifactSha256": "c0177ee36381c4d926efd34ccab0130a77fe76669b901efb5cb87674f7b2a7d6",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-dispatch-multiple-stopPropagation.html",
+      "artifact": "/tmp/event-cleanup-1.json",
+      "artifactSha256": "d8a393ad9a5d42616389873969bd059de066655abc2a10e5d5142e765f27fdc5",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-dispatch-propagation-stopped.html",
+      "artifact": "/tmp/event-cleanup-0.json",
+      "artifactSha256": "cf30947ae5476a820fcf913b85f9aeba0d499636327d5487c330d6e35c9d1760",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-dispatch-reenter.html",
+      "artifact": "/tmp/event-final-5.json",
+      "artifactSha256": "3c55453929b62efc2d885dbce576ebb69514c3c79d27b538f8e65666d4abc93a",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-init-while-dispatching.html",
+      "artifact": "/tmp/event-final-3.json",
+      "artifactSha256": "4a884b0a5fc62b2aa9ce00829be9644662e76e8d61fc9f575070dc6f98c7efc4",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-initEvent.html",
+      "artifact": "/tmp/event-final-1.json",
+      "artifactSha256": "ea8321486d6dcb7dc71c131b80d057d12cf5d3c7180640e693d3998f75300f01",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 11,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/Event-isTrusted.any.html",
+      "artifact": "/tmp/event-final-4.json",
+      "artifactSha256": "d739ef35e50c4b54e01d93ee15cbd3f55f5046d659940a55d03addb9e690af18",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/events/EventTarget-dispatchEvent.html",
+      "artifact": "/tmp/event-final-2.json",
+      "artifactSha256": "33d287de830abefa2b9a27f3f13f68a0866b63b368df1d771f2c31819a0e42e9",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "fail",
+        "passed": 17,
+        "reported": 25,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 25,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Attr-prefix.html",
+      "artifact": "/tmp/attr-wpt-Attr-prefix.html.json",
+      "artifactSha256": "5322d5e2857c0d5e28a3dc76e4dc90512484891fba32b783650b098c2f256350",
+      "stage": "Attr",
+      "after": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-constructor-svg.svg",
+      "artifact": "/tmp/document-after-3.json",
+      "artifactSha256": "6ff25ec5c8ebab7f5718c84ae234d287a1c43a5b00de902545bd1181b159a37d",
+      "stage": "Document",
+      "after": {
+        "classification": "incomplete",
+        "passed": 0,
+        "reported": 0,
+        "done": false,
+        "harnessStatus": null,
+        "runnerError": "Case deadline exceeded"
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "incomplete",
+        "passed": 0,
+        "reported": 0,
+        "done": false,
+        "harnessStatus": null,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-constructor-xml.xml",
+      "artifact": "/tmp/document-after-2.json",
+      "artifactSha256": "f30592be1a8cf732039623e0388752e7e4a0e9cfc01ab4ad7cd8290a79d4d9c6",
+      "stage": "Document",
+      "after": {
+        "classification": "incomplete",
+        "passed": 0,
+        "reported": 0,
+        "done": false,
+        "harnessStatus": null,
+        "runnerError": "Case deadline exceeded"
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "incomplete",
+        "passed": 0,
+        "reported": 0,
+        "done": false,
+        "harnessStatus": null,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-constructor.html",
+      "artifact": "/tmp/document-constructor-after.json",
+      "artifactSha256": "5c13664af843e2fe90cb6f21c49d12184d2c34fdf9bec53c7668ab91bc567bb2",
+      "stage": "Document",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createAttribute.html",
+      "artifact": "/tmp/attr-wpt-Document-createAttribute.html.json",
+      "artifactSha256": "ad0555648a884fe86ae469b385fb1a592be0165633ff6ef1d6bfe61fbc230291",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 36,
+        "reported": 36,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 36,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createElement-namespace.html",
+      "artifact": "/tmp/document-after-5.json",
+      "artifactSha256": "5570e73bcc136632c5795797f1a8228f514c799ac2925a26f2fddf80f8f2a227",
+      "stage": "Document",
+      "after": {
+        "classification": "fail",
+        "passed": 21,
+        "reported": 51,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 15,
+        "reported": 51,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createProcessingInstruction-xhtml.xhtml",
+      "artifact": "/tmp/pi-after-Document-createProcessingInstruction-xhtml.xhtml.json",
+      "artifactSha256": "3eea0ff13e6cbece5bafa6f6d70714e330774200aa5776895497c2ac5c66ef1a",
+      "stage": "ProcessingInstruction",
+      "after": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createProcessingInstruction.html",
+      "artifact": "/tmp/pi-final-official.json",
+      "artifactSha256": "5b8bddc642c092bde4b71ba2b7a9c34c63607665cee23a6abf0e4205a282eb30",
+      "stage": "ProcessingInstruction",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-doctype.html",
+      "artifact": "/tmp/document-after-4.json",
+      "artifactSha256": "f1a6d437d78c0e3c0be0f1ccccfb65ac1656cf03e2a50e275b5675e24bfbf942",
+      "stage": "Document",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Element-removeAttribute.html",
+      "artifact": "/tmp/attr-wpt-Element-removeAttribute.html.json",
+      "artifactSha256": "3a6dc83daebd60bc129734038223434723d0b0115fe8292a229053c7e158932e",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Element-removeAttributeNS.html",
+      "artifact": "/tmp/attr-wpt-Element-removeAttributeNS.html.json",
+      "artifactSha256": "c2a583f3c2f855af4fdf7fc3b814a1f0e98af341383b78da39325c3394a1dcde",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Element-setAttribute.html",
+      "artifact": "/tmp/attr-wpt-Element-setAttribute.html.json",
+      "artifactSha256": "670961f96c6e6284ebf2c7b914d2048f35fbbd57ba7d1ee2cdd8945438211c06",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Element-setAttributeNodeNS.html",
+      "artifact": "/tmp/attr-wpt-Element-setAttributeNodeNS.html.json",
+      "artifactSha256": "ef177ca9cd427a4e92075c01ab58b949da7baee659ece25abd9fcacbe1e310de",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/MutationObserver-attributes.html",
+      "artifact": "/tmp/attr-wpt-MutationObserver-attributes.html.json",
+      "artifactSha256": "5d5781f0c2540e33c63b8fae4d1327907bdf2389a2e97d0d37ea7ced565a7072",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 42,
+        "reported": 42,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 36,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-cloneNode-XMLDocument.html",
+      "artifact": "/tmp/document-after-1.json",
+      "artifactSha256": "75d7d70d6393cdaa01739e599e3e8e6e009885ef6de24967adaf81c57b1c7c04",
+      "stage": "Document",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/NodeList-Iterable.html",
+      "artifact": "/tmp/nodelist-NodeList-Iterable.html.json",
+      "artifactSha256": "3c3434044d6bc7d961f3980770e772deb3015a173ee63e3e06be4ff2cb490dfa",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/NodeList-live-mutations.window.html",
+      "artifact": "/tmp/nodelist-NodeList-live-mutations.window.html.json",
+      "artifactSha256": "6b9d38191688055bfe9ed1e2cb33e457c4077faaa092e7dec887427720f68b88",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/NodeList-static-length-getter-tampered-1.html",
+      "artifact": "/tmp/nodelist-NodeList-static-length-getter-tampered-1.html.json",
+      "artifactSha256": "cd4d90925000cf5b95165d7267891a82a5e3cef6ee4df5c86ed303368c93472a",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/NodeList-static-length-getter-tampered-2.html",
+      "artifact": "/tmp/nodelist-NodeList-static-length-getter-tampered-2.html.json",
+      "artifactSha256": "05ba5ad599bffc239c13dd87207bfebeda4fc9a9c78913ed6a984bd7018cfe7a",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/NodeList-static-length-getter-tampered-3.html",
+      "artifact": "/tmp/nodelist-NodeList-static-length-getter-tampered-3.html.json",
+      "artifactSha256": "6e922ff89a7b3c9eb84c53019f4de7d56ecc2a282ac9b9c17017940369707d4f",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/attributes-namednodemap-cross-document.window.html",
+      "artifact": "/tmp/document-after-0.json",
+      "artifactSha256": "4895229726cc2f7c5835d0bb58c0abb54feb8786eed9e78bf4439f677afd51ec",
+      "stage": "Document",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/attributes-namednodemap.html",
+      "artifact": "/tmp/attr-wpt-attributes-namednodemap.html.json",
+      "artifactSha256": "2eb36211303f6765e3a3c0180f223fb12aff8b0cd846d42b9bf685578bba8dd1",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/attributes.html",
+      "artifact": "/tmp/attr-wpt-attributes.html.json",
+      "artifactSha256": "2e056c2d858c5bef822a008ca9205c4cd0576b641ff92f661c905a50ba3a8cf1",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 67,
+        "reported": 67,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 29,
+        "reported": 67,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/namespaced-attribute-mutations.html",
+      "artifact": "/tmp/attr-wpt-namespaced-attribute-mutations.html.json",
+      "artifactSha256": "7920c48a0098db31ee0f99e01cf764ef12f4f6c8cfedc5c6ece548a6c7f38149",
+      "stage": "Attr",
+      "after": {
+        "classification": "pass",
+        "passed": 24,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-basics.any.html",
+      "artifact": "/tmp/encoder-api-basics.any.html.json",
+      "artifactSha256": "50bf6843fc46605161a220cce1471a1b2a5f65129e1e4ca6eee3278b0bc66906",
+      "stage": "TextEncoder",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-invalid-label.any.html?1-1000",
+      "artifact": "/tmp/wpt-encoding-api-invalid-label.any.html_1-1000.json",
+      "artifactSha256": "38e1b7dd3ded6e0e0e7e534114c7364a7cc7dcaacc1f6c8204ff2b777a6c6fa3",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-invalid-label.any.html?1001-2000",
+      "artifact": "/tmp/wpt-encoding-api-invalid-label.any.html_1001-2000.json",
+      "artifactSha256": "59722ef55cf0e648fbfbfc65a031d1159905d50a291830c57931241b55acf69b",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-invalid-label.any.html?2001-3000",
+      "artifact": "/tmp/wpt-encoding-api-invalid-label.any.html_2001-3000.json",
+      "artifactSha256": "2160d94d9b8d4d7ae117715f2cd586e36ad6e0f5cffff7a5a973c63505078713",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-invalid-label.any.html?3001-last",
+      "artifact": "/tmp/wpt-encoding-api-invalid-label.any.html_3001-last.json",
+      "artifactSha256": "99c2b4fb14f25e5b70b71b1279c2fe187dc356c0a8e8a24ee0a14d97fcaf802a",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 421,
+        "reported": 421,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 421,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-invalid-label.any.worker.html?1-1000",
+      "artifact": "/tmp/encoding-worker-after.json",
+      "artifactSha256": "1cbf7a4e721d16a3b55660e23412ea806faed3656e2517668816a8ba6b0106c9",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "incomplete",
+        "passed": 0,
+        "reported": 0,
+        "done": false,
+        "harnessStatus": null,
+        "runnerError": "Case deadline exceeded"
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-replacement-encodings.any.html",
+      "artifact": "/tmp/wpt-encoding-api-replacement-encodings.any.html.json",
+      "artifactSha256": "943e4b55ad61fe3d487776c78191ce4b8a4069e3f93e30d47e1aad935adcdf8f",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/api-surrogates-utf8.any.html",
+      "artifact": "/tmp/encoder-api-surrogates-utf8.any.html.json",
+      "artifactSha256": "53fcc45ce3f30234f577804ed2ab3f2dd95b62fdc06fc36c797ce78b16c6601e",
+      "stage": "TextEncoder",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/encodeInto.any.html",
+      "artifact": "/tmp/encoder-after.json",
+      "artifactSha256": "295e0a14f23f3027681004a4d3dbc514d6b2568aab1a4d382fb04e848ce37568",
+      "stage": "TextEncoder",
+      "after": {
+        "classification": "pass",
+        "passed": 111,
+        "reported": 111,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 85,
+        "reported": 111,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/idlharness.any.html",
+      "artifact": "/tmp/encoder-idlharness.any.html.json",
+      "artifactSha256": "b18f25aa6e4fd6769bcead43729b3898fcb9ff228fbe272f3109e92f0f405f66",
+      "stage": "TextEncoder",
+      "after": {
+        "classification": "fail",
+        "passed": 43,
+        "reported": 57,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 29,
+        "reported": 57,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/iso-2022-jp-decoder.any.html",
+      "artifact": "/tmp/wpt-encoding-iso-2022-jp-decoder.any.html.json",
+      "artifactSha256": "4279a9c5498fa1481d288a1ceb309625111e1c63f3219852fce6fdd2a55e4f17",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 38,
+        "reported": 38,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 38,
+        "reported": 38,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/replacement-encodings.any.html",
+      "artifact": "/tmp/wpt-encoding-replacement-encodings.any.html.json",
+      "artifactSha256": "bf679a74d1888af9be2ed82cb0e44bd9a8669f3d8f74e072e06795ddb7423b79",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/single-byte-decoder.any.html?TextDecoder",
+      "artifact": "/tmp/mainline-encoding-query-1-after.json",
+      "artifactSha256": "6cacc6c02295dc84a5dabc3622ae7c537c7046b12554d47243c20d8b731bf52e",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 168,
+        "reported": 168,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 168,
+        "reported": 168,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/single-byte-decoder.any.html?XMLHttpRequest",
+      "artifact": "/tmp/xhr-decode-_encoding_single-byte-decoder.any.html_XMLHttpRequest-after.json",
+      "artifactSha256": "11a374a711c33f708206bca619ad5c752e4c39e9db443020f1d4e147527e62f2",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 168,
+        "reported": 168,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 168,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-arguments.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-arguments.any.html.json",
+      "artifactSha256": "0108d18177e40d8459e2000ace16cb7dbae01c4dfcfbd81d0c6e8e9ad9df1379",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-byte-order-marks.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-byte-order-marks.any.html.json",
+      "artifactSha256": "507a6f04d4afcba00f898babc0882a9e07cfeb5a6848b93dc6b0e843b9d8cedf",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-copy.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-copy.any.html.json",
+      "artifactSha256": "fe2376dd685e2ec7e9e498a80dab98d7da2e4bd54da17ed32a8f23aa3e166fdd",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-eof.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-eof.any.html.json",
+      "artifactSha256": "fe555520271f21655462257a1cfacbea064ca0282e10a7eeb00333471cc4f210",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?1-1000",
+      "artifact": "/tmp/mainline-encoding-query-2-after.json",
+      "artifactSha256": "29a25abb3e9cb2eb865f6427a65932299c8500dd7cca2da42da5bcbc338daa89",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 993,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?1001-2000",
+      "artifact": "/tmp/mainline-encoding-query-3-after.json",
+      "artifactSha256": "bb94bcef67a4d51d3664a8ee82834e19308f68e53554e26e96ca479b200e538d",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 934,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?2001-3000",
+      "artifact": "/tmp/mainline-encoding-query-4-after.json",
+      "artifactSha256": "bfb71f1094e9104f81f2f757db2011fec86e859d94c8f2261ecff965bb54ae25",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 946,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?3001-4000",
+      "artifact": "/tmp/mainline-encoding-query-5-after.json",
+      "artifactSha256": "30aaf3c69bc8db20656ff2390c3eca869a6db2e0f6b26dbcee04138cc58fbc7f",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?4001-5000",
+      "artifact": "/tmp/mainline-encoding-query-6-after.json",
+      "artifactSha256": "e0fc17ed86f336a8ce8adc56e7047758d8d617a1bdf6d652b3f2d23039a32d00",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 992,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?5001-6000",
+      "artifact": "/tmp/mainline-encoding-query-7-after.json",
+      "artifactSha256": "3f316fce886ed67d905dadd075f98866e20f5e11b920442fc43787f1f9dfb9d8",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 997,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?6001-7000",
+      "artifact": "/tmp/mainline-encoding-query-9-after.json",
+      "artifactSha256": "d10d76c072f6ff71f9951cdbe5caaf0383ddc2a8904df64c1ecdaa279f72315c",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 1000,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 988,
+        "reported": 1000,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-single-byte.any.html?7001-last",
+      "artifact": "/tmp/mainline-encoding-query-8-after.json",
+      "artifactSha256": "41b71499f14cd86445761ebd0301382e4a853b2d9f1dbe5c04fc68e48ff19735",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 168,
+        "reported": 168,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 168,
+        "reported": 168,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal-streaming.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-fatal-streaming.any.html.json",
+      "artifactSha256": "709a74225fb40c489eb8883588b60d17afb4f6e239b670594cf838d9ffdf848b",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-fatal.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-fatal.any.html.json",
+      "artifactSha256": "c54c8dcccb7527f151c2eaee772e389e2850d3c8c81348c5ee4634fead34e197",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 36,
+        "reported": 36,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 36,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-ignorebom.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-ignorebom.any.html.json",
+      "artifactSha256": "83c4386acd83f6109db68950b0d0da8164520a01065f2bfcbaf2a392b5d041a0",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-labels.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-labels.any.html.json",
+      "artifactSha256": "21dbb63f91bc6446755f9a9e5c1b9f62c22628b6f20c906bfe7184c5161b21a2",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 222,
+        "reported": 222,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 222,
+        "reported": 222,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-mistakes.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-mistakes.any.html.json",
+      "artifactSha256": "3b06a37d9b1101906ac051dccd6e625ec4bd7f69d5436cf44936332ca1235257",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "fail",
+        "passed": 106,
+        "reported": 108,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 78,
+        "reported": 108,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-streaming.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-streaming.any.html.json",
+      "artifactSha256": "49e2b8af040cf0804ad30fc88681fe0262da5a97b504a0dac5a81348e6d26980",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 32,
+        "reported": 32,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 32,
+        "reported": 32,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textdecoder-utf16-surrogates.any.html",
+      "artifact": "/tmp/wpt-encoding-textdecoder-utf16-surrogates.any.html.json",
+      "artifactSha256": "c70e2863d88bb7af390f0956e2e78a1c5582044a3a9deecf1d8b563d1b3151f5",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textencoder-constructor-non-utf.any.html",
+      "artifact": "/tmp/encoder-constructor-after.json",
+      "artifactSha256": "a7cf73134cddd216cebe98c8676625ab6b50a21a6271d20b3095b52741553358",
+      "stage": "TextEncoder",
+      "after": {
+        "classification": "pass",
+        "passed": 79,
+        "reported": 79,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 79,
+        "reported": 79,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/textencoder-utf16-surrogates.any.html",
+      "artifact": "/tmp/encoder-textencoder-utf16-surrogates.any.html.json",
+      "artifactSha256": "f1926d975465606e8180956550d1db3ebceb363711c2d02ccb2050975993d4fa",
+      "stage": "TextEncoder",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/encoding/unsupported-encodings.any.html",
+      "artifact": "/tmp/wpt-encoding-unsupported-encodings.any.html.json",
+      "artifactSha256": "1f6364a8bbb13504d5bd0592629afb2b89e3aec39a2dd57d1bf474f8a03a8ff6",
+      "stage": "TextDecoder",
+      "after": {
+        "classification": "fail",
+        "passed": 10,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 10,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/dom/documents/dom-tree-accessors/document.getElementsByName/document.getElementsByName-liveness.html",
+      "artifact": "/tmp/nodelist-name-liveness.json",
+      "artifactSha256": "5393185aa690a842a80981468604387d765073c9fff66fc5dcf1f9d7960af409",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/dom/documents/dom-tree-accessors/document.getElementsByName/document.getElementsByName-namespace.html",
+      "artifact": "/tmp/nodelist-name-namespace.json",
+      "artifactSha256": "b551672e2fe17f8ee19d2951625d9159dedd8ab2643bee9841bd5517ec5da5d7",
+      "stage": "NodeList",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/dom/documents/dom-tree-accessors/document.getElementsByName/document.getElementsByName-newelements.html",
+      "artifact": "/tmp/nodelist-name-newelements.json",
+      "artifactSha256": "27c318ef5644491cd4af973bb92c5fa93f7b0a8e79f689f15309c76180c8848c",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/dom/documents/dom-tree-accessors/document.getElementsByName/document.getElementsByName-same.html",
+      "artifact": "/tmp/nodelist-name-same.json",
+      "artifactSha256": "9d462c93dc16694c3b60cb8dfaa9f40d48690d10abf311f730fe58cb6e807fb3",
+      "stage": "NodeList",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-validity-patternMismatch.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-pattern-after.json",
+      "artifactSha256": "970b559720c80d038029735b8d75650173625cd2bdc0aec82f617a4bd73956a2",
+      "stage": "Input pattern",
+      "after": {
+        "classification": "pass",
+        "passed": 85,
+        "reported": 85,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 53,
+        "reported": 85,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-willValidate-datalist.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/willvalidate-datalist-candidate-after.json",
+      "artifactSha256": "49a7f43ec4f1e122de4ea7bc8ccb9190eeedeba58c25796090a7b915ccea8ce7",
+      "stage": "Validity selectors",
+      "after": {
+        "classification": "pass",
+        "passed": 17,
+        "reported": 17,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 17,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-willValidate.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-validation-willValidate-after.json",
+      "artifactSha256": "f599cfa3d574a8487c5ce42ec6523de892cad5d41ac5ba3ecf6d9275b1874a2e",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 73,
+        "reported": 73,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 50,
+        "reported": 67,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/input-pattern-dynamic-value.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/pattern-dynamic-selectors-after.json",
+      "artifactSha256": "69fd84ca455e823a25a019d2efb172fa7a0cf2867a9c54e3b0682ee4e0dd4eef",
+      "stage": "Validity selectors",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/radio-group-valueMissing.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-group-missing-after.json",
+      "artifactSha256": "fdc7b0f2c6f870981d4044d870a89a6dd4cab4724b7b448369da6b223f19b874",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/radio-valueMissing.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-missing-after.json",
+      "artifactSha256": "d35c70ce3df691ef077b9476357c23a223030a55820880f2901382ea162c0430",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/resetting-a-form/reset-event.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/reset-event-after.json",
+      "artifactSha256": "948ce6949b9e7dd531aca683987a4ad7d9e71792a298a6d210602a918227bdd9",
+      "stage": "Form reset",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/resetting-a-form/reset-form-2.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/reset-form-2-after.json",
+      "artifactSha256": "7da71762c86737199e6f72e03327ace8d94ef13f145ab28e34f1fc4e3d5b61d8",
+      "stage": "Form reset",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/resetting-a-form/reset-form-event-realm.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/reset-form-event-realm-after.json",
+      "artifactSha256": "5aaf07f568e220589684940492a674a1f2d753287c48c2ccba9a0b06d7a648ff",
+      "stage": "Form reset",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/resetting-a-form/reset-form.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/reset-form-after.json",
+      "artifactSha256": "49b91048adadfcf1519fdf2b3232efa68ffbe7126d1b338663ac43130a67c1d1",
+      "stage": "Form reset",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/pattern_attribute.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/pattern-attribute-selectors-after.json",
+      "artifactSha256": "f0b202248101a6303c70093582c9b045563573fb0bb7512663ff3eb37f1ff1c8",
+      "stage": "Validity selectors",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/pattern_attribute_v_flag.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/pattern-v-selectors-after.json",
+      "artifactSha256": "d27cbf218459ac9dd4736ce4cfb4630cc788cc570adf739a4920480e1821f7aa",
+      "stage": "Validity selectors",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio-click-events.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-click-events-after.json",
+      "artifactSha256": "eeb0615f839a485c0713161ec71039b313bc1b48ac364da48f25a4fb99c32818",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio-disconnected-group-owner.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-disconnected-after.json",
+      "artifactSha256": "60ede34a4fe89e554ba4920a6943c9a7cf136502cc26d690febe931fe3622b71",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio-form-owner.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-form-owner-after.json",
+      "artifactSha256": "c089caaee20f0b9a1bd16124238c5807c28dc96f54b86cf42f00aaa3a246014e",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio-groupname-case.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-groupname-after.json",
+      "artifactSha256": "59cd20b2771d57db6fc367d2535a83639c3c69fe1b2c36014807d91c8533c94b",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio-input-cancel.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-input-cancel-after.json",
+      "artifactSha256": "e42938a370cdf72ea3b0eee144c9922c0c7fd708c229348c21c1f81b4fabd211",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio-morphed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-morphed-after.json",
+      "artifactSha256": "ec1da798004dee2797c064d41c3e4046bf8621fce14e8aecef4dc5e9cf7b8425",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio-multiple-selected.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/radio-multiple-after.json",
+      "artifactSha256": "6beea6d452cb1efb5d7a3f23c1d5a1c3114e548c09aca520544b08a64cff1416",
+      "stage": "Radio controls",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/radio.html",
+      "artifact": "/tmp/event-final-0.json",
+      "artifactSha256": "6f5d9c32a05593be1d335a9eaf32cb4f2340c4aa4cd9675675c5791c88fe9f9f",
+      "stage": "Event dispatch",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-option-element/option-element-constructor.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/option-constructor-after.json",
+      "artifactSha256": "09e65cab18a60d3443eec4f3a655e36757ca5beba55be0fffb67bc288c0e9f49",
+      "stage": "Option",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-output-element/mutations.window.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/output-mutations-after.json",
+      "artifactSha256": "ffb5e8c5cc109d86d0aa5cd1af7cb538c0b7cb90991e0918cd33ac83a010e131",
+      "stage": "Form reset",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-output-element/output.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/output-value-after.json",
+      "artifactSha256": "45df937d871eb1f979769843dc24f4d4479f060471fe6496da2709a8bedaea75",
+      "stage": "Form reset",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/common-HTMLOptionsCollection-add.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/common-HTMLOptionsCollection-add-after.json",
+      "artifactSha256": "e7ba10cdd88e503fc029cd26d82e8bd399d398e50cef6d4fe7e305c15536d382",
+      "stage": "Select options",
+      "after": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/common-HTMLOptionsCollection-namedItem.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/common-HTMLOptionsCollection-namedItem-after.json",
+      "artifactSha256": "c80acf8d60ce714c78ce4ca2c0cc78278ca5351a5932a4b0add70d6fc3917411",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/common-HTMLOptionsCollection.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/common-HTMLOptionsCollection-after.json",
+      "artifactSha256": "b5857a2c106a5a39cf738981e0181a554dce66a0414173b2dd2ca03b3df6dbb8",
+      "stage": "Select options",
+      "after": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/option-selectedness-script-mutation.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/option-selectedness-script-mutation-after.json",
+      "artifactSha256": "fe7cc05cf8058d1f158f797da3553470b53e920e69d81bf15dc9aaaa57dfeb79",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-add-optgroup.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-add-optgroup-after.json",
+      "artifactSha256": "4044a0ca887cae387ce2e27476477f1bb31975313d3eb1bc0d7160199d8029b7",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-add.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-add-after.json",
+      "artifactSha256": "9dff11cf09af83988f307d21f981a95cba30b175fffba0495a30fbb52e5bad24",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-multiple.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-multiple-after.json",
+      "artifactSha256": "cb4dded18da7cf73bef1a259de3e6a727e11264a6b5aea1cbeaae8d4c6887dee",
+      "stage": "Select options",
+      "after": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-named-getter.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-named-getter-after.json",
+      "artifactSha256": "e691aa1ff54b733a4b886fc6076b65a7c03a1b9c7ef87d7ae46f8e32b4fbbec5",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-remove.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-remove-after.json",
+      "artifactSha256": "d81a5df0ff59dfe0792d966292b0ea31a2effca87805c01b5ab4b95aca63745c",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-selectedOptions-and-value.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-selectedOptions-and-value-after.json",
+      "artifactSha256": "5aaaf7fe785fa814180a0bbb6d0138eca06f3660cb53f6d5e98e6e7533fe8e83",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-selectedOptions.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-selectedOptions-after.json",
+      "artifactSha256": "df04c887f64b558aa37da8b5bdbac1229b216760b9236728ccc127d1fd7e41ce",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-setter-dirtiness.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/select-setter-dirtiness-after.json",
+      "artifactSha256": "d15d308d6a49d19b5199a6761f9c35fd340b8eacde6b402f132044a1bef9c3e8",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/selected-index.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/selected-index-after.json",
+      "artifactSha256": "d9ac3971c729b7eb4405155770af77b18b82c86f49d77375a2babd0917fb758c",
+      "stage": "Select options",
+      "after": {
+        "classification": "pass",
+        "passed": 14,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/selectors/pseudo-classes/valid-invalid-fieldset-disconnected.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/validity-disconnected-selectors-after.json",
+      "artifactSha256": "0c13fcbf2c9ffd876fe5b0eae1ba0bd974339398b4f7ab43b964d145b285164f",
+      "stage": "Validity selectors",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/selectors/pseudo-classes/valid-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/validity-selectors-candidate-final.json",
+      "artifactSha256": "46427dbc29b9db1c56427c32c49d2b8d746c552288cd1e6ca2def275b2ae12d0",
+      "stage": "Validity selectors",
+      "after": {
+        "classification": "pass",
+        "passed": 30,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-blob.html",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-blob.html-after.json",
+      "artifactSha256": "c712c991d51a1f991126951cdb63a7c550977c0c4d052b5fcd85b2e76acf71a0",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 77,
+        "reported": 77,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 77,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-chunked-response.window.html",
+      "artifact": "/tmp/xhr-decode-chunked-after.json",
+      "artifactSha256": "9e62f932baba49afbf2abd25b76689eddb6c506deae93ce13fec1c839640fdd6",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-done-state.any.html",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-done-state.any.html-after.json",
+      "artifactSha256": "17af3149716daafe7d2d8b04c5dea4c30254bf6d29abe928ff33deb41b999260",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-edge-cases.window.html",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-edge-cases.window.html-after.json",
+      "artifactSha256": "513d7a212b2eb6c693ec8ff2fd2e4368431b354ebf77296ce60fabb859147a4f",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-headers-received-state-force-shiftjis.htm",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-headers-received-state-force-shiftjis.htm-after.json",
+      "artifactSha256": "c096dbd0e57f9146f564bef32c8f9aed178567ddd33e8c2bfbecd87400dd0714",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-invalid-mime-type.htm",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-invalid-mime-type.htm-after.json",
+      "artifactSha256": "af53cda354cea89358b7e05ed5cc3ee613bf9384553bfc84b621b5ca7efbbfc5",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-loading-state.htm",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-loading-state.htm-after.json",
+      "artifactSha256": "6d4a716bf9fa82544acee535eb4b51724db7b67482f06747a101e0738b439499",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-open-state-force-utf-8.htm",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-open-state-force-utf-8.htm-after.json",
+      "artifactSha256": "9688b48d367e31d62f5b91b50ad07118a93511b3a0e4c0540e7c59bbf3d1c804",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-unsent-state-force-shiftjis.any.html",
+      "artifact": "/tmp/xhr-decode-_xhr_overridemimetype-unsent-state-force-shiftjis.any.html-after.json",
+      "artifactSha256": "45db2c757612e772aad863fbe2d31cb5df8110b520f95de918aa240023215786",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/progressevent-constructor.any.html",
+      "artifact": "/tmp/progressevent-constructor.any.html-after.json",
+      "artifactSha256": "e2ed94ffd17e50eb5095fb3ce6619dbfe805e1c2d1f6956146d70bf85b4ebeaa",
+      "stage": "ProgressEvent",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/progressevent-interface.html",
+      "artifact": "/tmp/progressevent-interface.html-after.json",
+      "artifactSha256": "90a2df8c7d5a9cec284985ab104df370fc9c9c6b2285e9e72ce38679a1b52058",
+      "stage": "ProgressEvent",
+      "after": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/responsetext-decoding.htm",
+      "artifact": "/tmp/xhr-decode-_xhr_responsetext-decoding.htm-after.json",
+      "artifactSha256": "e0f356994961d4abac95921c681cb5700f5c529319b0974476898ae9cf806511",
+      "stage": "XHR response decoding",
+      "after": {
+        "classification": "pass",
+        "passed": 37,
+        "reported": 37,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 22,
+        "reported": 37,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    }
+  ],
+  "mainlineEstimate": {
+    "recordedAt": "2026-11-05T06:44:03.575619+00:00",
+    "throughBrowserRevision": "74c131d6bdae66d4993221d78e0253d84fe42b59",
+    "basis": "Frozen baseline plus unchanged patchedEstimate for001-025 plus latest matched mainlineTargetedRetests. Mixed stages/runtimes; not a full rerun.",
+    "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
+    "retainedPatchRetests": 44,
+    "additionalMatchedRetests": 191,
+    "totalMatchedRetests": 235,
+    "previousPatchSeriesGain": 35,
+    "mainlineNetGain": 120,
+    "cumulativeNetGain": 155,
+    "gainedFullPass": 155,
+    "lostFullPass": 0,
+    "classification": {
+      "fail": 21239,
+      "pass": 4125,
+      "harness-error": 11446,
+      "unsupported-infrastructure": 1457,
+      "incomplete": 1610
+    },
+    "eligible": 38420,
+    "passed": 4125,
+    "testedPassPercent": 10.736595523165018,
+    "wholeManifestCases": 131953,
+    "wholeManifestVerifiedPassPercent": 3.1261130857199153,
+    "excludedIncompleteRegistrations": [
+      {
+        "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-willValidate.html",
+        "excludedArtifact": "../wpt-run/willvalidate-candidate-after.json",
+        "reported": 67,
+        "expectedFromSourceAndWorkingTree": 73,
+        "reason": "validator.run_test throws at select.add(new Option(...)) before registering final 3 select + 3 textarea tests; current uncommitted select implements add. Page script errors not reflected as harness errors.",
+        "resolution": "The old 67-test artifact remains excluded. Select options commit 22063b4 enables all 73 tests; the separately recorded 73-test result is now included."
+      }
+    ],
+    "registrationAudit": {
+      "artifact": "/tmp/mainline-wpt-registration-audit.json",
+      "fullyPassingAfterArtifactsChecked": 177,
+      "afterMissingBaselineSubtests": 0,
+      "knownEarlyTermination": [
+        {
+          "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-willValidate.html",
+          "excludedArtifact": "../wpt-run/willvalidate-candidate-after.json",
+          "reported": 67,
+          "expectedFromSourceAndWorkingTree": 73,
+          "reason": "validator.run_test throws at select.add(new Option(...)) before registering final 3 select + 3 textarea tests; current uncommitted select implements add. Page script errors not reflected as harness errors."
+        }
+      ],
+      "newPassingArtifactsChecked": 25,
+      "newArtifactsMissingBaselineSubtests": 0,
+      "willValidateNowVerifiedWith73Tests": true
+    },
+    "reconciliation": {
+      "mainlineCommitMessagesTotal": 87,
+      "previouslyFixedComputedCasesNewlyAccounted": 3,
+      "exactEncodingQueryVariantsNewlyRetested": 6,
+      "mainlineNetGain": 96,
+      "falseCompletenessExcluded": 1,
+      "previousComputedCases": [
+        "/css/css-flexbox/parsing/flex-direction-computed.html",
+        "/css/css-sizing/parsing/box-sizing-computed.html",
+        "/css/css-ui/parsing/box-sizing-computed.html"
+      ],
+      "note": "Do not attribute the 3 already-fixed computed cases or 6 query retests as newly implemented behavior in this accounting step.",
+      "additionalCommittedParts": {
+        "opacity": 3,
+        "selectIncludingWillValidate": 11,
+        "xhrDecoding": 9,
+        "chunkedResponseNewlyRecorded": 1
+      }
+    },
+    "caveats": [
+      "Mixed-results estimate through 129fe0d: accepted results come from different cumulative mainline stages, not a uniform final-tree run. Latest means saved artifact mtime for each exact URL.",
+      "Frozen results and original patch001-025 estimate remain unchanged. Unretested outcomes are assumed unchanged; this cannot exclude regressions elsewhere.",
+      "Only completed harness status0/classificationpass with every reported assertion passing count. Partially improved suites do not count as gains.",
+      "All177 selected passing after artifacts retain every subtest name reported by the matching frozen result. This does not prove that either run registered every intended subtest if both aborted early.",
+      "Known false completeness for form-validation-willValidate67/67 is excluded. Actual source includes73 tests. A new73/73 result uses uncommitted select.add and is intentionally excluded from129fe0d estimate.",
+      "The browser apparently does not forward every top-level script error to testharness window.onerror; fix that general global-error propagation next and rerun any affected evidence.",
+      "No uncommitted select or opacity result is included. Two old encoding artifacts omitted query and stay unmatched, while10 exact-query followups now supply valid frozen matches.",
+      "Runtime differs: baseline Androidarm64Bun1.4.4canary; targeted artifacts Linuxarm64Bun1.4.4. Timing/resource differences remain.",
+      "Repeated radio, NamedNodeMap cross-document, pattern selector and encodeInto URLs are deduplicated. No full-case gain is counted twice across stages."
+    ]
   }
 }
