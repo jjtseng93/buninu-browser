@@ -833,14 +833,16 @@ test("calc() sums lengths and percentages; percentages resolve at layout time", 
     width: 26,
     minWidth: { unit: "math", kind: "calc", px: -10, percent: 50 },
   });
-  // "50% -10px" (no space after the minus) still subtracts
+  // Binary subtraction requires whitespace on both sides of the minus.
   expect(style("b")).toMatchObject({
-    width: { unit: "math", kind: "calc", px: -10, percent: 50 },
+    width: "auto",
     height: 84,
     maxWidth: { unit: "math", kind: "min" },
   });
-  // Invalid: length + number, % * %, division by zero, % where no percentages are allowed
-  expect(style("c")).toMatchObject({ width: "auto", maxWidth: "none", height: "auto", margin: [0, 0, 0, 0] });
+  // Mixed number/length and percentage-squared are invalid; infinity clamps
+  // to the supported finite range, while margin percentages defer to layout.
+  expect(style("c")).toMatchObject({ width: "auto", maxWidth: "none", height: 3.4028234663852886e38,
+    margin: [0, 0, 0, {unit:"math",kind:"calc",px:1,percent:10}] });
   window.happyDOM.abort();
 });
 
