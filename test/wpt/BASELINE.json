@@ -3838,6 +3838,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-box/negative-margin.html",
+      "artifact": "/tmp/css-margin-after-final-8.json",
+      "artifactSha256": "2b418f002c24252888c73f3b9438b4ddd98b0e9908027126122b65aeb436a0f9",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-box/parsing/height-invalid.html",
       "artifact": "/tmp/css-sizing-css-box-height-after.json",
       "artifactSha256": "2b69363eb352f127d0b58a37facf94acf9440ef8379b43d7b8a87fb04b548431",
@@ -3866,6 +3896,126 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/margin-computed.html",
+      "artifact": "/tmp/css-margin-after-final-3.json",
+      "artifactSha256": "2a756bb7d6c13a2740f40f0d5710b2e14bfcf55b7074b2a2dc6753f7c551a6d1",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/margin-invalid.html",
+      "artifact": "/tmp/css-margin-after-final-1.json",
+      "artifactSha256": "8b025cdcb5aeb18d8212a07905271fbc91d4f6b508b0a30b532919e12c81dda5",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/margin-shorthand.html",
+      "artifact": "/tmp/css-margin-after-final-2.json",
+      "artifactSha256": "bd318a10343ad72f3dcec15416d21cab0b01e0b9bccc69079d57070dfb02c45e",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/margin-valid.html",
+      "artifact": "/tmp/css-margin-after-final-0.json",
+      "artifactSha256": "560341ee831f33b7b62518f2b55466426928976590e3a1fc96264495c05a925e",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 15,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 15,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     },
     {
       "url": "http://web-platform.test:18000/css/css-box/parsing/max-height-invalid.html",
@@ -4611,6 +4761,126 @@
         "classification": "fail",
         "passed": 2,
         "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/margin-block-inline-computed.html",
+      "artifact": "/tmp/css-margin-after-final-7.json",
+      "artifactSha256": "0a869500328c3179f8d63c57013fdf9ce6652303b0b8a307f3119396967e94c6",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/margin-block-inline-invalid.html",
+      "artifact": "/tmp/css-margin-after-final-5.json",
+      "artifactSha256": "d8365c337be42832c3775e12c914b7d0e8397f03ab26bd38b1abfa622268ef7c",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/margin-block-inline-shorthand.html",
+      "artifact": "/tmp/css-margin-after-final-6.json",
+      "artifactSha256": "72b4448dd023d8075ae1057f280e7e24fb3e7a9cc657b7a919927f897bebfd6b",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/margin-block-inline-valid.html",
+      "artifact": "/tmp/css-margin-after-final-4.json",
+      "artifactSha256": "466a194c57c7eaafb0ff51d49e1088ecc8aeafef61eafd534b35e5271b5dde88",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 14,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 13,
+        "reported": 14,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -6808,6 +7078,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/cssom/getComputedStyle-margins-roundtrip.html",
+      "artifact": "/tmp/css-margin-after-final-9.json",
+      "artifactSha256": "8a129e1727a4b12207d991c4aba1b32e4f7e6cd3a524ba2b0e4b76b4af844749",
+      "stage": "Physical/logical percentage margins across CPU layout",
+      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/css/cssom/insertRule-no-index.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/72.json",
       "artifactSha256": "74537553acde8198b31e28019a4774d199078f1f7d59b17a867dcc9d3040a840",
@@ -8009,13 +8309,13 @@
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createCDATASection-xhtml.xhtml",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-0-final.json",
-      "artifactSha256": "63261c8bac397f439428a188152eeb1d5971625d81ffb45f18c221ecccbb90b4",
-      "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
-      "browserRevision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-0-coalesced.json",
+      "artifactSha256": "a7d3304186acd9a0589fcb5c996b58bfa78e8eb42f84c9e318e7d36f3ed6fedc",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
       "after": {
-        "classification": "fail",
-        "passed": 0,
+        "classification": "pass",
+        "passed": 7,
         "reported": 7,
         "done": true,
         "harnessStatus": 0,
@@ -8035,7 +8335,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createCDATASection.html",
@@ -8099,16 +8399,16 @@
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createProcessingInstruction-xhtml.xhtml",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/114.json",
-      "artifactSha256": "dba95d4cc5438b12e0d9dfd40864451dc3bd62fcd50d8b899e63c42949670068",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-2-coalesced.json",
+      "artifactSha256": "378751cbef9f1402deb5f28730bee5d3ed60a88ae2caa0b2f838b5a0c6de8f9a",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
       "after": {
-        "classification": "harness-error",
-        "passed": 0,
-        "reported": 0,
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
         "done": true,
-        "harnessStatus": 2,
+        "harnessStatus": 0,
         "runnerError": null
       },
       "runtime": {
@@ -8125,7 +8425,7 @@
         "harnessStatus": 2,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createProcessingInstruction.html",
@@ -8158,6 +8458,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createTreeWalker.html",
+      "artifact": "/tmp/traversal-after-0.json",
+      "artifactSha256": "3c7e36e095ee322309a4dcee60bb369927ef9f90a993863ee9ca51ed4d0a3664",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Document-doctype.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/116.json",
       "artifactSha256": "7b35e7fd0b6afa020dc8a43a5b6a2584db5d33a2895adbb29e8845dcb48e7eb3",
@@ -8183,6 +8513,36 @@
         "reported": 2,
         "done": true,
         "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-getElementsByTagName-xhtml.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-6-coalesced.json",
+      "artifactSha256": "d2d5f38b9903660175a27249621087a5124977ddb85f14fe93ca13913f2f5fa2",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
         "runnerError": null
       },
       "fullPassDelta": 1
@@ -8246,6 +8606,36 @@
         "runnerError": null
       },
       "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/DocumentType-literal-xhtml.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-3-coalesced.json",
+      "artifactSha256": "7e6ba7caba6816d970abdc172e347ad1ef96c0c61e023ffcbc45022a6d1364b2",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/DocumentType-remove.html",
@@ -8818,6 +9208,96 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/ProcessingInstruction-in-doctype.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-7-coalesced.json",
+      "artifactSha256": "aa83d377fe4dfa15e5d48bc6ccc551d703b1581c2ebb252615b2ba68214eb777",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/ProcessingInstruction-literal-1.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-4-coalesced.json",
+      "artifactSha256": "1498af433f8264ae61233d80ec36a49f2d94df27efb9cb6384d02f6c1be9828e",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/ProcessingInstruction-literal-2.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-5-coalesced.json",
+      "artifactSha256": "d5ebe65463f236b559a22c8e203d23df362f670b13ccb17d7a9adb724abfe868",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Text-constructor.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/135.json",
       "artifactSha256": "31041474e73a1d0ed440210f341305e12c2598333b51760763d09f0944a89649",
@@ -9056,6 +9536,306 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/NodeFilter-constants.html",
+      "artifact": "/tmp/traversal-after-6.json",
+      "artifactSha256": "6a84cf8f8d8d32edcde550d08ebf32d07479398ac5fd7bfdcd8040feb7092ed0",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/NodeIterator-removal-during-filtering.html",
+      "artifact": "/tmp/traversal-after-10.json",
+      "artifactSha256": "a2b3c76c2f75cb693134de4201b6742dd0ff78506e4d98586069e64c3640f972",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-acceptNode-filter-cross-realm.html",
+      "artifact": "/tmp/traversal-after-4.json",
+      "artifactSha256": "b725172c8d617b804957d3ebdb81903cf6fcdbb0903b4fed91109271e48e4794",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-acceptNode-filter.html",
+      "artifact": "/tmp/traversal-after-2.json",
+      "artifactSha256": "529138c3db41d3e183fea8d4917cc2f2fccd8108f2573d201603bac8bd5c7afe",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 10,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-basic.html",
+      "artifact": "/tmp/traversal-after-1.json",
+      "artifactSha256": "25781589158a6b13ed20b52c778c85a31d9f23df21cbd45d975272e428447807",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-currentNode.html",
+      "artifact": "/tmp/traversal-after-3.json",
+      "artifactSha256": "b6e51b1cc1a8df761d76bd7bb73c51e9cef62a4999f422c9d2bdb2b7309ec601",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-nextNode-detached-currentNode.window.html",
+      "artifact": "/tmp/traversal-after-9.json",
+      "artifactSha256": "9f379564b08b49f2bd614a70b26a06e21829a6ccb23b6345df66c3dcfec5f8d4",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-realm.html",
+      "artifact": "/tmp/traversal-after-5.json",
+      "artifactSha256": "3b143d6e3d705615c4bab0c6578a50aeec74ca8e35d1c149bb85eb0f79671fd1",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-traversal-reject.html",
+      "artifact": "/tmp/traversal-after-7.json",
+      "artifactSha256": "50442dcb1030a6996ebea3796d060ca2180764f69aca2c8fba51177d2093a8f0",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/traversal/TreeWalker-traversal-skip.html",
+      "artifact": "/tmp/traversal-after-8.json",
+      "artifactSha256": "76f6a48006af48ebecb1b19295b2b46a106f2293c37794a1ecd0f6537461ca52",
+      "stage": "Traversal Web IDL factories and recursive filter protection",
+      "browserRevision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     },
     {
       "url": "http://web-platform.test:18000/domparsing/DOMParser-parseFromString-xml-CDATA.html",
@@ -13049,13 +13829,13 @@
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-textarea-element/value-defaultValue-textContent-xhtml.xhtml",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-2-final.json",
-      "artifactSha256": "ac4ff6a59fef66d98a923e4d62ffc4e74d574a4611b697f00f1ea57a8d863039",
-      "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
-      "browserRevision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-1-coalesced.json",
+      "artifactSha256": "48b185905f40bf7dea47cbb7b33cff1fc0d542d65d7cffdb95b9b4d60da868b7",
+      "stage": "Active XHTML navigation with contiguous XML Text nodes",
+      "browserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
       "after": {
-        "classification": "fail",
-        "passed": 0,
+        "classification": "pass",
+        "passed": 1,
         "reported": 1,
         "done": true,
         "harnessStatus": 0,
@@ -13075,7 +13855,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-textarea-element/value-defaultValue-textContent.html",
@@ -14489,30 +15269,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T12:12:53.722880+00:00",
-    "throughBrowserRevision": "5cec3dc63c88f7e944334557152b0f497f8fc693",
+    "recordedAt": "2026-11-05T12:38:18.909087+00:00",
+    "throughBrowserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 358,
-    "totalMatchedRetests": 402,
+    "additionalMatchedRetests": 384,
+    "totalMatchedRetests": 428,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 259,
-    "cumulativeNetGain": 294,
-    "gainedFullPass": 294,
+    "mainlineNetGain": 276,
+    "cumulativeNetGain": 311,
+    "gainedFullPass": 311,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21106,
-      "pass": 4264,
-      "harness-error": 11441,
+      "fail": 21091,
+      "pass": 4281,
+      "harness-error": 11439,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4264,
-    "testedPassPercent": 11.098386257157731,
+    "passed": 4281,
+    "testedPassPercent": 11.14263404476835,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.23145362363872,
+    "wholeManifestVerifiedPassPercent": 3.2443369987798687,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -15376,6 +16156,151 @@
         "artifact": "/tmp/background-shorthand-final-6.json",
         "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
         "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-0-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-1-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-2-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-3-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-4-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-5-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-6-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/xhtml-navigation-7-coalesced.json",
+        "stage": "Active XHTML navigation with contiguous XML Text nodes",
+        "revision": "6fc59dd80a802496623d1863ced000f76512fa37"
+      },
+      {
+        "artifact": "/tmp/traversal-after-0.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-1.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-2.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-3.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-4.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-5.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-6.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-7.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-8.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-9.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/traversal-after-10.json",
+        "stage": "Traversal Web IDL factories and recursive filter protection",
+        "revision": "48f3c04b1fc5e6bb45608baeb40f08a0a2b5acd9"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-0.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-1.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-2.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-3.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-4.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-5.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-6.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-7.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-8.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/tmp/css-margin-after-final-9.json",
+        "stage": "Physical/logical percentage margins across CPU layout",
+        "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
       }
     ],
     "previousLedgerRegressions": [
@@ -15466,7 +16391,7 @@
       "The 249-case audit used one clean revision and four workers, verified by before/after source fingerprints. Later focused results replace only their exact URLs and carry separate revision identifiers.",
       "The 120-second controller budget does not change official testharness deadlines. Three long NodeList stress cases passed their assertions but exceeded the harness deadline under four-worker load; the original failures remain recorded.",
       "Global ErrorEvent reporting is now enabled: script registration errors are visible to the ordinary testharness. Passing artifacts were also checked for missing frozen-baseline subtest names.",
-      "Two XML/SVG constructor cases remain incomplete and the XHTML processing-instruction/worker cases still have harness timeouts. They are not counted as complete passes.",
+      "The XML/SVG constructor and worker cases remain incomplete. Real XHTML navigation now passes its separately recorded cases; unrelated incomplete cases are not counted as complete passes.",
       "The frozen baseline ran on Android ARM64, while this retest runs Linux ARM64 with a different Bun canary revision. Timing and runtime differences remain.",
       "The whole-manifest number is a mixed-results estimate against all 131,953 cases, not a fresh full-manifest run."
     ]
