@@ -22,7 +22,7 @@ test('border component counts and duplicates share validation across CSSOM, shee
       for(const value of invalid) {
         style.setProperty(name,valid,'important');const before=style.getPropertyValue(name);style.setProperty(name,value);
         expect(style.getPropertyValue(name)).toBe(before);expect(style.getPropertyPriority(name)).toBe('important');
-        expect(parseDeclarations(`${name}:${valid};${name}:${value}`).get(name)?.value).toBe(normalizeBorderValue(name,valid));
+        expect(parseDeclarations(`${name}:${valid};${name}:${value}`)).toEqual(parseDeclarations(`${name}:${valid}`));
         expect(supportsDeclaration(name,value)).toBeFalse();
       }
       style.removeProperty(name);expect(style.getPropertyValue(name)).toBe('');
