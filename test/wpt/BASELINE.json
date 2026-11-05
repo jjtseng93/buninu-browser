@@ -4769,13 +4769,13 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-logical/parsing/margin-block-inline-computed.html",
-      "artifact": "/tmp/css-margin-after-final-7.json",
-      "artifactSha256": "0a869500328c3179f8d63c57013fdf9ce6652303b0b8a307f3119396967e94c6",
-      "stage": "Physical/logical percentage margins across CPU layout",
-      "browserRevision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb",
+      "artifact": "/tmp/css-will-change-final-after-0.json",
+      "artifactSha256": "ee246d5060b450e41afa5683a1a3a5a3bbbb05063f2509bd1c3ceb3d115f9461",
+      "stage": "Will-change geometry, stacking and retained painting",
+      "browserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
       "after": {
-        "classification": "fail",
-        "passed": 9,
+        "classification": "pass",
+        "passed": 12,
         "reported": 12,
         "done": true,
         "harnessStatus": 0,
@@ -4795,7 +4795,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/css-logical/parsing/margin-block-inline-invalid.html",
@@ -6266,6 +6266,156 @@
         "runnerError": null
       },
       "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-will-change/inheritance.html",
+      "artifact": "/tmp/css-will-change-final-after-1.json",
+      "artifactSha256": "2b5ca749601a4eb1c8d343c0655396adf12c41efc9038e76fdd888576a8159f4",
+      "stage": "Will-change geometry, stacking and retained painting",
+      "browserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-will-change/parsing/will-change-computed.html",
+      "artifact": "/tmp/css-will-change-final-after-2.json",
+      "artifactSha256": "31bf63a0905fae9aed204b243c02bd5b0c0f3dcffed903f3bdc1754acf416103",
+      "stage": "Will-change geometry, stacking and retained painting",
+      "browserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
+      "after": {
+        "classification": "pass",
+        "passed": 23,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-will-change/parsing/will-change-invalid.html",
+      "artifact": "/tmp/css-will-change-final-after-4.json",
+      "artifactSha256": "544ade458893727b285a47d5cdfa80fef8716618f918e7327dd167c04e20e198",
+      "stage": "Will-change geometry, stacking and retained painting",
+      "browserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
+      "after": {
+        "classification": "pass",
+        "passed": 127,
+        "reported": 127,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 127,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-will-change/parsing/will-change-valid.html",
+      "artifact": "/tmp/css-will-change-final-after-3.json",
+      "artifactSha256": "8fc0ca8adba6f8d91444e8b18d6cf5ada2d5a690e45cb96c7de9949a23b58ef5",
+      "stage": "Will-change geometry, stacking and retained painting",
+      "browserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
+      "after": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-will-change/will-change-inherit-dynamic.html",
+      "artifact": "/tmp/css-will-change-final-after-5.json",
+      "artifactSha256": "23613c3db69f3cc5e883d8fa542736b6bd1c494b6c903ac95a7c7a8c370fabda",
+      "stage": "Will-change geometry, stacking and retained painting",
+      "browserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/css-writing-modes/parsing/direction-computed.html",
@@ -8398,6 +8548,66 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createElement.html",
+      "artifact": "/tmp/element-factories-final-0.json",
+      "artifactSha256": "1c4112553f6a041dec284e7ad9613e6bddc87346e26709974fd40cf654797ee5",
+      "stage": "Namespace-aware creation and element cloning",
+      "browserRevision": "b161837dd973c5b3c86f8120677bc642bc7f954f",
+      "after": {
+        "classification": "fail",
+        "passed": 98,
+        "reported": 147,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 24,
+        "reported": 147,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createElementNS.html",
+      "artifact": "/tmp/element-factories-final-1.json",
+      "artifactSha256": "da95b81f4f51525d81e210a7fb0628a40a66f88b19fe149820b22cdfbee60644",
+      "stage": "Namespace-aware creation and element cloning",
+      "browserRevision": "b161837dd973c5b3c86f8120677bc642bc7f954f",
+      "after": {
+        "classification": "fail",
+        "passed": 401,
+        "reported": 596,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 76,
+        "reported": 596,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createProcessingInstruction-xhtml.xhtml",
       "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-2-coalesced.json",
       "artifactSha256": "378751cbef9f1402deb5f28730bee5d3ed60a88ae2caa0b2f838b5a0c6de8f9a",
@@ -8901,6 +9111,96 @@
         "classification": "fail",
         "passed": 0,
         "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-cloneNode-parser-created-names.html",
+      "artifact": "/tmp/element-factories-final-2.json",
+      "artifactSha256": "1cd2b5a5aaa82831d0f826f607779bf28946c013f56872cef9ba1a0504c48421",
+      "stage": "Namespace-aware creation and element cloning",
+      "browserRevision": "b161837dd973c5b3c86f8120677bc642bc7f954f",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-cloneNode-svg.html",
+      "artifact": "/tmp/element-factories-final-3.json",
+      "artifactSha256": "1d5321cd96aa51f6e2628f2e06b55dadd522ba393fd980ea714ddf3d2f4b953e",
+      "stage": "Namespace-aware creation and element cloning",
+      "browserRevision": "b161837dd973c5b3c86f8120677bc642bc7f954f",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-cloneNode.html",
+      "artifact": "/tmp/element-factories-final-4.json",
+      "artifactSha256": "ea5ef3aadf4696ebe656ea7d0a88c9d4804b5552814387064872ff76b1ffabf1",
+      "stage": "Namespace-aware creation and element cloning",
+      "browserRevision": "b161837dd973c5b3c86f8120677bc642bc7f954f",
+      "after": {
+        "classification": "pass",
+        "passed": 135,
+        "reported": 135,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 129,
+        "reported": 135,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -11931,6 +12231,186 @@
         "classification": "fail",
         "passed": 38,
         "reported": 49,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-form-element/form-attribute-form-owner.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-association-0-after.json",
+      "artifactSha256": "52992df3f646b9e41531e407879c8e6c1458922c7fd7b4730514632f7e1bcd09",
+      "stage": "Live form ownership and control collections",
+      "browserRevision": "477a819296db93ccdde7be33bc41aa9dfbd71e81",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-form-element/form-elements-filter.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-association-1-after.json",
+      "artifactSha256": "11adfdc50acf4936594136f47210b0c3178dc08b4d671411b6daece00e74f103",
+      "stage": "Live form ownership and control collections",
+      "browserRevision": "477a819296db93ccdde7be33bc41aa9dfbd71e81",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-form-element/form-elements-form-owner.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-association-2-after.json",
+      "artifactSha256": "2c6eea081130ea9eaff6e3961de8dc4ceb390de3b7efed32160755b53a110356",
+      "stage": "Live form ownership and control collections",
+      "browserRevision": "477a819296db93ccdde7be33bc41aa9dfbd71e81",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-form-element/form-elements-interfaces-01.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-association-3-after.json",
+      "artifactSha256": "820e5c86c182982f851c3f6fb622dc997ef38a7e2af8311dc1012060f4f82fb8",
+      "stage": "Live form ownership and control collections",
+      "browserRevision": "477a819296db93ccdde7be33bc41aa9dfbd71e81",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-form-element/form-elements-matches.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-association-4-after.json",
+      "artifactSha256": "f031c495fe29674e8bfbf3186ee0784622f8d1e3595b0383788eba5f694c9faf",
+      "stage": "Live form ownership and control collections",
+      "browserRevision": "477a819296db93ccdde7be33bc41aa9dfbd71e81",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-form-element/form-elements-nameditem-01.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-association-5-after.json",
+      "artifactSha256": "268c9e65fe1e5ccd96147a54598a63925d4db6eb328f9cce5383d5c72e7da498",
+      "stage": "Live form ownership and control collections",
+      "browserRevision": "477a819296db93ccdde7be33bc41aa9dfbd71e81",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -15269,30 +15749,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T12:38:18.909087+00:00",
-    "throughBrowserRevision": "6fc59dd80a802496623d1863ced000f76512fa37",
+    "recordedAt": "2026-11-05T13:00:56.480211+00:00",
+    "throughBrowserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 384,
-    "totalMatchedRetests": 428,
+    "additionalMatchedRetests": 400,
+    "totalMatchedRetests": 444,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 276,
-    "cumulativeNetGain": 311,
-    "gainedFullPass": 311,
+    "mainlineNetGain": 288,
+    "cumulativeNetGain": 323,
+    "gainedFullPass": 323,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21091,
-      "pass": 4281,
+      "fail": 21079,
+      "pass": 4293,
       "harness-error": 11439,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4281,
-    "testedPassPercent": 11.14263404476835,
+    "passed": 4293,
+    "testedPassPercent": 11.173867777199375,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.2443369987798687,
+    "wholeManifestVerifiedPassPercent": 3.2534311459383267,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -16301,6 +16781,91 @@
         "artifact": "/tmp/css-margin-after-final-9.json",
         "stage": "Physical/logical percentage margins across CPU layout",
         "revision": "26b141b0ccb2421f0be6d1683188b8e6224e8fdb"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-association-0-after.json",
+        "stage": "Live form ownership and control collections",
+        "revision": "477a819296db93ccdde7be33bc41aa9dfbd71e81"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-association-1-after.json",
+        "stage": "Live form ownership and control collections",
+        "revision": "477a819296db93ccdde7be33bc41aa9dfbd71e81"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-association-2-after.json",
+        "stage": "Live form ownership and control collections",
+        "revision": "477a819296db93ccdde7be33bc41aa9dfbd71e81"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-association-3-after.json",
+        "stage": "Live form ownership and control collections",
+        "revision": "477a819296db93ccdde7be33bc41aa9dfbd71e81"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-association-4-after.json",
+        "stage": "Live form ownership and control collections",
+        "revision": "477a819296db93ccdde7be33bc41aa9dfbd71e81"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-association-5-after.json",
+        "stage": "Live form ownership and control collections",
+        "revision": "477a819296db93ccdde7be33bc41aa9dfbd71e81"
+      },
+      {
+        "artifact": "/tmp/element-factories-final-0.json",
+        "stage": "Namespace-aware creation and element cloning",
+        "revision": "b161837dd973c5b3c86f8120677bc642bc7f954f"
+      },
+      {
+        "artifact": "/tmp/element-factories-final-1.json",
+        "stage": "Namespace-aware creation and element cloning",
+        "revision": "b161837dd973c5b3c86f8120677bc642bc7f954f"
+      },
+      {
+        "artifact": "/tmp/element-factories-final-2.json",
+        "stage": "Namespace-aware creation and element cloning",
+        "revision": "b161837dd973c5b3c86f8120677bc642bc7f954f"
+      },
+      {
+        "artifact": "/tmp/element-factories-final-3.json",
+        "stage": "Namespace-aware creation and element cloning",
+        "revision": "b161837dd973c5b3c86f8120677bc642bc7f954f"
+      },
+      {
+        "artifact": "/tmp/element-factories-final-4.json",
+        "stage": "Namespace-aware creation and element cloning",
+        "revision": "b161837dd973c5b3c86f8120677bc642bc7f954f"
+      },
+      {
+        "artifact": "/tmp/css-will-change-final-after-0.json",
+        "stage": "Will-change geometry, stacking and retained painting",
+        "revision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40"
+      },
+      {
+        "artifact": "/tmp/css-will-change-final-after-1.json",
+        "stage": "Will-change geometry, stacking and retained painting",
+        "revision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40"
+      },
+      {
+        "artifact": "/tmp/css-will-change-final-after-2.json",
+        "stage": "Will-change geometry, stacking and retained painting",
+        "revision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40"
+      },
+      {
+        "artifact": "/tmp/css-will-change-final-after-3.json",
+        "stage": "Will-change geometry, stacking and retained painting",
+        "revision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40"
+      },
+      {
+        "artifact": "/tmp/css-will-change-final-after-4.json",
+        "stage": "Will-change geometry, stacking and retained painting",
+        "revision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40"
+      },
+      {
+        "artifact": "/tmp/css-will-change-final-after-5.json",
+        "stage": "Will-change geometry, stacking and retained painting",
+        "revision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40"
       }
     ],
     "previousLedgerRegressions": [
