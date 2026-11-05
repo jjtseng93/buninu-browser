@@ -163,3 +163,25 @@ test('post-dispatch activation can reinitialize or redispatch the completed clic
     return result;
   })()`)).toEqual([0,'click','changed',true,0,'click',true,true]);
 });
+
+test('replacing an on-event handler preserves its slot and null reactivation moves it to the end', async () => {
+  expect(await evaluate(`(() => {
+    const results=[];
+    for(const target of [document.createElement('button'),document,window]) {
+      const order=[];
+      const first=()=>order.push('first'),last=()=>order.push('last');
+      target.addEventListener('click',first);
+      target.onclick=()=>order.push('old');
+      target.addEventListener('click',last);
+      target.onclick=function(event){order.push(this===target?'new':'bad-this');return false};
+      const event=new MouseEvent('click',{cancelable:true});
+      const accepted=target.dispatchEvent(event);
+      results.push([order.slice(),accepted,event.defaultPrevented]);
+      order.length=0;target.onclick=null;target.onclick=()=>order.push('readded');
+      target.dispatchEvent(new MouseEvent('click'));
+      results.push(order.slice());
+      target.onclick=null;target.removeEventListener('click',first);target.removeEventListener('click',last);
+    }
+    return results;
+  })()`)).toEqual(Array.from({length:3},()=>[[['first','new','last'],false,true],['first','last','readded']]).flat());
+});

@@ -159,6 +159,40 @@ test('resource failures stay on the script element; cross-origin callbacks retai
   } finally {await renderer.close();server.stop(true);}
 },30_000);
 
+test('handler replacement refreshes error-source muting while preserving listener order', async () => {
+  const server=Bun.serve({port:0,hostname:'127.0.0.1',fetch() {
+    return new Response(`
+      becomesForeign.onclick=()=>{order.push('foreign-handler');throw new Error('foreign replacement')};
+      becomesLocal.onclick=()=>{throw new Error('old foreign handler')};
+    `,{headers:{'content-type':'text/javascript'}});
+  }});
+  const renderer=new RendererHost({timeout:20_000});
+  const url=`http://127.0.0.1:${server.port}/page`;
+  try {
+    await renderer.start();
+    await renderer.call('loadDocument',{url,contentType:'text/html',source:`<body><script>
+      globalThis.events=[];globalThis.order=[];
+      addEventListener('error',e=>{events.push([e.message,e.filename,e.error?.message??null]);e.preventDefault()});
+      globalThis.becomesForeign=document.createElement('button');
+      globalThis.becomesLocal=document.createElement('button');
+      becomesForeign.addEventListener('click',()=>order.push('foreign-before'));
+      becomesForeign.onclick=()=>order.push('old local handler');
+      becomesForeign.addEventListener('click',()=>order.push('foreign-after'));
+      becomesLocal.addEventListener('click',()=>order.push('local-before'));
+      </script><script src="http://localhost:${server.port}/foreign.js"></script><script>
+      becomesLocal.addEventListener('click',()=>order.push('local-after'));
+      becomesLocal.onclick=()=>{order.push('local-handler');throw new Error('local replacement')};
+      becomesForeign.dispatchEvent(new Event('click'));
+      becomesLocal.dispatchEvent(new Event('click'));
+      </script>`});
+    await renderer.call('whenLoaded');
+    expect(await renderer.call('evaluate','({events,order})')).toEqual({
+      events:[['Script error.','',null],['Uncaught Error: local replacement',url,'local replacement']],
+      order:['foreign-before','foreign-handler','foreign-after','local-before','local-handler','local-after'],
+    });
+  } finally {await renderer.close();server.stop(true);}
+},30_000);
+
 test('module parse/runtime failures report once, load failures stay resource errors and import rejects', async () => {
   const scripts={
     '/syntax.js':'export const broken = ;',
