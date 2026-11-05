@@ -25,6 +25,20 @@ test('active XHTML owns its XML tree, keeps case/CDATA/PI, and has live location
   } finally {window.happyDOM.close();}
 });
 
+test('XML parser token boundaries coalesce Text without merging CDATA, comments, PI or elements',()=>{
+  const {window,document}=parseXHTMLDocument(`<html xmlns="${HTML}"><head><title>&lt;?xml?> is not a ProcessingInstruction</title></head><body><p>a &gt; b > c &amp; d</p><div>a<![CDATA[b]]>c<!--d-->e<?p f?>g<i/>h > i</div><template>j > k > l</template></body></html>`,'https://xhtml.test/');
+  try {
+    const title=document.head.firstChild;
+    expect([title.childNodes.length,title.firstChild.data,document.title]).toEqual([1,'<?xml?> is not a ProcessingInstruction','<?xml?> is not a ProcessingInstruction']);
+    const p=document.body.firstChild;
+    expect([...p.childNodes].map(n=>[n.nodeType,n.data])).toEqual([[3,'a > b > c & d']]);
+    const div=p.nextSibling;
+    expect([...div.childNodes].map(n=>[n.nodeType,n.data??n.localName])).toEqual([[3,'a'],[4,'b'],[3,'c'],[8,'d'],[3,'e'],[7,'f'],[3,'g'],[1,'i'],[3,'h > i']]);
+    expect([...div.childNodes].every(n=>n.ownerDocument===document)).toBeTrue();
+    expect([...div.nextSibling.content.childNodes].map(n=>[n.nodeType,n.data])).toEqual([[3,'j > k > l']]);
+  } finally {window.happyDOM.close();}
+});
+
 test('tag-name collections preserve XML qualified-name case and stay live across mutation and adoption',()=>{
   const xml=parseXHTMLDocument(wrap('<DIV/><div/><x:item xmlns:x="urn:x"/><x:ITEM xmlns:x="urn:x"/>'),'https://xhtml.test/');
   const html=parseHTMLDocument('');
