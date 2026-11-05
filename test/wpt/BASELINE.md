@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `6848f7e`
+## Mainline targeted estimate through `70aab18`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **549 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **578 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,381 / 38,420 = 11.40292%.**
-- **Estimated whole-manifest passing share: 4,381 / 131,953 = 3.32012%.**
-- Cumulative gain over the frozen baseline: **411 complete files**, or **+1.06976 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **376 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,410 / 38,420 = 11.47840%.**
+- **Estimated whole-manifest passing share: 4,410 / 131,953 = 3.34210%.**
+- Cumulative gain over the frozen baseline: **440 complete files**, or **+1.14524 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **405 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
 ### Uniform audit and subsequent fixes
 
@@ -471,9 +471,11 @@ The broader regression checks found an obsolete animation fixture expectation: a
 - `6e66fec`: expose native-backed page Blob/File interfaces with shared Web IDL conversions, native line endings, slicing, exact MIME slots and correct File metadata, **+7 newly fixed complete files** (+0.01822 percentage points). Nine official files improve from 305/374 to 372/374 assertions and one to eight complete passes. Native body/canvas/XHR/WebSocket results and existing clone/message boundaries retain the correct page prototypes without a second clone. Thirty-six regressions / 377 assertions and eight final native tests / 192 assertions pass, with independent review. The already-passing File endings `.any` file adds **one evidence-only pass**. Two Blob-constructor assertions still require mutable Symbol/BigInt prototypes; response MIME-record extraction and full worker parity remain separate.
 - `6848f7e`: implement stable node/attribute document ordering and containment validation, **+1 newly fixed complete file** (+0.00260 percentage points). `Node-compareDocumentPosition.html` improves from 202/1444 to 1444/1444; `Node-contains.html` retains 1482/1482 and adds **one evidence-only pass**. Weak tree identities preserve disconnected antisymmetry without retaining documents; iterative ancestry and a single sibling scan avoid recursive/subtree work and quadratic sibling access. Thirty-four DOM regressions / 868 assertions and independent review pass. Existing native internal queries remain unchanged because they compare ordinary connected nodes; normalize/live Range repair and mutation hierarchy checks remain separate.
 
+- `70aab18`: share six alignment longhand grammars and `place-*` shorthand semantics with CSSOM, computed values and existing flex/grid positioning, **+29 complete files** (+0.07548 percentage points). Twenty-nine official files improve from 190/607 to 607/607 assertions; the previously passing `justify-content-valid` file retains 18/18. Multiword values, baseline omission, priority, pending substitution and `justify-items:legacy` retain their meaning through serialization and dynamic updates. Used positions distinguish logical, flow and physical edges, reverse/RTL layout, safe/unsafe overflow, explicit normal versus auto, and auto margins. The final eight-file local suite passes 146 tests / 2,240 assertions. Independent review caught and verified pending-longhand serialization, unrelated descendant restyling and unwanted auto-margin stretching fixes. Of 180 Chromium geometry probes, 176 match and four reversed safe-overflow positions intentionally follow the newer specification's flow-start fallback; 92 additional grid/margin/RTL probes match exactly. Two hundred cascade/round-trip comparisons have only documented reference-version differences: computed flow-* aliases and last-baseline content syntax. Full baseline-sharing groups, vertical writing, flex cross-line content distribution, wrap-reverse and distributed-grid spanning-area sizing remain separate work.
+
 `3ebeee0` also corrects two obsolete XHR lifecycle test expectations: default/text network-error responses are empty strings, while non-text `responseText` throws `InvalidStateError`. The asynchronous test now rejects assertion failures instead of hanging. Sixteen related tests / 59 assertions pass. This is test maintenance, with **no production change or WPT gain**.
 
-These parts and thirteen evidence-only additions add **234 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **201 files**, comprising 188 newly fixed files and thirteen additional evidence-only passes. The latest outerHTML, gap, Blob/File and node comparison parts fix **34 complete files**, adding **+0.08850 percentage points** among eligible cases. Two additional passing files were newly recorded without attributing them to these implementations. This round therefore adds 36 ledger passes (+0.09370 percentage points). Incomplete files remain nonpasses; exact-URL artifacts are recorded separately, and this is not a new whole-suite run.
+These parts and thirteen evidence-only additions add **263 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **230 files**, comprising 217 newly fixed files and thirteen additional evidence-only passes. The latest outerHTML, gap, Blob/File, node comparison and alignment parts fix **63 complete files**, adding **+0.16398 percentage points** among eligible cases. Two additional passing files were newly recorded without attributing them to these implementations. This round therefore adds 65 ledger passes (+0.16918 percentage points). Incomplete files remain nonpasses; exact-URL artifacts are recorded separately, and this is not a new whole-suite run.
 
 ### Registration and scope limitations
 

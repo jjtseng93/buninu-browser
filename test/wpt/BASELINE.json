@@ -2968,6 +2968,276 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-content-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-0-after.json",
+      "artifactSha256": "ba9dae3b004819fdd00a337dc09a94967ce2f9bce386decc9b29df07fa8660b2",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-content-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-1-after.json",
+      "artifactSha256": "006189adef0776b6b8ab67c2afe2423e930707f4680333f326bf60d9c83671db",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 23,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-content-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-2-after.json",
+      "artifactSha256": "ae25ac78cfcaaf3d3a420b8663c1d5ab398109cc726dfe42017984f8765e9936",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 19,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 18,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-items-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-3-after.json",
+      "artifactSha256": "cc42049b826c784f1d793dbcc4ca7f17d1a3d94a6ea0959cf29bc52c73818801",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 19,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-items-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-4-after.json",
+      "artifactSha256": "a2a7e25baa3426c560aac47cb5f598049c6392d4477504d997d4c4bf0cf63425",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 26,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-items-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-5-after.json",
+      "artifactSha256": "f9fb853b0004dd2b9a6762fc7055f8aef4ee0583c2be47f945c289aedbcb1ef7",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 19,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-self-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-6-after.json",
+      "artifactSha256": "ca4279f1951d48353dfed6ca8c1a7b22f541cd450c78d1049616c2dd85a0d62a",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-self-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-7-after.json",
+      "artifactSha256": "92aeec74b759e9ac69b2c35b9a3f1a60daf0223fc8f489464ed8f09b705f930b",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 24,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/align-self-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-8-after.json",
+      "artifactSha256": "5b9d5b9a2f746e9668c6177f40d73e29fd34283f212ce33aa800405b7ddd50d9",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 21,
+        "reported": 21,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 20,
+        "reported": 21,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-align/parsing/column-gap-computed.html",
       "artifact": "/tmp/css-gap-after-column-gap-computed.html.json",
       "artifactSha256": "8080a4d88a90619e4098818edbcf60240891e7a5c39de775c3aec469a76abcb0",
@@ -3478,14 +3748,194 @@
       "fullPassDelta": 1
     },
     {
-      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-computed.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/0.json",
-      "artifactSha256": "5ff024acb7c42ee8d272bb9e803d486ea78b5fd08936eec28439b90505f05ecf",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-content-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-9-after.json",
+      "artifactSha256": "b6bad146bb3f7bee4e5a383abf884377e13c65bea89b2e386e338b467cbaf802",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
       "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
         "classification": "fail",
-        "passed": 6,
+        "passed": 0,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-content-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-10-after.json",
+      "artifactSha256": "f530d4c17b04b34fe1ea6289b9441ce89a99b27a56efbd1ded613ced2a4d12d0",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 24,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-content-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-regression-justify-content-valid-after.json",
+      "artifactSha256": "dc3c1f070907221d497da4581ce93369f49b9833b352d7d75f1a970d262bb686",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-items-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-11-after.json",
+      "artifactSha256": "44279715183d30c6770f84d282ce27df46ad58fb21ab1ac0dc77b7e203e267d9",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 26,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-items-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-12-after.json",
+      "artifactSha256": "0014e08d56384d00d5b9f60b74a0b1c97c9f5f3fbf3b2264061b55766632670f",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 21,
+        "reported": 21,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 21,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-items-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-13-after.json",
+      "artifactSha256": "3600b9537c396cc14e506311f55d641f7e2d076c5c15edd83cb1b64250b401ff",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 26,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 22,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-14-after.json",
+      "artifactSha256": "a00413b92fd7980e51e8634b1aa3d5ed1bb99758344eaf5577a866595fdb0ea5",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 22,
         "reported": 22,
         "done": true,
         "harnessStatus": 0,
@@ -3505,7 +3955,427 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-15-after.json",
+      "artifactSha256": "160b8cd46f0ed6e36bc8a2e007a7b016dde09af1ee9072da2f2ca05e5fabda8b",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 22,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-16-after.json",
+      "artifactSha256": "22359bd07dd2ab2f4d0cafc42bca0bab63df34440b0f260f2518fa737f568e50",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 23,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 22,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-content-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-17-after.json",
+      "artifactSha256": "83896507414ccaa5cce4039b413b2e96af50366b660297f140d764b958e4ef2c",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 25,
+        "reported": 25,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 25,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-content-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-18-after.json",
+      "artifactSha256": "ca9fb280f0adfadf9d2aed3a173aa14e133b1cc898ec79cea46f9379c6732aad",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-content-shorthand.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-19-after.json",
+      "artifactSha256": "c10b02cd9da4b8f7c7fef80843ba5845aaa027ce285aaf6af6800a6c366ce479",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 15,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-content-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-20-after.json",
+      "artifactSha256": "f87533c6474342e994ef2f5d4acc34fab8f5666143f0138bbe59abd0ad910ded",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 26,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 18,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-items-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-21-after.json",
+      "artifactSha256": "4ce7e5d001555f27d87fc9beac457fd4ea1dda5fe929f5504bd298610d21294c",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 25,
+        "reported": 25,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 25,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-items-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-22-after.json",
+      "artifactSha256": "ab9522d64d01521f7f6b547c3c18f9d4c95e0d69e334e9c41318881205940e39",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 17,
+        "reported": 17,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 17,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-items-shorthand.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-23-after.json",
+      "artifactSha256": "fa3622ed81731f83ba2d5955da171458c94130cc7751a7f157fc889df46aa49f",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-items-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-24-after.json",
+      "artifactSha256": "054411db1c24f17a98146e7bb5811f0560648713ff5f72466b3b77ad603d5950",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 24,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 16,
+        "reported": 24,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-self-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-25-after.json",
+      "artifactSha256": "e85eced7aed1ba15a93d3b8ff46080faab4fabb7ba417459848a9e82697939cb",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 23,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-self-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-26-after.json",
+      "artifactSha256": "d52711f3ad0130d1f01fc5ec0d147943954e7d314654192c2e03b5273a55e316",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-self-shorthand.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-27-after.json",
+      "artifactSha256": "145832f64f60a705c8f494c47a8d767d54c36a8536b7d96da1e9a8d603f71c21",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/place-self-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/css-align-28-after.json",
+      "artifactSha256": "90526daef34a8c9b2461991d97dc3ba1ebffc3da58e88888e6b30cf749171062",
+      "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+      "browserRevision": "70aab18",
+      "after": {
+        "classification": "pass",
+        "passed": 23,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 16,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/css-align/parsing/row-gap-computed.html",
@@ -18899,30 +19769,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T15:47:52.987950+00:00",
-    "throughBrowserRevision": "6848f7ea0bd7cf8e0d86c3f86b3d406e75e0de03",
+    "recordedAt": "2026-11-05T16:11:04.018389+00:00",
+    "throughBrowserRevision": "70aab18145f56f795af95765cdd1fd4be287c1c9",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 505,
-    "totalMatchedRetests": 549,
+    "additionalMatchedRetests": 534,
+    "totalMatchedRetests": 578,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 376,
-    "cumulativeNetGain": 411,
-    "gainedFullPass": 411,
+    "mainlineNetGain": 405,
+    "cumulativeNetGain": 440,
+    "gainedFullPass": 440,
     "lostFullPass": 0,
     "classification": {
-      "fail": 20993,
-      "pass": 4381,
+      "fail": 20964,
+      "pass": 4410,
       "harness-error": 11436,
       "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4381,
-    "testedPassPercent": 11.40291514836023,
+    "passed": 4410,
+    "testedPassPercent": 11.478396668401874,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.3201215584336845,
+    "wholeManifestVerifiedPassPercent": 3.3420990807332913,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -20571,6 +21441,156 @@
         "artifact": "/tmp/node-contains-after.json",
         "stage": "Node comparison and containment; contains is earlier-fix evidence",
         "revision": "6848f7e"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-0-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-1-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-2-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-3-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-4-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-5-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-6-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-7-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-8-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-9-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-10-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-11-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-12-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-13-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-14-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-15-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-16-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-17-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-18-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-19-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-20-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-21-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-22-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-23-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-24-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-25-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-26-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-27-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-28-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/css-align-regression-justify-content-valid-after.json",
+        "stage": "CSS alignment grammar, pending provenance and flex/grid used positions",
+        "revision": "70aab18"
       }
     ],
     "previousLedgerRegressions": [
