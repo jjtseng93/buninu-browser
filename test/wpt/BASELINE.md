@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `7ca05d7`
+## Mainline targeted estimate through `093b1cf`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **347 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **359 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,221 / 38,420 = 10.98647%.**
-- **Estimated whole-manifest passing share: 4,221 / 131,953 = 3.19887%.**
-- Cumulative gain over the frozen baseline: **251 complete files**, or **+0.65331 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **216 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,228 / 38,420 = 11.00469%.**
+- **Estimated whole-manifest passing share: 4,228 / 131,953 = 3.20417%.**
+- Cumulative gain over the frozen baseline: **258 complete files**, or **+0.67153 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **223 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
 ### Uniform audit and subsequent fixes
 
@@ -422,7 +422,10 @@ Since the previous ledger through `74c131d`, the net increase is **22 files**: n
 - `9d92277`: expose a branded, per-page `IdleDeadline` interface and idle callback Web IDL bindings, **+3 complete files** (+0.00781 percentage points). Basic and IDL files improve from 18/35 to 35/35 assertions, and the frozen failing cross-realm file now passes 1/1. Borrowed methods retain the origin deadline clock; invalid receivers and conversion errors use the defining realm, while author exceptions retain identity. Sixteen regression tests / 125 assertions and independent review pass. The existing scheduler is unchanged; busy-task priority and frame suspension are not claimed fixed.
 - `7ca05d7`: derive CSSOM client metrics from untransformed padding boxes, including inline replaced elements, active-document/root checks and BODY display/blockification cases, **+1 complete file** (+0.00260 percentage points). Eight official files improve from 3 to 4 complete passes and 11/38 to 24/38 assertions; seventeen regression tests / 106 assertions and independent review pass. Existing scroll and pointer geometry remain unchanged. Table/SVG partial improvements remain nonpasses; quirks mode and CSS zoom are not implemented by this part. A discrepant input-box assertion is not special-cased away from observed Chromium behavior.
 
-These parts and the two newly recorded earlier fixes add **74 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **41 files**, comprising 39 newly fixed files and two evidence-only additions. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
+- `019cf0d`: resolve label/control associations using exact attributes and tree order, expose label `control`/`form`, and reuse live NodeList bindings for each control's `labels`, **+5 complete files** (+0.01301 percentage points), 56/56 assertions versus 10/56 before. Explicit unmatched `for` values never fall back to descendants; duplicate IDs, hidden controls, detached trees, shadow boundaries and adoption preserve correct relationships and collection identity. Twenty-three regression tests / 217 assertions and 32 independent cross-realm/association checks pass. Native activation shares the corrected control association; native vendor `labels` snapshots, custom-element form association and activation event/focus rules remain outside this part.
+- `093b1cf`: prevent early timeout wakes from reordering idle callbacks, **+1 newly fixed complete file** (+0.00260 percentage points); the multiple-callback file improves from 1/2 to 2/2 assertions and passes three consecutive runs. A removable deadline heap and one expiration timer preserve earliest-deadline/registration order, cancellation and one callback per host task, with at most two host timers. Eight official regression files pass 17/17 assertions; 22 local tests / 811 assertions and an independent 150-seed, 52,332-operation model check pass. `callback-exception.html` is also confirmed passing for the first time since its frozen harness error: this adds **one evidence-only pass**, not an implementation claim for this change. Busy-task idle priority and removed-frame lifetime remain separate.
+
+These parts, the two earlier evidence-only additions and the newly confirmed idle exception result add **81 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **48 files**, comprising 45 newly fixed files and three evidence-only additions. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
 
 ### Registration and scope limitations
 

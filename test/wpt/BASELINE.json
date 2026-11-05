@@ -11218,6 +11218,156 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-label-element/disabled-labeled-control.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/labels-disabled-labeled-control-after.json",
+      "artifactSha256": "e43144ad1869fbbf356cc7f3ab13245295a8790a75b6028a3a263e39140dcf3d",
+      "stage": "Label associations and live page labels collections",
+      "browserRevision": "019cf0dc4225154d60d85c441a4d7d29222eea2c",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-label-element/label-attributes.sub.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/labels-label-attributes.sub-after.json",
+      "artifactSha256": "c45cba0f67901de7bf87d2317883acb807a33ad7f1e27d2ec569949b25140193",
+      "stage": "Label associations and live page labels collections",
+      "browserRevision": "019cf0dc4225154d60d85c441a4d7d29222eea2c",
+      "after": {
+        "classification": "pass",
+        "passed": 20,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-label-element/labelable-elements.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/labels-labelable-elements-after.json",
+      "artifactSha256": "0ca3628ef1d3b7c8e17891c2ac7c411920b93d6e1fd524e57cf83a51809d47e2",
+      "stage": "Label associations and live page labels collections",
+      "browserRevision": "019cf0dc4225154d60d85c441a4d7d29222eea2c",
+      "after": {
+        "classification": "pass",
+        "passed": 26,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-label-element/labels-live-attribute-changes.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/labels-labels-live-attribute-changes-after.json",
+      "artifactSha256": "2f0868ea246a2e51a5ecb993493db7fd69d119977640a3f954982d7e8ccb7a29",
+      "stage": "Label associations and live page labels collections",
+      "browserRevision": "019cf0dc4225154d60d85c441a4d7d29222eea2c",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-label-element/labels-live-label-removal.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/labels-labels-live-label-removal-after.json",
+      "artifactSha256": "ed018255531caba4a91ff91e6c5f607acbd18055d7d99f13a6bcc2b9df2bb434",
+      "stage": "Label associations and live page labels collections",
+      "browserRevision": "019cf0dc4225154d60d85c441a4d7d29222eea2c",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-option-element/option-element-constructor.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/209.json",
       "artifactSha256": "75a43eeeb5f0987ac852cc8c6c88a2365e4e090f06df195accdf1b55549b4c2f",
@@ -12119,10 +12269,10 @@
     },
     {
       "url": "http://web-platform.test:18000/requestidlecallback/basic.html",
-      "artifact": "/tmp/idle-interface-basic-after.json",
-      "artifactSha256": "8e70131c6d21232441952b6e14b7ec94202b472ec6415b6b9232a5445d14b9dc",
-      "stage": "Branded IdleDeadline and idle callback Web IDL bindings",
-      "browserRevision": "9d922775c05da2eda1a352bc60e9000c968304f5",
+      "artifact": "/tmp/idle-order-basic-after.json",
+      "artifactSha256": "9b4069bcc57fc40e354aff326de1baeeb1dbc96f37373a195175358148c44f4b",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
       "after": {
         "classification": "pass",
         "passed": 6,
@@ -12141,6 +12291,126 @@
         "classification": "fail",
         "passed": 5,
         "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/callback-exception.html",
+      "artifact": "/tmp/idle-order-callback-exception-after.json",
+      "artifactSha256": "a831f3dab3e3acf1460bbaf8fb0cd8e6af28a6c9369b83abfcaf1a53efcd9c60",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/callback-idle-periods.html",
+      "artifact": "/tmp/idle-order-callback-idle-periods-after.json",
+      "artifactSha256": "3865a20e214dcaf7f3a8b4a0c35fd21c5943f413308e4a1573dcec740fe56e6c",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/callback-invoked.html",
+      "artifact": "/tmp/idle-order-callback-invoked-after.json",
+      "artifactSha256": "15a6cbac49040873baf5bda9feeeba6124f14c8c745e010590488ee7e6976f9a",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/callback-multiple-calls.html",
+      "artifact": "/tmp/idle-order-callback-multiple-calls-after.json",
+      "artifactSha256": "fa98efa8826c31c05ccc9a057e692214e679425abd7a852d03a1e30560ee9624",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -12176,6 +12446,96 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/callback-timeout.html",
+      "artifact": "/tmp/idle-order-callback-timeout-after.json",
+      "artifactSha256": "de4b1657540b60a2693d3d4d562e5da1b3a02a245360b7910f55fd86e8864315",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/cancel-invoked.html",
+      "artifact": "/tmp/idle-order-cancel-invoked-after.json",
+      "artifactSha256": "052150fd4a91a8a4c0042c5f0656d956ffb57ca6316fc8b5c19daf3cd8a3659b",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/deadline-after-expired-timer.html",
+      "artifact": "/tmp/idle-order-deadline-after-expired-timer-after.json",
+      "artifactSha256": "bdd1478697be299b3ff288cf3f7891f231671ee9b212d038e42a23d8daae7404",
+      "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+      "browserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     },
     {
       "url": "http://web-platform.test:18000/requestidlecallback/idlharness.window.html",
@@ -12839,30 +13199,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T10:10:51.817856+00:00",
-    "throughBrowserRevision": "7ca05d788ccd8a7b18c5ffb9b8d59ddca65f5f68",
+    "recordedAt": "2026-11-05T10:26:48.351956+00:00",
+    "throughBrowserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 303,
-    "totalMatchedRetests": 347,
+    "additionalMatchedRetests": 315,
+    "totalMatchedRetests": 359,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 216,
-    "cumulativeNetGain": 251,
-    "gainedFullPass": 251,
+    "mainlineNetGain": 223,
+    "cumulativeNetGain": 258,
+    "gainedFullPass": 258,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21145,
-      "pass": 4221,
-      "harness-error": 11445,
+      "fail": 21139,
+      "pass": 4228,
+      "harness-error": 11444,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4221,
-    "testedPassPercent": 10.986465382613222,
+    "passed": 4228,
+    "testedPassPercent": 11.004685059864654,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.198866262987579,
+    "wholeManifestVerifiedPassPercent": 3.204171182163346,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -13441,6 +13801,71 @@
         "artifact": "/tmp/css-client-metrics-client-props-zoom-after.json",
         "stage": "Untransformed CSSOM client metrics",
         "revision": "7ca05d788ccd8a7b18c5ffb9b8d59ddca65f5f68"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/labels-labelable-elements-after.json",
+        "stage": "Label associations and live page labels collections",
+        "revision": "019cf0dc4225154d60d85c441a4d7d29222eea2c"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/labels-disabled-labeled-control-after.json",
+        "stage": "Label associations and live page labels collections",
+        "revision": "019cf0dc4225154d60d85c441a4d7d29222eea2c"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/labels-labels-live-label-removal-after.json",
+        "stage": "Label associations and live page labels collections",
+        "revision": "019cf0dc4225154d60d85c441a4d7d29222eea2c"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/labels-labels-live-attribute-changes-after.json",
+        "stage": "Label associations and live page labels collections",
+        "revision": "019cf0dc4225154d60d85c441a4d7d29222eea2c"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/labels-label-attributes.sub-after.json",
+        "stage": "Label associations and live page labels collections",
+        "revision": "019cf0dc4225154d60d85c441a4d7d29222eea2c"
+      },
+      {
+        "artifact": "/tmp/idle-order-callback-multiple-calls-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/idle-order-basic-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/idle-order-callback-invoked-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/idle-order-callback-timeout-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/idle-order-callback-exception-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/idle-order-callback-idle-periods-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/idle-order-cancel-invoked-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/idle-order-deadline-after-expired-timer-after.json",
+        "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
+        "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
       }
     ],
     "previousLedgerRegressions": [
