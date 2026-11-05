@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `269839d`
+## Mainline targeted estimate through `0c2cc8e`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **659 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **673 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,480 / 38,420 = 11.66059%.**
-- **Estimated whole-manifest passing share: 4,480 / 131,953 = 3.39515%.**
-- Cumulative gain over the frozen baseline: **510 complete files**, or **+1.32743 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **475 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
+- **Estimated tested-case pass rate: 4,493 / 38,420 = 11.69443%.**
+- **Estimated whole-manifest passing share: 4,493 / 131,953 = 3.40500%.**
+- Cumulative gain over the frozen baseline: **523 complete files**, or **+1.36127 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **488 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
 
 ### Uniform audit and subsequent fixes
 
@@ -514,7 +514,15 @@ These parts add **12 freshly demonstrated complete passes**, or **+0.03123 perce
 
 These parts add **23 freshly demonstrated complete passes** (+0.05986 percentage points), plus the one evidence-only pass above. The ledger gains **24 files** (+0.06247 percentage points) over `2d0a80a`, updating 29 exact URLs and adding 26 newly recorded URLs, for **659 distinct cases**. Final passing artifacts retain all frozen-baseline registered assertions. Tests used the concurrent working tree and are attributed to separate functional commits; this remains a mixed-results estimate, not a uniform full-suite rerun.
 
-The final combined CSSOM/QML/event/move regression passes **46 tests / 721 assertions**. Wider checks also reproduced four existing failures with unchanged HEAD sources: two signed-zero internal style assertions, BroadcastChannel trust, and the diagnostic error name. They are not hidden or counted as new passes. The earlier Flea CSSOM optimization (`0d05346`) remains committed and its write-cache and QML update tests are included in the combined regression.
+The final combined CSSOM/QML/event/move regression passes **46 tests / 721 assertions**. At that stage, wider checks also reproduced four existing failures with unchanged HEAD sources: two signed-zero internal style assertions, BroadcastChannel trust, and the diagnostic error name. They are not hidden or counted as new passes. The earlier Flea CSSOM optimization (`0d05346`) remains committed and its write-cache and QML update tests are included in the combined regression.
+
+### BroadcastChannel, box-shadow and declarative shadow parsing
+
+- `d360d7c`: deliver BroadcastChannel messages through internal trusted event dispatch and preserve an event handler's listener position when its callback changes. Replacement handlers capture their own script error context, retaining cross-origin error muting. Defining-realm errors, name conversion, author clone exceptions, borrowed methods and disposal/task races have regression coverage. **+3 newly complete files** (+0.00781 percentage points); four official files improve from 19/27 to 27/27 assertions, retaining the already-passing ordering case. Seven related regression files pass 48 tests / 220 assertions, with a separate production-renderer channel check. Worker channel integration remains outside this part.
+- `de6c702`: share box-shadow grammar, canonical serialization and computed lengths across CSSOM, feature queries, cascade and CPU paint. Resolve omitted/currentColor after the final color declaration, preserve its identity during explicit inheritance, invalidate bad substitutions as unset and clamp calculated negative blur. Existing small-viewport fallback for container-query units is retained. **+3 newly complete files** (+0.00781 percentage points); three official files improve from 9/82 to 82/82 assertions. Seventy-six related tests / 744 assertions and twelve Chromium comparisons pass; CPU screenshots verify changes to shadow color, position and removal. Inset painting and actual query-container geometry remain unimplemented.
+- `0c2cc8e`: parse declarative shadow templates in initial documents and the opt-in `setHTMLUnsafe()` / `Document.parseHTMLUnsafe()` APIs, preserving closed/nested roots, flags, clonable contents and one-time hydration. Ordinary fragment APIs retain inert templates; parsed replacements share mutation/reaction batching without cloning custom hosts. **+7 newly complete files** (+0.01822 percentage points), including the three remaining moveBefore setup cases recorded above. Ten official files improve from 9/702 assertions to 694 passing assertions. The final artifacts report 694/701 because `innerhtml-on-ordinary-template.html` now stops with a harness error before its one known assertion registers; against the known registered denominator the result is **694/702**, and that file remains a nonpass. The attachment case is 648/654 with six table foster-parenting failures; slot assignment is 7/8 because `attachInternals` is absent. Eight focused tests / 42 assertions include real closed-root pixels, and the related regression run passes 51 tests / 684 assertions. Incremental initial parser/script timing, sanitizer support and `runScripts:true` remain outside this implementation; the latter two options explicitly report unsupported.
+
+These parts add **13 freshly demonstrated complete passes** (+0.03384 percentage points) over the ledger through `269839d`. They update 17 exact URLs, 14 newly recorded, bringing the ledger to **673 distinct cases**. All final passing artifacts retain the frozen baseline's registered assertions. Functional commits and exact artifact hashes are recorded separately; tests used the concurrent working tree, so this remains a mixed-results estimate rather than a uniform full-suite rerun. The separate diagnostic-error fix `15c0a9c` has local regression coverage and claims no additional WPT pass in this ledger.
 
 ### Registration and scope limitations
 

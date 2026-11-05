@@ -5518,6 +5518,96 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/box-shadow-computed.html",
+      "artifact": "/tmp/wpt-box-shadow/after-computed.json",
+      "artifactSha256": "40e2b43cf3cfb84b3ebb0b135bcb159ca5c5f22096df69c332dab2def4d3efee",
+      "stage": "Shared box-shadow grammar, computed lengths and currentColor (targeted working-tree verification)",
+      "browserRevision": "de6c702b3e90d11282f4d4e6ba125579b6ad5362",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/box-shadow-invalid.html",
+      "artifact": "/tmp/wpt-box-shadow/after-invalid.json",
+      "artifactSha256": "de5d887d1f91b035200809738c8249e75ae5316b75e81f8fe3556c5ecf012286",
+      "stage": "Shared box-shadow grammar, computed lengths and currentColor (targeted working-tree verification)",
+      "browserRevision": "de6c702b3e90d11282f4d4e6ba125579b6ad5362",
+      "after": {
+        "classification": "pass",
+        "passed": 40,
+        "reported": 40,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 40,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/box-shadow-valid.html",
+      "artifact": "/tmp/wpt-box-shadow/after-valid.json",
+      "artifactSha256": "d3508ca8d6b9a770a93cad36b36b4726af583a78b9af436ec672316ea29b0903",
+      "stage": "Shared box-shadow grammar, computed lengths and currentColor (targeted working-tree verification)",
+      "browserRevision": "de6c702b3e90d11282f4d4e6ba125579b6ad5362",
+      "after": {
+        "classification": "pass",
+        "passed": 38,
+        "reported": 38,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 38,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-box/negative-margin.html",
       "artifact": "/tmp/css-margin-after-final-8.json",
       "artifactSha256": "2b418f002c24252888c73f3b9438b4ddd98b0e9908027126122b65aeb436a0f9",
@@ -13139,13 +13229,13 @@
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/moveBefore/custom-element-move-reactions.html",
-      "artifact": "/tmp/wpt-move-before/final2-1.json",
-      "artifactSha256": "c21aa788dd41cd0fd08ed3a4ddb4b6a78afd11a391de13628233ab3ae1d39abb",
-      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
-      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-0.json",
+      "artifactSha256": "ef4083f27a92d7b207422ee24912a08afa7ba06d65bbafd40499869d25a69a76",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
       "after": {
-        "classification": "fail",
-        "passed": 6,
+        "classification": "pass",
+        "passed": 7,
         "reported": 7,
         "done": true,
         "harnessStatus": 0,
@@ -13165,7 +13255,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/moveBefore/focus-preserve.html",
@@ -13349,13 +13439,13 @@
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-shadow-inside.html",
-      "artifact": "/tmp/wpt-move-before/final2-11.json",
-      "artifactSha256": "a38e00f571b3be24daf3b8b99afde2a1b62f3c9059c1374d6fd20b12030a94e7",
-      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
-      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-2.json",
+      "artifactSha256": "36b0a2811b835bb58a3ff2ed709d8c60e1c8ea59d2ed35f4a28a6229259694f0",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
       "after": {
-        "classification": "fail",
-        "passed": 0,
+        "classification": "pass",
+        "passed": 1,
         "reported": 1,
         "done": true,
         "harnessStatus": 0,
@@ -13375,17 +13465,17 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-shadow-root.html",
-      "artifact": "/tmp/wpt-move-before/final2-10.json",
-      "artifactSha256": "fd7574af02e9ff18ce4918558c613d81e166ad86acb12e14a8140bfc0f2e9ee6",
-      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
-      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-1.json",
+      "artifactSha256": "d5a1510223370b2313f6d7d3d95f2c369a997202474cf7726974eb1941a7d726",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
       "after": {
-        "classification": "fail",
-        "passed": 1,
+        "classification": "pass",
+        "passed": 3,
         "reported": 3,
         "done": true,
         "harnessStatus": 0,
@@ -13405,7 +13495,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/moveBefore/mutation-observer-moved-subtree.window.html",
@@ -19618,6 +19708,216 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/shadow-dom/declarative/declarative-shadow-dom-attachment.html",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-4.json",
+      "artifactSha256": "d7aaf02e64541350851af4c28de26a5bcec2d502b0dda9c30480829528a1b244",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
+      "after": {
+        "classification": "fail",
+        "passed": 648,
+        "reported": 654,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 654,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/declarative/declarative-shadow-dom-basic.html",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-3.json",
+      "artifactSha256": "0c11d382a0d979cbefe49248291291d0d39e5b85ef13b6afefc10ff6bce1ccab",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
+      "after": {
+        "classification": "pass",
+        "passed": 22,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/declarative/declarative-shadow-dom-repeats-2.html",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-6.json",
+      "artifactSha256": "65417a029400188343a49cb9ccbf3137e71767b805dee203c96701165507bb1b",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/declarative/declarative-shadow-dom-repeats-slot-assignment.html",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-8.json",
+      "artifactSha256": "75bbc61f03d8e0b42fc625c45de9ca7e00246c5e8047ad2b4f49eb38658a9c8f",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/declarative/declarative-shadow-dom-repeats.html",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-5.json",
+      "artifactSha256": "a82b624edf1c737a21b709097814d1d8f00787da15b81ef5cf4f709e58a24c9c",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/declarative/declarative-shadow-dom-slot-assignment.html",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-7.json",
+      "artifactSha256": "822741fb5d588b2bb507948cf68bf379ac6c17afaeb0a06e69a394c9fee6cfeb",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
+      "after": {
+        "classification": "fail",
+        "passed": 7,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/declarative/innerhtml-on-ordinary-template.html",
+      "artifact": "/tmp/wpt-declarative-shadow/after2-9.json",
+      "artifactSha256": "167a56fe9320bc801952a73a752c978e1ef289ab2d74c7c4a50dffe00675c5f7",
+      "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+      "browserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
+      "after": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 1,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/shadow-dom/imperative-slot-api-slotchange.html",
       "artifact": "/tmp/text-replace-slot-2-final.json",
       "artifactSha256": "d01a2c161f28539647564e48c3f4d94fde7c6465bce0fd72022fca45a68129be",
@@ -20063,6 +20363,126 @@
         "reported": 0,
         "done": true,
         "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/webmessaging/broadcastchannel/basics.any.html",
+      "artifact": "/tmp/wpt-broadcast-current/after-basics.json",
+      "artifactSha256": "3b8687a479e2845eef8193285b7813a2d46fc18bdc70563d644a7dbe8ff2a6bd",
+      "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+      "browserRevision": "d360d7c798a510a6ae6e555957357c935acbc72f",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/webmessaging/broadcastchannel/detached-iframe.html",
+      "artifact": "/tmp/wpt-broadcast-current/after-detached.json",
+      "artifactSha256": "b9226db3b0545283dba72431c73967ac46b9474593a3a9bd917114b8f5e4da80",
+      "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+      "browserRevision": "d360d7c798a510a6ae6e555957357c935acbc72f",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/webmessaging/broadcastchannel/interface.any.html",
+      "artifact": "/tmp/wpt-broadcast-current/after-interface.json",
+      "artifactSha256": "a249116ed07f2a10670a3d80e446aa60e162bcec6fef428a82d989868e5abf66",
+      "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+      "browserRevision": "d360d7c798a510a6ae6e555957357c935acbc72f",
+      "after": {
+        "classification": "pass",
+        "passed": 13,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 11,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/webmessaging/broadcastchannel/ordering.html",
+      "artifact": "/tmp/wpt-broadcast-current/after-ordering.json",
+      "artifactSha256": "f5283f5aaac2ef7f59a8ed16d23b5bac8e683f0bf794f1490271cda57e0703a7",
+      "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+      "browserRevision": "d360d7c798a510a6ae6e555957357c935acbc72f",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
         "runnerError": null
       },
       "fullPassDelta": 0
@@ -22199,30 +22619,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T21:07:55.086235+00:00",
-    "throughBrowserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+    "recordedAt": "2026-11-05T21:32:33.828619+00:00",
+    "throughBrowserRevision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 615,
-    "totalMatchedRetests": 659,
+    "additionalMatchedRetests": 629,
+    "totalMatchedRetests": 673,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 475,
-    "cumulativeNetGain": 510,
-    "gainedFullPass": 511,
+    "mainlineNetGain": 488,
+    "cumulativeNetGain": 523,
+    "gainedFullPass": 524,
     "lostFullPass": 1,
     "classification": {
-      "fail": 20899,
-      "pass": 4480,
-      "harness-error": 11431,
+      "fail": 20885,
+      "pass": 4493,
+      "harness-error": 11432,
       "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4480,
-    "testedPassPercent": 11.66059344091619,
+    "passed": 4493,
+    "testedPassPercent": 11.694429984383135,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.3951482724909625,
+    "wholeManifestVerifiedPassPercent": 3.405000265245959,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -24501,6 +24921,91 @@
         "artifact": "/tmp/wpt-move-before/final2-9.json",
         "stage": "State-preserving ParentNode.moveBefore final targeted verification",
         "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-broadcast-current/after-basics.json",
+        "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+        "revision": "d360d7c798a510a6ae6e555957357c935acbc72f"
+      },
+      {
+        "artifact": "/tmp/wpt-broadcast-current/after-interface.json",
+        "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+        "revision": "d360d7c798a510a6ae6e555957357c935acbc72f"
+      },
+      {
+        "artifact": "/tmp/wpt-broadcast-current/after-detached.json",
+        "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+        "revision": "d360d7c798a510a6ae6e555957357c935acbc72f"
+      },
+      {
+        "artifact": "/tmp/wpt-broadcast-current/after-ordering.json",
+        "stage": "Trusted BroadcastChannel delivery and stable event-handler ordering (targeted working-tree verification)",
+        "revision": "d360d7c798a510a6ae6e555957357c935acbc72f"
+      },
+      {
+        "artifact": "/tmp/wpt-box-shadow/after-valid.json",
+        "stage": "Shared box-shadow grammar, computed lengths and currentColor (targeted working-tree verification)",
+        "revision": "de6c702b3e90d11282f4d4e6ba125579b6ad5362"
+      },
+      {
+        "artifact": "/tmp/wpt-box-shadow/after-invalid.json",
+        "stage": "Shared box-shadow grammar, computed lengths and currentColor (targeted working-tree verification)",
+        "revision": "de6c702b3e90d11282f4d4e6ba125579b6ad5362"
+      },
+      {
+        "artifact": "/tmp/wpt-box-shadow/after-computed.json",
+        "stage": "Shared box-shadow grammar, computed lengths and currentColor (targeted working-tree verification)",
+        "revision": "de6c702b3e90d11282f4d4e6ba125579b6ad5362"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-0.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-1.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-2.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-3.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-4.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-5.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-6.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-7.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-8.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
+      },
+      {
+        "artifact": "/tmp/wpt-declarative-shadow/after2-9.json",
+        "stage": "Declarative shadow parsing and unsafe HTML fragments (targeted working-tree verification)",
+        "revision": "0c2cc8eed7660a5fdd437b4e11229ea970fc12e3"
       }
     ],
     "previousLedgerRegressions": [
@@ -24596,7 +25101,8 @@
       "The whole-manifest number is a mixed-results estimate against all 131,953 cases, not a fresh full-manifest run.",
       "One frozen font-shorthand-subproperties-reset pass now registers zero tests and is counted as a nonpass. All conditional CSS.supports gates were already false in the exact pre-font HEAD comparison; this is not attributed to c279d4d.",
       "The font-family, KeyboardEvent and XHR checks ran in a concurrent working tree. Independent paint-damage edits in page-renderer.js, video-mask.js and test/fixtures/canvas-damage.js are excluded from the functional commits.",
-      "Legacy events, scoped shadow rendering and atomic moves were tested in the concurrent working tree and committed separately. Their final passing artifacts retain frozen-baseline subtest names; incomplete declarative-shadow/setHTMLUnsafe, textInput execCommand and sensor automation cases remain nonpasses or unsupported. Complete shadow event routing and scoped font/keyframe rules are not claimed."
+      "Legacy events, scoped shadow rendering and atomic moves were tested in the concurrent working tree and committed separately. Their final passing artifacts retain frozen-baseline subtest names; incomplete declarative-shadow/setHTMLUnsafe, textInput execCommand and sensor automation cases remain nonpasses or unsupported. Complete shadow event routing and scoped font/keyframe rules are not claimed.",
+      "The BroadcastChannel, box-shadow and declarative-shadow follow-ups were tested in the concurrent working tree and committed separately. Declarative parsing resolves the three earlier moveBefore setup failures; table foster parenting, attachInternals and the ordinary-template harness failure remain nonpasses. Those ten files retain 702 known assertions, while the final artifacts report 701 because the ordinary-template assertion does not register. The separate diagnostic-error fix has no additional WPT gain here."
     ]
   }
 }
