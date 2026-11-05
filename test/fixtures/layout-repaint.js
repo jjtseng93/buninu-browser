@@ -43,7 +43,10 @@ try {
   for (const [id, property, value, expectedLayouts] of [
     ['box', 'opacity', '.45', 0], ['box', 'opacity', '0', 0], ['box', 'opacity', '1', 0],
     ['box', 'backgroundColor', '#ade', 0], ['decorated', 'backgroundColor', '#fea', 0],
-    ['cell', 'backgroundColor', '#def', 0], ['gradient', 'opacity', '.6', 0],
+    ['cell', 'backgroundColor', '#def', 0],
+    // Crossing 1 adds/removes a stacking context; intermediate alpha values
+    // retain both geometry and layer ownership.
+    ['gradient', 'opacity', '.6', 1], ['gradient', 'opacity', '.3', 0], ['gradient', 'opacity', '1', 1],
     ['gradient', 'backgroundSize', '40px 20px', 0],
     ['plain', 'backgroundColor', '#fbc', 1], ['plain', 'backgroundColor', 'transparent', 1],
     ['box', 'color', '#a30', 1], ['box', 'width', '150px', 1],

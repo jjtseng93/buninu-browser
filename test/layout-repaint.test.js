@@ -116,7 +116,7 @@ for (const [description, content, color] of [
 }
 
 test('retained styles preserve gradient text identity across repeated paint changes', () => {
-  const f = fixture('<body><div id="a" style="width:100px;background-image:linear-gradient(red,blue);background-clip:text">gradient text</div></body>');
+  const f = fixture('<body><div id="a" style="width:100px;opacity:.8;background-image:linear-gradient(red,blue);background-clip:text">gradient text</div></body>');
   try {
     let previous = f.first, layout = f.layout;
     for (const [property, value] of [['opacity', '.5'], ['background-size', '40px 20px'], ['background-color', 'green']]) {
@@ -145,7 +145,7 @@ test('color changes with inherited currentColor borders, decorations and SVG kee
 
 for (const otherOpacity of [null, '0.7', '0.3']) {
   test(`a shared old style cannot leak into an alias with opacity ${otherOpacity ?? 'unchanged'}`, () => {
-    const f = fixture('<body><div id="a" style="width:100px">first</div><div id="b" style="width:100px">second</div></body>');
+    const f = fixture('<body><div id="a" style="width:100px;opacity:.8">first</div><div id="b" style="width:100px;opacity:.8">second</div></body>');
     try {
       const a = [...f.first.nodesById.values()].find(node => node.domNode === f.element);
       const other = f.document.getElementById('b');
@@ -200,6 +200,21 @@ test('a changed run only replaces its own immutable fragment and preserves sibli
     expect(buildDisplayList(retained,next)).toEqual(buildDisplayList(f.engine.layout(next,f.options),next));
     expect(JSON.stringify(f.layout)).toBe(before);
   } finally {f.window.happyDOM.abort();}
+});
+
+test('opacity crossing the stacking-context boundary rebuilds layers',()=>{
+  const f=fixture('<body><div id="a" style="width:100px;background:red"><span style="position:absolute;z-index:-1;background:green">child</span></div></body>');
+  try {
+    let previous=f.first,layout=f.layout;
+    for(const [opacity,retains] of [['.5',false],['.3',true],['1',false]]) {
+      f.element.style.opacity=opacity;
+      const next=f.builder.build(f.document,new StyleEngine().compute(f.document));
+      const retained=repaintLayout(layout,previous,next);
+      if(retains)expectEquivalent(f,next,retained);
+      else expect(retained).toBeNull();
+      layout=retained??f.engine.layout(next,f.options);previous=next;
+    }
+  }finally{f.window.happyDOM.abort();}
 });
 test('box-only and no-op paint updates keep unchanged fragment and record arrays',()=>{
   const f=fixture('<body><div id="a" style="width:100px;height:30px;background-size:20px 20px"></div><p>after</p></body>');

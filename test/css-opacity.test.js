@@ -60,7 +60,8 @@ test('opacity variable fallback, invalid computed values and transparent paint c
     const layout = layoutText(tree,{x:0,y:0,width:200,lineHeight:20,measureText:text=>text.length*10,fontMetrics:()=>({ascent:16,height:20})});
     const texts = buildDisplayList(layout,tree).items.filter(item=>item.op==='drawText');
     expect(texts.find(item=>item.text==='gone')).toBeUndefined();
-    expect(texts.map(item=>[item.text,item.opacity])).toEqual([['faint',.25],['unset',.5],['fallback',.15],['inherited',.25]]);
+    // In-flow text paints before the sibling opacity stacking contexts.
+    expect(texts.map(item=>[item.text,item.opacity])).toEqual([['unset',.5],['faint',.25],['fallback',.15],['inherited',.25]]);
   } finally {window.happyDOM.close();}
 });
 
