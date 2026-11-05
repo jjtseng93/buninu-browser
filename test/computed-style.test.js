@@ -921,8 +921,10 @@ test("background shorthand and longhands keep image layers with their position, 
   const engine = new StyleEngine().compute(document);
   const style = (id) => engine.get(document.getElementById(id));
   expect(style("short")).toMatchObject({
-    backgroundImage: "url(icon.png), linear-gradient(red, blue)",
-    backgroundPosition: "center, 0% 0%",
+    backgroundImage: 'url("icon.png"), linear-gradient(red, blue)',
+    backgroundPosition: "center center, 0% 0%",
+    backgroundPositionXValues: [{unit:'%',value:50},{unit:'%',value:0}],
+    backgroundPositionYValues: [{unit:'%',value:50},{unit:'%',value:0}],
     backgroundSize: "32px 16px, auto",
     backgroundRepeat: "no-repeat, repeat",
     backgroundColor: "rgba(255, 255, 255, 1)",
