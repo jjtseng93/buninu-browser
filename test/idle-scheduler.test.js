@@ -13,6 +13,12 @@ function fixture() {
       return handle;
     },
     clearTimer: handle => tasks.delete(handle),
+    fire(handle, at) {
+      const task = tasks.get(handle);
+      tasks.delete(handle);
+      time = at;
+      task.callback();
+    },
     run() {
       let iterations = 0;
       while (tasks.size) {
@@ -45,6 +51,101 @@ test('a burst of cooperative idle work gives an already due timer a turn', () =>
   clock.run();
   expect(timer).toEqual({ at: 22, completed: 2 });
   expect(completed).toBe(16);
+  expect(tasks.size).toBe(0);
+});
+
+// Keep the first ordinary idle task pending outside the runnable timer queue,
+// as when the host can process timeout tasks but has not granted idle time.
+function holdInitialIdle(tasks) {
+  const entry = [...tasks].find(([, task]) => task.at === 1);
+  expect(entry).toBeDefined();
+  tasks.delete(entry[0]);
+}
+
+test('a fractional early timeout wake cannot let a later deadline overtake it', () => {
+  const {clock,idle,tasks}=fixture(), seen=[];
+  idle.request(1,d=>seen.push([1,d.didTimeout,d.timeRemaining()]),50);
+  holdInitialIdle(tasks);
+  const first=[...tasks.keys()][0];
+  clock.consume(.25);
+  idle.request(2,d=>seen.push([2,d.didTimeout,d.timeRemaining()]),50);
+  clock.fire(first,49.9);
+  expect(seen).toEqual([]);
+  clock.run();
+  expect(seen).toEqual([[1,true,0],[2,true,0]]);
+  expect(tasks.size).toBe(0);
+});
+
+test('late equal-deadline callbacks retain registration order and yield after each delivery', () => {
+  const {clock,idle,tasks}=fixture(), seen=[];
+  for(let i=0;i<80;i++)idle.request(i,d=>{
+    expect(d.didTimeout).toBeTrue();expect(d.timeRemaining()).toBe(0);seen.push(i);
+  },50);
+  // One idle dispatch and one expiration task, independent of burst size.
+  expect(tasks.size).toBe(2);
+  holdInitialIdle(tasks);
+  clock.fire([...tasks.keys()][0],75);
+  expect(seen).toEqual([0]);
+  let atOrdinaryTimer;
+  clock.setTimer(()=>{atOrdinaryTimer=seen.length;},1);
+  clock.run();
+  expect(atOrdinaryTimer).toBeLessThan(80);
+  expect(seen).toEqual(Array.from({length:80},(_,i)=>i));
+  expect(tasks.size).toBe(0);
+});
+
+test('timeout cancellation and shorter requests replace only the earliest timer', () => {
+  const {clock,idle,tasks}=fixture(), seen=[];
+  idle.request(1,()=>seen.push(1),50);holdInitialIdle(tasks);
+  idle.request(2,()=>seen.push(2),10);
+  idle.request(3,()=>seen.push(3),30);
+  expect([...tasks.values()].map(t=>t.at)).toEqual([10]);
+  idle.cancel(2);expect([...tasks.values()].map(t=>t.at)).toEqual([30]);
+  idle.cancel(3);expect([...tasks.values()].map(t=>t.at)).toEqual([50]);
+  idle.request(4,()=>seen.push(4),20);
+  clock.run();
+  expect(seen).toEqual([4,1]);expect(tasks.size).toBe(0);
+});
+
+test('an idle task becoming runnable late honors the same earliest expired deadline', () => {
+  const {clock,idle,tasks}=fixture(), seen=[];
+  idle.request(1,d=>seen.push([1,d.didTimeout]),100);
+  idle.request(2,d=>seen.push([2,d.didTimeout]),1);
+  clock.consume(200);
+  clock.run();
+  expect(seen).toEqual([[2,true],[1,true]]);expect(tasks.size).toBe(0);
+});
+
+test('timeout callbacks may cancel, register and dispose without retained or duplicate delivery', () => {
+  const {clock,idle,tasks}=fixture(), seen=[];
+  idle.request(1,()=>{
+    seen.push(1);idle.cancel(2);
+    idle.request(4,d=>{seen.push(4);expect(d.didTimeout).toBeTrue();idle.dispose();},1);
+  },5);
+  holdInitialIdle(tasks);
+  idle.request(2,()=>seen.push(2),6);
+  idle.request(3,()=>seen.push(3),6);
+  idle.request(5,()=>seen.push(5),100);
+  clock.fire([...tasks.keys()][0],10);
+  clock.run();
+  expect(seen).toEqual([1,3,4]);expect(tasks.size).toBe(0);
+  idle.request(6,()=>seen.push(6),1);expect(tasks.size).toBe(0);
+});
+
+test('arbitrary timed cancellations and reused handles preserve deadline and tie order', () => {
+  const {clock,idle,tasks}=fixture(), expected=new Map(), seen=[];
+  idle.request(-1,()=>{},10000);holdInitialIdle(tasks);
+  let seed=12345,order=0;
+  const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed;};
+  for(let i=0;i<500;i++){
+    const id=random()%160,timeout=1+random()%97;
+    idle.request(id,()=>seen.push(id),timeout);
+    expected.set(id,{id,timeout,order:order++});
+    if(i%3===0){const cancel=random()%160;idle.cancel(cancel);expected.delete(cancel);}
+    expect(tasks.size).toBe(1);
+  }
+  idle.cancel(-1);clock.run();
+  expect(seen).toEqual([...expected.values()].sort((a,b)=>a.timeout-b.timeout||a.order-b.order).map(x=>x.id));
   expect(tasks.size).toBe(0);
 });
 
