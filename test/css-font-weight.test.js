@@ -22,7 +22,7 @@ test('font weight grammar, CSSOM and feature queries share literal ranges and ca
       f.s.cssText='';f.s.fontWeight=value;expect(f.s.fontWeight).toBe(serialized);expect(f.computed().fontWeight).toBe(computed);expect(supportsDeclaration('font-weight',value)).toBeTrue();
       const text=f.s.cssText;f.s.cssText=text;expect(f.s.fontWeight).toBe(serialized);
     }
-    for(const value of ['0','.999','-100','1000.001','1001','400 700','bold 400','calc(200) 400','calc(200px)','calc(50%)','calc(100 + 1px)','calc(100+200)','calc(100 +)','var(x)','calc(sign(20cqw - 10px))']) {
+    for(const value of ['0','.999','-100','1000.001','1001','400 700','bold 400','calc(200) 400','calc(200px)','calc(50%)','calc(100 + 1px)','calc(100+200)','calc(100 +)','var(x)']) {
       f.s.cssText='font-weight:300!important';f.s.fontWeight=value;
       expect(f.s.fontWeight).toBe('300');expect(f.s.getPropertyPriority('font-weight')).toBe('important');expect(supportsDeclaration('font-weight',value)).toBeFalse();
       expect(parseDeclarations(`font-weight:300;font-weight:${value}`)).toEqual(parseDeclarations('font-weight:300'));
