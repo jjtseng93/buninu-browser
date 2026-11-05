@@ -151,6 +151,20 @@ const load = async (html, url = "https://page.test/") => {
 };
 const evaluate = (expression) => renderer.call("evaluate", expression);
 
+test('ProgressEvent dispatches through page DOM bindings', async () => {
+  await load('<p id="target">progress</p>');
+  expect(await evaluate(`(() => {
+    const node=document.getElementById('target');
+    const event=new ProgressEvent('progress',{loaded:1.5,total:3,bubbles:true,cancelable:true});
+    let ok=false;
+    node.addEventListener('progress', e => {
+      ok=e===event && e.target===node && e instanceof Event && e instanceof ProgressEvent && e.loaded===1.5;
+      e.preventDefault();
+    });
+    return !node.dispatchEvent(event) && ok;
+  })()`)).toBe(true);
+});
+
 test('TextDecoder errors belong to the page realm and preserve conversion exceptions', async () => {
   await load('<p>encoding</p>');
   expect(await evaluate(`(() => {
