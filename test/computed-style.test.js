@@ -136,6 +136,23 @@ test("immutable border and inset arrays are shared while descendant overrides st
   } finally { window.happyDOM.abort(); }
 });
 
+test("expanded inheritance shares border arrays across a large set of descendants", () => {
+  const {document,window}=parseHTMLDocument('<div id="parent" style="border:3px solid red">'+ '<i style="border:inherit"></i>'.repeat(1000)+'</div>');
+  try {
+    const engine=new StyleEngine().compute(document), parent=engine.get(document.getElementById('parent'));
+    const children=[...document.querySelectorAll('i')].map(node=>engine.get(node));
+    for(const field of ['borderStyles','borderSpecifiedWidths']) {
+      expect(new Set(children.map(style=>style[field])).size).toBe(1);
+      expect(children.every(style=>style[field]===parent[field])).toBe(true);
+    }
+    const changed=document.querySelector('i');changed.style.borderLeftWidth='7px';
+    const styles=new StyleEngine().compute(document);
+    expect(styles.get(changed).borderSpecifiedWidths).toEqual([3,3,3,7]);
+    expect(styles.get(changed.nextElementSibling).borderSpecifiedWidths).toEqual([3,3,3,3]);
+    expect(parent.borderSpecifiedWidths).toEqual([3,3,3,3]);
+  } finally {window.happyDOM.close();}
+});
+
 test("inheriting mutable border and inset arrays copies without freezing caller-owned arrays", () => {
   const { document, window } = parseHTMLDocument('<div id="parent"></div><span id="child" style="border:inherit;inset:inherit"></span>');
   try {
