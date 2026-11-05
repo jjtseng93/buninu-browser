@@ -1,71 +1,63 @@
 # Recorded WPT baseline and targeted retests
 
-The saved official-server run is **interrupted**, not complete. This record
-replaces the earlier static sample; the old sample is not combined with it.
+The official-server **testharness run is complete**: all 39,877 cases were attempted.
+This does not mean all WPT test types were run or that every case completed successfully.
 
-- Last saved progress (UTC): `2026-11-04T09:23:50.559Z`.
+- Finished (UTC): `2026-11-05T03:24:33.913Z` (2026-11-05 11:24:33 Asia/Taipei).
 - WPT revision: `f6789b0b5c0034ab9a7c87c9f651bf135719015d`.
 - Frozen browser revision: `d11f21bfb2a58b0fedd4207d6de1f652dd9d5791`.
 - Native Termux / Android arm64, Bun 1.4.4 canary `da867c60bf0bcbf9d6d36994f8ca0efa42075115`.
 - Official wptserve with our browser adapter; four workers, no directory sampling.
+- Resumed saved results without repeating completed cases; frozen baseline unchanged.
 - Normal case budget: 20 seconds; long cases: 75 seconds, plus runner watchdog.
 
 ## Actual coverage
 
 | Outcome | Cases |
 | --- | ---: |
-| Fully passing | 1,648 |
-| Assertion failures | 9,329 |
-| Harness errors | 4,074 |
-| Incomplete / deadline / process failure | 851 |
-| Unsupported infrastructure | 435 |
-| Total saved cases | 16,337 |
-| Remaining testharness cases | 23,540 |
+| Fully passing | 3,970 |
+| Assertion failures | 21,392 |
+| Harness errors | 11,449 |
+| Incomplete / deadline / process failure | 1,609 |
+| Unsupported infrastructure | 1,457 |
+| Total saved cases | 39,877 |
+| Remaining testharness cases | 0 |
 
-- **Tested-case pass rate: 1,648 / 15,902 = 10.36%.** The denominator excludes
-  unsupported infrastructure but includes failures, harness errors and incomplete cases.
-- **Whole-manifest verified lower bound: 1,648 / 131,953 = 1.24893%.** All official
-  test types remain in the denominator. Untested means unknown, not failed.
-  Only 16,337 of 39,877 testharness cases have saved results.
-- Reported subtests: **58,270 passed / 850,680 reported**, including reports from
-  incomplete/unsupported cases. Unreported assertions are unknown. This is not
-  a complete subtest pass rate or a website usability score.
+- **Tested-case pass rate: 3,970 / 38,420 = 10.33%.** Excludes unsupported infrastructure; includes failures, harness errors and incomplete cases.
+- **Whole-manifest verified lower bound: 3,970 / 131,953 = 3.00865%.** Includes all test types in the denominator. Untested types remain unknown, not failed.
+- Including unsupported infrastructure in the attempted-case denominator: **3,970 / 39,877 = 9.96%**.
+- Reported subtests: **216,708 passed / 1,215,617 reported** (17.83%). Includes reports from incomplete/unsupported cases; unreported assertions remain unknown.
 
-Counts were recomputed from results.jsonl: all 16,337 records parse, case keys
-are unique, and totals match progress.json. The partial directory-ordered run
-is not a representative random sample. Harness errors/timeouts are not
-necessarily engine bugs; infrastructure and resource limits also matter.
+All 39,877 JSONL records parse, case keys are unique, and outcome totals match progress.json.
+Harness errors/timeouts may reflect engine gaps, infrastructure or resource limits.
+These numbers are not a website usability score.
 
-## Approximate result after patches 001–016
+## Approximate result after patches 001–025
 
-**Estimated tested-case pass rate: 1,669 / 15,902 = 10.50%**
-(before: 10.36%, approximately +0.13 percentage points).
+**Estimated tested-case pass rate: 4,005 / 38,420 = 10.42%**
+(baseline 10.33%; +0.09 percentage points).
 
-**Estimated whole-manifest passing share: 1,669 / 131,953 = 1.26484%**
-(before: 1.24893%). This is not a prediction for untested cases.
+**Estimated whole-manifest passing share: 4,005 / 131,953 = 3.03517%**
+(baseline 3.00865%).
 
-Method: match the 27 saved targeted retests by full manifest URL, including query
-variants, and replace those outcomes in the 16,337-case baseline. All 27 are
-already in the baseline, so the denominator does not grow. Twenty-one formerly
-nonpassing files become fully passing (20 assertion failures and one harness
-error); no matched file changes from pass to nonpass. Files with additional
-passing subtests but remaining failures still count as nonpassing files.
+Method: deduplicate 47 targeted artifacts by full case URL (including query), keeping the latest saved result for each of 44 matched cases.
+Use the original full-run result as the before outcome and replace only those matched outcomes.
+This turns 35 nonpassing cases into fully passing cases; 0 matched cases regress from pass to nonpass.
+Partially improved files remain nonpassing. No gains are extrapolated to untested or unretested cases.
 
-This is a **mixed-results estimate**, not a uniform rerun of the patched browser.
-It assumes all other cases remain unchanged, combines retests from different
-patch stages/runtimes, and cannot rule out regressions elsewhere. Fixes may also
-improve other cases, but those gains are not extrapolated. The original baseline
-counts below remain unchanged; machine-readable estimate details are in
-`BASELINE.json` under `patchedEstimate`.
+This is a **mixed-results estimate**, not a full rerun of patch 025. Retests come from different cumulative patch stages and Linux ARM64 runtimes, while the baseline ran on Android.
+It assumes all other cases remain unchanged and cannot rule out regressions elsewhere.
+Patches remain in the independent checkout and have not been applied to production.
 
 ## Tested groups
 
-Only groups with saved results are listed. Nonpass includes assertions, harness
-errors and incomplete runs; unsupported infrastructure is separate.
+Nonpass combines assertion failures, harness errors and incomplete cases.
 
 | Group | Saved | Pass | Nonpass | Unsupported |
 | --- | ---: | ---: | ---: | ---: |
 | FileAPI | 113 | 15 | 98 | 0 |
+| IndexedDB | 820 | 1 | 819 | 0 |
+| WebCryptoAPI | 334 | 3 | 331 | 0 |
 | accelerometer | 12 | 1 | 11 | 0 |
 | accessibility | 1 | 0 | 1 | 0 |
 | accname | 21 | 0 | 21 | 0 |
@@ -149,72 +141,241 @@ errors and incomplete runs; unsupported infrastructure is separate.
 | gyroscope | 10 | 1 | 9 | 0 |
 | hr-time | 18 | 5 | 13 | 0 |
 | hsts | 1 | 0 | 1 | 0 |
-| html | 758 | 88 | 669 | 1 |
+| html | 9017 | 1433 | 7255 | 329 |
 | html-aam | 36 | 0 | 20 | 16 |
 | html-media-capture | 2 | 0 | 2 | 0 |
+| https-upgrades | 6 | 0 | 6 | 0 |
+| idle-detection | 12 | 0 | 1 | 11 |
+| imagebitmap-renderingcontext | 14 | 0 | 14 | 0 |
+| import-maps | 59 | 14 | 45 | 0 |
+| inert | 29 | 3 | 21 | 5 |
+| infrastructure | 130 | 12 | 64 | 54 |
+| input-device-capabilities | 1 | 0 | 1 | 0 |
+| input-events | 34 | 0 | 8 | 26 |
+| installedapp | 2 | 0 | 2 | 0 |
+| intersection-observer | 153 | 33 | 120 | 0 |
+| intervention-reporting | 2 | 1 | 1 | 0 |
+| is-input-pending | 12 | 0 | 1 | 11 |
+| jpegxl | 12 | 0 | 12 | 0 |
+| js | 35 | 10 | 25 | 0 |
+| js-self-profiling | 26 | 0 | 26 | 0 |
+| keyboard-lock | 7 | 0 | 7 | 0 |
+| keyboard-map | 8 | 0 | 8 | 0 |
+| largest-contentful-paint | 74 | 0 | 74 | 0 |
+| layout-instability | 83 | 0 | 83 | 0 |
+| loading | 53 | 0 | 53 | 0 |
+| long-animation-frame | 53 | 0 | 53 | 0 |
+| longtask-timing | 21 | 0 | 21 | 0 |
+| magnetometer | 10 | 1 | 9 | 0 |
+| managed | 2 | 0 | 2 | 0 |
+| mathml | 216 | 16 | 200 | 0 |
+| measure-memory | 16 | 0 | 16 | 0 |
+| media-capabilities | 12 | 0 | 12 | 0 |
+| media-playback-quality | 1 | 0 | 1 | 0 |
+| media-source | 88 | 3 | 85 | 0 |
+| mediacapture-extensions | 13 | 0 | 6 | 7 |
+| mediacapture-fromelement | 12 | 0 | 12 | 0 |
+| mediacapture-handle | 1 | 0 | 1 | 0 |
+| mediacapture-image | 23 | 0 | 22 | 1 |
+| mediacapture-insertable-streams | 20 | 0 | 16 | 4 |
+| mediacapture-record | 120 | 0 | 93 | 27 |
+| mediacapture-region | 1 | 0 | 1 | 0 |
+| mediacapture-streams | 59 | 2 | 19 | 38 |
+| mediasession | 9 | 0 | 9 | 0 |
+| merchant-validation | 4 | 1 | 3 | 0 |
+| mimesniff | 7 | 2 | 5 | 0 |
+| mixed-content | 388 | 6 | 382 | 0 |
+| mst-content-hint | 4 | 0 | 4 | 0 |
+| nav-tracking-mitigations | 2 | 0 | 0 | 2 |
+| navigation-api | 511 | 0 | 511 | 0 |
+| navigation-timing | 59 | 10 | 49 | 0 |
+| netinfo | 3 | 0 | 3 | 0 |
+| network-error-logging | 12 | 0 | 12 | 0 |
+| notifications | 28 | 0 | 14 | 14 |
+| old-tests | 15 | 6 | 9 | 0 |
+| orientation-event | 27 | 0 | 5 | 22 |
+| orientation-sensor | 16 | 1 | 15 | 0 |
+| page-lifecycle | 5 | 0 | 5 | 0 |
+| page-visibility | 11 | 3 | 7 | 1 |
+| paint-timing | 59 | 2 | 57 | 0 |
+| payment-method-basic-card | 4 | 0 | 4 | 0 |
+| payment-method-id | 1 | 0 | 1 | 0 |
+| payment-method-manifest | 11 | 0 | 11 | 0 |
+| payment-request | 33 | 2 | 31 | 0 |
+| performance-timeline | 74 | 17 | 57 | 0 |
+| periodic-background-sync | 3 | 0 | 3 | 0 |
+| permissions | 18 | 2 | 10 | 6 |
+| permissions-policy | 123 | 1 | 118 | 4 |
+| permissions-request | 2 | 0 | 2 | 0 |
+| permissions-revoke | 2 | 0 | 2 | 0 |
+| picture-in-picture | 18 | 0 | 18 | 0 |
+| png | 4 | 1 | 3 | 0 |
+| pointerevents | 262 | 2 | 59 | 201 |
+| pointerlock | 20 | 0 | 8 | 12 |
+| preload | 86 | 10 | 75 | 1 |
+| presentation-api | 13 | 0 | 13 | 0 |
+| private-click-measurement | 1 | 0 | 1 | 0 |
+| proximity | 4 | 1 | 3 | 0 |
+| push-api | 18 | 1 | 9 | 8 |
+| quirks | 18 | 2 | 16 | 0 |
+| referrer-policy | 1482 | 104 | 1375 | 3 |
+| remote-playback | 9 | 0 | 9 | 0 |
+| reporting | 26 | 0 | 22 | 4 |
+| requestidlecallback | 21 | 12 | 9 | 0 |
+| resize-observer | 35 | 15 | 20 | 0 |
+| resource-timing | 170 | 7 | 163 | 0 |
+| sanitizer-api | 50 | 0 | 50 | 0 |
+| savedata | 2 | 0 | 2 | 0 |
+| scheduler | 118 | 2 | 116 | 0 |
+| screen-capture | 15 | 1 | 14 | 0 |
+| screen-details | 3 | 1 | 0 | 2 |
+| screen-orientation | 15 | 0 | 14 | 1 |
+| screen-wake-lock | 18 | 1 | 5 | 12 |
+| scroll-animations | 224 | 0 | 224 | 0 |
+| scroll-performance-timing | 1 | 0 | 1 | 0 |
+| scroll-to-text-fragment | 38 | 0 | 37 | 1 |
+| secure-contexts | 10 | 1 | 9 | 0 |
+| secure-payment-confirmation | 20 | 0 | 2 | 18 |
+| selection | 134 | 12 | 100 | 22 |
+| serial | 11 | 0 | 11 | 0 |
+| server-timing | 10 | 1 | 9 | 0 |
+| service-workers | 331 | 0 | 331 | 0 |
+| shadow-dom | 314 | 57 | 244 | 13 |
+| shape-detection | 28 | 0 | 28 | 0 |
+| signed-exchange | 60 | 0 | 60 | 0 |
+| soft-navigation-heuristics | 96 | 0 | 96 | 0 |
+| speculation-rules | 544 | 0 | 544 | 0 |
+| speech-api | 18 | 1 | 17 | 0 |
+| storage | 56 | 1 | 52 | 3 |
+| storage-access-api | 42 | 0 | 34 | 8 |
+| streams | 306 | 33 | 273 | 0 |
+| subapps | 8 | 0 | 8 | 0 |
+| subresource-integrity | 36 | 3 | 33 | 0 |
+| svg | 787 | 12 | 772 | 3 |
+| svg-aam | 7 | 0 | 3 | 4 |
+| timing-entrytypes-registry | 3 | 1 | 2 | 0 |
+| touch-events | 14 | 0 | 7 | 7 |
+| trust-tokens | 3 | 0 | 2 | 1 |
+| trusted-types | 247 | 32 | 215 | 0 |
+| ua-client-hints | 4 | 0 | 4 | 0 |
+| uievents | 74 | 6 | 25 | 43 |
+| upgrade-insecure-requests | 197 | 50 | 147 | 0 |
+| url | 77 | 20 | 57 | 0 |
+| urlpattern | 30 | 0 | 30 | 0 |
+| user-timing | 61 | 17 | 44 | 0 |
+| vibration | 4 | 0 | 4 | 0 |
+| video-rvfc | 8 | 0 | 8 | 0 |
+| viewport | 1 | 0 | 1 | 0 |
+| viewport-segments | 3 | 0 | 0 | 3 |
+| virtual-keyboard | 3 | 0 | 3 | 0 |
+| visual-viewport | 19 | 12 | 4 | 3 |
+| wai-aria | 35 | 0 | 5 | 30 |
+| wasm | 616 | 17 | 599 | 0 |
+| web-animations | 144 | 0 | 144 | 0 |
+| web-based-payment-handler | 13 | 2 | 11 | 0 |
+| web-bundle | 29 | 0 | 29 | 0 |
+| web-extensions | 6 | 0 | 6 | 0 |
+| web-install | 5 | 0 | 5 | 0 |
+| web-locks | 86 | 1 | 85 | 0 |
+| web-nfc | 11 | 1 | 9 | 1 |
+| web-otp | 1 | 0 | 1 | 0 |
+| web-share | 15 | 2 | 13 | 0 |
+| webaudio | 348 | 5 | 343 | 0 |
+| webauthn | 55 | 1 | 8 | 46 |
+| webcodecs | 283 | 1 | 282 | 0 |
+| webdriver | 1 | 0 | 1 | 0 |
+| webgl | 22 | 1 | 21 | 0 |
+| webhid | 6 | 1 | 5 | 0 |
+| webidl | 63 | 10 | 53 | 0 |
+| webmcp | 75 | 1 | 74 | 0 |
+| webmessaging | 161 | 55 | 106 | 0 |
+| webmidi | 1 | 0 | 0 | 1 |
+| webnn | 607 | 1 | 606 | 0 |
+| webrtc | 265 | 1 | 263 | 1 |
+| webrtc-encoded-transform | 41 | 0 | 34 | 7 |
+| webrtc-extensions | 11 | 0 | 11 | 0 |
+| webrtc-ice | 1 | 0 | 1 | 0 |
+| webrtc-identity | 4 | 0 | 4 | 0 |
+| webrtc-priority | 2 | 0 | 2 | 0 |
+| webrtc-stats | 10 | 1 | 9 | 0 |
+| webrtc-svc | 5 | 0 | 5 | 0 |
+| websockets | 799 | 119 | 678 | 2 |
+| webstorage | 54 | 16 | 38 | 0 |
+| webtransport | 138 | 0 | 138 | 0 |
+| webusb | 49 | 1 | 48 | 0 |
+| webvtt | 75 | 0 | 75 | 0 |
+| webxr | 179 | 1 | 178 | 0 |
+| window-management | 5 | 0 | 5 | 0 |
+| workers | 336 | 68 | 268 | 0 |
+| worklets | 22 | 0 | 22 | 0 |
+| x-frame-options | 6 | 1 | 5 | 0 |
+| xhr | 440 | 96 | 344 | 0 |
+| xml | 14 | 3 | 11 | 0 |
 
 ## Independent fixes: targeted results only
 
-Patches 001–016 live in `../wpt-run/patches`, developed in
-`../buninu-browser-wpt-fixes`. They have **not** been applied to production or
-its frozen baseline. All sixteen sequential patches were verified against the
-base commit. Retests use proot Linux arm64 Bun and the official server: these
-are functional comparisons, not cross-platform performance measurements.
+Patches 001–025 live in `../wpt-run/patches`, developed in `../buninu-browser-wpt-fixes`.
+The table shows the latest saved targeted result per case, not a uniform patch-025 rerun. Before counts always come from the final native baseline.
 
-Below are all saved `*-after.json` artifacts, including failures. Each is the
-latest saved result at that case's patch stage, **not** a full rerun under patch
-016. Before counts use paired retests where present, otherwise saved native
-baseline results. Setup failure with zero reports is not a set of failed
-assertions. Do not add these gains to the frozen baseline percentages above.
-
-| Artifact | Before pass/reported | After pass/reported | After outcome |
+| Artifact | Baseline passed/reported | After passed/reported | After outcome |
 | --- | ---: | ---: | --- |
+| `justify-self-after.json` | 0/22 (fail) | 6/22 | fail |
+| `color-after.json` | 2/16 (fail) | 16/16 | pass |
+| `supports-l3-after.json` | 6/17 (fail) | 17/17 | pass |
+| `z-index-invalid-024-after.json` | 0/4 (fail) | 4/4 | pass |
+| `z-index-valid-024-after.json` | 4/4 (pass) | 4/4 | pass |
+| `decoration-after.json` | 0/3 (fail) | 3/3 | pass |
+| `direction-after.json` | 0/2 (fail) | 2/2 | pass |
+| `check-visibility-after.json` | 9/21 (fail) | 12/21 | fail |
+| `css-namespace-025-after.json` | 0/4 (fail) | 4/4 | pass |
 | `CSSGroupingRule-insertRule-computed-after.json` | 0/1 (fail) | 1/1 | pass |
+| `css-indexed-after.json` | 5/6 (fail) | 6/6 | pass |
+| `css-iterator-after.json` | 0/1 (fail) | 1/1 | pass |
 | `CSSStyleSheet-constructable-cssRules-after.json` | 0/1 (fail) | 1/1 | pass |
 | `CSSStyleSheet-constructable-invalidation-after.json` | 0/3 (fail) | 1/3 | fail |
-| `CSSStyleSheet-constructable-replace-cssRules-after.json` | 0/2 (incomplete) | 2/2 | pass |
+| `CSSStyleSheet-constructable-replace-cssRules-after.json` | 0/2 (fail) | 2/2 | pass |
 | `CSSStyleSheet-constructable-replace-on-regular-sheet-after.json` | 0/3 (fail) | 0/3 | fail |
 | `CSSStyleSheet-insertRule-computed-after.json` | 0/1 (fail) | 1/1 | pass |
-| `CharacterData-remove-after.json` | 0/0 (harness-error) | 12/12 | pass |
-| `ChildNode-after-after.json` | 13/45 (fail) | 45/45 | pass |
-| `ChildNode-before-after.json` | 17/45 (fail) | 45/45 | pass |
-| `DocumentType-remove-after.json` | 0/4 (fail) | 4/4 | pass |
 | `StyleSheetList-constructable-after.json` | 0/1 (fail) | 1/1 | pass |
 | `adoptedstylesheets-observablearray-removal-after.json` | 0/12 (fail) | 6/12 | fail |
+| `computed-readonly-020-after.json` | 3/4 (fail) | 4/4 | pass |
+| `computed-set-020-after.json` | 0/5 (fail) | 4/5 | fail |
+| `style-decl-block-024-after.json` | 3/7 (fail) | 6/7 | fail |
+| `style-attribute-023-after.json` | 0/1 (fail) | 1/1 | pass |
+| `insertRule-no-index-after.json` | 0/2 (fail) | 2/2 | pass |
+| `token-reactions-019-after.json` | 16/19 (fail) | 19/19 | pass |
+| `token-iteration-019-after.json` | 5/6 (fail) | 6/6 | pass |
 | `character-append-after.json` | 0/14 (fail) | 14/14 | pass |
 | `character-delete-after.json` | 0/18 (fail) | 18/18 | pass |
 | `character-insert-after.json` | 0/18 (fail) | 18/18 | pass |
+| `CharacterData-remove-after.json` | 0/0 (harness-error) | 12/12 | pass |
 | `character-replace-after.json` | 0/34 (fail) | 34/34 | pass |
 | `character-substring-after.json` | 0/28 (fail) | 28/28 | pass |
-| `check-visibility-after.json` | 9/21 (fail) | 12/21 | fail |
-| `color-after.json` | 2/16 (fail) | 16/16 | pass |
-| `decoration-after.json` | 0/3 (fail) | 3/3 | pass |
-| `direction-after.json` | 0/2 (fail) | 2/2 | pass |
-| `insertRule-no-index-after.json` | 0/2 (fail) | 2/2 | pass |
-| `justify-self-after.json` | 0/22 (fail) | 6/22 | fail |
-| `supports-l3-after.json` | 6/17 (fail) | 17/17 | pass |
+| `ChildNode-after-after.json` | 13/45 (fail) | 45/45 | pass |
+| `ChildNode-before-after.json` | 17/45 (fail) | 45/45 | pass |
+| `comment-constructor-022-after.json` | 0/16 (fail) | 16/16 | pass |
+| `fragment-constructor-022-after.json` | 0/2 (fail) | 2/2 | pass |
+| `DocumentType-remove-after.json` | 0/4 (fail) | 4/4 | pass |
+| `classlist-019-after.json` | 935/1420 (fail) | 1420/1420 | pass |
+| `webkit-matches-after.json` | 5/669 (fail) | 621/669 | fail |
+| `sibling-021-after.json` | 2/6 (fail) | 6/6 | pass |
+| `text-constructor-022-after.json` | 0/16 (fail) | 16/16 | pass |
 | `text-split-after.json` | 0/6 (fail) | 6/6 | pass |
 | `text-whole-after.json` | 0/1 (fail) | 1/1 | pass |
-| `webkit-matches-after.json` | 5/669 (fail) | 621/669 | fail |
+| `unscopables-025-after.json` | 0/6 (fail) | 6/6 | pass |
 
-Remaining areas include Shadow DOM style scope, imported stylesheets, selector
-parsing/matching, editing and Range boundary maintenance, and unsupported
-testdriver operations. Multi-tab and window.open work is intentionally excluded.
-Selected passing tests do not establish complete API conformance.
+Remaining areas include DOM collections/Attr, Range boundaries, CSS URL resolution, numeric parsing, layout, form validation, error-realm compatibility, networking and software audio.
+Multi-tab and window.open remain excluded from patch work. Selected passing tests do not establish complete API conformance.
 
 ## Evidence and reproduction
 
-[BASELINE.json](BASELINE.json) stores counts, runtime/runner signatures, result
-SHA-256, groups, infrastructure limitations and targeted-result references.
-Large original artifacts stay outside the package:
+[BASELINE.json](BASELINE.json) stores the final counts, signatures, result SHA-256, groups, limitations, targeted artifact hashes and estimate details. Large artifacts remain outside the package:
 
-- `../wpt-run/native-all/results.jsonl`: per-case assertions and outcomes.
-- `../wpt-run/native-all/manifest.json`: inventory and run signature.
-- `../wpt-run/native-all/progress.json`: saved progress; its ETA is stale.
-- `../wpt-run/MANIFEST.json`: official generated manifest.
-- `../wpt-run/*-before.json`, `*-saved-baseline.json`, `*-after.json`: retests.
-- `../wpt-run/patches/README.md`: fixes, validation and limitations.
+- `../wpt-run/native-all/results.jsonl`: frozen baseline results.
+- `../wpt-run/native-all/manifest.json`: inventory and signature.
+- `../wpt-run/native-all/progress.json`: final completion record.
+- `../wpt-run/MANIFEST.json`: official manifest.
+- `../wpt-run/*-after.json`: targeted patched retests.
+- `../wpt-run/patches/README.md`: patch scope, validation and known limitations.
 
-See [README.md](README.md) for commands. Resume only with the frozen browser
-checkout and matching signature; measure patched code in a new output directory.
-Do not overwrite baseline results with independent fixes.
+See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.

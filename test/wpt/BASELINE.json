@@ -1,6 +1,6 @@
 {
-  "recordedAt": "2026-11-04T09:23:50.559Z",
-  "state": "Interrupted; not a completed full-suite run",
+  "recordedAt": "2026-11-05T03:24:33.913Z",
+  "state": "complete",
   "signature": {
     "revision": "f6789b0b5c0034ab9a7c87c9f651bf135719015d",
     "browserRevision": "d11f21bfb2a58b0fedd4207d6de1f652dd9d5791",
@@ -18,7 +18,7 @@
     "timeout": 20000,
     "longTimeout": 75000
   },
-  "resultsSha256": "a36005e5326a3334f6235b3ba9d95dc923a8f92029b7574aea69d82d9f5b7819",
+  "resultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
   "manifestTypes": {
     "aamtest": 190,
     "crashtest": 2089,
@@ -30,50 +30,97 @@
     "visual": 2714,
     "wdspec": 658
   },
-  "completed": 16337,
-  "remaining": 23540,
+  "completed": 39877,
+  "remaining": 0,
   "classification": {
-    "fail": 9329,
-    "pass": 1648,
-    "harness-error": 4074,
-    "unsupported-infrastructure": 435,
-    "incomplete": 851
+    "fail": 21392,
+    "pass": 3970,
+    "harness-error": 11449,
+    "unsupported-infrastructure": 1457,
+    "incomplete": 1609
   },
-  "eligible": 15902,
-  "testedPassPercent": 10.363476292290278,
-  "wholeManifestVerifiedPassPercent": 1.24892954309489,
+  "eligible": 38420,
+  "testedPassPercent": 10.333159812597605,
+  "wholeManifestVerifiedPassPercent": 3.0086470182565006,
   "wholeManifestCases": 131953,
-  "reportedSubtests": 850680,
-  "passedSubtests": 58270,
+  "reportedSubtests": 1215617,
+  "passedSubtests": 216708,
   "limitations": {
-    "testdriver: set_permission": 81,
-    "testdriver: bidi.log.entry_added.subscribe": 5,
+    "testdriver: set_permission": 261,
+    "testdriver: bidi.log.entry_added.subscribe": 7,
     "Unmapped host: web-platform.test.": 4,
     "Unmapped host: evil.com": 2,
-    "testdriver: delete_all_cookies": 19,
-    "testdriver: get_named_cookie": 1,
-    "testdriver: get_computed_role": 22,
-    "testdriver: action_sequence": 196,
+    "testdriver: delete_all_cookies": 24,
+    "testdriver: get_named_cookie": 3,
+    "testdriver: get_computed_role": 60,
+    "testdriver: action_sequence": 859,
     "testdriver: clear_device_posture": 4,
     "testdriver: set_virtual_wallet_behavior": 4,
-    "testdriver: send_keys": 1,
+    "testdriver: send_keys": 5,
     "PAC proxy setup: /fedcm/support/proxy.sub.pac": 82,
     "testdriver: set_fedcm_delay_enabled": 1,
     "testdriver: reset_fedcm_cooldown": 1,
     "Unmapped host: bad-port.wpt": 2,
-    "PAC proxy setup: /common/proxy-all.sub.pac": 3,
+    "PAC proxy setup: /common/proxy-all.sub.pac": 4,
     "Unmapped host: www.web-platform.test.": 2,
     "Unmapped host: www.not-web-platform.test.": 2,
-    "testdriver: bidi.permissions.set_permission": 9,
+    "testdriver: bidi.permissions.set_permission": 13,
     "testdriver: get_global_privacy_control": 1,
     "testdriver: set_global_privacy_control": 2,
-    "testdriver: create_window": 1
+    "testdriver: create_window": 3,
+    "Unmapped host: some.nonexistant.test": 1,
+    "testdriver: set_window_rect": 3,
+    "testdriver: set_rph_registration_mode": 5,
+    "Unmapped host: not-a-real-domain.wpt.test": 1,
+    "PAC proxy setup: resources/proxy.sub.pac": 1,
+    "testdriver: bidi.bluetooth.request_device_prompt_updated.subscribe": 8,
+    "testdriver: bidi.bluetooth.simulate_adapter": 2,
+    "testdriver: bidi.emulation.set_locale_override": 1,
+    "testdriver: bidi.emulation.set_media_features_override": 1,
+    "testdriver: bidi.emulation.set_screen_orientation_override": 1,
+    "testdriver: bidi.emulation.set_scrollbar_type_override": 1,
+    "testdriver: bidi.emulation.set_touch_override": 1,
+    "testdriver: bidi.emulation.set_viewport_meta_override": 1,
+    "testdriver: bidi.speculation.prefetch_status_updated.subscribe": 1,
+    "testdriver: bidi.user_agent_client_hints.set_client_hints_override": 1,
+    "testdriver: generate_test_report": 5,
+    "testdriver: get_all_cookies": 2,
+    "testdriver: get_window_rect": 1,
+    "testdriver: add_virtual_authenticator": 65,
+    "testdriver: add_credential": 1,
+    "testdriver: get_credentials": 1,
+    "testdriver: set_credential_properties": 1,
+    "testdriver: remove_credential": 1,
+    "testdriver: set_user_verified": 1,
+    "testdriver: remove_virtual_authenticator": 2,
+    "testdriver: minimize_window": 3,
+    "testdriver: set_storage_access": 9,
+    "testdriver: create_virtual_sensor": 1,
+    "testdriver: remove_virtual_sensor": 1,
+    "Unmapped host: ff0faa57-377d-4679-8abb-59c47642191c.wpt": 1,
+    "Unmapped host: other-site.example": 2,
+    "Unmapped host: other-page.example": 1,
+    "testdriver: set_spc_transaction_mode": 1,
+    "Unmapped host: privatetoken.example": 1,
+    "testdriver: clear_display_features": 3,
+    "testdriver: get_accessibility_properties_for_element": 4,
+    "PAC proxy setup: resources/https-proxy.sub.pac": 2
   },
   "groups": {
     "FileAPI": {
       "pass": 15,
       "harness-error": 57,
       "fail": 41
+    },
+    "IndexedDB": {
+      "fail": 211,
+      "harness-error": 608,
+      "pass": 1
+    },
+    "WebCryptoAPI": {
+      "fail": 94,
+      "harness-error": 237,
+      "pass": 3
     },
     "accelerometer": {
       "fail": 7,
@@ -442,11 +489,11 @@
       "harness-error": 1
     },
     "html": {
-      "fail": 242,
-      "harness-error": 412,
-      "pass": 88,
-      "incomplete": 15,
-      "unsupported-infrastructure": 1
+      "fail": 4510,
+      "harness-error": 2393,
+      "pass": 1433,
+      "incomplete": 352,
+      "unsupported-infrastructure": 329
     },
     "html-aam": {
       "fail": 20,
@@ -454,252 +501,771 @@
     },
     "html-media-capture": {
       "fail": 2
+    },
+    "https-upgrades": {
+      "harness-error": 6
+    },
+    "idle-detection": {
+      "unsupported-infrastructure": 11,
+      "harness-error": 1
+    },
+    "imagebitmap-renderingcontext": {
+      "fail": 14
+    },
+    "import-maps": {
+      "pass": 14,
+      "harness-error": 19,
+      "fail": 26
+    },
+    "inert": {
+      "fail": 14,
+      "pass": 3,
+      "harness-error": 7,
+      "unsupported-infrastructure": 5
+    },
+    "infrastructure": {
+      "pass": 12,
+      "fail": 20,
+      "harness-error": 38,
+      "incomplete": 6,
+      "unsupported-infrastructure": 54
+    },
+    "input-device-capabilities": {
+      "fail": 1
+    },
+    "input-events": {
+      "unsupported-infrastructure": 26,
+      "fail": 8
+    },
+    "installedapp": {
+      "fail": 2
+    },
+    "intersection-observer": {
+      "fail": 87,
+      "pass": 33,
+      "harness-error": 33
+    },
+    "intervention-reporting": {
+      "pass": 1,
+      "harness-error": 1
+    },
+    "is-input-pending": {
+      "fail": 1,
+      "unsupported-infrastructure": 11
+    },
+    "jpegxl": {
+      "fail": 9,
+      "harness-error": 3
+    },
+    "js": {
+      "fail": 14,
+      "pass": 10,
+      "harness-error": 10,
+      "incomplete": 1
+    },
+    "js-self-profiling": {
+      "fail": 23,
+      "harness-error": 3
+    },
+    "keyboard-lock": {
+      "fail": 5,
+      "harness-error": 2
+    },
+    "keyboard-map": {
+      "fail": 4,
+      "harness-error": 4
+    },
+    "largest-contentful-paint": {
+      "fail": 64,
+      "harness-error": 10
+    },
+    "layout-instability": {
+      "fail": 81,
+      "harness-error": 2
+    },
+    "loading": {
+      "harness-error": 39,
+      "fail": 14
+    },
+    "long-animation-frame": {
+      "harness-error": 52,
+      "fail": 1
+    },
+    "longtask-timing": {
+      "fail": 18,
+      "harness-error": 3
+    },
+    "magnetometer": {
+      "fail": 7,
+      "pass": 1,
+      "harness-error": 2
+    },
+    "managed": {
+      "fail": 2
+    },
+    "mathml": {
+      "fail": 102,
+      "harness-error": 98,
+      "pass": 16
+    },
+    "measure-memory": {
+      "fail": 14,
+      "harness-error": 2
+    },
+    "media-capabilities": {
+      "fail": 7,
+      "harness-error": 5
+    },
+    "media-playback-quality": {
+      "fail": 1
+    },
+    "media-source": {
+      "fail": 64,
+      "harness-error": 21,
+      "pass": 3
+    },
+    "mediacapture-extensions": {
+      "fail": 6,
+      "unsupported-infrastructure": 7
+    },
+    "mediacapture-fromelement": {
+      "fail": 11,
+      "harness-error": 1
+    },
+    "mediacapture-handle": {
+      "fail": 1
+    },
+    "mediacapture-image": {
+      "fail": 22,
+      "unsupported-infrastructure": 1
+    },
+    "mediacapture-insertable-streams": {
+      "unsupported-infrastructure": 4,
+      "fail": 8,
+      "harness-error": 8
+    },
+    "mediacapture-record": {
+      "fail": 91,
+      "harness-error": 2,
+      "unsupported-infrastructure": 27
+    },
+    "mediacapture-region": {
+      "fail": 1
+    },
+    "mediacapture-streams": {
+      "fail": 17,
+      "unsupported-infrastructure": 38,
+      "pass": 2,
+      "harness-error": 2
+    },
+    "mediasession": {
+      "fail": 9
+    },
+    "merchant-validation": {
+      "fail": 3,
+      "pass": 1
+    },
+    "mimesniff": {
+      "pass": 2,
+      "harness-error": 4,
+      "fail": 1
+    },
+    "mixed-content": {
+      "fail": 256,
+      "harness-error": 126,
+      "pass": 6
+    },
+    "mst-content-hint": {
+      "fail": 4
+    },
+    "nav-tracking-mitigations": {
+      "unsupported-infrastructure": 2
+    },
+    "navigation-api": {
+      "fail": 457,
+      "harness-error": 54
+    },
+    "navigation-timing": {
+      "fail": 11,
+      "harness-error": 38,
+      "pass": 10
+    },
+    "netinfo": {
+      "fail": 2,
+      "harness-error": 1
+    },
+    "network-error-logging": {
+      "fail": 12
+    },
+    "notifications": {
+      "fail": 8,
+      "unsupported-infrastructure": 14,
+      "harness-error": 6
+    },
+    "old-tests": {
+      "fail": 8,
+      "pass": 6,
+      "harness-error": 1
+    },
+    "orientation-event": {
+      "unsupported-infrastructure": 22,
+      "fail": 5
+    },
+    "orientation-sensor": {
+      "fail": 11,
+      "harness-error": 4,
+      "pass": 1
+    },
+    "page-lifecycle": {
+      "fail": 1,
+      "harness-error": 4
+    },
+    "page-visibility": {
+      "unsupported-infrastructure": 1,
+      "pass": 3,
+      "fail": 1,
+      "harness-error": 6
+    },
+    "paint-timing": {
+      "fail": 50,
+      "pass": 2,
+      "harness-error": 7
+    },
+    "payment-method-basic-card": {
+      "fail": 2,
+      "incomplete": 2
+    },
+    "payment-method-id": {
+      "fail": 1
+    },
+    "payment-method-manifest": {
+      "fail": 11
+    },
+    "payment-request": {
+      "fail": 29,
+      "harness-error": 2,
+      "pass": 2
+    },
+    "performance-timeline": {
+      "pass": 17,
+      "harness-error": 48,
+      "fail": 9
+    },
+    "periodic-background-sync": {
+      "fail": 2,
+      "harness-error": 1
+    },
+    "permissions": {
+      "fail": 4,
+      "pass": 2,
+      "harness-error": 5,
+      "incomplete": 1,
+      "unsupported-infrastructure": 6
+    },
+    "permissions-policy": {
+      "fail": 42,
+      "harness-error": 76,
+      "pass": 1,
+      "unsupported-infrastructure": 4
+    },
+    "permissions-request": {
+      "fail": 1,
+      "harness-error": 1
+    },
+    "permissions-revoke": {
+      "fail": 1,
+      "harness-error": 1
+    },
+    "picture-in-picture": {
+      "harness-error": 16,
+      "fail": 2
+    },
+    "png": {
+      "harness-error": 3,
+      "pass": 1
+    },
+    "pointerevents": {
+      "unsupported-infrastructure": 201,
+      "fail": 19,
+      "incomplete": 21,
+      "harness-error": 19,
+      "pass": 2
+    },
+    "pointerlock": {
+      "fail": 4,
+      "unsupported-infrastructure": 12,
+      "harness-error": 4
+    },
+    "preload": {
+      "harness-error": 44,
+      "fail": 31,
+      "pass": 10,
+      "unsupported-infrastructure": 1
+    },
+    "presentation-api": {
+      "fail": 13
+    },
+    "private-click-measurement": {
+      "fail": 1
+    },
+    "proximity": {
+      "fail": 1,
+      "pass": 1,
+      "harness-error": 2
+    },
+    "push-api": {
+      "unsupported-infrastructure": 8,
+      "fail": 2,
+      "harness-error": 7,
+      "pass": 1
+    },
+    "quirks": {
+      "fail": 5,
+      "harness-error": 11,
+      "pass": 2
+    },
+    "referrer-policy": {
+      "fail": 745,
+      "harness-error": 562,
+      "incomplete": 68,
+      "pass": 104,
+      "unsupported-infrastructure": 3
+    },
+    "remote-playback": {
+      "fail": 9
+    },
+    "reporting": {
+      "unsupported-infrastructure": 4,
+      "fail": 15,
+      "harness-error": 7
+    },
+    "requestidlecallback": {
+      "fail": 6,
+      "pass": 12,
+      "harness-error": 3
+    },
+    "resize-observer": {
+      "pass": 15,
+      "fail": 14,
+      "harness-error": 5,
+      "incomplete": 1
+    },
+    "resource-timing": {
+      "fail": 64,
+      "harness-error": 97,
+      "pass": 7,
+      "incomplete": 2
+    },
+    "sanitizer-api": {
+      "fail": 38,
+      "harness-error": 12
+    },
+    "savedata": {
+      "fail": 1,
+      "harness-error": 1
+    },
+    "scheduler": {
+      "fail": 30,
+      "harness-error": 86,
+      "pass": 2
+    },
+    "screen-capture": {
+      "fail": 9,
+      "harness-error": 5,
+      "pass": 1
+    },
+    "screen-details": {
+      "unsupported-infrastructure": 2,
+      "pass": 1
+    },
+    "screen-orientation": {
+      "harness-error": 11,
+      "unsupported-infrastructure": 1,
+      "fail": 3
+    },
+    "screen-wake-lock": {
+      "unsupported-infrastructure": 12,
+      "fail": 2,
+      "harness-error": 3,
+      "pass": 1
+    },
+    "scroll-animations": {
+      "fail": 188,
+      "harness-error": 35,
+      "incomplete": 1
+    },
+    "scroll-performance-timing": {
+      "fail": 1
+    },
+    "scroll-to-text-fragment": {
+      "unsupported-infrastructure": 1,
+      "fail": 33,
+      "harness-error": 4
+    },
+    "secure-contexts": {
+      "fail": 1,
+      "harness-error": 8,
+      "pass": 1
+    },
+    "secure-payment-confirmation": {
+      "unsupported-infrastructure": 18,
+      "fail": 2
+    },
+    "selection": {
+      "harness-error": 40,
+      "pass": 12,
+      "unsupported-infrastructure": 22,
+      "fail": 60
+    },
+    "serial": {
+      "fail": 5,
+      "harness-error": 6
+    },
+    "server-timing": {
+      "harness-error": 9,
+      "pass": 1
+    },
+    "service-workers": {
+      "harness-error": 86,
+      "fail": 244,
+      "incomplete": 1
+    },
+    "shadow-dom": {
+      "unsupported-infrastructure": 13,
+      "pass": 57,
+      "fail": 227,
+      "harness-error": 17
+    },
+    "shape-detection": {
+      "fail": 18,
+      "harness-error": 10
+    },
+    "signed-exchange": {
+      "harness-error": 31,
+      "fail": 29
+    },
+    "soft-navigation-heuristics": {
+      "fail": 82,
+      "harness-error": 14
+    },
+    "speculation-rules": {
+      "harness-error": 536,
+      "fail": 7,
+      "incomplete": 1
+    },
+    "speech-api": {
+      "fail": 17,
+      "pass": 1
+    },
+    "storage": {
+      "fail": 17,
+      "harness-error": 35,
+      "unsupported-infrastructure": 3,
+      "pass": 1
+    },
+    "storage-access-api": {
+      "harness-error": 23,
+      "fail": 11,
+      "unsupported-infrastructure": 8
+    },
+    "streams": {
+      "harness-error": 223,
+      "fail": 50,
+      "pass": 33
+    },
+    "subapps": {
+      "harness-error": 3,
+      "fail": 5
+    },
+    "subresource-integrity": {
+      "pass": 3,
+      "fail": 21,
+      "harness-error": 12
+    },
+    "svg": {
+      "fail": 472,
+      "harness-error": 82,
+      "pass": 12,
+      "incomplete": 218,
+      "unsupported-infrastructure": 3
+    },
+    "svg-aam": {
+      "fail": 3,
+      "unsupported-infrastructure": 4
+    },
+    "timing-entrytypes-registry": {
+      "fail": 1,
+      "pass": 1,
+      "harness-error": 1
+    },
+    "touch-events": {
+      "fail": 6,
+      "unsupported-infrastructure": 7,
+      "harness-error": 1
+    },
+    "trust-tokens": {
+      "unsupported-infrastructure": 1,
+      "fail": 1,
+      "harness-error": 1
+    },
+    "trusted-types": {
+      "fail": 104,
+      "harness-error": 111,
+      "pass": 32
+    },
+    "ua-client-hints": {
+      "fail": 2,
+      "harness-error": 2
+    },
+    "uievents": {
+      "unsupported-infrastructure": 43,
+      "fail": 22,
+      "pass": 6,
+      "harness-error": 3
+    },
+    "upgrade-insecure-requests": {
+      "pass": 50,
+      "fail": 90,
+      "harness-error": 57
+    },
+    "url": {
+      "fail": 27,
+      "harness-error": 30,
+      "pass": 20
+    },
+    "urlpattern": {
+      "fail": 9,
+      "harness-error": 21
+    },
+    "user-timing": {
+      "pass": 17,
+      "harness-error": 29,
+      "fail": 15
+    },
+    "vibration": {
+      "fail": 3,
+      "harness-error": 1
+    },
+    "video-rvfc": {
+      "fail": 7,
+      "harness-error": 1
+    },
+    "viewport": {
+      "fail": 1
+    },
+    "viewport-segments": {
+      "unsupported-infrastructure": 3
+    },
+    "virtual-keyboard": {
+      "fail": 3
+    },
+    "visual-viewport": {
+      "unsupported-infrastructure": 3,
+      "fail": 3,
+      "pass": 12,
+      "harness-error": 1
+    },
+    "wai-aria": {
+      "unsupported-infrastructure": 30,
+      "fail": 5
+    },
+    "wasm": {
+      "fail": 355,
+      "incomplete": 88,
+      "harness-error": 156,
+      "pass": 17
+    },
+    "web-animations": {
+      "fail": 140,
+      "harness-error": 4
+    },
+    "web-based-payment-handler": {
+      "pass": 2,
+      "fail": 6,
+      "harness-error": 5
+    },
+    "web-bundle": {
+      "harness-error": 28,
+      "fail": 1
+    },
+    "web-extensions": {
+      "harness-error": 6
+    },
+    "web-install": {
+      "fail": 4,
+      "harness-error": 1
+    },
+    "web-locks": {
+      "fail": 21,
+      "harness-error": 64,
+      "pass": 1
+    },
+    "web-nfc": {
+      "fail": 9,
+      "pass": 1,
+      "unsupported-infrastructure": 1
+    },
+    "web-otp": {
+      "fail": 1
+    },
+    "web-share": {
+      "fail": 13,
+      "pass": 2
+    },
+    "webaudio": {
+      "fail": 308,
+      "harness-error": 35,
+      "pass": 5
+    },
+    "webauthn": {
+      "unsupported-infrastructure": 46,
+      "fail": 8,
+      "pass": 1
+    },
+    "webcodecs": {
+      "fail": 117,
+      "harness-error": 165,
+      "pass": 1
+    },
+    "webdriver": {
+      "fail": 1
+    },
+    "webgl": {
+      "fail": 20,
+      "pass": 1,
+      "harness-error": 1
+    },
+    "webhid": {
+      "harness-error": 4,
+      "fail": 1,
+      "pass": 1
+    },
+    "webidl": {
+      "fail": 34,
+      "pass": 10,
+      "harness-error": 19
+    },
+    "webmcp": {
+      "fail": 63,
+      "harness-error": 11,
+      "pass": 1
+    },
+    "webmessaging": {
+      "fail": 32,
+      "harness-error": 72,
+      "pass": 55,
+      "incomplete": 2
+    },
+    "webmidi": {
+      "unsupported-infrastructure": 1
+    },
+    "webnn": {
+      "fail": 566,
+      "harness-error": 40,
+      "pass": 1
+    },
+    "webrtc": {
+      "harness-error": 8,
+      "fail": 255,
+      "unsupported-infrastructure": 1,
+      "pass": 1
+    },
+    "webrtc-encoded-transform": {
+      "fail": 34,
+      "unsupported-infrastructure": 7
+    },
+    "webrtc-extensions": {
+      "fail": 11
+    },
+    "webrtc-ice": {
+      "fail": 1
+    },
+    "webrtc-identity": {
+      "fail": 4
+    },
+    "webrtc-priority": {
+      "fail": 2
+    },
+    "webrtc-stats": {
+      "fail": 9,
+      "pass": 1
+    },
+    "webrtc-svc": {
+      "harness-error": 4,
+      "fail": 1
+    },
+    "websockets": {
+      "harness-error": 311,
+      "fail": 367,
+      "pass": 119,
+      "unsupported-infrastructure": 2
+    },
+    "webstorage": {
+      "pass": 16,
+      "harness-error": 27,
+      "fail": 7,
+      "incomplete": 4
+    },
+    "webtransport": {
+      "fail": 37,
+      "harness-error": 101
+    },
+    "webusb": {
+      "fail": 26,
+      "pass": 1,
+      "harness-error": 22
+    },
+    "webvtt": {
+      "fail": 23,
+      "harness-error": 52
+    },
+    "webxr": {
+      "fail": 167,
+      "harness-error": 11,
+      "pass": 1
+    },
+    "window-management": {
+      "fail": 5
+    },
+    "workers": {
+      "fail": 112,
+      "harness-error": 152,
+      "pass": 68,
+      "incomplete": 4
+    },
+    "worklets": {
+      "fail": 11,
+      "harness-error": 11
+    },
+    "x-frame-options": {
+      "harness-error": 5,
+      "pass": 1
+    },
+    "xhr": {
+      "fail": 205,
+      "harness-error": 139,
+      "pass": 96
+    },
+    "xml": {
+      "fail": 6,
+      "harness-error": 5,
+      "pass": 3
     }
   },
   "patchSeries": {
-    "count": 16,
+    "count": 25,
     "appliedToProduction": false,
     "note": "Retests represent different cumulative patch stages, not a uniform full rerun."
   },
   "targetedRetests": [
     {
-      "url": "http://web-platform.test:18000/css/cssom/CSSGroupingRule-insertRule-computed.html",
-      "artifact": "CSSGroupingRule-insertRule-computed-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 1,
-        "reported": 1
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 1
-      },
-      "beforeArtifact": "CSSGroupingRule-insertRule-computed-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-cssRules.html",
-      "artifact": "CSSStyleSheet-constructable-cssRules-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 1,
-        "reported": 1
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 1
-      },
-      "beforeArtifact": "CSSStyleSheet-constructable-cssRules-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-invalidation.html",
-      "artifact": "CSSStyleSheet-constructable-invalidation-after.json",
-      "after": {
-        "classification": "fail",
-        "passed": 1,
-        "reported": 3
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 3
-      },
-      "beforeArtifact": "CSSStyleSheet-constructable-invalidation-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-replace-cssRules.html",
-      "artifact": "CSSStyleSheet-constructable-replace-cssRules-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 2,
-        "reported": 2
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "incomplete",
-        "passed": 0,
-        "reported": 2
-      },
-      "beforeArtifact": "CSSStyleSheet-constructable-replace-cssRules-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-replace-on-regular-sheet.html",
-      "artifact": "CSSStyleSheet-constructable-replace-on-regular-sheet-after.json",
-      "after": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 3
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 3
-      },
-      "beforeArtifact": "native-all/results.jsonl"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-insertRule-computed.html",
-      "artifact": "CSSStyleSheet-insertRule-computed-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 1,
-        "reported": 1
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 1
-      },
-      "beforeArtifact": "CSSStyleSheet-insertRule-computed-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-remove.html",
-      "artifact": "CharacterData-remove-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 12,
-        "reported": 12
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "harness-error",
-        "passed": 0,
-        "reported": 0
-      },
-      "beforeArtifact": "CharacterData-remove-saved-baseline.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/ChildNode-after.html",
-      "artifact": "ChildNode-after-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 45,
-        "reported": 45
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 13,
-        "reported": 45
-      },
-      "beforeArtifact": "ChildNode-after-saved-baseline.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/ChildNode-before.html",
-      "artifact": "ChildNode-before-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 45,
-        "reported": 45
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 17,
-        "reported": 45
-      },
-      "beforeArtifact": "ChildNode-before-saved-baseline.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/DocumentType-remove.html",
-      "artifact": "DocumentType-remove-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 4,
-        "reported": 4
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 4
-      },
-      "beforeArtifact": "DocumentType-remove-saved-baseline.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/StyleSheetList-constructable.html",
-      "artifact": "StyleSheetList-constructable-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 1,
-        "reported": 1
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 1
-      },
-      "beforeArtifact": "StyleSheetList-constructable-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/adoptedstylesheets-observablearray-removal.html",
-      "artifact": "adoptedstylesheets-observablearray-removal-after.json",
+      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-computed.html",
+      "artifact": "justify-self-after.json",
+      "artifactSha256": "d935f7e1e4366115611fbb56c62eb6bdddc2e9ba14068ac2f1ebb394b0376feb",
       "after": {
         "classification": "fail",
         "passed": 6,
-        "reported": 12
+        "reported": 22
       },
       "runtime": {
         "platform": "linux",
@@ -710,139 +1276,14 @@
       "before": {
         "classification": "fail",
         "passed": 0,
-        "reported": 12
+        "reported": 22
       },
-      "beforeArtifact": "adoptedstylesheets-observablearray-removal-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-appendData.html",
-      "artifact": "character-append-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 14,
-        "reported": 14
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 14
-      },
-      "beforeArtifact": "character-append-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-deleteData.html",
-      "artifact": "character-delete-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 18,
-        "reported": 18
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 18
-      },
-      "beforeArtifact": "character-delete-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-insertData.html",
-      "artifact": "character-insert-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 18,
-        "reported": 18
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 18
-      },
-      "beforeArtifact": "character-insert-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-replaceData.html",
-      "artifact": "character-replace-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 34,
-        "reported": 34
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 34
-      },
-      "beforeArtifact": "character-replace-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-substringData.html",
-      "artifact": "character-substring-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 28,
-        "reported": 28
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 28
-      },
-      "beforeArtifact": "character-substring-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom-view/checkVisibility.html",
-      "artifact": "check-visibility-after.json",
-      "after": {
-        "classification": "fail",
-        "passed": 12,
-        "reported": 21
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 9,
-        "reported": 21
-      },
-      "beforeArtifact": "native-all/results.jsonl"
+      "beforeSource": "native-all/results.jsonl"
     },
     {
       "url": "http://web-platform.test:18000/css/css-color/parsing/color-computed.html",
       "artifact": "color-after.json",
+      "artifactSha256": "152af3a4418115e88616bfc98fe94945f38db29035046b656ae2b7835af2c727",
       "after": {
         "classification": "pass",
         "passed": 16,
@@ -859,95 +1300,12 @@
         "passed": 2,
         "reported": 16
       },
-      "beforeArtifact": "color-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/css-text-decor/parsing/text-decoration-color-computed.html",
-      "artifact": "decoration-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 3,
-        "reported": 3
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 3
-      },
-      "beforeArtifact": "native-all/results.jsonl"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/css-writing-modes/parsing/direction-computed.html",
-      "artifact": "direction-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 2,
-        "reported": 2
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 2
-      },
-      "beforeArtifact": "native-all/results.jsonl"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/cssom/insertRule-no-index.html",
-      "artifact": "insertRule-no-index-after.json",
-      "after": {
-        "classification": "pass",
-        "passed": 2,
-        "reported": 2
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 2
-      },
-      "beforeArtifact": "insertRule-no-index-before.json"
-    },
-    {
-      "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-computed.html",
-      "artifact": "justify-self-after.json",
-      "after": {
-        "classification": "fail",
-        "passed": 6,
-        "reported": 22
-      },
-      "runtime": {
-        "platform": "linux",
-        "arch": "arm64",
-        "bun": "1.4.4",
-        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
-      },
-      "before": {
-        "classification": "fail",
-        "passed": 0,
-        "reported": 22
-      },
-      "beforeArtifact": "native-all/results.jsonl"
+      "beforeSource": "native-all/results.jsonl"
     },
     {
       "url": "http://web-platform.test:18000/css/css-conditional/js/CSS-supports-L3.html",
       "artifact": "supports-l3-after.json",
+      "artifactSha256": "0d41bdb09ee6b0ffeb0f2bccc86267ff9d5eb654e2adc8de98acc2edc8e84adb",
       "after": {
         "classification": "pass",
         "passed": 17,
@@ -964,15 +1322,16 @@
         "passed": 6,
         "reported": 17
       },
-      "beforeArtifact": "supports-l3-before.json"
+      "beforeSource": "native-all/results.jsonl"
     },
     {
-      "url": "http://web-platform.test:18000/dom/nodes/Text-splitText.html",
-      "artifact": "text-split-after.json",
+      "url": "http://web-platform.test:18000/css/css-position/parsing/z-index-invalid.html",
+      "artifact": "z-index-invalid-024-after.json",
+      "artifactSha256": "bae68a2355283db6ab53bf093ac363ed0b787e09c38c89d5da30820abf0796b5",
       "after": {
         "classification": "pass",
-        "passed": 6,
-        "reported": 6
+        "passed": 4,
+        "reported": 4
       },
       "runtime": {
         "platform": "linux",
@@ -983,13 +1342,124 @@
       "before": {
         "classification": "fail",
         "passed": 0,
-        "reported": 6
+        "reported": 4
       },
-      "beforeArtifact": "text-split-before.json"
+      "beforeSource": "native-all/results.jsonl"
     },
     {
-      "url": "http://web-platform.test:18000/dom/nodes/Text-wholeText.html",
-      "artifact": "text-whole-after.json",
+      "url": "http://web-platform.test:18000/css/css-position/parsing/z-index-valid.html",
+      "artifact": "z-index-valid-024-after.json",
+      "artifactSha256": "13a03334f5e76901014ab5bf03dfee9d074859de903f3cc757efed0db3a94907",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-text-decor/parsing/text-decoration-color-computed.html",
+      "artifact": "decoration-after.json",
+      "artifactSha256": "5df5b1ca21e97c01d047110905c51e6db8c20416e6450054c6b65535c09c25af",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-writing-modes/parsing/direction-computed.html",
+      "artifact": "direction-after.json",
+      "artifactSha256": "01048d14717ff8f70e230e0b6fcd4d48c3593608fab1a86dd22ee15477d67ac6",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom-view/checkVisibility.html",
+      "artifact": "check-visibility-after.json",
+      "artifactSha256": "988726a7bb5ca07410760695eb8bc994d36c3f2a5dab7bc0cdcc0dc3547dd9ac",
+      "after": {
+        "classification": "fail",
+        "passed": 12,
+        "reported": 21
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 21
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSS-namespace-object-class-string.html",
+      "artifact": "css-namespace-025-after.json",
+      "artifactSha256": "a2e756cbcabe1954ae0f252082e9c87ebef58818d1dbee32d567b6231735338a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSGroupingRule-insertRule-computed.html",
+      "artifact": "CSSGroupingRule-insertRule-computed-after.json",
+      "artifactSha256": "bf9ec395b6d059c301a48261cbdd3a270ed35013661b718fde3ba8bd5c7d0064",
       "after": {
         "classification": "pass",
         "passed": 1,
@@ -1006,11 +1476,628 @@
         "passed": 0,
         "reported": 1
       },
-      "beforeArtifact": "text-whole-before.json"
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleDeclaration-indexed-properties.html",
+      "artifact": "css-indexed-after.json",
+      "artifactSha256": "2d36efdf836642854a2e7d4130d980e32f4ee20e424740a9d7e9d04d0add06c4",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 6
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleDeclaration-iterator.html",
+      "artifact": "css-iterator-after.json",
+      "artifactSha256": "5c688f92d9cc48788b1f9d567742ec0e4dc5b26c3a37cd6929b0cafa9fd06c80",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-cssRules.html",
+      "artifact": "CSSStyleSheet-constructable-cssRules-after.json",
+      "artifactSha256": "116748a90a068a78bd8d41b95e5549ae3a05c3726f3dea36cd568788844e9992",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-invalidation.html",
+      "artifact": "CSSStyleSheet-constructable-invalidation-after.json",
+      "artifactSha256": "c7b3908979d2cb774c4327e7efb2f501139e4eef247ac26e7963fe6b21c2ad0b",
+      "after": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 3
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-replace-cssRules.html",
+      "artifact": "CSSStyleSheet-constructable-replace-cssRules-after.json",
+      "artifactSha256": "17c6db9b2a60dc9826fd60bde2a2586af8c8f7a65c1a06eee25bcbcbef217920",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-replace-on-regular-sheet.html",
+      "artifact": "CSSStyleSheet-constructable-replace-on-regular-sheet-after.json",
+      "artifactSha256": "dc5a1b02698fe76ac8f66d2b52b5f33c9de0550f2de36c780f34d5668c4fdfb7",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-insertRule-computed.html",
+      "artifact": "CSSStyleSheet-insertRule-computed-after.json",
+      "artifactSha256": "4f990d944d2f1176978496577495d4144ce452078d09928b89961e586e582bc9",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/StyleSheetList-constructable.html",
+      "artifact": "StyleSheetList-constructable-after.json",
+      "artifactSha256": "ca794490966045fa4eb2284380edf865dd9f4a79393217004a1d5129f3baee52",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/adoptedstylesheets-observablearray-removal.html",
+      "artifact": "adoptedstylesheets-observablearray-removal-after.json",
+      "artifactSha256": "431f69ca6ae1abe8cc7e389f92dc8b1fac9f7b44ece362251cda15e8a10e3b72",
+      "after": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 12
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/computed-style-001.html",
+      "artifact": "computed-readonly-020-after.json",
+      "artifactSha256": "aa6b8b81c61e0bb90ae2e825ff3ebff071e8493a26048271015ebcc28ea40a0a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/computed-style-set-property.html",
+      "artifact": "computed-set-020-after.json",
+      "artifactSha256": "56b001ec7ebd0b30604f7707bec197fe3ffedb512fbb38fe567b31a0b3a9967d",
+      "after": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/css-style-attr-decl-block.html",
+      "artifact": "style-decl-block-024-after.json",
+      "artifactSha256": "7f22338027c8e2a541413483a89ec6b36482f931bbcef83690efbfaa814cc2c2",
+      "after": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 7
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 7
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/css-style-attribute-modifications.html",
+      "artifact": "style-attribute-023-after.json",
+      "artifactSha256": "1181b2efb64eedb02fe9f25f37f5f80b06b714589e0323ddac06002c191ebe19",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/insertRule-no-index.html",
+      "artifact": "insertRule-no-index-after.json",
+      "artifactSha256": "16923586b7f74d8c57d04452a9d0424503f64cadbcd8b6ec85a365efbaa76368",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/custom-elements/reactions/DOMTokenList.html",
+      "artifact": "token-reactions-019-after.json",
+      "artifactSha256": "f8affd8579550df265fa90738e3c78d37f2add1d3890d318eced0785fd2a4547",
+      "after": {
+        "classification": "pass",
+        "passed": 19,
+        "reported": 19
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 16,
+        "reported": 19
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/lists/DOMTokenList-iteration.html",
+      "artifact": "token-iteration-019-after.json",
+      "artifactSha256": "879b164a6466a3e6817654b6586ea930fd46d1246e2b50953de248c8762c24cb",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 6
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-appendData.html",
+      "artifact": "character-append-after.json",
+      "artifactSha256": "49c3d3062c5e3d13b9686aa7d105775455566a380ff0cbdfe03e612cffdd39d0",
+      "after": {
+        "classification": "pass",
+        "passed": 14,
+        "reported": 14
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 14
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-deleteData.html",
+      "artifact": "character-delete-after.json",
+      "artifactSha256": "5aec2c7a0b3f4c3cdff9e63406855616e8c78e073d433d74eae9ef792f84222a",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 18
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-insertData.html",
+      "artifact": "character-insert-after.json",
+      "artifactSha256": "9d24a3dd0f6bc4dd49568073f061500b01e88d9bee48dd4b33c8018dabbf9887",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 18
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-remove.html",
+      "artifact": "CharacterData-remove-after.json",
+      "artifactSha256": "bcfbc9657c289f4c1fd5c5637f64b83001987c25baf4b55efcd0f9840364b3a3",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-replaceData.html",
+      "artifact": "character-replace-after.json",
+      "artifactSha256": "4104e9269d3afe8c0f88c3515662aa0cfa35479d62d81833b6643c9c1554beed",
+      "after": {
+        "classification": "pass",
+        "passed": 34,
+        "reported": 34
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 34
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-substringData.html",
+      "artifact": "character-substring-after.json",
+      "artifactSha256": "5b4fea9896602451797db0e3f3e3a97a53cf0f1bf3a39217adfb8fe83a9914bf",
+      "after": {
+        "classification": "pass",
+        "passed": 28,
+        "reported": 28
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 28
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/ChildNode-after.html",
+      "artifact": "ChildNode-after-after.json",
+      "artifactSha256": "7f0da93ea703f07933f0f678bbdb3e2ea94dcb7ee73548992fe171b2ddecd80c",
+      "after": {
+        "classification": "pass",
+        "passed": 45,
+        "reported": 45
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 13,
+        "reported": 45
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/ChildNode-before.html",
+      "artifact": "ChildNode-before-after.json",
+      "artifactSha256": "6ef1f74473a9e86956d2dc697516eb8541208b94e274eae512bc7df017000909",
+      "after": {
+        "classification": "pass",
+        "passed": 45,
+        "reported": 45
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 17,
+        "reported": 45
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Comment-constructor.html",
+      "artifact": "comment-constructor-022-after.json",
+      "artifactSha256": "eabe74cc778557551f352379b2aa2791267a8e7e02de85f36ffbaa29778b7137",
+      "after": {
+        "classification": "pass",
+        "passed": 16,
+        "reported": 16
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 16
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/DocumentFragment-constructor.html",
+      "artifact": "fragment-constructor-022-after.json",
+      "artifactSha256": "18a2e0a273381d0c7c360a367db122667bf53ec4ddf1c607dfd40c93a1f8d88b",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/DocumentType-remove.html",
+      "artifact": "DocumentType-remove-after.json",
+      "artifactSha256": "b56f0626df0d5ee5b5bb3f30edcd35aa5c92ef2a5344736ec5e630b208f0cac4",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Element-classlist.html",
+      "artifact": "classlist-019-after.json",
+      "artifactSha256": "217a5098b4b4e19c81ab87b3e1db94a8d5ea196b7c7960ea4e3ea34fb7b32467",
+      "after": {
+        "classification": "pass",
+        "passed": 1420,
+        "reported": 1420
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 935,
+        "reported": 1420
+      },
+      "beforeSource": "native-all/results.jsonl"
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Element-webkitMatchesSelector.html",
       "artifact": "webkit-matches-after.json",
+      "artifactSha256": "63f3066516bcecee4667044cb35958ebdf19915fc616a8998c61c56815a89cfe",
       "after": {
         "classification": "fail",
         "passed": 621,
@@ -1027,16 +2114,166 @@
         "passed": 5,
         "reported": 669
       },
-      "beforeArtifact": "webkit-matches-saved-baseline.json"
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/NonDocumentTypeChildNode-sibling-element.html",
+      "artifact": "sibling-021-after.json",
+      "artifactSha256": "f2987a9d619da7ef6b4304a84c58fd9149d068a113549ddc518fba4972fd22c0",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 6
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Text-constructor.html",
+      "artifact": "text-constructor-022-after.json",
+      "artifactSha256": "2031b9d56bfa804405d8b9cd707e9f5a1f433aa9c970439fe3135c4b74c35c6d",
+      "after": {
+        "classification": "pass",
+        "passed": 16,
+        "reported": 16
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 16
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Text-splitText.html",
+      "artifact": "text-split-after.json",
+      "artifactSha256": "f0a6a5fac6ad464709737085c2aa83ff0f28ccc94dea0b9b7d2efd63af627f2c",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Text-wholeText.html",
+      "artifact": "text-whole-after.json",
+      "artifactSha256": "4dbbdb0f0e421eec31d7b9056c46238ba4c62eb941818025b66e76947cf144c3",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1
+      },
+      "beforeSource": "native-all/results.jsonl"
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/remove-unscopable.html",
+      "artifact": "unscopables-025-after.json",
+      "artifactSha256": "9699f905dff4a19466aa9c22ff5e07fce8d97b2199e6251ef4fd99e53b6df7af",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6
+      },
+      "beforeSource": "native-all/results.jsonl"
     }
   ],
   "patchedEstimate": {
     "method": "Replace matching baseline case outcomes with the latest saved targeted results; assume unretested cases unchanged.",
     "caveat": "Mixed patch stages and runtimes; no uniform post-patch full run or regression guarantee. No extrapolation to untested cases.",
-    "matchedRetests": 27,
+    "matchedRetests": 44,
     "changedCases": [
       {
+        "case": "/css/css-color/parsing/color-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-conditional/js/CSS-supports-L3.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-position/parsing/z-index-invalid.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-text-decor/parsing/text-decoration-color-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/css-writing-modes/parsing/direction-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/CSS-namespace-object-class-string.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
         "case": "/css/cssom/CSSGroupingRule-insertRule-computed.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/CSSStyleDeclaration-indexed-properties.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/CSSStyleDeclaration-iterator.html",
         "before": "fail",
         "after": "pass"
       },
@@ -1056,27 +2293,32 @@
         "after": "pass"
       },
       {
-        "case": "/dom/nodes/CharacterData-remove.html",
-        "before": "harness-error",
-        "after": "pass"
-      },
-      {
-        "case": "/dom/nodes/ChildNode-after.html",
-        "before": "fail",
-        "after": "pass"
-      },
-      {
-        "case": "/dom/nodes/ChildNode-before.html",
-        "before": "fail",
-        "after": "pass"
-      },
-      {
-        "case": "/dom/nodes/DocumentType-remove.html",
-        "before": "fail",
-        "after": "pass"
-      },
-      {
         "case": "/css/cssom/StyleSheetList-constructable.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/computed-style-001.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/css-style-attribute-modifications.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/css/cssom/insertRule-no-index.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/custom-elements/reactions/DOMTokenList.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/lists/DOMTokenList-iteration.html",
         "before": "fail",
         "after": "pass"
       },
@@ -1096,6 +2338,11 @@
         "after": "pass"
       },
       {
+        "case": "/dom/nodes/CharacterData-remove.html",
+        "before": "harness-error",
+        "after": "pass"
+      },
+      {
         "case": "/dom/nodes/CharacterData-replaceData.html",
         "before": "fail",
         "after": "pass"
@@ -1106,27 +2353,42 @@
         "after": "pass"
       },
       {
-        "case": "/css/css-color/parsing/color-computed.html",
+        "case": "/dom/nodes/ChildNode-after.html",
         "before": "fail",
         "after": "pass"
       },
       {
-        "case": "/css/css-text-decor/parsing/text-decoration-color-computed.html",
+        "case": "/dom/nodes/ChildNode-before.html",
         "before": "fail",
         "after": "pass"
       },
       {
-        "case": "/css/css-writing-modes/parsing/direction-computed.html",
+        "case": "/dom/nodes/Comment-constructor.html",
         "before": "fail",
         "after": "pass"
       },
       {
-        "case": "/css/cssom/insertRule-no-index.html",
+        "case": "/dom/nodes/DocumentFragment-constructor.html",
         "before": "fail",
         "after": "pass"
       },
       {
-        "case": "/css/css-conditional/js/CSS-supports-L3.html",
+        "case": "/dom/nodes/DocumentType-remove.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/Element-classlist.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/NonDocumentTypeChildNode-sibling-element.html",
+        "before": "fail",
+        "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/Text-constructor.html",
         "before": "fail",
         "after": "pass"
       },
@@ -1139,18 +2401,24 @@
         "case": "/dom/nodes/Text-wholeText.html",
         "before": "fail",
         "after": "pass"
+      },
+      {
+        "case": "/dom/nodes/remove-unscopable.html",
+        "before": "fail",
+        "after": "pass"
       }
     ],
     "classification": {
-      "fail": 9309,
-      "pass": 1669,
-      "harness-error": 4073,
-      "unsupported-infrastructure": 435,
-      "incomplete": 851
+      "fail": 21358,
+      "pass": 4005,
+      "harness-error": 11448,
+      "unsupported-infrastructure": 1457,
+      "incomplete": 1609
     },
-    "eligible": 15902,
-    "passed": 1669,
-    "testedPassPercent": 10.495535152810968,
-    "wholeManifestVerifiedPassPercentEstimate": 1.2648443006221912
+    "eligible": 38420,
+    "passed": 4005,
+    "testedPassPercent": 10.424258198854764,
+    "wholeManifestCases": 131953,
+    "wholeManifestVerifiedPassPercent": 3.035171614135336
   }
 }

@@ -3,15 +3,15 @@
 
 ## Recorded results
 
-[BASELINE.md](BASELINE.md) documents the interrupted 16,337-case official-server
-run and separately lists targeted retests for patches 001–016.
+[BASELINE.md](BASELINE.md) documents the completed 39,877-case official-server
+testharness run and separately lists targeted retests for patches 001–025.
 [BASELINE.json](BASELINE.json) stores counts and provenance. The baseline rates
-are **10.36% of supported attempted cases** and a **1.24893% verified lower bound
+are **10.33% of supported attempted cases** and a **3.00865% verified lower bound
 across the whole manifest**. These are frozen-base results, not a score for the
-current patched browser. Using the 27 saved targeted retests to replace matching
-baseline outcomes gives an approximate post-patch **10.50%** tested-case rate
-and **1.26484%** whole-manifest passing share; this assumes other cases remain
-unchanged and is not a full rerun. See BASELINE.md for the calculation and caveats.
+current patched browser. Replacing matching baseline outcomes with 44 distinct
+saved targeted retests gives an approximate post-patch **10.42%** tested-case rate
+and **3.03517%** whole-manifest passing share. This assumes other cases remain
+unchanged and is not a full patched rerun. See BASELINE.md for details and caveats.
 The earlier static sample is no longer retained here.
 
 ## Complete testharness run with the official server
