@@ -3418,6 +3418,96 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/border-radius-computed.html",
+      "artifact": "/tmp/css-radius-computed-after.json",
+      "artifactSha256": "c9f5d146f721bf6aad903b0e99cbefb41529694c96afc9669eb31ee703298cc0",
+      "stage": "Elliptical border radius parsing and pending cascade",
+      "browserRevision": "d0cf40f742f673b2a1d876e07b7350873e2785ed",
+      "after": {
+        "classification": "pass",
+        "passed": 14,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/border-radius-invalid.html",
+      "artifact": "/tmp/css-radius-invalid-after.json",
+      "artifactSha256": "27149d0e8df286b834afb6e78317249fe4ccf80055a9f14845cb705c54500f24",
+      "stage": "Elliptical border radius parsing and pending cascade",
+      "browserRevision": "d0cf40f742f673b2a1d876e07b7350873e2785ed",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/border-radius-valid.html",
+      "artifact": "/tmp/css-radius-valid-after.json",
+      "artifactSha256": "7b9c395a8f9871e97278859e11c3469153a905293e1bb79c0c6078b89eb607b5",
+      "stage": "Elliptical border radius parsing and pending cascade",
+      "browserRevision": "d0cf40f742f673b2a1d876e07b7350873e2785ed",
+      "after": {
+        "classification": "pass",
+        "passed": 23,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 12,
+        "reported": 23,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/border-style-computed.html",
       "artifact": "/tmp/css-border-border-style-computed-after.json",
       "artifactSha256": "64a9041c3ad547182ed880447af5b057f2fe62623110ae9d265342f5da00aa08",
@@ -10348,6 +10438,306 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/defaultSelection.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-7-after.json",
+      "artifactSha256": "b20cdab13fbbc1d65a02319f0620ce7b5868e69f97bfb741e6d7e6645be0a65e",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/select-event.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-6-after.json",
+      "artifactSha256": "84b0ad28a3ef96299117ebe294921aec3244a1e9080db129a63f35832d1a259b",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 270,
+        "reported": 270,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 108,
+        "reported": 270,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/selection-after-content-change.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-10-after.json",
+      "artifactSha256": "ed369133311c94cd7b83dc70572bd98de63f46b3f78fc7a79e84dc840824b2a2",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 18,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 15,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/selection-not-application.html?default",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-1-after.json",
+      "artifactSha256": "b2279317b817d7c2010870999f8b3a8e3398b4f803f1e291128fc7522b2f0498",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 183,
+        "reported": 183,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 108,
+        "reported": 183,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/selection-not-application.html?week,month",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-0-after.json",
+      "artifactSha256": "008b3423249126485666d79f8bbde8d82ed43bedf583866e46cd916322abb80a",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 79,
+        "reported": 79,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 69,
+        "reported": 79,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/selection-start-end-extra.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-8-after.json",
+      "artifactSha256": "7813251142e2167b4355bebc11538413e599d1d3e39fe723fcc00eda2d07a0bd",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/selection-start-end.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-3-after.json",
+      "artifactSha256": "9d73854558e0ce212762918fd708488690826339cfa7f818b6835ec7e51ee7ed",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 45,
+        "reported": 45,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 25,
+        "reported": 27,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/setSelectionRange.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-9-after.json",
+      "artifactSha256": "626448a042b6098aa7e0d105439fb70109c43ac2bf66337f73d9e1cdb93ba1d8",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/textfieldselection-setRangeText.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-4-after.json",
+      "artifactSha256": "23a750f0580825446125365b3c5f53b03619f248ed5ce471eaa1afb8daaa6732",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 88,
+        "reported": 88,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 41,
+        "reported": 65,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/textfieldselection/textfieldselection-setSelectionRange.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-5-after.json",
+      "artifactSha256": "06ee6b1eb339162564b795bb4661099b9d0ba427bf4e00315b7a57b000dbafce",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 49,
+        "reported": 49,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 38,
+        "reported": 49,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/datetime-local-valueasdate.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-datetime-local-valueasdate-after.json",
       "artifactSha256": "78012408b8d4df06a8a34db4ec480a056810e6751e180d8fa18dff7e2efbb1c9",
@@ -11211,6 +11601,36 @@
         "classification": "fail",
         "passed": 9,
         "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/selection.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-2-after.json",
+      "artifactSha256": "915401284a635cb994783142254ac22208ac3c91d29e8010222b4208f9351cf4",
+      "stage": "Shared text field selection and range replacement",
+      "browserRevision": "cc7ae4048132eae97eebfaa03232649109e054f5",
+      "after": {
+        "classification": "pass",
+        "passed": 42,
+        "reported": 42,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 27,
+        "reported": 42,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -12268,6 +12688,36 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/html/webappapis/timers/settimeout-detached-iframe.html",
+      "artifact": "/tmp/iframe-timer-after.json",
+      "artifactSha256": "91e03cd0dd0a313d9c6d347cc2f976276fafe4a37a88c4e23f5c613e9358325b",
+      "stage": "Synchronous iframe context lifetime",
+      "browserRevision": "a2143924c68497b9b894c8e497ee01ec6f580815",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/requestidlecallback/basic.html",
       "artifact": "/tmp/idle-order-basic-after.json",
       "artifactSha256": "9b4069bcc57fc40e354aff326de1baeeb1dbc96f37373a195175358148c44f4b",
@@ -12411,6 +12861,36 @@
         "classification": "fail",
         "passed": 1,
         "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/requestidlecallback/callback-removed-frame.html",
+      "artifact": "/tmp/iframe-idle-after.json",
+      "artifactSha256": "3d967bbaa5f45ef561a3380a51c904e3c058af3153154e4d401aed2990e0cd78",
+      "stage": "Synchronous iframe context lifetime",
+      "browserRevision": "a2143924c68497b9b894c8e497ee01ec6f580815",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -13199,30 +13679,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T10:26:48.351956+00:00",
-    "throughBrowserRevision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1",
+    "recordedAt": "2026-11-05T10:55:44.492367+00:00",
+    "throughBrowserRevision": "d0cf40f742f673b2a1d876e07b7350873e2785ed",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 315,
-    "totalMatchedRetests": 359,
+    "additionalMatchedRetests": 331,
+    "totalMatchedRetests": 375,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 223,
-    "cumulativeNetGain": 258,
-    "gainedFullPass": 258,
+    "mainlineNetGain": 238,
+    "cumulativeNetGain": 273,
+    "gainedFullPass": 273,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21139,
-      "pass": 4228,
-      "harness-error": 11444,
+      "fail": 21126,
+      "pass": 4243,
+      "harness-error": 11442,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4228,
-    "testedPassPercent": 11.004685059864654,
+    "passed": 4243,
+    "testedPassPercent": 11.043727225403435,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.204171182163346,
+    "wholeManifestVerifiedPassPercent": 3.2155388661114186,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -13866,6 +14346,86 @@
         "artifact": "/tmp/idle-order-deadline-after-expired-timer-after.json",
         "stage": "Ordered idle callback expiration; exception outcome is new evidence only",
         "revision": "093b1cfa5723d556a1c5bd2dff8c01df9f9cb5f1"
+      },
+      {
+        "artifact": "/tmp/iframe-idle-after.json",
+        "stage": "Synchronous iframe context lifetime",
+        "revision": "a2143924c68497b9b894c8e497ee01ec6f580815"
+      },
+      {
+        "artifact": "/tmp/iframe-timer-after.json",
+        "stage": "Synchronous iframe context lifetime",
+        "revision": "a2143924c68497b9b894c8e497ee01ec6f580815"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-0-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-1-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-2-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-3-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-4-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-5-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-6-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-7-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-8-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-9-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-selection-10-after.json",
+        "stage": "Shared text field selection and range replacement",
+        "revision": "cc7ae4048132eae97eebfaa03232649109e054f5"
+      },
+      {
+        "artifact": "/tmp/css-radius-valid-after.json",
+        "stage": "Elliptical border radius parsing and pending cascade",
+        "revision": "d0cf40f742f673b2a1d876e07b7350873e2785ed"
+      },
+      {
+        "artifact": "/tmp/css-radius-invalid-after.json",
+        "stage": "Elliptical border radius parsing and pending cascade",
+        "revision": "d0cf40f742f673b2a1d876e07b7350873e2785ed"
+      },
+      {
+        "artifact": "/tmp/css-radius-computed-after.json",
+        "stage": "Elliptical border radius parsing and pending cascade",
+        "revision": "d0cf40f742f673b2a1d876e07b7350873e2785ed"
       }
     ],
     "previousLedgerRegressions": [
