@@ -3238,6 +3238,36 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-timing-function-invalid.html",
+      "artifact": "/tmp/css-easing-animation-timing-function-invalid-after.json",
+      "artifactSha256": "c34b24c3ca6a0da5f441a044ca7e38796a9ce126edeca96bc902d7be31341476",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-backgrounds/background-border-cssText.html",
       "artifact": "/tmp/css-border-pending-background-border-cssText-after.json",
       "artifactSha256": "d9626685e434ecd27a01443ed16bc7e21c260c1f35b2682465c922897d6c93f7",
@@ -3771,6 +3801,246 @@
         "classification": "fail",
         "passed": 6,
         "reported": 17,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/step-jump-both.html",
+      "artifact": "/tmp/css-easing-step-jump-both-after.json",
+      "artifactSha256": "5b0303aa5023e7cc81da0f2b195631f73613c6cbc39c698e92db043de857c075",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/step-jump-end.html",
+      "artifact": "/tmp/css-easing-step-jump-end-after.json",
+      "artifactSha256": "e13b6f4a80464c4024b5f0bded9ebf86a66d1a3b4545935173b3fc80fea373fc",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/step-jump-none.html",
+      "artifact": "/tmp/css-easing-step-jump-none-after.json",
+      "artifactSha256": "dfb5fb6c7d9f789ef683b08d481192335f3fac8e4586536d8d021eb32154f178",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/step-jump-start.html",
+      "artifact": "/tmp/css-easing-step-jump-start-after.json",
+      "artifactSha256": "292ce9e7f2187156deaa0767830ab3c4bf18b4dc307093afc39d5e4204a9e858",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/step-timing-functions-syntax.html",
+      "artifact": "/tmp/css-easing-step-timing-functions-syntax-after.json",
+      "artifactSha256": "1aa956529172fe065bad46b0a12b34d5518e4cb8d3d4df8b69e2855a60bfb8c7",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 15,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 15,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/timing-functions-syntax-computed.html",
+      "artifact": "/tmp/css-easing-timing-functions-syntax-computed-after.json",
+      "artifactSha256": "75429208a42a26480e0c1e204ea47a5c7fbe3c008e70565b9f456a75005cf570",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 21,
+        "reported": 21,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 21,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/timing-functions-syntax-invalid.html",
+      "artifact": "/tmp/css-easing-timing-functions-syntax-invalid-after.json",
+      "artifactSha256": "29925548b377816ee88689b6ebe93e37dad7b724b9f0208ad960434e7ed76110",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 13,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-easing/timing-functions-syntax-valid.html",
+      "artifact": "/tmp/css-easing-timing-functions-syntax-valid-after.json",
+      "artifactSha256": "56a6974c9e36e3de4bb81d99abe21c077b46c298c2ffb13bc54ba947b484683c",
+      "stage": "Shared CSS easing and step animation sampling",
+      "browserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
+      "after": {
+        "classification": "pass",
+        "passed": 22,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 17,
+        "reported": 22,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -9838,14 +10108,254 @@
       "fullPassDelta": 1
     },
     {
-      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasnumber.html",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-api-input-valueasnumber-time-format-after.json",
-      "artifactSha256": "734745f40670d6cfdce24c7a72f29df680561b66a7c51a1375d40f91c05746bb",
-      "stage": "Canonical time numeric serialization regression check",
-      "browserRevision": "5e744a347255f3908128f8e1b9550b7be1e46934",
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/datetime-local-valueasdate.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-datetime-local-valueasdate-after.json",
+      "artifactSha256": "78012408b8d4df06a8a34db4ec480a056810e6751e180d8fa18dff7e2efbb1c9",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
       "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
         "classification": "fail",
-        "passed": 59,
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasdate-invalidstateerr.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-invalidstateerr-after.json",
+      "artifactSha256": "3f69bb715b6facf78180e8a0f8786178b8843352f75c486e5c06875eb66032e5",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasdate-null.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-null-after.json",
+      "artifactSha256": "0b038732125228fb9e936c4cfd72c6ed86a019fe09840fdea770888f11acadc2",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasdate-typeerror.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-typeerror-after.json",
+      "artifactSha256": "0eb5e1ec2a13a9669f644b095c96ad8b99f33c3e8ddebbee974da4146282dce0",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasdate.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-after.json",
+      "artifactSha256": "9f69d2afe46a1e825ca341a9b9f4030562c7794b2ce8a0a71246a03976714b3e",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 30,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasnumber-invalidstateerr.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-invalidstateerr-after.json",
+      "artifactSha256": "5cce20b12f327a86becf6ec2aa77ab19adfd882e72b327330455ef23d3ad7fb4",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasnumber-nan.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-nan-after.json",
+      "artifactSha256": "3551d8c7b5f9e928a91046c84134b7ebed47442d21847ee4f6e41d7068b42905",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasnumber-typeerror.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-typeerror-after.json",
+      "artifactSha256": "ee93bc30ffd028bbc305e215c04d043bc45fde2e9371722af8ec1c2dc787eeb1",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasnumber.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-after.json",
+      "artifactSha256": "329597b3041bf97cefd9f8d3171d24afcf80a382401084c5053419fb97ed2a5e",
+      "stage": "Public typed input number and Date APIs",
+      "browserRevision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23",
+      "after": {
+        "classification": "pass",
+        "passed": 64,
         "reported": 64,
         "done": true,
         "harnessStatus": 0,
@@ -9865,7 +10375,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/maxlength.html",
@@ -11759,30 +12269,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T09:05:28.868636+00:00",
-    "throughBrowserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+    "recordedAt": "2026-11-05T09:42:13.507755+00:00",
+    "throughBrowserRevision": "7ea0506ce3eed4d93626a479efd0efb900adc689",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 267,
-    "totalMatchedRetests": 311,
+    "additionalMatchedRetests": 284,
+    "totalMatchedRetests": 328,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 188,
-    "cumulativeNetGain": 223,
-    "gainedFullPass": 223,
+    "mainlineNetGain": 204,
+    "cumulativeNetGain": 239,
+    "gainedFullPass": 239,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21172,
-      "pass": 4193,
+      "fail": 21156,
+      "pass": 4209,
       "harness-error": 11446,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4193,
-    "testedPassPercent": 10.913586673607496,
+    "passed": 4209,
+    "testedPassPercent": 10.955231650182197,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.1776465862845105,
+    "wholeManifestVerifiedPassPercent": 3.189772115829121,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -12176,6 +12686,96 @@
         "artifact": "/tmp/css-border-pending-border-shorthand-keyword-after.json",
         "stage": "Pending border CSSOM source preservation",
         "revision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-datetime-local-valueasdate-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-invalidstateerr-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-null-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-typeerror-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-invalidstateerr-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-nan-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasnumber-typeerror-after.json",
+        "stage": "Public typed input number and Date APIs",
+        "revision": "5fa1b73e659ed2126f2069d8cbfefcb8c17c8a23"
+      },
+      {
+        "artifact": "/tmp/css-easing-animation-timing-function-invalid-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-step-jump-both-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-step-jump-end-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-step-jump-none-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-step-jump-start-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-step-timing-functions-syntax-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-timing-functions-syntax-computed-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-timing-functions-syntax-invalid-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
+      },
+      {
+        "artifact": "/tmp/css-easing-timing-functions-syntax-valid-after.json",
+        "stage": "Shared CSS easing and step animation sampling",
+        "revision": "7ea0506ce3eed4d93626a479efd0efb900adc689"
       }
     ],
     "previousLedgerRegressions": [
