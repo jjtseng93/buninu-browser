@@ -190,7 +190,8 @@ try {
   await renderer.whenLoaded();
   const result=JSON.parse(await renderer.evaluate('('+mutationObserverCases.toString()+')().then(JSON.stringify)'));
   for (const [name,value] of Object.entries(expected)) assert.deepEqual(result[name],value,name);
-  assert.equal(errors.length,1); assert.match(errors[0],/observer-fixture-expected/);
+  // exceptionIsolation cancels the ErrorEvent, so reporting must not log it.
+  assert.equal(errors.length,0);
   // Navigation gives the next realm a fresh observer constructor and delivery.
   await renderer.loadDocument({url:'https://mutation.test/next',contentType:'text/html',source:'<!doctype html><body></body>'});
   await renderer.whenLoaded();

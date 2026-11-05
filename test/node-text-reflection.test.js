@@ -117,5 +117,44 @@ test('page text reflection updates actual pixels and styles, and preserves nulla
       globalThis.TypeError=OriginalError;out.push(document.textContent===null,document.doctype.textContent===null);
       return out;
     })()`)).toEqual(Array(18).fill(true));
+    expect(await run(`(()=>{
+      const parent=document.createElement('section');document.body.appendChild(parent);let observer;
+      const seen=[];
+      customElements.define('replace-text-child',class extends HTMLElement{
+        disconnectedCallback(){
+          const records=observer.takeRecords();
+          seen.push(parent.textContent,records.length,records[0].removedNodes[0]===this,
+            records[0].addedNodes[0]===parent.firstChild);
+          parent.textContent='from callback';
+        }
+      });
+      parent.appendChild(document.createElement('replace-text-child'));
+      observer=new MutationObserver(()=>{});observer.observe(parent,{childList:true});
+      parent.textContent='complete';const records=observer.takeRecords();
+      seen.push(records.length,records[0].removedNodes[0].data,records[0].addedNodes[0].data,parent.textContent);
+      observer.disconnect();parent.remove();return seen;
+    })()`)).toEqual(['complete',1,true,true,1,'complete','from callback','from callback']);
+    expect(await run(`(async()=>{
+      const parent=document.createElement('div');parent.textContent='old';document.body.appendChild(parent);
+      const shadow=parent.attachShadow({mode:'open'});shadow.innerHTML='<slot></slot>';
+      const events=[],slot=shadow.firstChild;
+      const observer=new MutationObserver(records=>events.push('records:'+records.length));
+      observer.observe(parent,{childList:true});slot.addEventListener('slotchange',()=>events.push('slot:'+parent.textContent));
+      parent.textContent='new';events.push('set:'+parent.textContent);await Promise.resolve();
+      observer.disconnect();parent.remove();return events;
+    })()`)).toEqual(['set:new','records:1','slot:new']);
+    expect(await run(`(async()=>{
+      const parent=document.body.appendChild(document.createElement('div'));
+      const shadow=parent.attachShadow({mode:'open',slotAssignment:'manual'});
+      shadow.innerHTML='<slot></slot>';const slot=shadow.firstChild;
+      const a=parent.appendChild(document.createElement('span')),b=parent.appendChild(document.createElement('b'));
+      await Promise.resolve();const events=[];
+      slot.addEventListener('slotchange',event=>events.push(event.cancelable?'author:'+event.isTrusted:'slot:'+event.isTrusted));
+      const observer=new MutationObserver(()=>events.push('observer'));observer.observe(parent,{attributes:true});
+      slot.assign(a);slot.assign(a,b);slot.assign(b);
+      slot.dispatchEvent(new Event('slotchange',{cancelable:true}));
+      parent.setAttribute('changed','yes');events.push('end');await Promise.resolve();
+      observer.disconnect();parent.remove();return events;
+    })()`)).toEqual(['author:false','end','observer','slot:true']);
   } finally {await host.close();}
 },30000);
