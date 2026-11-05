@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `04800ed`
+## Mainline targeted estimate through `74605de`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **602 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **626 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,428 / 38,420 = 11.52525%.**
-- **Estimated whole-manifest passing share: 4,428 / 131,953 = 3.35574%.**
-- Cumulative gain over the frozen baseline: **458 complete files**, or **+1.19209 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **423 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
+- **Estimated tested-case pass rate: 4,444 / 38,420 = 11.56689%.**
+- **Estimated whole-manifest passing share: 4,444 / 131,953 = 3.36787%.**
+- Cumulative gain over the frozen baseline: **474 complete files**, or **+1.23373 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **439 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
 
 ### Uniform audit and subsequent fixes
 
@@ -486,6 +486,16 @@ These parts and thirteen evidence-only additions add **263 complete files** beyo
 The additional checks reveal one stale frozen pass: `css/css-fonts/font-shorthand-subproperties-reset.html` now registers zero tests and reports a harness error instead of its frozen 13/13. All thirteen conditional CSS.supports gates are already false in a fresh comparison against the exact pre-font HEAD source and remain false afterward. This is **not a regression introduced by the font-family change**, but the current ledger correctly removes that old passing result. The supporting source comparison is `/tmp/font-family-subproperty-regression-audit.json`; the nonpassing official artifact is recorded in BASELINE.json.
 
 Relative to the ledger through `70aab18`, this round adds **14 freshly demonstrated fixes**, records **five additional passing outcomes without fresh-before attribution**, and removes **one stale pass**: a net **+18 complete files**, or **+0.04685 percentage points** among eligible cases. It replaces 26 exact-URL outcomes, of which 24 are newly included URLs, bringing the ledger to 602 distinct cases. Historical baseline and patch-series estimates stay unchanged. Runtime tests used the concurrent working tree; these commits exclude the independent paint-damage changes in `page-renderer.js`, `video-mask.js` and `test/fixtures/canvas-damage.js`.
+
+### HTTP request validation, computed font weights and text mutations
+
+- `3f857b4`: validate XHR arguments in Web IDL order, preserve active requests after invalid `open()` calls, and share HTTP method/header rules with fetch and the controller, **+6 freshly fixed complete files** (+0.01562 percentage points). Eleven official cases yield ten complete passes versus four before, with the same registered tests. Four already-passing cases newly enter this ledger as **four evidence-only passes**. Thirty-eight local tests / 197 assertions cover reentry, upload, response state and real native transport. Bun methods that would be rewritten are rejected before preflight; custom methods are preserved with capable injected transports. One header-spelling case still fails because Bun lowercases wire header names; synchronous XHR remains unsupported.
+- `b06d4c0`: share numeric and relative font-weight grammar through CSSOM, cascade, descriptor ranges, DOM font selection and Canvas assignment, **+2 freshly fixed complete files** (+0.00521 percentage points). Seven official files improve from 70/147 to 142/147 assertions and two to four complete passes. Fractional weights, absolute typed calculations, inherited bolder/lighter thresholds and pending shorthand fallback use shared semantics; @font-face retains its separate range grammar. One hundred five local tests / 1,596 assertions and independent review pass. Context-dependent `rem`/`cqw` sign calculations remain failures; no new font assets or native dependencies are introduced.
+
+- `05b950a`: replace Element/DocumentFragment `textContent` atomically while preserving native mutation hooks, transient observers and captured custom-element reactions, **+1 freshly fixed complete file** (+0.00260 percentage points). `MutationObserver-textContent.html` improves from 1/4 to 4/4 and passes again after review. Native/manual slot changes share the observer notification microtask; author-dispatched events remain synchronous. Independent Chromium comparisons caught and verified fixes for callback-time slot duplication and lost queued callbacks after adoption. Twenty-seven local tests / 487 assertions pass. Related slot-event assertions improve from 0/32 to 12/32, but that file remains a harness error from exposed assertion failures. Separate saved registration diagnostics show `slotchange.html` has 17 registered tests (4 pass, 13 time out), and `imperative-slot-api-slotchange.html` has 13 (9 pass, 2 time out, 2 not run). Earlier partial result reports containing only the 4 or 9 passes are not the full registered totals. Both files still have harness timeouts; none of these three slot files is counted as a complete pass.
+- `74605de`: normalize exclusive Text descendants while preserving live Range/Selection boundaries, **+3 freshly fixed complete files** (+0.00781 percentage points). `Node-normalize.html`, `Node-normalize-2.html` and `Range-mutations-normalize.html` improve from fresh 3/4, 0/2 and 0/4 to 4/4, 2/2 and 4/4; all pass again on the final working tree with unchanged registered assertions. The frozen first-file result was 2/4 and remains the ledger's baseline comparison. Iterative traversal preserves the first nonempty Text identity, UTF-16 offsets, parent-index boundaries and existing observer/iterator/style hooks; weak registries also cover selection-created and retained cloned ranges. Fifty-one related tests / 831 assertions and 139 independent native review checks pass. This is a normalization fix, not a claim that all Range mutation operations are implemented.
+
+Together these parts add **12 freshly demonstrated fixes** and **four evidence-only passes**, a net **+16 complete files** (+0.04164 percentage points) over the ledger through `04800ed`. They update 25 distinct URLs, 24 newly included in the ledger, and passing files retain the frozen baseline's registered assertions. These targeted results were collected in a concurrent working tree; functional commits remain separate. The partial-repaint correctness commit `c583b21` and CSSOM performance commit `0d05346` have their own regression coverage and contribute no claimed WPT gain here.
 
 ### Registration and scope limitations
 

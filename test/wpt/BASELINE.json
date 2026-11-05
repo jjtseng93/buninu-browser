@@ -6628,6 +6628,36 @@
       "fullPassDelta": -1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-fonts/font-weight-sign-function.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-6-after.json",
+      "artifactSha256": "cb3dcdf3215fafc116c158b134bcab34908657a841642ef20446bde44b717386",
+      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-fonts/getComputedStyle-fontFamily.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/font-family-regression-getComputedStyle-fontFamily-after.json",
       "artifactSha256": "14306bd98fc17cb34ca217f903e476a19384adc4467f0bdef1b5e2b4157fb263",
@@ -6741,6 +6771,186 @@
         "classification": "fail",
         "passed": 3,
         "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-fonts/parsing/font-weight-computed.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-3-after.json",
+      "artifactSha256": "944a1e1d8c3b43bd2f9d25a54f9cd77f0af0d4be3d6d65c0540c817edde7bf2b",
+      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "after": {
+        "classification": "fail",
+        "passed": 57,
+        "reported": 58,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 58,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-fonts/parsing/font-weight-invalid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-4-after.json",
+      "artifactSha256": "d2ce1490979ca0d3295827e80d3294d38fec3f7cda57aecbb111522ce8888849",
+      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-fonts/parsing/font-weight-valid.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-2-after.json",
+      "artifactSha256": "e26ea0f58aa8b77e3924f389b5454e931d00b470f5362404ccb38dbc79fc3a3b",
+      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "after": {
+        "classification": "fail",
+        "passed": 21,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 16,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-fonts/variations/font-weight-lighter-bolder.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-1-after.json",
+      "artifactSha256": "ba039961b896e5d8e1170b680c0a98e0c171e3a0351e40eeb44e33ef1da02420",
+      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "after": {
+        "classification": "pass",
+        "passed": 22,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 22,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-fonts/variations/font-weight-matching.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-5-after.json",
+      "artifactSha256": "91c6cac14017df03a9207beec0e5eb3a7e9d71e32b3c373ad5fbb52dae88f864",
+      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "after": {
+        "classification": "pass",
+        "passed": 14,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 14,
+        "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-fonts/variations/font-weight-parsing.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-0-after.json",
+      "artifactSha256": "a884190a560d7cf77728c1a01350f611557a05502af859906875f9e2fe576498",
+      "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+      "browserRevision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b",
+      "after": {
+        "classification": "pass",
+        "passed": 26,
+        "reported": 26,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 12,
+        "reported": 26,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -11849,13 +12059,13 @@
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/MutationObserver-textContent.html",
-      "artifact": "/tmp/character-data-MutationObserver-textContent.html-after.json",
-      "artifactSha256": "c26c64bb3f219cd38cdb79fb35353652ce352b648e954d1dc31ed39a986d082f",
-      "stage": "CharacterData related regression and remaining batching gap",
-      "browserRevision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e",
+      "artifact": "/tmp/text-replace-slot-3-final.json",
+      "artifactSha256": "d767e5c58b6cc4e222b011b276405bbf80034afb5b2af401fd74114493d6cef0",
+      "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+      "browserRevision": "05b950a",
       "after": {
-        "classification": "fail",
-        "passed": 1,
+        "classification": "pass",
+        "passed": 4,
         "reported": 4,
         "done": true,
         "harnessStatus": 0,
@@ -11875,7 +12085,7 @@
         "harnessStatus": 1,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Node-cloneNode-XMLDocument.html",
@@ -12171,6 +12381,66 @@
         "classification": "fail",
         "passed": 4,
         "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-normalize-2.html",
+      "artifact": "/tmp/wpt-node-normalize/final-1.json",
+      "artifactSha256": "658e34db4047c00a35982ff368def003c98f10dc463a5065a12202a190893f76",
+      "stage": "Live ranges and exclusive Text normalization",
+      "browserRevision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-normalize.html",
+      "artifact": "/tmp/wpt-node-normalize/final-0.json",
+      "artifactSha256": "785f2707a41305ed4b7d0c3a3e9e702cd6b19356a19be9cf7b802ae6e859275b",
+      "stage": "Live ranges and exclusive Text normalization",
+      "browserRevision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -12831,6 +13101,36 @@
         "classification": "fail",
         "passed": 0,
         "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/ranges/Range-mutations-normalize.html",
+      "artifact": "/tmp/wpt-node-normalize/final-2.json",
+      "artifactSha256": "689f0abcb04bd0f0e5216d00d11108fc0072d0c2f1e49ba9c0b0292c85cdb4e4",
+      "stage": "Live ranges and exclusive Text normalization",
+      "browserRevision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -18568,6 +18868,96 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/shadow-dom/imperative-slot-api-slotchange.html",
+      "artifact": "/tmp/text-replace-slot-2-final.json",
+      "artifactSha256": "d01a2c161f28539647564e48c3f4d94fde7c6465bce0fd72022fca45a68129be",
+      "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+      "browserRevision": "05b950a",
+      "after": {
+        "classification": "harness-error",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/slotchange-event.html",
+      "artifact": "/tmp/text-replace-slot-0-final.json",
+      "artifactSha256": "36af76451a82fe5a80020379978760b3f4141ead76c87f53f3bc3d2b72d31460",
+      "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+      "browserRevision": "05b950a",
+      "after": {
+        "classification": "harness-error",
+        "passed": 12,
+        "reported": 32,
+        "done": true,
+        "harnessStatus": 1,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 32,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/slotchange.html",
+      "artifact": "/tmp/text-replace-slot-1-final.json",
+      "artifactSha256": "2d4a86717e7b398c08815a9f516c92fdfe2252f5bd4de1e47d04f2c7d99d4d1c",
+      "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+      "browserRevision": "05b950a",
+      "after": {
+        "classification": "harness-error",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/trusted-types/Element-outerHTML.html",
       "artifact": "/tmp/outerhtml-5-after.json",
       "artifactSha256": "b4366ce320ec3fa523991ffcd620c3573e77d9cece9c19166a678bb7a41a8b62",
@@ -19498,6 +19888,66 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/xhr/getresponseheader-special-characters.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-5.json",
+      "artifactSha256": "f551d2f1836125e6443d3c056f8daf4b9e05f9e68fdc0b62e7ad84212af7845b",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/open-after-setrequestheader.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-9.json",
+      "artifactSha256": "07a4cf95dfbc8c49936916abde9616574fa274d437adaa16144ccce540bf0de1",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/open-during-abort-event.htm",
       "artifact": "/tmp/wpt-xhr-upload-lifecycle/final-0.json",
       "artifactSha256": "bd1a09e4c7f39058323ea521b05556c5109c3fc610c4ccc240d531262e1477bd",
@@ -19533,6 +19983,126 @@
       "artifactSha256": "a3463df943891154dfc8a2d24614c7da87a0c0f010437443bb8e4abc3f530273",
       "stage": "XHR inert document responses and request reentry",
       "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/open-method-bogus.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-0.json",
+      "artifactSha256": "5b21df5a30dd78ff29d28994faeabd8292c6d5fa20731005bd022f17a2311b08",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/open-method-insecure.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-1.json",
+      "artifactSha256": "5957c91bd2c4bb88fbdce3cf764635cf3c1b7c75c5f467b99cb3216186e95c4e",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/open-open-send.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-8.json",
+      "artifactSha256": "1cbadac24f6eb80ceae9da6fbd4eed6d78f4f168a810cb9ef84ce6efbbc34f77",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/open-parameters-toString.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-2.json",
+      "artifactSha256": "f800ef7c3d32393aadb01bb1e5a8be41f9a4afeecf0ffb416ea3ab82ebc6bc19",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
       "after": {
         "classification": "pass",
         "passed": 1,
@@ -20398,6 +20968,156 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/xhr/setrequestheader-after-send.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-7.json",
+      "artifactSha256": "76d4ee71e69a6e7d86fa0802646b67e37ae018aa58c910e55a726c1f08be762c",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/setrequestheader-before-open.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-6.json",
+      "artifactSha256": "58b9be630452c1ed735bf1ef068d86e9e751cbb371f4a0e21de7b1fa17b19ec2",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/setrequestheader-bogus-name.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-3.json",
+      "artifactSha256": "c64f568c59d560b00ffb0bed83d11f0246c0f68aa44a1e628948ccae27f30e50",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 71,
+        "reported": 71,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 71,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/setrequestheader-bogus-value.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-4.json",
+      "artifactSha256": "5448eb222156936f046e352cbd686c8f994bb6df5324806961b213d179b55e6f",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/setrequestheader-open-setrequestheader.htm",
+      "artifact": "/tmp/wpt-xhr-request-contract/after-10.json",
+      "artifactSha256": "7c6c34edad40aa59592adbbf8234118ce4032f983590cd4406718525bf819eb8",
+      "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+      "browserRevision": "3f857b4",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/template-element.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-template-element-after.json",
       "artifactSha256": "4d324261d33017604b4deee20d7bc3d19393f857697cfc05d890caf785957f0b",
@@ -20489,30 +21209,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T18:27:16.453383+00:00",
-    "throughBrowserRevision": "04800edc58a0b9b31a014ba9a83d1b42683cc169",
+    "recordedAt": "2026-11-05T20:03:48.662699+00:00",
+    "throughBrowserRevision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 558,
-    "totalMatchedRetests": 602,
+    "additionalMatchedRetests": 582,
+    "totalMatchedRetests": 626,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 423,
-    "cumulativeNetGain": 458,
-    "gainedFullPass": 459,
+    "mainlineNetGain": 439,
+    "cumulativeNetGain": 474,
+    "gainedFullPass": 475,
     "lostFullPass": 1,
     "classification": {
-      "fail": 20951,
-      "pass": 4428,
-      "harness-error": 11431,
+      "fail": 20934,
+      "pass": 4444,
+      "harness-error": 11432,
       "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4428,
-    "testedPassPercent": 11.525247267048412,
+    "passed": 4444,
+    "testedPassPercent": 11.566892243623112,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.3557403014709783,
+    "wholeManifestVerifiedPassPercent": 3.367865831015589,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -22441,6 +23161,131 @@
         "artifact": "/tmp/wpt-xhr-upload-lifecycle/extra-8.json",
         "stage": "Additional XHR body/progress validation; no fresh-before run for gain attribution",
         "revision": "04800ed"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-0.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-1.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-2.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-3.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-4.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-5.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-6.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-7.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-8.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-9.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/tmp/wpt-xhr-request-contract/after-10.json",
+        "stage": "XHR argument and HTTP request contract; six fresh-before failures fixed, four existing passes retained",
+        "revision": "3f857b4"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-0-after.json",
+        "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+        "revision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-1-after.json",
+        "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+        "revision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-2-after.json",
+        "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+        "revision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-3-after.json",
+        "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+        "revision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-4-after.json",
+        "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+        "revision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-5-after.json",
+        "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+        "revision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/font-weight-6-after.json",
+        "stage": "Font-weight grammar, relative computation and text integration; two fresh-before failures fixed",
+        "revision": "b06d4c0e1e86ff588988023ba3aa3aa3531bfa5b"
+      },
+      {
+        "artifact": "/tmp/text-replace-slot-0-final.json",
+        "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+        "revision": "05b950a"
+      },
+      {
+        "artifact": "/tmp/text-replace-slot-1-final.json",
+        "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+        "revision": "05b950a"
+      },
+      {
+        "artifact": "/tmp/text-replace-slot-2-final.json",
+        "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+        "revision": "05b950a"
+      },
+      {
+        "artifact": "/tmp/text-replace-slot-3-final.json",
+        "stage": "Atomic textContent and shared slot notifications; textContent original fresh1/4 to4/4, related slot files remain nonpasses",
+        "revision": "05b950a"
+      },
+      {
+        "artifact": "/tmp/wpt-node-normalize/final-0.json",
+        "stage": "Live ranges and exclusive Text normalization",
+        "revision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a"
+      },
+      {
+        "artifact": "/tmp/wpt-node-normalize/final-1.json",
+        "stage": "Live ranges and exclusive Text normalization",
+        "revision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a"
+      },
+      {
+        "artifact": "/tmp/wpt-node-normalize/final-2.json",
+        "stage": "Live ranges and exclusive Text normalization",
+        "revision": "74605dec9c48d251ef75b9ddc4764d6b1aca7a0a"
       }
     ],
     "previousLedgerRegressions": [
