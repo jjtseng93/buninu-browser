@@ -380,17 +380,35 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `74c131d`
+## Mainline targeted estimate through `d8ae039`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **235 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **258 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,125 / 38,420 = 10.73660%.**
-- **Estimated whole-manifest passing share: 4,125 / 131,953 = 3.12611%.**
-- Cumulative gain over the frozen baseline: **155 complete files**, or **+0.40344 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **120 files**. Matched pass-to-nonpass regressions: **0**.
+- **Estimated tested-case pass rate: 4,147 / 38,420 = 10.79386%.**
+- **Estimated whole-manifest passing share: 4,147 / 131,953 = 3.14279%.**
+- Cumulative gain over the frozen baseline: **177 complete files**, or **+0.46070 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **142 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
-The mainline accounting through `129fe0d` added 96 complete passes: 87 reported with implementation commits, three previously fixed computed-style cases newly recorded, and six newly verified exact-query encoding variants. The last nine are additional evidence, not newly implemented behavior. Subsequent opacity work adds three complete files; select options add eleven, including all 73 assertions in `form-validation-willValidate.html`. XHR decoding adds nine newly repaired files; a chunked-response retest adds one more against the frozen baseline, without attributing that earlier improvement to the decoding change.
+### Uniform audit and subsequent fixes
 
-The old apparent 67/67 pass in that form test is excluded: execution had stopped before six tests were registered. The corrected 73/73 artifact replaces it only after the select implementation was committed. All passing artifacts in this ledger were audited against the baseline's registered subtest names; none loses a previously registered assertion. This check cannot establish completeness when both runs abort at the same point. Global script-error propagation is being audited separately.
+A four-worker audit re-ran all 235 previously recorded URLs plus 14 new error-reporting and overflow cases on one clean revision, `3fbab84`. Source fingerprints before and after the run matched. The **249-case audit** finished with **213 passes, 29 failures, 5 harness errors and 2 incomplete cases**. Its controller allowed 120 seconds, but the official testharness deadlines were unchanged.
 
-This remains a **mixed-results estimate**, combining successive mainline stages and Linux ARM64 runtimes with the Android baseline. It is not a full rerun; unretested cases are assumed unchanged, so regressions elsewhere remain possible. Exact artifacts, hashes, runtimes, before/after counts and exclusions are recorded in `BASELINE.json`.
+This exposed one functional regression and three pressure-test timeouts that the earlier mixed-stage ledger did not show:
+
+- `color: currentcolor` no longer passed CSS feature queries after the stricter declaration validation. `fc825af` restores that behavior; this recovers a previously recorded pass and is not counted as a new additional pass.
+- Three static NodeList length-tampering cases passed their assertions but exceeded the official 60-second deadline under four-worker load. `d8ae039` caches wrappers only for explicit static snapshots, preserving live collection and overridable length behavior. Final targeted checks finish those three cases in about 30–32 seconds. Their recovered passes are not counted twice.
+- Three additional NodeList `indexOf` pressure cases now complete within the original deadline. These add three complete passes to the ledger. The cases were queued serially; brief overlap with unrelated tests means their timings are not isolated performance comparisons.
+
+All four previously recorded regressions are covered by successful follow-up artifacts. This does not establish that all unrelated cases or every concurrency level are regression-free.
+
+Since the previous ledger through `74c131d`, the net increase is **22 files**: nine for trusted global error reporting, four for CSS overflow, four for input/textarea length reflection, three additional NodeList pressure cases, and two previously fixed exact-URL encoding cases newly recorded during the uniform audit. The last two are additional evidence, not new implementation claims.
+
+### Registration and scope limitations
+
+Global script exceptions now reach `ErrorEvent` and `window.onerror`, allowing the ordinary testharness to report errors that could previously truncate registration silently. All passing artifacts in this ledger were checked against the frozen baseline's registered subtest names; none loses a previously registered assertion. This cannot prove completeness when both runs abort before the same subtests are registered.
+
+The old apparent 67/67 pass in `form-validation-willValidate.html` remains excluded: execution had stopped before six tests were registered. The corrected 73/73 result is retained. XML/SVG constructor cases remain incomplete, and XHTML processing-instruction and worker cases still have harness timeouts; none is counted as a complete pass.
+
+This remains a **mixed-results estimate**, combining the uniform 249-case audit and explicitly identified follow-ups with the Android baseline. It is not a full rerun; unretested cases are assumed unchanged, so regressions elsewhere remain possible. Retests use Linux ARM64 and a different Bun canary revision, which also affects timing. The whole-manifest percentage is an estimate, not a fresh verified full-manifest run.
+
+`BASELINE.json` records exact URLs, artifacts, SHA-256 hashes, runtime/revision identifiers, before/after outcomes and the uniform audit's source fingerprint. Raw audit artifacts are in `/tmp/wpt-mainline-current-wicq3Q/`; follow-ups use the separate paths recorded in that ledger. Preserve those artifacts elsewhere if they must survive temporary-directory cleanup. Multi-tab and `window.open` remain outside this work.
