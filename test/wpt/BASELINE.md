@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `2d0a80a`
+## Mainline targeted estimate through `269839d`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **633 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **659 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,456 / 38,420 = 11.59813%.**
-- **Estimated whole-manifest passing share: 4,456 / 131,953 = 3.37696%.**
-- Cumulative gain over the frozen baseline: **486 complete files**, or **+1.26497 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **451 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
+- **Estimated tested-case pass rate: 4,480 / 38,420 = 11.66059%.**
+- **Estimated whole-manifest passing share: 4,480 / 131,953 = 3.39515%.**
+- Cumulative gain over the frozen baseline: **510 complete files**, or **+1.32743 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **475 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
 
 ### Uniform audit and subsequent fixes
 
@@ -504,6 +504,17 @@ Together these parts add **12 freshly demonstrated fixes** and **four evidence-o
 - `2d0a80a`: validate relative typed numeric math before resolving actual font/root/viewport bases in the cascade and Canvas text, **+2 freshly fixed complete files** (+0.00521 percentage points). `font-weight-sign-function.html` improves from 0/3 to 3/3 and `font-weight-valid.html` from 21/22 to 22/22. Six official files retain their exact registered tests; the other four stay nonpasses. Symbolic serialization preserves arithmetic precedence, repeated CSSOM writes and negative zero without an extra source-storage layer. Negative zero uses an arithmetic form rather than claiming byte-identical Chromium CSSOM serialization. One hundred eighteen local tests / 3,029 assertions pass; independent review checks 2,500 expressions in 12,500 contexts and verifies the signed-zero fix. Missing container-query geometry and animation timelines remain explicit limitations.
 
 These parts add **12 freshly demonstrated complete passes**, or **+0.03123 percentage points** among eligible cases, over the ledger through `74605de`. They update 16 exact URLs, seven newly included, bringing the ledger to 633 distinct cases. Every final passing artifact retains the frozen baseline's registered assertions; the fresh before/after name multisets also match. Tests used the concurrent working tree, with separate functional commits. The frozen full-run and historical patch-series estimates remain unchanged.
+
+### Legacy event interfaces, shadow rendering and atomic moves
+
+- `4fe9741`: preserve native binding private-slot caches behind indexed SELECT proxies. This repairs style/classList/dataset/validity access and click guards while retaining public JavaScript receiver behavior. Fifty-six regression tests / 452 assertions pass. It is a prerequisite for the move tests below; no separate complete-file gain is claimed.
+- `f2f8922`: implement genuine legacy event interfaces and `createEvent()` factories with brands, readonly Touch lists, defining-realm errors, initialization guards and Web IDL conversion order. Synthetic sensor interfaces are secure-context-only and do not access hardware. **+7 newly complete files** (+0.01822 percentage points): `Document-createEvent.https.html` improves from 221/279 to 279/279, with 25 additional passing assertions across the eight follow-up event files (including the six textInput assertions below). Final focused tests pass 33/33 with 601 assertions. `textInput/api.html` improves its six initial assertions but still has an `execCommand` harness error; the insecure-origin sensor automation case remains unsupported. Neither is counted as a full pass.
+- `c38ef47`: render composed shadow trees with scoped/adopted stylesheets, host/slotted cascade, closed-root resources and composed scrolling/hit geometry. **+3 newly complete files** (+0.00781 percentage points); four official CSSOM files improve from 20/31 to 31/31 assertions. Public hit APIs and event target getters retarget to hosts without changing internal input targets; per-listener snapshots are discarded after dispatch. Ordinary documents retain incremental styles and added-subtree-only resource discovery. Fifteen style and nine public-boundary Chromium comparisons agree; shadow/resource/legacy tests pass 26/26 with 1,056 assertions. `adoptedstylesheets-modify-array-and-sheet.html` was already passing before this implementation but is newly recorded against its frozen failure, adding **one evidence-only pass**. Scoped font-face/keyframes and complete shadow event routing remain unimplemented, including slot propagation, public composedPath, synthetic relatedTarget construction and equal-retargeted-relatedTarget suppression.
+- `269839d`: implement state-preserving `ParentNode.moveBefore()` without running ordinary remove/insert teardown. Reuse Range, iterator, observer, slot and custom-element machinery; update form/select ownership and radio groups; retain iframe, media and CSS animation state. **+13 newly complete files** (+0.03384 percentage points); sixteen official files improve from 4/77 to 73/77 assertions, with identical registered assertion-name multisets. Remaining failures require declarative shadow or `setHTMLUnsafe` during setup, before the tested move. Sixty-three local tests / 555 assertions pass. A production-renderer fixture with an injected decoder verifies advancing media/CSS/iframe timelines without session reopen or refetch. Only an atomic move involving focused content adds a post-RAF style checkpoint; ordinary animation updates keep the existing coalesced path.
+
+These parts add **23 freshly demonstrated complete passes** (+0.05986 percentage points), plus the one evidence-only pass above. The ledger gains **24 files** (+0.06247 percentage points) over `2d0a80a`, updating 29 exact URLs and adding 26 newly recorded URLs, for **659 distinct cases**. Final passing artifacts retain all frozen-baseline registered assertions. Tests used the concurrent working tree and are attributed to separate functional commits; this remains a mixed-results estimate, not a uniform full-suite rerun.
+
+The final combined CSSOM/QML/event/move regression passes **46 tests / 721 assertions**. Wider checks also reproduced four existing failures with unchanged HEAD sources: two signed-zero internal style assertions, BroadcastChannel trust, and the diagnostic error name. They are not hidden or counted as new passes. The earlier Flea CSSOM optimization (`0d05346`) remains committed and its write-cache and QML update tests are included in the combined regression.
 
 ### Registration and scope limitations
 

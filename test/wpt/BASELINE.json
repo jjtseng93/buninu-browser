@@ -9539,13 +9539,13 @@
     },
     {
       "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-invalidation.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/68.json",
-      "artifactSha256": "a5b4dcf7d3c17f985037acac0fba29a4ccb50333127f0aa118aa59f1b58b1cad",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/tmp/wpt-shadow-cascade/after-invalidation.json",
+      "artifactSha256": "557597d996abe58c5f48cd1b27fa864c5560a3aaf77e6831ded71a5befbd27bf",
+      "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+      "browserRevision": "c38ef47f6f1e5fcacd016291a334feb846277e6c",
       "after": {
-        "classification": "fail",
-        "passed": 1,
+        "classification": "pass",
+        "passed": 3,
         "reported": 3,
         "done": true,
         "harnessStatus": 0,
@@ -9565,7 +9565,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/cssom/CSSStyleSheet-constructable-replace-cssRules.html",
@@ -9688,14 +9688,74 @@
       "fullPassDelta": 1
     },
     {
-      "url": "http://web-platform.test:18000/css/cssom/adoptedstylesheets-observablearray-removal.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/58.json",
-      "artifactSha256": "ce825f4e6e19e7ea29a633a6819f6398fcdffd5223862a0fe1ec35620d6e577e",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "url": "http://web-platform.test:18000/css/cssom/adoptedstylesheets-cascade-order.html",
+      "artifact": "/tmp/wpt-shadow-cascade/after-order.json",
+      "artifactSha256": "dd880ba352fd34577776a9dafa24469f4b7efa84c7fa30150d1bb6746c8450d7",
+      "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+      "browserRevision": "c38ef47f6f1e5fcacd016291a334feb846277e6c",
       "after": {
+        "classification": "pass",
+        "passed": 13,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
         "classification": "fail",
-        "passed": 6,
+        "passed": 0,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/adoptedstylesheets-modify-array-and-sheet.html",
+      "artifact": "/tmp/wpt-shadow-cascade/after-modify.json",
+      "artifactSha256": "59b1319e384c7a4f5eb09e220500133b3f5cc34c9efe7e120e19ba57dfaea14b",
+      "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+      "browserRevision": "c38ef47f6f1e5fcacd016291a334feb846277e6c",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/adoptedstylesheets-observablearray-removal.html",
+      "artifact": "/tmp/wpt-shadow-cascade/after-removal.json",
+      "artifactSha256": "e830c59b6f6dce296c5855206103bcac736731d051842d1c8347faf6bb9d8843",
+      "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+      "browserRevision": "c38ef47f6f1e5fcacd016291a334feb846277e6c",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
         "reported": 12,
         "done": true,
         "harnessStatus": 0,
@@ -9715,7 +9775,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/cssom/computed-style-001.html",
@@ -13041,6 +13101,456 @@
         "classification": "fail",
         "passed": 29,
         "reported": 67,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/Node-moveBefore.html",
+      "artifact": "/tmp/wpt-move-before/final2-0.json",
+      "artifactSha256": "56daf7d570d732ef2318566a7e315213b15cd9b26ee2975f2350a867311017e6",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 32,
+        "reported": 32,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 20,
+        "done": true,
+        "harnessStatus": 1,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/custom-element-move-reactions.html",
+      "artifact": "/tmp/wpt-move-before/final2-1.json",
+      "artifactSha256": "c21aa788dd41cd0fd08ed3a4ddb4b6a78afd11a391de13628233ab3ae1d39abb",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/focus-preserve.html",
+      "artifact": "/tmp/wpt-move-before/final2-6.json",
+      "artifactSha256": "fb32d56d5f284955718614beb91f4b8f59d615b1be68025a2b193813199bc6ee",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/live-range-updates.html",
+      "artifact": "/tmp/wpt-move-before/final2-4.json",
+      "artifactSha256": "d5673dcd8005d7be39acb641a50313998d6b377f30f6042ddf9721351ca04f0b",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-id-map.html",
+      "artifact": "/tmp/wpt-move-before/final2-8.json",
+      "artifactSha256": "094eba5d607ecd8bb4c80a276ee2037b239454196a59a0d00ed4474e65858949",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-name-map.html",
+      "artifact": "/tmp/wpt-move-before/final2-9.json",
+      "artifactSha256": "81df52001669eb2fb0fb993f80f7a41a44438a7df805e4046fc92097471e31b4",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-nodeiterator.html",
+      "artifact": "/tmp/wpt-move-before/final2-5.json",
+      "artifactSha256": "c50a1bcda5050630685d565487dc59c825674918eb366d6ea7dadc703e9e0711",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-optgroup.html",
+      "artifact": "/tmp/wpt-move-before/final2-12.json",
+      "artifactSha256": "5fabe2eb9864a6bb324e496d7a830f4184e716bd87bc817a7e1ff340f00fb0eb",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-shadow-inside.html",
+      "artifact": "/tmp/wpt-move-before/final2-11.json",
+      "artifactSha256": "a38e00f571b3be24daf3b8b99afde2a1b62f3c9059c1374d6fd20b12030a94e7",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/moveBefore-shadow-root.html",
+      "artifact": "/tmp/wpt-move-before/final2-10.json",
+      "artifactSha256": "fd7574af02e9ff18ce4918558c613d81e166ad86acb12e14a8140bfc0f2e9ee6",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/mutation-observer-moved-subtree.window.html",
+      "artifact": "/tmp/wpt-move-before/final2-3.json",
+      "artifactSha256": "471fa889d6c43c3068b121b6db0fa7aeb2b3e3986806acf5ef0ce8482c3c643d",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/mutation-observer.html",
+      "artifact": "/tmp/wpt-move-before/final2-2.json",
+      "artifactSha256": "58c0e56974adcfee9e3fb2d7493a33c9b71a05173c0a9a7193298cc6ac677b43",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/script-move-before.html",
+      "artifact": "/tmp/wpt-move-before/final2-14.json",
+      "artifactSha256": "dce817005173bd6965669664c1d074fef8b11986e9d4b6e3c13af20b4dfbd7d7",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/select-option-optgroup.html",
+      "artifact": "/tmp/wpt-move-before/final2-13.json",
+      "artifactSha256": "41dbd1410c7deeb8d63cb72766d11977fdc0ec1235c20afb8fba2f775b906f66",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/moveBefore/slotchange-events.html",
+      "artifact": "/tmp/wpt-move-before/final2-7.json",
+      "artifactSha256": "df07662af9885d49814eb2463edb1663c71ae8997040f8f76d1a20f21874293e",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -17939,13 +18449,13 @@
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-validity-option-descendants.html",
-      "artifact": "/tmp/select-validity-descendants-after.json",
-      "artifactSha256": "da2b479497cf7d7926be91805275bf1f2bc4841014f8daede801c95b10212319",
-      "stage": "Required select validity, display-size reflection and current-tree selectedness",
-      "browserRevision": "67d7e92180d1d29a01e49c4568e10200b8ebd891",
+      "artifact": "/tmp/wpt-move-before/final2-15.json",
+      "artifactSha256": "e96385e1c9288e5bbaa55fd5d779b4ed558ddc23e0c2209bf7719024e0ce1688",
+      "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+      "browserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
       "after": {
-        "classification": "fail",
-        "passed": 3,
+        "classification": "pass",
+        "passed": 4,
         "reported": 4,
         "done": true,
         "harnessStatus": 0,
@@ -17965,7 +18475,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-validity.html",
@@ -18688,6 +19198,36 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/orientation-event/device-orientation-events-unavailable-on-insecure-origins.html",
+      "artifact": "/tmp/wpt-legacy-events/after-6.json",
+      "artifactSha256": "bb11a815b03bb7932d397a1e2ee64ff803563dc22fbc275b77ca0e2ec7727b12",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "unsupported-infrastructure",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 1,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "unsupported-infrastructure",
+        "passed": 1,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 1,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/requestidlecallback/basic.html",
       "artifact": "/tmp/idle-order-basic-after.json",
       "artifactSha256": "9b4069bcc57fc40e354aff326de1baeeb1dbc96f37373a195175358148c44f4b",
@@ -19168,6 +19708,36 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/touch-events/touch-touchevent-constructor.html",
+      "artifact": "/tmp/wpt-legacy-events/after-2.json",
+      "artifactSha256": "fe85490e2f01fe9a74b2ba6cc642a9fc27ac4afeea9e5c711769ac6abd893f57",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/trusted-types/Element-outerHTML.html",
       "artifact": "/tmp/outerhtml-5-after.json",
       "artifactSha256": "b4366ce320ec3fa523991ffcd620c3573e77d9cece9c19166a678bb7a41a8b62",
@@ -19196,6 +19766,66 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/uievents/legacy/Event-subclasses-init.html",
+      "artifact": "/tmp/wpt-legacy-events/after-7.json",
+      "artifactSha256": "3caaf670349c953e3197a8edc797f0820a1d680819dea0b2b10311955916e0a9",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/uievents/textInput/api.html",
+      "artifact": "/tmp/wpt-legacy-events/after-3.json",
+      "artifactSha256": "f58ec07392250863f301e208711afbf189f81092903a74abc058d87662ea8adb",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "harness-error",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     },
     {
       "url": "http://web-platform.test:18000/urlpattern/urlpattern-constructor.any.html",
@@ -19436,6 +20066,66 @@
         "runnerError": null
       },
       "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/webstorage/event_constructor.window.html",
+      "artifact": "/tmp/wpt-legacy-events/after-0.json",
+      "artifactSha256": "8c1533ee93d3f30f7b7117f56f1e8a428a8b181d98a676db02f5924b5cbc2e30",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/webstorage/event_initstorageevent.window.html",
+      "artifact": "/tmp/wpt-legacy-events/after-1.json",
+      "artifactSha256": "07452909607888e9f7223d37ad792ef0de5e53f4e72e481b671a4029e00d2ad0",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/xhr/abort-during-upload.any.html",
@@ -21358,6 +22048,96 @@
       "fullPassDelta": 1
     },
     {
+      "url": "https://web-platform.test:18443/dom/nodes/Document-createEvent.https.html",
+      "artifact": "/tmp/wpt-create-event/after.json",
+      "artifactSha256": "4fe5cc896506a2b83d09028bc6f0ba2a928287ce92c486e167ce995e79b13d6b",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "pass",
+        "passed": 279,
+        "reported": 279,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 221,
+        "reported": 279,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "https://web-platform.test:18443/orientation-event/motion/create-event.https.html",
+      "artifact": "/tmp/wpt-legacy-events/after-5.json",
+      "artifactSha256": "2c50795bce689c30c422d24ac9eb737d8a0e9eb0dcb39c130255154117b54ea6",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "https://web-platform.test:18443/orientation-event/orientation/create-event.https.html",
+      "artifact": "/tmp/wpt-legacy-events/after-4.json",
+      "artifactSha256": "fd832fa66d6132d41fec59bf0c0f9a46ab61bd3d28afa6fe025e491b31503937",
+      "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+      "browserRevision": "f2f89223719627523b1f72b40c7ee00fe574fab9",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "https://web-platform.test:18443/urlpattern/urlpattern.https.any.html",
       "artifact": "/tmp/urlpattern-final-7.json",
       "artifactSha256": "75ecf85e5947ea3aef09df1e9e1a7f6217b45772df37ba70b5e77645dfae381f",
@@ -21419,30 +22199,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T20:28:13.760375+00:00",
-    "throughBrowserRevision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0",
+    "recordedAt": "2026-11-05T21:07:55.086235+00:00",
+    "throughBrowserRevision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 589,
-    "totalMatchedRetests": 633,
+    "additionalMatchedRetests": 615,
+    "totalMatchedRetests": 659,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 451,
-    "cumulativeNetGain": 486,
-    "gainedFullPass": 487,
+    "mainlineNetGain": 475,
+    "cumulativeNetGain": 510,
+    "gainedFullPass": 511,
     "lostFullPass": 1,
     "classification": {
-      "fail": 20922,
-      "pass": 4456,
-      "harness-error": 11432,
+      "fail": 20899,
+      "pass": 4480,
+      "harness-error": 11431,
       "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4456,
-    "testedPassPercent": 11.598125976054138,
+    "passed": 4480,
+    "testedPassPercent": 11.66059344091619,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.376959978174047,
+    "wholeManifestVerifiedPassPercent": 3.3951482724909625,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -23576,6 +24356,151 @@
         "artifact": "/tmp/wpt-relative-math/review-final-5.json",
         "stage": "Relative numeric CSS math and stable symbolic serialization",
         "revision": "2d0a80a93d68ca9eb344fbfbb0d834df23362ac0"
+      },
+      {
+        "artifact": "/tmp/wpt-create-event/after.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-0.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-1.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-2.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-3.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-4.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-5.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-6.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-legacy-events/after-7.json",
+        "stage": "Legacy event interfaces and createEvent factories (targeted working-tree verification)",
+        "revision": "f2f89223719627523b1f72b40c7ee00fe574fab9"
+      },
+      {
+        "artifact": "/tmp/wpt-shadow-cascade/after-invalidation.json",
+        "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+        "revision": "c38ef47f6f1e5fcacd016291a334feb846277e6c"
+      },
+      {
+        "artifact": "/tmp/wpt-shadow-cascade/after-modify.json",
+        "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+        "revision": "c38ef47f6f1e5fcacd016291a334feb846277e6c"
+      },
+      {
+        "artifact": "/tmp/wpt-shadow-cascade/after-order.json",
+        "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+        "revision": "c38ef47f6f1e5fcacd016291a334feb846277e6c"
+      },
+      {
+        "artifact": "/tmp/wpt-shadow-cascade/after-removal.json",
+        "stage": "Scoped shadow stylesheets and composed rendering (targeted working-tree verification)",
+        "revision": "c38ef47f6f1e5fcacd016291a334feb846277e6c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-0.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-1.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-10.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-11.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-12.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-13.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-14.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-15.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-2.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-3.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-4.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-5.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-6.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-7.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-8.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
+      },
+      {
+        "artifact": "/tmp/wpt-move-before/final2-9.json",
+        "stage": "State-preserving ParentNode.moveBefore final targeted verification",
+        "revision": "269839d66807ebdce6ac0eca4ba24e288bdcaa2c"
       }
     ],
     "previousLedgerRegressions": [
@@ -23670,7 +24595,8 @@
       "The frozen baseline ran on Android ARM64, while this retest runs Linux ARM64 with a different Bun canary revision. Timing and runtime differences remain.",
       "The whole-manifest number is a mixed-results estimate against all 131,953 cases, not a fresh full-manifest run.",
       "One frozen font-shorthand-subproperties-reset pass now registers zero tests and is counted as a nonpass. All conditional CSS.supports gates were already false in the exact pre-font HEAD comparison; this is not attributed to c279d4d.",
-      "The font-family, KeyboardEvent and XHR checks ran in a concurrent working tree. Independent paint-damage edits in page-renderer.js, video-mask.js and test/fixtures/canvas-damage.js are excluded from the functional commits."
+      "The font-family, KeyboardEvent and XHR checks ran in a concurrent working tree. Independent paint-damage edits in page-renderer.js, video-mask.js and test/fixtures/canvas-damage.js are excluded from the functional commits.",
+      "Legacy events, scoped shadow rendering and atomic moves were tested in the concurrent working tree and committed separately. Their final passing artifacts retain frozen-baseline subtest names; incomplete declarative-shadow/setHTMLUnsafe, textInput execCommand and sensor automation cases remain nonpasses or unsupported. Complete shadow event routing and scoped font/keyframe rules are not claimed."
     ]
   }
 }
