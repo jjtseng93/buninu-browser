@@ -13,11 +13,11 @@ test('DOM unscopables belong to each mixin interface and CSS namespace tag stays
    r.push(Element.prototype[Symbol.unscopables]!==Document.prototype[Symbol.unscopables]);
    r.push(Object.prototype.toString.call(CSS));Object.defineProperty(CSS,Symbol.toStringTag,{value:'Other'});r.push(Object.prototype.toString.call(CSS));delete CSS[Symbol.toStringTag];r.push(Object.prototype.toString.call(CSS),CSS.supports('color','red'));return r;
   })()`)).toEqual([
-   [['before','after','replaceWith','remove','prepend','append','replaceChildren'],true,false,false,true],
+   [['before','after','replaceWith','remove','prepend','append','replaceChildren','moveBefore'],true,false,false,true],
    [['before','after','replaceWith','remove'],true,false,false,true],
    [['before','after','replaceWith','remove'],true,false,false,true],
-   [['prepend','append','replaceChildren'],true,false,false,true],
-   [['prepend','append','replaceChildren'],true,false,false,true],
+   [['prepend','append','replaceChildren','moveBefore'],true,false,false,true],
+   [['prepend','append','replaceChildren','moveBefore'],true,false,false,true],
    true,'[object CSS]','[object Other]','[object Object]',true
   ]);
  }finally{await host.close();}
