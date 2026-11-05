@@ -82,7 +82,7 @@ test('real keyboard, paste and deletion update length validity before input hand
     await host.call('press','Backspace');expect(await run(`[i.value,i.validity.tooShort]`)).toEqual(['a',true]);
     await run(`i.setCustomValidity('custom');i.disabled=true`);
     expect(await run(`[i.validity.tooShort,i.checkValidity(),i.validationMessage]`)).toEqual([true,true,'']);
-    await run(`i.disabled=false;i.setCustomValidity('');i.oninput=()=>{i.value='x'}`);await host.call('type','b');
+    await run(`i.disabled=false;i.focus();i.setCustomValidity('');i.oninput=()=>{i.value='x'}`);await host.call('type','b');
     expect(await run(`[i.value,i.validity.tooShort]`)).toEqual(['x',false]);
     await run(`t.oninput=()=>{t.defaultValue=t.value;t.replaceChildren(t.value)};t.focus()`);
     clipboard='a\r\n😀';await host.call('press','v',{modifiers:2});
