@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `9e6171e`
+## Mainline targeted estimate through `b05bbf7`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **297 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **311 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,180 / 38,420 = 10.87975%.**
-- **Estimated whole-manifest passing share: 4,180 / 131,953 = 3.16779%.**
-- Cumulative gain over the frozen baseline: **210 complete files**, or **+0.54659 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **175 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,193 / 38,420 = 10.91359%.**
+- **Estimated whole-manifest passing share: 4,193 / 131,953 = 3.17765%.**
+- Cumulative gain over the frozen baseline: **223 complete files**, or **+0.58043 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **188 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
 ### Uniform audit and subsequent fixes
 
@@ -409,10 +409,13 @@ Since the previous ledger through `74c131d`, the net increase is **22 files**: n
 - `179e4c1`: inert XHR document responses and request reentry protection, **+8 complete files** (+0.02082 percentage points), 24/24 assertions. The separately checked upload-abort case still times out and remains a nonpass; synchronous XHR, upload events, HTML meta charset prescan and full DTD support are not claimed.
 - `3d44a35`: CSS physical/logical size validation and computed/used-value range handling, **+10 complete files** (+0.02603 percentage points), 85/85 assertions versus 21/85 before. Native regressions also cover actual block/flex/grid/canvas geometry and preserve negative offsets/margins.
 
-- `8968ad3`: track actual user edits for text length validity, **+2 complete files** (+0.00521 percentage points); `tooLong` and `tooShort` each improve from 49/63 to 63/63. `checkValidity` and `reportValidity` each improve from 88/130 to 100/130 but remain nonpasses. Native/renderer regressions cover paste, deletion, clones/resets, CRLF/UTF-16, all six text input types, canceled/reentrant `beforeinput`, and programmatic writes.
-- `9e6171e`: validate physical border component counts, duplicate shorthand components and calculated width ranges, with canonical computed shorthands, **+7 complete files** (+0.01822 percentage points), 38/38 assertions versus 16/38 before. Actual geometry and paint commands pass; existing pending shorthand partial-overwrite/removal limitations are preserved and require separate work.
+- `8968ad3`: track actual user edits for text length validity, **+2 complete files** (+0.00521 percentage points); `tooLong` and `tooShort` each improve from 49/63 to 63/63. `checkValidity` and `reportValidity` each improve from 88/130 to 100/130 at this stage; their remaining typed-input failures are resolved below. Native/renderer regressions cover paste, deletion, clones/resets, CRLF/UTF-16, all six text input types, canceled/reentrant `beforeinput`, and programmatic writes.
+- `9e6171e`: validate physical border component counts, duplicate shorthand components and calculated width ranges, with canonical computed shorthands, **+7 complete files** (+0.01822 percentage points), 38/38 assertions versus 16/38 before. Actual geometry and paint commands pass; pending shorthand partial-overwrite/removal limitations are addressed by `b05bbf7` below.
+- `112914d`: apply Web IDL argument conversion to `CSS.escape()` and document hit testing, **+2 complete files** (+0.00521 percentage points), 14/14 assertions versus 9/14 before. Regressions cover page-realm exceptions, conversion order, detached documents and author-thrown exceptions.
+- `09312d0`: share strict typed-input parsing across value sanitation, range checks and decimal step validation, **+7 complete files** (+0.01822 percentage points), 422/422 assertions versus 319/422 before. This includes both `checkValidity` and `reportValidity`, now 130/130 each. Calendar/week arithmetic is UTC; tests cover midnight-wrapping time ranges and exact decimal step arithmetic. `5e744a3` separately preserves canonical numeric time serialization after the string-sanitizer fix: `input-valueasnumber.html` is 59/64 (frozen 58/64), still a nonpass; it contributes no complete-file gain.
+- `b05bbf7`: preserve pending border shorthand sources through partial CSSOM changes and invalidate renderer caches even when serialized text stays identical, **+2 newly passing complete files** (+0.00521 percentage points), 66/67 assertions versus 61/67 before. The six checked files include two other frozen failures already fixed by earlier work but not previously in this ledger. Those add **two evidence-only passes**, so the ledger increase for this group is four; they are not attributed to this implementation. The remaining `transition-duration` assertion stays a nonpass. Read-only CSSOM, external style-attribute writes, rule mutations and actual page cache invalidation have regression coverage.
 
-These parts add **33 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
+These parts and the two newly recorded earlier fixes add **46 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **13 files**, comprising 11 newly fixed files and two evidence-only additions. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
 
 ### Registration and scope limitations
 

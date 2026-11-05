@@ -3238,6 +3238,66 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/background-border-cssText.html",
+      "artifact": "/tmp/css-border-pending-background-border-cssText-after.json",
+      "artifactSha256": "d9626685e434ecd27a01443ed16bc7e21c260c1f35b2682465c922897d6c93f7",
+      "stage": "Pending border CSSOM source preservation",
+      "browserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/border-shorthand-keyword.html",
+      "artifact": "/tmp/css-border-pending-border-shorthand-keyword-after.json",
+      "artifactSha256": "c74417f1b815be882bb51281c97c4b87adb0f7de8791e960b7f683b4473f9346",
+      "stage": "Pending border CSSOM source preservation",
+      "browserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/border-color-computed.html",
       "artifact": "/tmp/css-border-border-color-computed-after.json",
       "artifactSha256": "6c9393de1146caac0cf10da508533fcd95826e5a74463d4366dba4ebf0e5a51d",
@@ -5218,6 +5278,96 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/css/css-variables/variable-definition-border-shorthand-serialize.html",
+      "artifact": "/tmp/css-border-pending-variable-definition-border-shorthand-serialize-after.json",
+      "artifactSha256": "dddb5105f04968600a75435b9c565acad54340bad208357538d28feed8b5bb29",
+      "stage": "Pending border CSSOM source preservation",
+      "browserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-variables/variable-substitution-shorthands.html",
+      "artifact": "/tmp/css-border-pending-variable-substitution-shorthands-after.json",
+      "artifactSha256": "7b0733d5d61bffeda2e7ff3f743b017ba50c898ea84a0fa8d3f784a74c33c42a",
+      "stage": "Pending border CSSOM source preservation",
+      "browserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+      "after": {
+        "classification": "fail",
+        "passed": 50,
+        "reported": 51,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 40,
+        "reported": 51,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-variables/vars-border-shorthand-serialize.html",
+      "artifact": "/tmp/css-border-pending-vars-border-shorthand-serialize-after.json",
+      "artifactSha256": "2f1051cdd0015a9a68feba195274bb3f40e695349784b7eaff5547308625da60",
+      "stage": "Pending border CSSOM source preservation",
+      "browserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-writing-modes/parsing/direction-computed.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/56.json",
       "artifactSha256": "b3eec6599fc1df80384e4d501e1dfb38f4505036227b040d1f3cddda91187291",
@@ -5276,6 +5426,36 @@
         "runnerError": null
       },
       "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom-view/elementFromPoint-parameters.html",
+      "artifact": "/tmp/css-point-args-after.json",
+      "artifactSha256": "93769c0bf02fc12145f19edfbd4f19ca23fd390dc0a063f1acb1ebdd78d35c9e",
+      "stage": "CSSOM argument validation",
+      "browserRevision": "112914d8f96197db69f159ee5833285e0013414d",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/cssom/CSS-namespace-object-class-string.html",
@@ -5728,6 +5908,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/cssom/escape.html",
+      "artifact": "/tmp/css-escape-after.json",
+      "artifactSha256": "7fe250b1f5ab6f6942888d067382ed99945342aa40c0efd0911b811545daf6e9",
+      "stage": "CSSOM argument validation",
+      "browserRevision": "112914d8f96197db69f159ee5833285e0013414d",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/cssom/insertRule-no-index.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/72.json",
       "artifactSha256": "74537553acde8198b31e28019a4774d199078f1f7d59b17a867dcc9d3040a840",
@@ -5781,6 +5991,36 @@
         "classification": "fail",
         "passed": 14,
         "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/style-border-shorthand-var.html",
+      "artifact": "/tmp/css-border-pending-style-border-shorthand-var-after.json",
+      "artifactSha256": "acf875318f216b52ccb1d092041dbbd843af91687579be4fb3bbca16e7cafa21",
+      "stage": "Pending border CSSOM source preservation",
+      "browserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -9029,13 +9269,13 @@
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-checkValidity.html",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/text-user-validity-form-validation-checkValidity-after.json",
-      "artifactSha256": "f3cb950087c9ac9d43e5172ec201d95e7a59bd591530dfce8dc58d26b276da4e",
-      "stage": "Text control user-edit length validity",
-      "browserRevision": "8968ad3c975b844421d42e81795ae33faefde21a",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-checkValidity-after.json",
+      "artifactSha256": "914624aa3c47bc3eb96d064a776ae60d182a9a4dc43374d653df280e9fb5aecf",
+      "stage": "Typed input range and step validation",
+      "browserRevision": "09312d03935ff20161f601a06bf36a180f1efe0e",
       "after": {
-        "classification": "fail",
-        "passed": 100,
+        "classification": "pass",
+        "passed": 130,
         "reported": 130,
         "done": true,
         "harnessStatus": 0,
@@ -9055,17 +9295,17 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-reportValidity.html",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/text-user-validity-form-validation-reportValidity-after.json",
-      "artifactSha256": "4abcbf323d56484871615f432fb7765a18b648da3f9a7503f60eb802da33a669",
-      "stage": "Text control user-edit length validity",
-      "browserRevision": "8968ad3c975b844421d42e81795ae33faefde21a",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-reportValidity-after.json",
+      "artifactSha256": "9f6c4b83a70e6070af2ebb049e5abeb5dae2931b80946dab6af684514b1bb586",
+      "stage": "Typed input range and step validation",
+      "browserRevision": "09312d03935ff20161f601a06bf36a180f1efe0e",
       "after": {
-        "classification": "fail",
-        "passed": 100,
+        "classification": "pass",
+        "passed": 130,
         "reported": 130,
         "done": true,
         "harnessStatus": 0,
@@ -9085,7 +9325,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-validity-patternMismatch.html",
@@ -9111,6 +9351,156 @@
         "classification": "fail",
         "passed": 53,
         "reported": 85,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-validity-rangeOverflow-weekmonth.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeOverflow-weekmonth-after.json",
+      "artifactSha256": "de1eef83fb424d28f8878bfac3f567d8b5ac6321293c1a9920d8382853539a20",
+      "stage": "Typed input range and step validation",
+      "browserRevision": "09312d03935ff20161f601a06bf36a180f1efe0e",
+      "after": {
+        "classification": "pass",
+        "passed": 19,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 15,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-validity-rangeOverflow.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeOverflow-after.json",
+      "artifactSha256": "efe91c8b5dcc590ce5f98e20f0fff00bb15779f297359a0da04e886fecaf3d37",
+      "stage": "Typed input range and step validation",
+      "browserRevision": "09312d03935ff20161f601a06bf36a180f1efe0e",
+      "after": {
+        "classification": "pass",
+        "passed": 49,
+        "reported": 49,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 35,
+        "reported": 49,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-validity-rangeUnderflow-weekmonth.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeUnderflow-weekmonth-after.json",
+      "artifactSha256": "4eca82af09acecd1a2cdc2048d4f8532ef730d2a70ab4d70ac20359be2966d4f",
+      "stage": "Typed input range and step validation",
+      "browserRevision": "09312d03935ff20161f601a06bf36a180f1efe0e",
+      "after": {
+        "classification": "pass",
+        "passed": 19,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 15,
+        "reported": 19,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-validity-rangeUnderflow.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeUnderflow-after.json",
+      "artifactSha256": "13dbd66599f15bbdb628f493832779921bca2f52026e4249f5a524826d624a19",
+      "stage": "Typed input range and step validation",
+      "browserRevision": "09312d03935ff20161f601a06bf36a180f1efe0e",
+      "after": {
+        "classification": "pass",
+        "passed": 47,
+        "reported": 47,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 34,
+        "reported": 47,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/constraints/form-validation-validity-stepMismatch.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-stepMismatch-after.json",
+      "artifactSha256": "2597556b83105c2adaf1640def081cb29ea748f0d934302cf2f411211d7986fc",
+      "stage": "Typed input range and step validation",
+      "browserRevision": "09312d03935ff20161f601a06bf36a180f1efe0e",
+      "after": {
+        "classification": "pass",
+        "passed": 28,
+        "reported": 28,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 20,
+        "reported": 28,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -9446,6 +9836,36 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasnumber.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/typed-api-input-valueasnumber-time-format-after.json",
+      "artifactSha256": "734745f40670d6cfdce24c7a72f29df680561b66a7c51a1375d40f91c05746bb",
+      "stage": "Canonical time numeric serialization regression check",
+      "browserRevision": "5e744a347255f3908128f8e1b9550b7be1e46934",
+      "after": {
+        "classification": "fail",
+        "passed": 59,
+        "reported": 64,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 58,
+        "reported": 64,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     },
     {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/maxlength.html",
@@ -11339,30 +11759,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T08:28:40.808714+00:00",
-    "throughBrowserRevision": "9e6171e7c4ab195e83337a87b86530cc2fb5a164",
+    "recordedAt": "2026-11-05T09:05:28.868636+00:00",
+    "throughBrowserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 253,
-    "totalMatchedRetests": 297,
+    "additionalMatchedRetests": 267,
+    "totalMatchedRetests": 311,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 175,
-    "cumulativeNetGain": 210,
-    "gainedFullPass": 210,
+    "mainlineNetGain": 188,
+    "cumulativeNetGain": 223,
+    "gainedFullPass": 223,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21185,
-      "pass": 4180,
+      "fail": 21172,
+      "pass": 4193,
       "harness-error": 11446,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4180,
-    "testedPassPercent": 10.879750130140552,
+    "passed": 4193,
+    "testedPassPercent": 10.913586673607496,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.167794593529514,
+    "wholeManifestVerifiedPassPercent": 3.1776465862845105,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -11676,6 +12096,86 @@
         "artifact": "/tmp/css-border-border-invalid-after.json",
         "stage": "Physical border validation and computed shorthands",
         "revision": "9e6171e7c4ab195e83337a87b86530cc2fb5a164"
+      },
+      {
+        "artifact": "/tmp/css-escape-after.json",
+        "stage": "CSSOM argument validation",
+        "revision": "112914d8f96197db69f159ee5833285e0013414d"
+      },
+      {
+        "artifact": "/tmp/css-point-args-after.json",
+        "stage": "CSSOM argument validation",
+        "revision": "112914d8f96197db69f159ee5833285e0013414d"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-checkValidity-after.json",
+        "stage": "Typed input range and step validation",
+        "revision": "09312d03935ff20161f601a06bf36a180f1efe0e"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-reportValidity-after.json",
+        "stage": "Typed input range and step validation",
+        "revision": "09312d03935ff20161f601a06bf36a180f1efe0e"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeOverflow-after.json",
+        "stage": "Typed input range and step validation",
+        "revision": "09312d03935ff20161f601a06bf36a180f1efe0e"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeOverflow-weekmonth-after.json",
+        "stage": "Typed input range and step validation",
+        "revision": "09312d03935ff20161f601a06bf36a180f1efe0e"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeUnderflow-after.json",
+        "stage": "Typed input range and step validation",
+        "revision": "09312d03935ff20161f601a06bf36a180f1efe0e"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-rangeUnderflow-weekmonth-after.json",
+        "stage": "Typed input range and step validation",
+        "revision": "09312d03935ff20161f601a06bf36a180f1efe0e"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-input-form-validation-validity-stepMismatch-after.json",
+        "stage": "Typed input range and step validation",
+        "revision": "09312d03935ff20161f601a06bf36a180f1efe0e"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/typed-api-input-valueasnumber-time-format-after.json",
+        "stage": "Canonical time numeric serialization regression check",
+        "revision": "5e744a347255f3908128f8e1b9550b7be1e46934"
+      },
+      {
+        "artifact": "/tmp/css-border-pending-style-border-shorthand-var-after.json",
+        "stage": "Pending border CSSOM source preservation",
+        "revision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2"
+      },
+      {
+        "artifact": "/tmp/css-border-pending-vars-border-shorthand-serialize-after.json",
+        "stage": "Pending border CSSOM source preservation",
+        "revision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2"
+      },
+      {
+        "artifact": "/tmp/css-border-pending-variable-definition-border-shorthand-serialize-after.json",
+        "stage": "Pending border CSSOM source preservation",
+        "revision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2"
+      },
+      {
+        "artifact": "/tmp/css-border-pending-variable-substitution-shorthands-after.json",
+        "stage": "Pending border CSSOM source preservation",
+        "revision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2"
+      },
+      {
+        "artifact": "/tmp/css-border-pending-background-border-cssText-after.json",
+        "stage": "Pending border CSSOM source preservation",
+        "revision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2"
+      },
+      {
+        "artifact": "/tmp/css-border-pending-border-shorthand-keyword-after.json",
+        "stage": "Pending border CSSOM source preservation",
+        "revision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2"
       }
     ],
     "previousLedgerRegressions": [
