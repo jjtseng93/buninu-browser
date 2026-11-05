@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `70aab18`
+## Mainline targeted estimate through `04800ed`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **578 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **602 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,410 / 38,420 = 11.47840%.**
-- **Estimated whole-manifest passing share: 4,410 / 131,953 = 3.34210%.**
-- Cumulative gain over the frozen baseline: **440 complete files**, or **+1.14524 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **405 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,428 / 38,420 = 11.52525%.**
+- **Estimated whole-manifest passing share: 4,428 / 131,953 = 3.35574%.**
+- Cumulative gain over the frozen baseline: **458 complete files**, or **+1.19209 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **423 files**. Matched pass-to-nonpass regressions against the frozen baseline: **1**, already present before the font-family part (see below).
 
 ### Uniform audit and subsequent fixes
 
@@ -476,6 +476,16 @@ The broader regression checks found an obsolete animation fixture expectation: a
 `3ebeee0` also corrects two obsolete XHR lifecycle test expectations: default/text network-error responses are empty strings, while non-text `responseText` throws `InvalidStateError`. The asynchronous test now rejects assertion failures instead of hanging. Sixteen related tests / 59 assertions pass. This is test maintenance, with **no production change or WPT gain**.
 
 These parts and thirteen evidence-only additions add **263 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **230 files**, comprising 217 newly fixed files and thirteen additional evidence-only passes. The latest outerHTML, gap, Blob/File, node comparison and alignment parts fix **63 complete files**, adding **+0.16398 percentage points** among eligible cases. Two additional passing files were newly recorded without attributing them to these implementations. This round therefore adds 65 ledger passes (+0.16918 percentage points). Incomplete files remain nonpasses; exact-URL artifacts are recorded separately, and this is not a new whole-suite run.
+
+### Font-family, keyboard initialization and XHR upload follow-ups
+
+- `c279d4d`: share font-family grammar and canonical serialization across CSSOM, CSS.supports, computed styles, font loading and canvas text, **+5 freshly fixed complete files** (+0.01301 percentage points). Five official files improve from 23/68 to 68/68 assertions. Quoted custom names remain distinct from generic families through caches and font lookup; CSS escapes, commas, shorthand family tails and literal quoted `var()` text keep their meaning. Eighty local tests / 764 assertions and two prior passing official files pass, with independent review. This adds no typefaces or FontFaceSet implementation and does not claim complete modern font shorthand support.
+- `5904146`: implement the deployed `initKeyboardEvent` signature, missing keyboard members and realm-safe UI initialization, **+1 freshly fixed complete file** (+0.00260 percentage points). `Event-init-while-dispatching.html` improves from 4/5 to 5/5. Argument conversion precedes the dispatch guard; genuine Window facades are internally branded, and initialized state follows the native event across wrappers. Twenty-two focused/related tests / 114 assertions pass, with independent review. The unrelated HTMLCollection failures involving SES error-constructor identity remain separate.
+- `04800ed`: snapshot XHR bodies before loadstart and deliver trusted upload progress/terminal events through the existing EventTarget and network IPC paths, **+8 freshly fixed complete files** (+0.02082 percentage points), confirmed by a final 8/8 rerun. Upload listeners require CORS preflight; pull-driven consumption, fresh retry streams and request-generation guards preserve redirect, cancellation and reentry behavior. Fifty-one local body/network/renderer tests / 466 assertions pass, with independent review. Eight additional official body/progress files pass, including **five newly recorded passes over the frozen ledger**; these have no fresh pre-change run, so their gains are not all attributed to this part. The Blob MIME file passes its four asynchronous cases but fails all four synchronous cases, which remain unsupported. A broader WebSocket test's 1006-versus-1002 close-code failure also reproduces with the exact pre-change network-service source.
+
+The additional checks reveal one stale frozen pass: `css/css-fonts/font-shorthand-subproperties-reset.html` now registers zero tests and reports a harness error instead of its frozen 13/13. All thirteen conditional CSS.supports gates are already false in a fresh comparison against the exact pre-font HEAD source and remain false afterward. This is **not a regression introduced by the font-family change**, but the current ledger correctly removes that old passing result. The supporting source comparison is `/tmp/font-family-subproperty-regression-audit.json`; the nonpassing official artifact is recorded in BASELINE.json.
+
+Relative to the ledger through `70aab18`, this round adds **14 freshly demonstrated fixes**, records **five additional passing outcomes without fresh-before attribution**, and removes **one stale pass**: a net **+18 complete files**, or **+0.04685 percentage points** among eligible cases. It replaces 26 exact-URL outcomes, of which 24 are newly included URLs, bringing the ledger to 602 distinct cases. Historical baseline and patch-series estimates stay unchanged. Runtime tests used the concurrent working tree; these commits exclude the independent paint-damage changes in `page-renderer.js`, `video-mask.js` and `test/fixtures/canvas-damage.js`.
 
 ### Registration and scope limitations
 
