@@ -20,7 +20,7 @@ try{
   traces.length=0;
   await r.evaluate(command);
   const partial=await pixels();
-  assert.ok(traces.some(s=>s.includes('canvas damage')),'exercise the partial paint path');
+  assert.ok(traces.some(s=>s.includes('paint damage')),'exercise the partial paint path');
   r.resize(401,300,1);r.resize(400,300,1);
   assert.deepEqual(await pixels(),partial,'partial pixels must match a full repaint, including transparency, clipping and occlusion');
  }
@@ -30,34 +30,56 @@ try{
   traces.length=0;
   await r.evaluate(`document.getElementById('status').textContent=${JSON.stringify(text)};ctx.fillStyle='red';ctx.fillRect(10,10,20,20)`);
   const partial=await pixels();
-  assert.ok(traces.some(s=>s.includes('canvas damage')),'status text and canvas share partial repaint');
+  assert.ok(traces.some(s=>s.includes('paint damage')),'status text and canvas share partial repaint');
   r.resize(401,300,1);r.resize(400,300,1);
   assert.deepEqual(await pixels(),partial,'status replacement clears old glyphs and matches full repaint');
  }
- // Changed font metrics / wrapping retain the complete-paint fallback.
+ // A font change repaints only the text it moves, and still matches a full repaint.
  traces.length=0;
  await r.evaluate("document.getElementById('status').style.fontSize='30px';ctx.fillRect(0,0,5,5)");
  const restyled=await pixels();
- assert.ok(!traces.some(s=>s.includes('canvas damage')),'changed fonts must not use text damage');
+ assert.ok(traces.some(s=>s.includes('paint damage')),'a font change repaints only the text it moves');
  r.resize(401,300,1);r.resize(400,300,1);assert.deepEqual(await pixels(),restyled);
  // Italic overhang and fractional raster scaling must preserve the same pixels.
  await r.evaluate("document.getElementById('status').style.fontStyle='italic'");
  r.resize(400,300,1.5);await pixels();traces.length=0;
  await r.evaluate("document.getElementById('status').textContent='fj';ctx.clearRect(0,0,120,100)");
- const italic=await pixels();assert.ok(traces.some(s=>s.includes('canvas damage')));
+ const italic=await pixels();assert.ok(traces.some(s=>s.includes('paint damage')));
  r.resize(401,300,1.5);r.resize(400,300,1.5);assert.deepEqual(await pixels(),italic);
  r.resize(400,300,1);
- // Geometry/transform changes must fall back, then remain pixel-correct.
+ // A transform repaints its transformed bounds, before and after, pixel for pixel.
  traces.length=0;
  await r.evaluate("document.querySelector('.clip').style.transform='scale(1.2)';ctx.fillRect(0,0,80,80)");
  const transformed=await pixels();
- assert.ok(!traces.some(s=>s.includes('canvas damage')));
+ assert.ok(traces.some(s=>s.includes('paint damage')),'a transform repaints only where the box was and is');
  r.resize(401,300,1);r.resize(400,300,1);
  assert.deepEqual(await pixels(),transformed);
  traces.length=0;
  await r.evaluate("ctx.clearRect(0,0,120,100)");
  const cleared=await pixels();
- assert.ok(!traces.some(s=>s.includes('canvas damage')),'transformed canvas stays on full paint');
+ assert.ok(traces.some(s=>s.includes('paint damage')),'a transformed canvas repaints only its transformed bounds');
  r.resize(401,300,1);r.resize(400,300,1);
  assert.deepEqual(await pixels(),cleared);
+ // Ordinary DOM changes, as a QML animation makes them: a box moves, then one
+ // appears and goes away (the display list changes length).
+ await r.evaluate("document.body.insertAdjacentHTML('beforeend','<div id=mover style=\"position:absolute;left:200px;top:200px;width:20px;height:20px;background:purple\"></div>')");
+ await pixels();
+ for(const command of ["document.getElementById('mover').style.left='240px'","document.getElementById('mover').style.background='orange'",
+   "document.body.insertAdjacentHTML('beforeend','<div id=extra style=\"position:absolute;left:300px;top:60px;width:30px;height:30px;background:teal\"></div>')",
+   "document.getElementById('extra').remove()"]){
+  traces.length=0;
+  await r.evaluate(command);
+  const partial=await pixels();
+  assert.ok(traces.some(s=>s.includes('paint damage')),`${command} repaints only what changed`);
+  r.resize(401,300,1);r.resize(400,300,1);
+  assert.deepEqual(await pixels(),partial,`${command} matches a full repaint`);
+ }
+ // Fixed content follows the viewport, not the document, so it repaints the whole tile.
+ await r.evaluate("document.getElementById('mover').style.position='fixed'");await pixels();
+ traces.length=0;
+ await r.evaluate("document.getElementById('mover').style.left='260px'");
+ const fixed=await pixels();
+ assert.ok(!traces.some(s=>s.includes('paint damage')),'a fixed box repaints fully');
+ r.resize(401,300,1);r.resize(400,300,1);
+ assert.deepEqual(await pixels(),fixed);
 }finally{r.dispose()}
