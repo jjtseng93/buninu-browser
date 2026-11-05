@@ -603,11 +603,25 @@ test("template content can be cloned and typed arrays are available", async () =
   expect(await evaluate("document.getElementById('mount').dataset.number")).toBe("1.5");
 });
 
-test("DOM collection interfaces expose iterable array-compatible prototypes", async () => {
+test("DOM collections expose their standard iterable interfaces", async () => {
   await load(`<p>one</p><p>two</p>`);
   expect(await evaluate("typeof NodeList.prototype.forEach")).toBe("function");
-  expect(await evaluate("typeof HTMLCollection.prototype.item")).toBe("undefined");
+  expect(await evaluate("typeof HTMLCollection.prototype.item")).toBe("function");
+  expect(await evaluate("typeof HTMLCollection.prototype.forEach")).toBe("undefined");
+  expect(await evaluate("document.getElementsByTagName('p') instanceof HTMLCollection")).toBe(true);
   expect(await evaluate("[...document.querySelectorAll('p')].map(p => p.textContent).join(',')")).toBe("one,two");
+});
+
+test('document HTMLCollections stay live and expose names without Array methods', async () => {
+  await load('<form id="first"></form><a href="/" id="link"></a>');
+  expect(await evaluate(`(() => {
+    const forms=document.forms, links=document.links, images=document.images, scripts=document.scripts;
+    const form=document.createElement('form'); form.id='second'; document.body.append(form);
+    const image=document.createElement('img'); image.id='photo'; document.body.append(image);
+    const link=document.getElementById('link'); link.removeAttribute('href');
+    return forms.length===2 && forms.second===form && forms===document.forms && images.photo===image &&
+      links.length===0 && scripts instanceof HTMLCollection && !Array.isArray(forms) && forms.map===undefined;
+  })()`)).toBe(true);
 });
 
 test("an unfocused page exposes an empty Selection", async () => {
