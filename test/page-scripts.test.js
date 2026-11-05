@@ -179,7 +179,22 @@ test('workers decode text using their own encoding interface', async () => {
   expect(await evaluate('workerEncoding')).toEqual({text:'A', range:true, identity:true});
 });
 
-
+test('TextEncoder exposes page errors, mutable methods and native UTF-8 encoding', async () => {
+  await load('<p>encoding</p>');
+  expect(await evaluate(`(() => {
+    const encoder = new TextEncoder(), checks = [];
+    for (const action of [() => encoder.encodeInto('a', {}), () => encoder.encode(Symbol()),
+      () => TextEncoder.prototype.encode.call({}), () => encoder.encodeInto()]) {
+      try { action(); checks.push(false); } catch(e) { checks.push(e.constructor === TypeError); }
+    }
+    const old = TextEncoder.prototype.encode;
+    TextEncoder.prototype.encode = () => 42;
+    checks.push(encoder.encode() === 42);
+    TextEncoder.prototype.encode = old;
+    checks.push(encoder.encode('水').length === 3);
+    return checks.every(Boolean) && checks.length === 6;
+  })()`)).toBe(true);
+});
 
 test("the renderer reports both sandbox layers", () => {
   expect(renderer.sandbox.ses).toEqual({ installed: true, reason: null });
