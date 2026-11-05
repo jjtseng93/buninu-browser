@@ -50,6 +50,6 @@ export default class MutationRecord {
 		this.nextSibling = init.nextSibling || null;
 		this.attributeName = init.attributeName || null;
 		this.attributeNamespace = init.attributeNamespace || null;
-		this.oldValue = init.oldValue || null;
+		this.oldValue = init.oldValue ?? null;
 	}
 }
