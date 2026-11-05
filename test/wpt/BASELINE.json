@@ -11038,6 +11038,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-value-dirty-flag.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-control-values-0-after.json",
+      "artifactSha256": "46aa2a186643b98c3f98909fe7418064862bbc5d124f667c6cfd63e9c26bd753",
+      "stage": "Input/textarea null value bindings and direct-child textarea default text",
+      "browserRevision": "0243f1b5a551a0017e3f0c05b151b6e222b58364",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/input-valueasdate-invalidstateerr.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/typed-public-input-valueasdate-invalidstateerr-after.json",
       "artifactSha256": "3f69bb715b6facf78180e8a0f8786178b8843352f75c486e5c06875eb66032e5",
@@ -11721,6 +11751,36 @@
         "classification": "fail",
         "passed": 27,
         "reported": 42,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-input-element/valueMode.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-control-values-1-after.json",
+      "artifactSha256": "fd882fe34cd1c08ee77990306378c9706b65d878b208f1dc2cedc3523631c4c0",
+      "stage": "Input/textarea null value bindings and direct-child textarea default text",
+      "browserRevision": "0243f1b5a551a0017e3f0c05b151b6e222b58364",
+      "after": {
+        "classification": "pass",
+        "passed": 40,
+        "reported": 40,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 39,
+        "reported": 40,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -12651,6 +12711,36 @@
         "classification": "fail",
         "passed": 1,
         "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-textarea-element/value-defaultValue-textContent.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/text-control-values-2-after.json",
+      "artifactSha256": "035a5eb34c6212bcd388160bc7b01bac640512512fb82d9c24dbf5ce4e884cc7",
+      "stage": "Input/textarea null value bindings and direct-child textarea default text",
+      "browserRevision": "0243f1b5a551a0017e3f0c05b151b6e222b58364",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 7,
+        "reported": 12,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -14009,30 +14099,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T11:22:08.114801+00:00",
-    "throughBrowserRevision": "0a34482b1b72c657183372be54aac73d93560f5c",
+    "recordedAt": "2026-11-05T11:35:06.970596+00:00",
+    "throughBrowserRevision": "0243f1b5a551a0017e3f0c05b151b6e222b58364",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 342,
-    "totalMatchedRetests": 386,
+    "additionalMatchedRetests": 345,
+    "totalMatchedRetests": 389,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 248,
-    "cumulativeNetGain": 283,
-    "gainedFullPass": 283,
+    "mainlineNetGain": 251,
+    "cumulativeNetGain": 286,
+    "gainedFullPass": 286,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21116,
-      "pass": 4253,
+      "fail": 21113,
+      "pass": 4256,
       "harness-error": 11442,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4253,
-    "testedPassPercent": 11.069755335762624,
+    "passed": 4256,
+    "testedPassPercent": 11.07756376887038,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.2231173220768,
+    "wholeManifestVerifiedPassPercent": 3.2253908588664144,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -14811,6 +14901,21 @@
         "artifact": "/tmp/css-background-size-computed-after.json",
         "stage": "Shared background-size grammar/computed values and CPU URL-image tiling",
         "revision": "0a34482b1b72c657183372be54aac73d93560f5c"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-control-values-0-after.json",
+        "stage": "Input/textarea null value bindings and direct-child textarea default text",
+        "revision": "0243f1b5a551a0017e3f0c05b151b6e222b58364"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-control-values-1-after.json",
+        "stage": "Input/textarea null value bindings and direct-child textarea default text",
+        "revision": "0243f1b5a551a0017e3f0c05b151b6e222b58364"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/text-control-values-2-after.json",
+        "stage": "Input/textarea null value bindings and direct-child textarea default text",
+        "revision": "0243f1b5a551a0017e3f0c05b151b6e222b58364"
       }
     ],
     "previousLedgerRegressions": [

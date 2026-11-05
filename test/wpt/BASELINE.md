@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `0a34482`
+## Mainline targeted estimate through `0243f1b`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **386 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **389 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,253 / 38,420 = 11.06976%.**
-- **Estimated whole-manifest passing share: 4,253 / 131,953 = 3.22312%.**
-- Cumulative gain over the frozen baseline: **283 complete files**, or **+0.73660 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **248 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,256 / 38,420 = 11.07756%.**
+- **Estimated whole-manifest passing share: 4,256 / 131,953 = 3.22539%.**
+- Cumulative gain over the frozen baseline: **286 complete files**, or **+0.74440 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **251 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
 ### Uniform audit and subsequent fixes
 
@@ -433,9 +433,11 @@ Since the previous ledger through `74c131d`, the net increase is **22 files**: n
 - `67d7e92`: correct required-select placeholder validity and size reflection, **+2 complete files** (+0.00521 percentage points). The two newly passing files improve from 3/8 to 8/8 assertions; a third descendants file retains 3/4 because `moveBefore` remains absent. Selectedness walks current native child arrays, avoiding stale query caches during insertion and dead dependency accumulation. Targeted tests cover equivalent size assignments, namespaced attributes, reinserted selected options, warmed collections, real validity paint and 1,000 selection changes without metadata growth; 68 Chromium black-box probes agree. The multiple/size-one behavior follows Chromium; full listbox UI and complete option-list filtering are not claimed.
 - `0a34482`: share background-size grammar through CSSOM, cascade, computed values and CPU URL-image tiling, **+3 complete files** (+0.00781 percentage points), 28/28 assertions versus 7/28 before. Typed lengths retain percentages and math until tile geometry is resolved, auto preserves image ratio, and dynamic size changes stay on the existing paint-only update path. Sixty-seven scoped tests / 632 assertions, two existing background tests and independent review pass, including actual pixels. Gradient sizing/tiling and broader existing background shorthand serialization gaps remain separate.
 
+- `0243f1b`: correct input/textarea `value = null` conversion and textarea direct-child default/raw text, **+3 complete files** (+0.00781 percentage points), 57/57 assertions versus 52/57 on the fresh preceding revision. The frozen run was 50/57; two earlier newline fixes are not attributed again. Branded accessors convert before checking reentrant file-input state and retain existing dirty/selection/reset and file capability paths. Twenty-four regression tests / 344 assertions plus 106 independent native/realm checks pass, covering actual paint, emoji editing, CRLF paste, clipboard copy, file selection/clear and cross-realm errors. CDATA construction and input default-value namespace reflection remain separate.
+
 The broader regression checks found an obsolete animation fixture expectation: a canceled global `ErrorEvent` should be delivered but not reported to the host. `edbc6a4` corrects that assertion and checks delivery separately; all four animation tests pass, with no production change or WPT gain. Two other pre-existing `computed-style.test.js` failures were reproduced with the pre-radius HEAD sources: array identity after `border:inherit`, and an obsolete expectation accepting `calc(50% -10px)` without required whitespace. Those two are unchanged and are not included in the passing scoped regression count above.
 
-These parts and four evidence-only additions add **106 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **73 files**, comprising 69 newly fixed files and four evidence-only additions. The latest option, select and background-size parts fix **10 complete files**, adding **+0.02603 percentage points** among eligible cases. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
+These parts and four evidence-only additions add **109 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **76 files**, comprising 72 newly fixed files and four evidence-only additions. The latest option, select, background-size and text-value parts fix **13 complete files**, adding **+0.03384 percentage points** among eligible cases. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
 
 ### Registration and scope limitations
 
