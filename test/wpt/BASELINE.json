@@ -3328,6 +3328,96 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/background-size-computed.html",
+      "artifact": "/tmp/css-background-size-computed-after.json",
+      "artifactSha256": "5261497efa88471b67ff57edf92b99518808c3b5fe77b664b50db3641e8d3b9f",
+      "stage": "Shared background-size grammar/computed values and CPU URL-image tiling",
+      "browserRevision": "0a34482b1b72c657183372be54aac73d93560f5c",
+      "after": {
+        "classification": "pass",
+        "passed": 16,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/background-size-invalid.html",
+      "artifact": "/tmp/css-background-size-invalid-after.json",
+      "artifactSha256": "619b85602568abce076323d9cf5422f1a4ef8ba705959ef0fc7c01a1aa7b2654",
+      "stage": "Shared background-size grammar/computed values and CPU URL-image tiling",
+      "browserRevision": "0a34482b1b72c657183372be54aac73d93560f5c",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/background-size-valid.html",
+      "artifact": "/tmp/css-background-size-valid-after.json",
+      "artifactSha256": "17a8d8680521a9900c32b0474126104d59e53c91d92f461eb319e58ea6fb58aa",
+      "stage": "Shared background-size grammar/computed values and CPU URL-image tiling",
+      "browserRevision": "0a34482b1b72c657183372be54aac73d93560f5c",
+      "after": {
+        "classification": "pass",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 7,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/border-color-computed.html",
       "artifact": "/tmp/css-border-border-color-computed-after.json",
       "artifactSha256": "6c9393de1146caac0cf10da508533fcd95826e5a74463d4366dba4ebf0e5a51d",
@@ -11818,6 +11908,156 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-option-element/option-label.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-0-after.json",
+      "artifactSha256": "845900fd6f837246b14aa874f496e08fbf7bb530eca350ce8b120d1c63b3a2de",
+      "stage": "HTML option text, label/value and actual select display",
+      "browserRevision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-option-element/option-text-recurse.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-1-after.json",
+      "artifactSha256": "822c86458428824077cab28f614f45c35f5640d94d2f55b02957851f56cea56c",
+      "stage": "HTML option text, label/value and actual select display",
+      "browserRevision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-option-element/option-text-setter.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-3-after.json",
+      "artifactSha256": "03fd3a3343d66692d3151411f6ff6085d740f2fc357950d84d667a3a96b27e39",
+      "stage": "HTML option text, label/value and actual select display",
+      "browserRevision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-option-element/option-text-spaces.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-2-after.json",
+      "artifactSha256": "1ecf0886755db256d9e3bb1586c8d492a76b51437e37f40d0b689cde33d46fe4",
+      "stage": "HTML option text, label/value and actual select display",
+      "browserRevision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b",
+      "after": {
+        "classification": "pass",
+        "passed": 50,
+        "reported": 50,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 50,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-option-element/option-value.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-4-after.json",
+      "artifactSha256": "474176bac3587fe3d8f37d292decae3c985af7d1abecc29f80f950d128e7da53",
+      "stage": "HTML option text, label/value and actual select display",
+      "browserRevision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 7,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-output-element/mutations.window.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/210.json",
       "artifactSha256": "d53b3baf55b125ef32118ffed7cf99c0f8dbc2095ce49c719aee53c5c5b0fa85",
@@ -12231,6 +12471,96 @@
         "classification": "fail",
         "passed": 0,
         "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-validity-option-descendants.html",
+      "artifact": "/tmp/select-validity-descendants-after.json",
+      "artifactSha256": "da2b479497cf7d7926be91805275bf1f2bc4841014f8daede801c95b10212319",
+      "stage": "Required select validity, display-size reflection and current-tree selectedness",
+      "browserRevision": "67d7e92180d1d29a01e49c4568e10200b8ebd891",
+      "after": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-validity.html",
+      "artifact": "/tmp/select-validity-after.json",
+      "artifactSha256": "a4e9ddcc36b1915f8cf5d62245c4a80de17dff23606ff7633587b3e393da6655",
+      "stage": "Required select validity, display-size reflection and current-tree selectedness",
+      "browserRevision": "67d7e92180d1d29a01e49c4568e10200b8ebd891",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-select-element/select-validity.tentative.html",
+      "artifact": "/tmp/select-validity-tentative-after.json",
+      "artifactSha256": "28504cdf0780395b9180bf0f3de07e25b138cd6e4de3a027804e2de4d78e2b06",
+      "stage": "Required select validity, display-size reflection and current-tree selectedness",
+      "browserRevision": "67d7e92180d1d29a01e49c4568e10200b8ebd891",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -13679,30 +14009,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T10:55:44.492367+00:00",
-    "throughBrowserRevision": "d0cf40f742f673b2a1d876e07b7350873e2785ed",
+    "recordedAt": "2026-11-05T11:22:08.114801+00:00",
+    "throughBrowserRevision": "0a34482b1b72c657183372be54aac73d93560f5c",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 331,
-    "totalMatchedRetests": 375,
+    "additionalMatchedRetests": 342,
+    "totalMatchedRetests": 386,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 238,
-    "cumulativeNetGain": 273,
-    "gainedFullPass": 273,
+    "mainlineNetGain": 248,
+    "cumulativeNetGain": 283,
+    "gainedFullPass": 283,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21126,
-      "pass": 4243,
+      "fail": 21116,
+      "pass": 4253,
       "harness-error": 11442,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4243,
-    "testedPassPercent": 11.043727225403435,
+    "passed": 4253,
+    "testedPassPercent": 11.069755335762624,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.2155388661114186,
+    "wholeManifestVerifiedPassPercent": 3.2231173220768,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -14426,6 +14756,61 @@
         "artifact": "/tmp/css-radius-computed-after.json",
         "stage": "Elliptical border radius parsing and pending cascade",
         "revision": "d0cf40f742f673b2a1d876e07b7350873e2785ed"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-0-after.json",
+        "stage": "HTML option text, label/value and actual select display",
+        "revision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-1-after.json",
+        "stage": "HTML option text, label/value and actual select display",
+        "revision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-2-after.json",
+        "stage": "HTML option text, label/value and actual select display",
+        "revision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-3-after.json",
+        "stage": "HTML option text, label/value and actual select display",
+        "revision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/option-values-4-after.json",
+        "stage": "HTML option text, label/value and actual select display",
+        "revision": "d3415dd2c3c81a3dc693db01cc202352f8033b3b"
+      },
+      {
+        "artifact": "/tmp/select-validity-after.json",
+        "stage": "Required select validity, display-size reflection and current-tree selectedness",
+        "revision": "67d7e92180d1d29a01e49c4568e10200b8ebd891"
+      },
+      {
+        "artifact": "/tmp/select-validity-tentative-after.json",
+        "stage": "Required select validity, display-size reflection and current-tree selectedness",
+        "revision": "67d7e92180d1d29a01e49c4568e10200b8ebd891"
+      },
+      {
+        "artifact": "/tmp/select-validity-descendants-after.json",
+        "stage": "Required select validity, display-size reflection and current-tree selectedness",
+        "revision": "67d7e92180d1d29a01e49c4568e10200b8ebd891"
+      },
+      {
+        "artifact": "/tmp/css-background-size-valid-after.json",
+        "stage": "Shared background-size grammar/computed values and CPU URL-image tiling",
+        "revision": "0a34482b1b72c657183372be54aac73d93560f5c"
+      },
+      {
+        "artifact": "/tmp/css-background-size-invalid-after.json",
+        "stage": "Shared background-size grammar/computed values and CPU URL-image tiling",
+        "revision": "0a34482b1b72c657183372be54aac73d93560f5c"
+      },
+      {
+        "artifact": "/tmp/css-background-size-computed-after.json",
+        "stage": "Shared background-size grammar/computed values and CPU URL-image tiling",
+        "revision": "0a34482b1b72c657183372be54aac73d93560f5c"
       }
     ],
     "previousLedgerRegressions": [

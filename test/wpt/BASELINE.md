@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `d0cf40f`
+## Mainline targeted estimate through `0a34482`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **375 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **386 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,243 / 38,420 = 11.04373%.**
-- **Estimated whole-manifest passing share: 4,243 / 131,953 = 3.21554%.**
-- Cumulative gain over the frozen baseline: **273 complete files**, or **+0.71057 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **238 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,253 / 38,420 = 11.06976%.**
+- **Estimated whole-manifest passing share: 4,253 / 131,953 = 3.22312%.**
+- Cumulative gain over the frozen baseline: **283 complete files**, or **+0.73660 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **248 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
 ### Uniform audit and subsequent fixes
 
@@ -429,9 +429,13 @@ Since the previous ledger through `74c131d`, the net increase is **22 files**: n
 - `cc7ae40`: share input/textarea selection state between DOM APIs, keyboard input, clipboard and painting, **+10 newly fixed complete files** (+0.02603 percentage points), 792/792 assertions versus 438/751 before across eleven files. Two former harness errors now allow 41 additional assertions to register. Web IDL conversions and defining-realm exceptions, UTF-16 ranges, default/value/type changes, clone/reset, range replacement and queued trusted `select` events are covered, including the `onselect` handler. Nineteen local tests / 396 assertions and 150 independent binding/editing checks pass; 64 Chromium black-box cases inform boundary behavior. `selection-after-content-change.html` was already passing before this implementation and is newly recorded against its frozen failure, adding **one evidence-only pass**. HTML dirty-before-IndexSizeError and relevant-value clamping are retained where Chromium differs; `selectionchange` and nonselectable input editing remain outside this part.
 - `d0cf40f`: use shared length-percentage parsing for elliptical radius CSSOM/cascade values and clamp computed negative math, **+3 complete files** (+0.00781 percentage points), 48/48 assertions versus 23/48 before. Radius shorthands reuse the existing per-longhand pending-substitution metadata, preserving partial writes/removals, priorities, `all`, custom properties and stylesheet changes. Thirty-eight related tests / 1,954 assertions verify geometry and actual CPU pixels; independent review compares 1,000 mixed CSSOM/stylesheet declarations. Existing logical corner mapping is retained without claiming new vertical-writing support.
 
+- `d3415dd`: share HTML-aware option text collection with `text`, `label`, `value` and actual select labels, **+5 complete files** (+0.01301 percentage points), 86/86 assertions versus 18/86 before. Iterative traversal excludes script contents and collapses only ASCII whitespace; empty attributes remain distinct from missing ones. Page accessors preserve conversion, receiver branding and realm errors. Five focused tests / 112 assertions include CPU screenshots, option-label updates and an unselected select's empty display. Independent native and cross-realm checks pass. Selection/validity integration is covered by the next part; this does not add a popup UI.
+- `67d7e92`: correct required-select placeholder validity and size reflection, **+2 complete files** (+0.00521 percentage points). The two newly passing files improve from 3/8 to 8/8 assertions; a third descendants file retains 3/4 because `moveBefore` remains absent. Selectedness walks current native child arrays, avoiding stale query caches during insertion and dead dependency accumulation. Targeted tests cover equivalent size assignments, namespaced attributes, reinserted selected options, warmed collections, real validity paint and 1,000 selection changes without metadata growth; 68 Chromium black-box probes agree. The multiple/size-one behavior follows Chromium; full listbox UI and complete option-list filtering are not claimed.
+- `0a34482`: share background-size grammar through CSSOM, cascade, computed values and CPU URL-image tiling, **+3 complete files** (+0.00781 percentage points), 28/28 assertions versus 7/28 before. Typed lengths retain percentages and math until tile geometry is resolved, auto preserves image ratio, and dynamic size changes stay on the existing paint-only update path. Sixty-seven scoped tests / 632 assertions, two existing background tests and independent review pass, including actual pixels. Gradient sizing/tiling and broader existing background shorthand serialization gaps remain separate.
+
 The broader regression checks found an obsolete animation fixture expectation: a canceled global `ErrorEvent` should be delivered but not reported to the host. `edbc6a4` corrects that assertion and checks delivery separately; all four animation tests pass, with no production change or WPT gain. Two other pre-existing `computed-style.test.js` failures were reproduced with the pre-radius HEAD sources: array identity after `border:inherit`, and an obsolete expectation accepting `calc(50% -10px)` without required whitespace. Those two are unchanged and are not included in the passing scoped regression count above.
 
-These parts and four evidence-only additions add **96 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **63 files**, comprising 59 newly fixed files and four evidence-only additions. The latest three functional parts fix 14 complete files; the separately confirmed pre-existing selection pass makes their ledger increase 15. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
+These parts and four evidence-only additions add **106 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **73 files**, comprising 69 newly fixed files and four evidence-only additions. The latest option, select and background-size parts fix **10 complete files**, adding **+0.02603 percentage points** among eligible cases. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
 
 ### Registration and scope limitations
 
