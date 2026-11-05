@@ -8728,6 +8728,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-data.html",
+      "artifact": "/tmp/character-data-CharacterData-data.html-after.json",
+      "artifactSha256": "6c76337bb0455489de2ff39396878fdbe1be5bfd9d90c579b112c536762838fd",
+      "stage": "CharacterData and nullable Node text reflection",
+      "browserRevision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e",
+      "after": {
+        "classification": "pass",
+        "passed": 16,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 14,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/CharacterData-deleteData.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/101.json",
       "artifactSha256": "04408191d84f6ae73647ed4491d3aa23da90324aa3c70ffcfa8999d22b85e4ad",
@@ -8871,6 +8901,36 @@
         "classification": "fail",
         "passed": 0,
         "reported": 28,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/CharacterData-surrogates.html",
+      "artifact": "/tmp/character-data-CharacterData-surrogates.html-after.json",
+      "artifactSha256": "176621042032e93e6a0f755fb103c2c601f9e8fc99af1e3b0ffc3522470f112a",
+      "stage": "CharacterData related regression and remaining batching gap",
+      "browserRevision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 8,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -9388,6 +9448,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-getElementById.html",
+      "artifact": "/tmp/dom-query-Document-getElementById.html-final.json",
+      "artifactSha256": "d931d6a63d87aa23015526475b8b60f6f2ab2979b0c52755fab0ef3a967ed5e4",
+      "stage": "DOM namespace and exact tree-order ID queries",
+      "browserRevision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6",
+      "after": {
+        "classification": "fail",
+        "passed": 16,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 14,
+        "reported": 18,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Document-getElementsByTagName-xhtml.xhtml",
       "artifact": "/data/data/com.termux/files/home/wpt-run/xhtml-navigation-6-coalesced.json",
       "artifactSha256": "d2d5f38b9903660175a27249621087a5124977ddb85f14fe93ca13913f2f5fa2",
@@ -9471,6 +9561,36 @@
         "classification": "fail",
         "passed": 0,
         "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/DocumentFragment-getElementById.html",
+      "artifact": "/tmp/dom-query-DocumentFragment-getElementById.html-final.json",
+      "artifactSha256": "efb835d685224668796e205858de71c8b93a6b32a87af3a8adaf59d171735f76",
+      "stage": "DOM namespace and exact tree-order ID queries",
+      "browserRevision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 5,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -9808,6 +9928,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/MutationObserver-textContent.html",
+      "artifact": "/tmp/character-data-MutationObserver-textContent.html-after.json",
+      "artifactSha256": "c26c64bb3f219cd38cdb79fb35353652ce352b648e954d1dc31ed39a986d082f",
+      "stage": "CharacterData related regression and remaining batching gap",
+      "browserRevision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e",
+      "after": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 1,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 1,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Node-cloneNode-XMLDocument.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/127.json",
       "artifactSha256": "fdc7f9e99c0dc2c4b73873b95996f67eafbf1e84fb34c2286eecf2b62ed66b9f",
@@ -9928,6 +10078,66 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-lookupNamespaceURI.html",
+      "artifact": "/tmp/dom-query-Node-lookupNamespaceURI.html-final.json",
+      "artifactSha256": "508385465222a904cd43c93f19d199481b9221865b3c5578c4bbe37f4c078c2d",
+      "stage": "DOM namespace and exact tree-order ID queries",
+      "browserRevision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6",
+      "after": {
+        "classification": "pass",
+        "passed": 75,
+        "reported": 75,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 64,
+        "reported": 68,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-lookupPrefix.xhtml",
+      "artifact": "/tmp/dom-query-Node-lookupPrefix.xhtml-final.json",
+      "artifactSha256": "ac66a1c97377728fdc15a660691e9f851f8cb8ba7c27d50da1e5ed2642b9e309",
+      "stage": "DOM namespace and exact tree-order ID queries",
+      "browserRevision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 10,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Node-mutation-adoptNode.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/node-transfer-2-after.json",
       "artifactSha256": "836568bd987157a8d58e7db70ced7cac691fb40e597c8ca67d634f36fdf721a2",
@@ -9951,6 +10161,66 @@
         "classification": "fail",
         "passed": 1,
         "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-nodeValue.html",
+      "artifact": "/tmp/character-data-Node-nodeValue.html-after.json",
+      "artifactSha256": "e6a9ccf71d9fcd413f0e54e35c41ab268d946da94e6bb450ef3aa2988b61a558",
+      "stage": "CharacterData and nullable Node text reflection",
+      "browserRevision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-textContent.html",
+      "artifact": "/tmp/character-data-Node-textContent.html-after.json",
+      "artifactSha256": "ce9cf98e644ab5a442db6e768a36196eaa0cbcbe94553cd873d32bb60724d264",
+      "stage": "CharacterData and nullable Node text reflection",
+      "browserRevision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e",
+      "after": {
+        "classification": "pass",
+        "passed": 81,
+        "reported": 81,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 32,
+        "reported": 81,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -12561,6 +12831,36 @@
         "classification": "fail",
         "passed": 4,
         "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/semantics/forms/form-submission-0/FormDataEvent.window.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-event-after.json",
+      "artifactSha256": "e05a520afec8ca6146b7d54ea378d610a58c940edc4858e15f5451b46740373e",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -16348,6 +16648,486 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/xhr/formdata/append-formelement.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-6-after.json",
+      "artifactSha256": "98cfd7c109c343f6de166b544788b8f1c24c18204141e67bb6252893efee7b61",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/append.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-7-after.json",
+      "artifactSha256": "96815180e2baea704b2e390ee08c2b1ad12a0038004d9e34d450903655b6c15c",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/constructor-formelement.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-0-after.json",
+      "artifactSha256": "f78b54c4b885d8e28580f73355690149d0d332cdb703eec919d9329323bc8aa2",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/constructor-submitter.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-1-after.json",
+      "artifactSha256": "c1ad66739f131571e1f8ea201023bfd758dfefb737208a70149a1f0854564d1c",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/constructor.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-2-after.json",
+      "artifactSha256": "e280fb0b2e72439ef21ff05cd70e1de8e6400b271a1bcc36a02b7406ab097aad",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/delete-formelement.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-3-after.json",
+      "artifactSha256": "fe788bd815e7281011e2e789d016adaff68498d16254bcb280fad04da0ae897e",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/delete.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-11-after.json",
+      "artifactSha256": "062d9e4e7f70e86733bb0222ae136e0a5198cd71aefea710f621e8c58be040e1",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/foreach.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-8-after.json",
+      "artifactSha256": "cd7de2d9a32cf8e98fe420eaf3e9d908b3fadcf34825a72dc477203c5eb8c5f5",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/get-formelement.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-4-after.json",
+      "artifactSha256": "129744e86f7e9bbb8f142dfefddcd52bb94117a3d56d2db657d6fc4bee868457",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/get.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-12-after.json",
+      "artifactSha256": "487aabe103b9344f74991f2fe490c6a403d23677458a02342de9783f17a73ff8",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/has-formelement.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-5-after.json",
+      "artifactSha256": "5408734c7f1b4011322bcd7757cd50069e706970be077faf1cfe8fb6f63cd457",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/has.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-13-after.json",
+      "artifactSha256": "9965cfe2227c53f13b6572d9132c58f184e423b09bc063bea6fca45b2ab58e36",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/iteration.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-14-after.json",
+      "artifactSha256": "7cd8b61f6efd3a30f1e09cb323f664aa797852dd7fab4875c31cb0b0f7e60839",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/set-blob.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-9-after.json",
+      "artifactSha256": "46b46e846f8787400b7a9359ef33f1aa8f61af3812defd8eab866a424be7e35f",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/set-formelement.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-10-after.json",
+      "artifactSha256": "790c4e0cdc83ce6517cc62ff75ec1eb89535428ea9c1f4f78ac7b5c0a8362798",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 6,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/formdata/set.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-15-after.json",
+      "artifactSha256": "3dee614c03261f960722b763b0957b74b495ad7a117f723388e899ea71a483f3",
+      "stage": "Shared form entries and FormData File event interfaces",
+      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/open-during-abort-event.htm",
       "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-open-during-abort-event-after.json",
       "artifactSha256": "91f84983914979099eb111ff43f252a002a4f28e2e45be6d12393737a45be307",
@@ -17039,30 +17819,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T14:06:58.018853+00:00",
-    "throughBrowserRevision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39",
+    "recordedAt": "2026-11-05T14:42:11.341836+00:00",
+    "throughBrowserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 443,
-    "totalMatchedRetests": 487,
+    "additionalMatchedRetests": 469,
+    "totalMatchedRetests": 513,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 322,
-    "cumulativeNetGain": 357,
-    "gainedFullPass": 357,
+    "mainlineNetGain": 340,
+    "cumulativeNetGain": 375,
+    "gainedFullPass": 375,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21044,
-      "pass": 4327,
-      "harness-error": 11439,
+      "fail": 21027,
+      "pass": 4345,
+      "harness-error": 11438,
       "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4327,
-    "testedPassPercent": 11.262363352420614,
+    "passed": 4345,
+    "testedPassPercent": 11.309213951067152,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.279197896220624,
+    "wholeManifestVerifiedPassPercent": 3.292839116958311,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -18386,6 +19166,136 @@
         "artifact": "/tmp/urlpattern-final-9.json",
         "stage": "Realm-local URLPattern interface using Bun parser",
         "revision": "daf0b6efa6e4e1eaa8afccde6371262c3f905e39"
+      },
+      {
+        "artifact": "/tmp/character-data-CharacterData-data.html-after.json",
+        "stage": "CharacterData and nullable Node text reflection",
+        "revision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e"
+      },
+      {
+        "artifact": "/tmp/character-data-Node-nodeValue.html-after.json",
+        "stage": "CharacterData and nullable Node text reflection",
+        "revision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e"
+      },
+      {
+        "artifact": "/tmp/character-data-Node-textContent.html-after.json",
+        "stage": "CharacterData and nullable Node text reflection",
+        "revision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e"
+      },
+      {
+        "artifact": "/tmp/character-data-CharacterData-surrogates.html-after.json",
+        "stage": "CharacterData related regression and remaining batching gap",
+        "revision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e"
+      },
+      {
+        "artifact": "/tmp/character-data-MutationObserver-textContent.html-after.json",
+        "stage": "CharacterData related regression and remaining batching gap",
+        "revision": "a3dc2994c9a3c9f14959d4e1f0dadead3ffd878e"
+      },
+      {
+        "artifact": "/tmp/dom-query-DocumentFragment-getElementById.html-final.json",
+        "stage": "DOM namespace and exact tree-order ID queries",
+        "revision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6"
+      },
+      {
+        "artifact": "/tmp/dom-query-Node-lookupNamespaceURI.html-final.json",
+        "stage": "DOM namespace and exact tree-order ID queries",
+        "revision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6"
+      },
+      {
+        "artifact": "/tmp/dom-query-Node-lookupPrefix.xhtml-final.json",
+        "stage": "DOM namespace and exact tree-order ID queries",
+        "revision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6"
+      },
+      {
+        "artifact": "/tmp/dom-query-Document-getElementById.html-final.json",
+        "stage": "DOM namespace and exact tree-order ID queries",
+        "revision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-0-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-1-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-2-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-3-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-4-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-5-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-6-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-7-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-8-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-9-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-10-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-11-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-12-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-13-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-14-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-15-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/form-data-event-after.json",
+        "stage": "Shared form entries and FormData File event interfaces",
+        "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
       }
     ],
     "previousLedgerRegressions": [

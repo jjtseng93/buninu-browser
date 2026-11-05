@@ -13,8 +13,8 @@ saved targeted retests gives an approximate post-patch **10.42%** tested-case ra
 and **3.03517%** whole-manifest passing share. This assumes other cases remain
 unchanged and is not a full patched rerun. See BASELINE.md for details and caveats.
 The later mainline ledger, including the uniform audit and functional follow-ups
-through `daf0b6e`, estimates **11.26236%** of eligible cases and **3.27920%** of the
-whole manifest (4,327 complete passes). This is also a mixed-results estimate,
+through `84ddc5b`, estimates **11.30921%** of eligible cases and **3.29284%** of the
+whole manifest (4,345 complete passes). This is also a mixed-results estimate,
 not a full rerun of the latest revision. The historical patch-only estimate above
 is retained separately. See BASELINE.md for exact scope and remaining failures.
 The earlier static sample is no longer retained here.
