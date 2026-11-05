@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `0243f1b`
+## Mainline targeted estimate through `8a1ae81`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **389 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **390 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,256 / 38,420 = 11.07756%.**
-- **Estimated whole-manifest passing share: 4,256 / 131,953 = 3.22539%.**
-- Cumulative gain over the frozen baseline: **286 complete files**, or **+0.74440 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **251 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,257 / 38,420 = 11.08017%.**
+- **Estimated whole-manifest passing share: 4,257 / 131,953 = 3.22615%.**
+- Cumulative gain over the frozen baseline: **287 complete files**, or **+0.74701 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **252 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
 ### Uniform audit and subsequent fixes
 
@@ -435,9 +435,11 @@ Since the previous ledger through `74c131d`, the net increase is **22 files**: n
 
 - `0243f1b`: correct input/textarea `value = null` conversion and textarea direct-child default/raw text, **+3 complete files** (+0.00781 percentage points), 57/57 assertions versus 52/57 on the fresh preceding revision. The frozen run was 50/57; two earlier newline fixes are not attributed again. Branded accessors convert before checking reentrant file-input state and retain existing dirty/selection/reset and file capability paths. Twenty-four regression tests / 344 assertions plus 106 independent native/realm checks pass, covering actual paint, emoji editing, CRLF paste, clipboard copy, file selection/clear and cross-realm errors. CDATA construction and input default-value namespace reflection remain separate.
 
+- `8a1ae81`: canonicalize hexadecimal border colors with the existing CSSOM color serializer and expose resolved side/all-border shorthands, **+1 complete file** (+0.00260 percentage points), 6/6 assertions versus 0/6 before. Seventeen scoped tests / 1,229 assertions and independent review pass, including all 256 alpha-byte round trips and actual pixels. Chromium's BSD-licensed shorthand implementation and 15 black-box cases confirm that computed `border` requires equal sides but ignores reset-only `border-image`; specified shorthand serialization keeps its existing reset behavior.
+
 The broader regression checks found an obsolete animation fixture expectation: a canceled global `ErrorEvent` should be delivered but not reported to the host. `edbc6a4` corrects that assertion and checks delivery separately; all four animation tests pass, with no production change or WPT gain. Two other pre-existing `computed-style.test.js` failures were reproduced with the pre-radius HEAD sources: array identity after `border:inherit`, and an obsolete expectation accepting `calc(50% -10px)` without required whitespace. Those two are unchanged and are not included in the passing scoped regression count above.
 
-These parts and four evidence-only additions add **109 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **76 files**, comprising 72 newly fixed files and four evidence-only additions. The latest option, select, background-size and text-value parts fix **13 complete files**, adding **+0.03384 percentage points** among eligible cases. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
+These parts and four evidence-only additions add **110 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **77 files**, comprising 73 newly fixed files and four evidence-only additions. The latest option, select, background-size, text-value and border-serialization parts fix **14 complete files**, adding **+0.03644 percentage points** among eligible cases. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
 
 ### Registration and scope limitations
 
