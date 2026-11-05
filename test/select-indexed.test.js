@@ -79,3 +79,21 @@ test('removing multiple retains the first selected option through property and a
     return out;
   })()`)).toEqual([1,1,true,1,1,true,1,1,true,1,1,true,-1,-1,0,-1,-1]);
 });
+
+
+test('select element caches and click guard use backing slots without changing author receivers', async () => {
+  expect(await evaluate(`(() => {
+    const s=document.createElement('select'),out=[];s.append(new Option('A'));
+    for(const name of ['style','classList','dataset','attributes','validity']) out.push(s[name]===s[name]);
+    s.style='color:red';s.classList='one';s.dataset.answer='42';
+    out.push(s.style.color,s.className,s.getAttribute('data-answer'),s.attributes.getNamedItem('style').ownerElement===s,s.validity.valid);
+    let calls=0,receiver; s.addEventListener('click',function(){calls++;receiver=this;s.click()});s.click();s.click();
+    out.push(calls,receiver===s);
+    Object.defineProperty(s,'author',{get(){return this},set(v){this.saved=v},configurable:true});
+    const derived=Object.create(s);derived.author=12;out.push(s.author===s,derived.author===derived,derived.saved,s.saved===undefined);
+    const get=Object.getOwnPropertyDescriptor(HTMLElement.prototype,'style')?.get ?? Object.getOwnPropertyDescriptor(Element.prototype,'style').get;
+    out.push(get.call(s)===s.style);
+    for(const receiver of [{},derived]) {try{get.call(receiver);out.push(false)}catch(e){out.push(e instanceof TypeError)}}
+    return out;
+  })()`)).toEqual([true,true,true,true,true,'red','one','42',true,true,2,true,true,true,12,true,true,true,true]);
+});
