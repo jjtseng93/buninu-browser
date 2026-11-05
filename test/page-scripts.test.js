@@ -2158,9 +2158,10 @@ test("compareDocumentPosition, document.styleSheets and user timing with Perform
     $("outer").compareDocumentPosition($("first")), $("first").compareDocumentPosition($("outer")),
     Node.DOCUMENT_POSITION_FOLLOWING, $("first").DOCUMENT_POSITION_CONTAINED_BY,
   ]`)).toEqual([4, 2, 20, 10, 4, 16]);
-  expect(await evaluate(`[document.styleSheets.length, document.styleSheets[0].href, document.styleSheets[1].href,
-    document.styleSheets.item(1).media.mediaText, document.styleSheets[0].ownerNode.tagName]`))
-    .toEqual([2, null, "https://page.test/missing.css", "print", "STYLE"]);
+  // A failed stylesheet load does not create a CSSStyleSheet.
+  expect(await evaluate(`[document.styleSheets.length, document.styleSheets[0].href,
+    document.styleSheets.item(1), document.styleSheets[0].ownerNode.tagName]`))
+    .toEqual([1, null, null, "STYLE"]);
   await waitFor("window.observed.length === 3");
   expect(await evaluate(`[observed, performance.getEntriesByType("measure").length, PerformanceObserver.supportedEntryTypes]`))
     .toEqual([["mark:start", "mark:end", "measure:span"], 1, ["mark", "measure"]]);

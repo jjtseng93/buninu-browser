@@ -39,7 +39,7 @@ test("document base URL consistently resolves scripts, styles, images, backgroun
     1,"https://base.test/assets/classic.js",42,"https://base.test/assets/","https://base.test/assets/","https://base.test/page/index.html",
   ]);
   expect(await evaluate("[getComputedStyle(document.getElementById('target')).color,document.getElementById('image').naturalWidth,document.styleSheets[0].href]"))
-    .toEqual(["rgba(0, 0, 255, 1)",2,"https://base.test/assets/sheet.css"]);
+    .toEqual(["rgb(0, 0, 255)",2,"https://base.test/assets/sheet.css"]);
   expect(requests.every(url=>url.startsWith("https://base.test/assets/"))).toBeTrue();
   expect(requests.filter(url=>url.endsWith('/classic.js'))).toHaveLength(1);
   expect(await evaluate("new Promise((resolve,reject)=>{const worker=new Worker('worker.js');worker.onmessage=e=>{resolve(e.data);worker.terminate()};worker.onerror=reject;worker.postMessage('go')})"))
