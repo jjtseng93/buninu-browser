@@ -36,8 +36,8 @@ test('border component counts and duplicates share validation across CSSOM, shee
     }
     style.cssText='border:2px solid #f00;border:thin double green 1px';
     expect(style.borderTopWidth).toBe('2px');expect(style.borderTopStyle).toBe('solid');
-    expect(normalizeBorderValue('border','2px/**/solid/**/#f00')).toBe('2px solid #f00');
-    expect(normalizeBorderValue('border-color','#f\\30 0')).toBe('#f00');
+    expect(normalizeBorderValue('border','2px/**/solid/**/#f00')).toBe('2px solid rgb(255, 0, 0)');
+    expect(normalizeBorderValue('border-color','#f\\30 0')).toBe('rgb(255, 0, 0)');
     expect(normalizeBorderValue('border-image','none')).toBeUndefined();
   } finally {window.happyDOM.close();}
 });
