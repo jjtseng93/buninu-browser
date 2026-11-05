@@ -3269,10 +3269,10 @@
     },
     {
       "url": "http://web-platform.test:18000/css/css-backgrounds/background-border-cssText.html",
-      "artifact": "/tmp/css-border-pending-background-border-cssText-after.json",
-      "artifactSha256": "d9626685e434ecd27a01443ed16bc7e21c260c1f35b2682465c922897d6c93f7",
-      "stage": "Pending border CSSOM source preservation",
-      "browserRevision": "b05bbf7d9869e7ea4427cf2fac68d2376647e5d2",
+      "artifact": "/tmp/background-shorthand-final-3.json",
+      "artifactSha256": "ef38a97e0bd45953e77403aa90a89a8210e89e17f535f536ba8f0972c2819d56",
+      "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+      "browserRevision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a",
       "after": {
         "classification": "pass",
         "passed": 5,
@@ -3358,6 +3358,66 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/background-computed.html",
+      "artifact": "/tmp/background-shorthand-final-computed.json",
+      "artifactSha256": "a4e11f5bbf9b10c37a421a637a78456d9104b4c0bf274f3cc9656d646d76877d",
+      "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+      "browserRevision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a",
+      "after": {
+        "classification": "pass",
+        "passed": 39,
+        "reported": 39,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 39,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/background-invalid.html",
+      "artifact": "/tmp/background-shorthand-final-1.json",
+      "artifactSha256": "121091c19253cedabfe73970a5e4d6140959d1af24c8f1d2b0b5f84251c88ba0",
+      "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+      "browserRevision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/background-size-computed.html",
       "artifact": "/tmp/css-background-size-computed-after.json",
       "artifactSha256": "5261497efa88471b67ff57edf92b99518808c3b5fe77b664b50db3641e8d3b9f",
@@ -3441,6 +3501,36 @@
         "classification": "fail",
         "passed": 7,
         "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-backgrounds/parsing/background-valid.html",
+      "artifact": "/tmp/background-shorthand-final-0.json",
+      "artifactSha256": "4d6bfbcabd1c1228d722c161d7ca227c1524d41de105a376b28c1a6c1f16d8d2",
+      "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+      "browserRevision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a",
+      "after": {
+        "classification": "pass",
+        "passed": 46,
+        "reported": 46,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 7,
+        "reported": 46,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -5788,6 +5878,66 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-variables/variable-reference-shorthands-cssom.html",
+      "artifact": "/tmp/background-shorthand-final-5.json",
+      "artifactSha256": "1b6938b0c7731559ce682f3e04b55ee45b07d7b69979fa706d8e7097ad239fc4",
+      "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+      "browserRevision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-variables/variable-substitution-background-properties.html",
+      "artifact": "/tmp/background-shorthand-final-6.json",
+      "artifactSha256": "243346436edfa6757fcd70b08fddb7d45aa92ae53a50248553b8e8733563d6ff",
+      "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+      "browserRevision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a",
+      "after": {
+        "classification": "fail",
+        "passed": 8,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-variables/variable-substitution-shorthands.html",
       "artifact": "/tmp/css-border-pending-variable-substitution-shorthands-after.json",
       "artifactSha256": "7b0733d5d61bffeda2e7ff3f743b017ba50c898ea84a0fa8d3f784a74c33c42a",
@@ -6688,6 +6838,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/cssom/shorthand-serialization.html",
+      "artifact": "/tmp/css-box-shorthand-after.json",
+      "artifactSha256": "4f170b3f99821493847a25f14cda46fc3d358acec9a40dfb55f8c6e424ae30c5",
+      "stage": "Preserve unequal per-side priorities in margin/padding CSSOM shorthands",
+      "browserRevision": "c392a05a3fe61ac0cdc2385d3b81149e841eaa53",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/cssom/style-attr-stray-braces.tentative.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/73.json",
       "artifactSha256": "5faba348a8cae5c3558446b7521d36c405eec32f4e4dd1d782c1dc33978ddcf7",
@@ -6711,6 +6891,36 @@
         "classification": "fail",
         "passed": 14,
         "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/cssom/style-background-shorthand-overwrite.html",
+      "artifact": "/tmp/background-shorthand-final-4.json",
+      "artifactSha256": "3e3d23f4adecd39f276bdb4ffbb09b778e63e2dfe8ea851f8990c8b6d2523ed6",
+      "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+      "browserRevision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -7798,6 +8008,66 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createCDATASection-xhtml.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-0-final.json",
+      "artifactSha256": "63261c8bac397f439428a188152eeb1d5971625d81ffb45f18c221ecccbb90b4",
+      "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+      "browserRevision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-createCDATASection.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-1-final.json",
+      "artifactSha256": "4484af62ab7168b2658e7046befa989c59c860e208fe3a90e495392ce1484d0c",
+      "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+      "browserRevision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Document-createElement-namespace.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/113.json",
       "artifactSha256": "0662a6e0bed60d3a833cb1e7bc6b4f84c34d6cafd5c70e2089c1ecf38b9c3e1e",
@@ -8781,6 +9051,36 @@
         "classification": "fail",
         "passed": 0,
         "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/domparsing/DOMParser-parseFromString-xml-CDATA.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-3-final.json",
+      "artifactSha256": "b0e6d223c76b6f22c8b1987c8f0beae438706d9dadc054b4cdb5ff5b67dbb294",
+      "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+      "browserRevision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7",
+      "after": {
+        "classification": "pass",
+        "passed": 8,
+        "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 8,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -12748,6 +13048,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/html/semantics/forms/the-textarea-element/value-defaultValue-textContent-xhtml.xhtml",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-2-final.json",
+      "artifactSha256": "ac4ff6a59fef66d98a923e4d62ffc4e74d574a4611b697f00f1ea57a8d863039",
+      "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+      "browserRevision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7",
+      "after": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/html/semantics/forms/the-textarea-element/value-defaultValue-textContent.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/text-control-values-2-after.json",
       "artifactSha256": "035a5eb34c6212bcd388160bc7b01bac640512512fb82d9c24dbf5ce4e884cc7",
@@ -12831,6 +13161,36 @@
         "classification": "fail",
         "passed": 3,
         "reported": 30,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/syntax/serializing-html-fragments/serializing-cdata-in-html-document.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-4-final.json",
+      "artifactSha256": "391685f490c69f76c4e32c5b12eb64d2c3d5d086434ab7bb593bd6fc9a9c5e47",
+      "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+      "browserRevision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -14129,30 +14489,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T11:52:38.188050+00:00",
-    "throughBrowserRevision": "8a1ae810e49097fe30e0f4dba5d93df9d5bdbc31",
+    "recordedAt": "2026-11-05T12:12:53.722880+00:00",
+    "throughBrowserRevision": "5cec3dc63c88f7e944334557152b0f497f8fc693",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 346,
-    "totalMatchedRetests": 390,
+    "additionalMatchedRetests": 358,
+    "totalMatchedRetests": 402,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 252,
-    "cumulativeNetGain": 287,
-    "gainedFullPass": 287,
+    "mainlineNetGain": 259,
+    "cumulativeNetGain": 294,
+    "gainedFullPass": 294,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21112,
-      "pass": 4257,
-      "harness-error": 11442,
+      "fail": 21106,
+      "pass": 4264,
+      "harness-error": 11441,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4257,
-    "testedPassPercent": 11.0801665799063,
+    "passed": 4264,
+    "testedPassPercent": 11.098386257157731,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.2261487044629527,
+    "wholeManifestVerifiedPassPercent": 3.23145362363872,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -14951,6 +15311,71 @@
         "artifact": "/tmp/border-cssom-after.json",
         "stage": "Canonical hex border colors and resolved side/all-border CSSOM shorthands",
         "revision": "8a1ae810e49097fe30e0f4dba5d93df9d5bdbc31"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/cdata-0-final.json",
+        "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+        "revision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/cdata-1-final.json",
+        "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+        "revision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/cdata-2-final.json",
+        "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+        "revision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/cdata-3-final.json",
+        "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+        "revision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/cdata-4-final.json",
+        "stage": "Real CDATA DOM/parser/serialization/render integration; XHTML navigation remains unimplemented",
+        "revision": "9ee3919715c10e3d5b6b6759a95bf922c9905eb7"
+      },
+      {
+        "artifact": "/tmp/css-box-shorthand-after.json",
+        "stage": "Preserve unequal per-side priorities in margin/padding CSSOM shorthands",
+        "revision": "c392a05a3fe61ac0cdc2385d3b81149e841eaa53"
+      },
+      {
+        "artifact": "/tmp/background-shorthand-final-0.json",
+        "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+        "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
+      },
+      {
+        "artifact": "/tmp/background-shorthand-final-1.json",
+        "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+        "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
+      },
+      {
+        "artifact": "/tmp/background-shorthand-final-computed.json",
+        "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+        "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
+      },
+      {
+        "artifact": "/tmp/background-shorthand-final-3.json",
+        "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+        "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
+      },
+      {
+        "artifact": "/tmp/background-shorthand-final-4.json",
+        "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+        "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
+      },
+      {
+        "artifact": "/tmp/background-shorthand-final-5.json",
+        "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+        "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
+      },
+      {
+        "artifact": "/tmp/background-shorthand-final-6.json",
+        "stage": "Shared background shorthand grammar, pending longhand provenance and typed URL-image placement",
+        "revision": "c025f2813d81fa81ea4ab1c7412a28a348d8886a"
       }
     ],
     "previousLedgerRegressions": [
