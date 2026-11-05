@@ -80,14 +80,14 @@ try {
   const css = await countsStyles(`(() => {
     const s=getComputedStyle(leaf);return[s.color,s.width,s.getPropertyValue('--tone')];
   })()`);
-  equal([css[0], css[2]], ["rgba(12, 34, 56, 1)", "rgb(12,34,56)"], "explicit hidden CSS still resolves");
+  equal([css[0], css[2]], ["rgb(12, 34, 56)", "rgb(12,34,56)"], "explicit hidden CSS still resolves");
   check(css[1].endsWith("px") && Number.parseFloat(css[1]) > 0, "hidden ch width resolves to positive pixels");
   check(styleReads > 0, "explicit CSS materializes the deferred style");
   await evaluate(`leaf.style.width='81px';leaf.style.height='29px';leaf.style.color='rgb(9,8,7)';
     document.getElementById('hidden').style.setProperty('--tone','purple')`);
   equal(await evaluate(`(() => {const s=getComputedStyle(leaf);
     return[s.width,s.height,s.color,s.getPropertyValue('--tone')];})()`),
-    ["81px", "29px", "rgba(9, 8, 7, 1)", "purple"], "hidden CSS updates remain live");
+    ["81px", "29px", "rgb(9, 8, 7)", "purple"], "hidden CSS updates remain live");
 
   const rendered = await evaluate(`['inline','contents','svg'].map(id=>rect(document.getElementById(id)))`);
   check(rendered[0][2] > 0 && rendered[1][2] > 0, "inline and display-contents text retain bounds");
