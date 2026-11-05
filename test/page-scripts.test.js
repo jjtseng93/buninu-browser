@@ -1113,7 +1113,12 @@ test("page scripts cannot escape the sandbox or reach engine state", async () =>
     attempt('bindingConstructor', () => document.getElementById('p').constructor.constructor('return globalThis')().Bun);
     attempt('hostGlobals', () => [typeof process, typeof Bun, typeof require, typeof fetch].join('/'));
     attempt('privateState', () => Object.getOwnPropertySymbols(document).length + '/' + Object.getOwnPropertyNames(document).length);
-    attempt('newBinding', () => new document.constructor());
+    // Document is a public constructor. Its result must still be an inert
+    // binding with no native state or host window reachable from page code.
+    attempt('newBinding', () => { const d = new document.constructor();
+      return [d instanceof Document, d.defaultView, Object.getOwnPropertySymbols(d).length,
+        Object.getOwnPropertyNames(d).length].join('/'); });
+    attempt('newBindingConstructor', () => new document.constructor().constructor.constructor('return globalThis')().Bun);
     attempt('patchPrototype', () => { Object.getPrototypeOf(document.body).appendChild = () => 'pwned'; return 'patched'; });
     // Classic scripts are sloppy-mode code: assigning to a frozen property
     // fails silently, as in browsers. What matters is that nothing changed.
@@ -1128,7 +1133,8 @@ test("page scripts cannot escape the sandbox or reach engine state", async () =>
     // fetch is the page's own fetch (through the controller), not Bun's.
     hostGlobals: "undefined/undefined/undefined/function",
     privateState: "0/0",
-    newBinding: "blocked",
+    newBinding: "true//0/0",
+    newBindingConstructor: "blocked",
     patchPrototype: "patched",
     patchIntrinsic: "blocked",
     patchUrl: "blocked",
