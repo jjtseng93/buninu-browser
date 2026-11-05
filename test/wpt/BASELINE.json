@@ -4078,6 +4078,96 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/padding-computed.html",
+      "artifact": "/tmp/css-padding-after-0.json",
+      "artifactSha256": "c5ed7626b448e95849d472be9461791c286670c808432138d494f8ba1d41c7ef",
+      "stage": "Padding grammar, pending CSSOM and percentage geometry",
+      "browserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+      "after": {
+        "classification": "pass",
+        "passed": 13,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/padding-invalid.html",
+      "artifact": "/tmp/css-padding-after-1.json",
+      "artifactSha256": "cb77e016818adde98b8efc0210283537e66de595f608eda79763744293955afa",
+      "stage": "Padding grammar, pending CSSOM and percentage geometry",
+      "browserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 7,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/padding-valid.html",
+      "artifact": "/tmp/css-padding-after-2.json",
+      "artifactSha256": "9a04760b77f663b16bf0907423a0f9d35cfa9d45c8a9bb4d95bce56fbf45475e",
+      "stage": "Padding grammar, pending CSSOM and percentage geometry",
+      "browserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 10,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-box/parsing/width-invalid.html",
       "artifact": "/tmp/css-sizing-css-box-width-after.json",
       "artifactSha256": "246740bb5c46878041f785e10daa1dbf0a0116469bbbeffdf5267b1c555b29b0",
@@ -4881,6 +4971,126 @@
         "classification": "fail",
         "passed": 13,
         "reported": 14,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/padding-block-inline-computed.html",
+      "artifact": "/tmp/css-padding-after-3.json",
+      "artifactSha256": "4c41da83d57438328c197b0b72750974366836a513d07b4330d7c152c9b802cd",
+      "stage": "Padding grammar, pending CSSOM and percentage geometry",
+      "browserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+      "after": {
+        "classification": "pass",
+        "passed": 16,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 16,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/padding-block-inline-invalid.html",
+      "artifact": "/tmp/css-padding-after-4.json",
+      "artifactSha256": "e6996fe6b86e44d2990e13846a4a48e285b9490ee2b325aa2d39c69827c7857f",
+      "stage": "Padding grammar, pending CSSOM and percentage geometry",
+      "browserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+      "after": {
+        "classification": "pass",
+        "passed": 17,
+        "reported": 17,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 17,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/padding-block-inline-shorthand.html",
+      "artifact": "/tmp/css-padding-after-5.json",
+      "artifactSha256": "66a206b1b7e3181b95b4eb3ec08b69d97f354d17597bd249cfa34d29d790ce08",
+      "stage": "Padding grammar, pending CSSOM and percentage geometry",
+      "browserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-logical/parsing/padding-block-inline-valid.html",
+      "artifact": "/tmp/css-padding-after-6.json",
+      "artifactSha256": "79b12158ff92ef377f59603fb90be6e2bd79313e8812e8df9d6c7885827c5c1c",
+      "stage": "Padding grammar, pending CSSOM and percentage geometry",
+      "browserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
+      "after": {
+        "classification": "pass",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 8,
+        "reported": 9,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -8338,6 +8548,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-adoptNode.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/node-transfer-0-after.json",
+      "artifactSha256": "4d54b04a38b01dac3b768c326eb1e75bfe1ad0c44328a4ec59d9303e79d2c3a0",
+      "stage": "Cross-document node and attribute transfer",
+      "browserRevision": "62dbce0a21cb7c98432826dc095592f71062a548",
+      "after": {
+        "classification": "pass",
+        "passed": 7,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 7,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Document-constructor-svg.svg",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/109.json",
       "artifactSha256": "94d60c1806b58dfc08e5da623c2f9889fcf3bd9a11664f82c7b4aaf9508035ac",
@@ -8758,6 +8998,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Document-importNode.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/node-transfer-1-after.json",
+      "artifactSha256": "bca679d636ab9137783e6450a6f7a028a2e2ee1987f03d1bc373817efcac400c",
+      "stage": "Cross-document node and attribute transfer",
+      "browserRevision": "62dbce0a21cb7c98432826dc095592f71062a548",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/DocumentFragment-constructor.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/117.json",
       "artifactSha256": "01e9ec05667d05478e9caca0d1eb854f1dc2ab3e2bd6f021be674dde695c3fd6",
@@ -9028,6 +9298,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/dom/nodes/Element-tagName.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/node-transfer-5-after.json",
+      "artifactSha256": "65e43703fc788dc564dea1709909812a8cd7e51027a7a16db6447655688086e8",
+      "stage": "Cross-document node and attribute transfer",
+      "browserRevision": "62dbce0a21cb7c98432826dc095592f71062a548",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/dom/nodes/Element-webkitMatchesSelector.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/124.json",
       "artifactSha256": "9ed5417bcb37b4074a97d86122df981d4660170765fb92e9a62806ffed4c4faf",
@@ -9201,6 +9501,36 @@
         "classification": "fail",
         "passed": 129,
         "reported": 135,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-mutation-adoptNode.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/node-transfer-2-after.json",
+      "artifactSha256": "836568bd987157a8d58e7db70ced7cac691fb40e597c8ca67d634f36fdf721a2",
+      "stage": "Cross-document node and attribute transfer",
+      "browserRevision": "62dbce0a21cb7c98432826dc095592f71062a548",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 2,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -15118,6 +15448,66 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/shadow-dom/Document-prototype-adoptNode.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/node-transfer-3-after.json",
+      "artifactSha256": "203a2e2c81ccd013cacbb69f1e113aa47ffec53797f782bef496e8a9d3f5edbf",
+      "stage": "Cross-document node and attribute transfer",
+      "browserRevision": "62dbce0a21cb7c98432826dc095592f71062a548",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/shadow-dom/Document-prototype-importNode.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/node-transfer-4-after.json",
+      "artifactSha256": "1b1348241619b713fe14c7bb64e58dd2266b74f08396399a5c38e4cc73ed7b68",
+      "stage": "Cross-document node and attribute transfer",
+      "browserRevision": "62dbce0a21cb7c98432826dc095592f71062a548",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/open-during-abort-event.htm",
       "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-open-during-abort-event-after.json",
       "artifactSha256": "91f84983914979099eb111ff43f252a002a4f28e2e45be6d12393737a45be307",
@@ -15749,30 +16139,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T13:00:56.480211+00:00",
-    "throughBrowserRevision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40",
+    "recordedAt": "2026-11-05T13:19:45.961759+00:00",
+    "throughBrowserRevision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 400,
-    "totalMatchedRetests": 444,
+    "additionalMatchedRetests": 413,
+    "totalMatchedRetests": 457,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 288,
-    "cumulativeNetGain": 323,
-    "gainedFullPass": 323,
+    "mainlineNetGain": 301,
+    "cumulativeNetGain": 336,
+    "gainedFullPass": 336,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21079,
-      "pass": 4293,
+      "fail": 21066,
+      "pass": 4306,
       "harness-error": 11439,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4293,
-    "testedPassPercent": 11.173867777199375,
+    "passed": 4306,
+    "testedPassPercent": 11.20770432066632,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.2534311459383267,
+    "wholeManifestVerifiedPassPercent": 3.2632831386933225,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -16866,6 +17256,71 @@
         "artifact": "/tmp/css-will-change-final-after-5.json",
         "stage": "Will-change geometry, stacking and retained painting",
         "revision": "74d8398ae1cb6f97f936c6c6950f614d958fdc40"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/node-transfer-0-after.json",
+        "stage": "Cross-document node and attribute transfer",
+        "revision": "62dbce0a21cb7c98432826dc095592f71062a548"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/node-transfer-1-after.json",
+        "stage": "Cross-document node and attribute transfer",
+        "revision": "62dbce0a21cb7c98432826dc095592f71062a548"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/node-transfer-2-after.json",
+        "stage": "Cross-document node and attribute transfer",
+        "revision": "62dbce0a21cb7c98432826dc095592f71062a548"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/node-transfer-3-after.json",
+        "stage": "Cross-document node and attribute transfer",
+        "revision": "62dbce0a21cb7c98432826dc095592f71062a548"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/node-transfer-4-after.json",
+        "stage": "Cross-document node and attribute transfer",
+        "revision": "62dbce0a21cb7c98432826dc095592f71062a548"
+      },
+      {
+        "artifact": "/home/johnny/tmh/wpt-run/node-transfer-5-after.json",
+        "stage": "Cross-document node and attribute transfer",
+        "revision": "62dbce0a21cb7c98432826dc095592f71062a548"
+      },
+      {
+        "artifact": "/tmp/css-padding-after-0.json",
+        "stage": "Padding grammar, pending CSSOM and percentage geometry",
+        "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
+      },
+      {
+        "artifact": "/tmp/css-padding-after-1.json",
+        "stage": "Padding grammar, pending CSSOM and percentage geometry",
+        "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
+      },
+      {
+        "artifact": "/tmp/css-padding-after-2.json",
+        "stage": "Padding grammar, pending CSSOM and percentage geometry",
+        "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
+      },
+      {
+        "artifact": "/tmp/css-padding-after-3.json",
+        "stage": "Padding grammar, pending CSSOM and percentage geometry",
+        "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
+      },
+      {
+        "artifact": "/tmp/css-padding-after-4.json",
+        "stage": "Padding grammar, pending CSSOM and percentage geometry",
+        "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
+      },
+      {
+        "artifact": "/tmp/css-padding-after-5.json",
+        "stage": "Padding grammar, pending CSSOM and percentage geometry",
+        "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
+      },
+      {
+        "artifact": "/tmp/css-padding-after-6.json",
+        "stage": "Padding grammar, pending CSSOM and percentage geometry",
+        "revision": "5974a4e7f80f7d0a8af5e35db69fffda4d901811"
       }
     ],
     "previousLedgerRegressions": [

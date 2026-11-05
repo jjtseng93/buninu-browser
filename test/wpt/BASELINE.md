@@ -380,14 +380,14 @@ Multi-tab and window.open remain excluded from patch work. Selected passing test
 
 See [README.md](README.md) for commands. A patched full rerun must use a separate output directory; do not overwrite the baseline.
 
-## Mainline targeted estimate through `74d8398`
+## Mainline targeted estimate through `5974a4e`
 
-The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **444 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
+The frozen baseline and patches 001–025 estimate above remain unchanged. The combined ledger now covers **457 distinct frozen case URLs**, including query variants. Only the recorded outcomes are replaced; partially passing files do not count as complete passes.
 
-- **Estimated tested-case pass rate: 4,293 / 38,420 = 11.17387%.**
-- **Estimated whole-manifest passing share: 4,293 / 131,953 = 3.25343%.**
-- Cumulative gain over the frozen baseline: **323 complete files**, or **+0.84071 percentage points** among eligible cases.
-- Gain beyond patches 001–025: **288 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
+- **Estimated tested-case pass rate: 4,306 / 38,420 = 11.20770%.**
+- **Estimated whole-manifest passing share: 4,306 / 131,953 = 3.26328%.**
+- Cumulative gain over the frozen baseline: **336 complete files**, or **+0.87454 percentage points** among eligible cases.
+- Gain beyond patches 001–025: **301 files**. Matched pass-to-nonpass regressions against the frozen baseline: **0**.
 
 ### Uniform audit and subsequent fixes
 
@@ -454,7 +454,10 @@ Since the previous ledger through `74c131d`, the net increase is **22 files**: n
 
 The broader regression checks found an obsolete animation fixture expectation: a canceled global `ErrorEvent` should be delivered but not reported to the host. `edbc6a4` corrects that assertion and checks delivery separately; all four animation tests pass, with no production change or WPT gain. Two other pre-existing `computed-style.test.js` failures were reproduced with the pre-radius HEAD sources: array identity after `border:inherit`, and an obsolete expectation accepting `calc(50% -10px)` without required whitespace. `5cec3dc` restores the array-sharing optimization and passes the original identity test unchanged. `26b141b` then corrects the mixed numeric fixture: subtraction without required whitespace is invalid, infinity follows the existing finite clamp, and valid percentage margin math is retained and resolved by layout. The full computed-style test file now passes; the border identity assertion remains unchanged.
 
-These parts and five evidence-only additions add **146 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **113 files**, comprising 108 newly fixed files and five evidence-only additions. The latest form ownership, namespace creation/clone and `will-change` parts fix **12 complete files**, adding **+0.03123 percentage points** among eligible cases. Partially improved XML-iframe factory files are not counted as complete passes. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
+- `62dbce0`: preserve node/attribute ownership across explicit adoption, import and implicit insertion, **+4 newly fixed complete files** (+0.01041 percentage points). Six official files improve from 15/24 to 24/24 assertions; two additional files already passed the fresh before run and are recorded as earlier-fix evidence, not new gains from this commit. Native removal hooks, shadow-inclusive ownership, specialized clones and page-realm validation remain intact. Focused transfer/XHTML tests pass 12 tests / 220 assertions; independent review passes. Two unrelated broad-regression failures were reproduced on a clean pre-change archive. Template inert ownership and complete cross-realm wrapper identity remain separate work.
+- `5974a4e`: share physical/logical padding grammar, pending CSSOM order and used percentage geometry, **+7 complete files** (+0.01822 percentage points). Seven official files improve from 35/88 assertions and zero complete passes to 88/88 and seven complete passes. Inline/image offsets use containing width; logical computed getters, scroll extents and caret reveal consume resolved padding. Pixel, resize, scroll and shared CSS/layout regressions pass 219 tests / 3,770 assertions with independent review. Automatic border-box form-control default sizes and vertical writing remain separate limitations.
+
+These parts and seven evidence-only additions add **159 complete files** beyond the uniform-audit follow-up ledger through `d8ae039`. Since `9e6171e`, the ledger increases by **126 files**, comprising 119 newly fixed files and seven evidence-only additions. The latest adoption/import and padding parts fix **11 complete files**, adding **+0.02863 percentage points** among eligible cases; two earlier-fixed cases were also newly recorded. Partially improved XML-iframe factory files are not counted as complete passes. Their exact-URL artifacts are recorded separately; this is not a new whole-suite run.
 
 ### Registration and scope limitations
 
