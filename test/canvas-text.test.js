@@ -4,7 +4,7 @@ import { loadGraphics } from "../lib/renderer/page-renderer.js";
 
 test("canvas fonts share shorthand parsing, font units, styles and quoted fallback families", () => {
   expect(parseCanvasFont('italic bold 1.5em "A, B", sans-serif', 20)).toEqual({
-    fontSize: 30, fontFamily: ["A, B", "sans-serif"], fontWeight: 700, fontStyle: "italic", fontStretch: 100,
+    fontSize: 30, fontFamily: ['"A, B"', "sans-serif"], fontWeight: 700, fontStyle: "italic", fontStretch: 100,
   });
   expect(parseCanvasFont("condensed 2rem monospace", 20, 15).fontSize).toBe(30);
   expect(parseCanvasFont("condensed 12pt monospace").fontStretch).toBe(75);

@@ -81,7 +81,7 @@ test("explicit inheritance preserves serialized values, factors and fallback fie
     document.querySelector('#small').setAttribute('style', 'font-size:10px;line-height:inherit');
     const engine = new StyleEngine().compute(document);
     expect(engine.get(document.querySelector('#child'))).toMatchObject({
-      backgroundColor: 'rgba(20, 40, 60, 1)', fontFamily: ['Two Words', 'Comma, Face', 'serif'],
+      backgroundColor: 'rgba(20, 40, 60, 1)', fontFamily: ['Two Words', '"Comma, Face"', 'serif'],
       fontSize: 20, fontWeight: 600, fontStyle: 'italic', fontStretch: 87.5,
       lineHeight: 25, lineHeightFactor: 1.25, listStyleType: 'decimal', pointerEvents: 'none',
       userSelect: 'all', textAlign: 'end', whiteSpace: 'pre-wrap', colorScheme: 'dark', opacity: .6,
@@ -98,7 +98,7 @@ test("ordinary inheritance does not serialize unrelated font families", () => {
     let serialized = 0;
     const fontFamily = new Proxy(parent.fontFamily, {
       get(target, key, receiver) {
-        if (key === 'map') serialized++;
+        if (key === 'join') serialized++;
         return Reflect.get(target, key, receiver);
       },
     });
