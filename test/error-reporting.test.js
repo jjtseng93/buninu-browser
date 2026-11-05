@@ -222,3 +222,63 @@ test('module parse/runtime failures report once, load failures stay resource err
     expect([result.caught,result.later,result.unreachable]).toEqual(['caught import',true,'undefined']);
   } finally {await renderer.close();server.stop(true);}
 },30_000);
+
+test('SES error defaults retain standard data descriptors and native exception names without reading page getters', async () => {
+  const renderer=new RendererHost({timeout:20000});
+  try {
+    await renderer.call('loadDocument',{url:'https://page.test/errors',contentType:'text/html',source:'<!doctype html><body></body>'});
+    await renderer.call('whenLoaded');
+    expect(await renderer.call('evaluate',`(()=>{
+      const result=[];
+      for(const name of ['Error','EvalError','RangeError','ReferenceError','SyntaxError','TypeError','URIError']) {
+        const C=globalThis[name],n=Object.getOwnPropertyDescriptor(C.prototype,'name'),m=Object.getOwnPropertyDescriptor(C.prototype,'message');
+        result.push([C.name,n.value,n.writable,n.enumerable,n.configurable,m.value,m.writable,typeof n.get]);
+      }
+      return result;
+    })()`)).toEqual(['Error','EvalError','RangeError','ReferenceError','SyntaxError','TypeError','URIError']
+      .map(name=>[name,name,true,false,true,'',true,'undefined']));
+    const result=await renderer.call('evaluate',`(()=>{
+      const reported=[];globalThis.accesses=0;
+      addEventListener('error',e=>{reported.push([e.message,e.error.name]);e.preventDefault()});
+      for(const action of [()=>null.field,()=>JSON.parse('{'),()=>new Array(-1)]) {
+        try{action()}catch(error){reportError(error);console.error(error)}
+      }
+      const error=new TypeError('secret');
+      const getter=()=>{accesses++;throw Error('getter ran')};getter.originalValue='ForgedError';
+      Object.defineProperty(error,'name',{get:getter});
+      console.error(error);
+      return [reported.map(row=>row[0].startsWith('Uncaught '+row[1]+':')),accesses,typeof getStackString];
+    })()`);
+    expect(result).toEqual([[true,true,true],0,'undefined']);
+    const messages=await renderer.call('consoleMessages');
+    expect(messages.slice(0,3).map(e=>e.text.split(':')[0])).toEqual(['TypeError','SyntaxError','RangeError']);
+    expect(messages[3].text).not.toContain('ForgedError');
+    expect(await renderer.call('evaluate','accesses')).toBe(0);
+    expect(await renderer.call('evaluate',`(()=>{
+      const touched=[];
+      for(const key of ['name','message','stack']) {
+        const error=new Error('accessor');
+        Object.defineProperty(error,key,{get(){touched.push(key);return 'author'}});
+        console.error(error);
+      }
+      for(const key of ['name','message']) {
+        const error=new Error('conversion');
+        error[key]={toString(){touched.push(key+'.toString');return 'author'}};
+        console.error(error);
+      }
+      const error=new Error('proxy');
+      Object.setPrototypeOf(error,new Proxy(Error.prototype,{
+        get(){touched.push('get')},
+        getOwnPropertyDescriptor(){touched.push('descriptor')},
+        getPrototypeOf(){touched.push('prototype')}
+      }));
+      console.error(error);
+      return touched;
+    })()`)).toEqual([]);
+    await renderer.call('evaluate',"TypeError.prototype.name='LocalError'");
+    expect(await renderer.call('evaluate',"new TypeError().name")).toBe('LocalError');
+    await renderer.call('loadDocument',{url:'https://page.test/new',contentType:'text/html',source:'<!doctype html><body></body>'});
+    await renderer.call('whenLoaded');
+    expect(await renderer.call('evaluate',"new TypeError().name")).toBe('TypeError');
+  } finally {await renderer.close();}
+},30000);
