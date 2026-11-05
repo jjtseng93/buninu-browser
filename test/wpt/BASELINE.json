@@ -3238,6 +3238,126 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/height-invalid.html",
+      "artifact": "/tmp/css-sizing-css-box-height-after.json",
+      "artifactSha256": "2b69363eb352f127d0b58a37facf94acf9440ef8379b43d7b8a87fb04b548431",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 10,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 8,
+        "reported": 10,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/max-height-invalid.html",
+      "artifact": "/tmp/css-sizing-css-box-max-height-after.json",
+      "artifactSha256": "7fe18193c5baab34356dbb69f7b8078d0ae1f6707dcee55f3e08baafb954cfb2",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/max-width-invalid.html",
+      "artifact": "/tmp/css-sizing-css-box-max-width-after.json",
+      "artifactSha256": "e2dd762880f86d5e97c4eb0c27dda266ed8ee18697c220aa3d9949a6ad7ba594",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-box/parsing/width-invalid.html",
+      "artifact": "/tmp/css-sizing-css-box-width-after.json",
+      "artifactSha256": "246740bb5c46878041f785e10daa1dbf0a0116469bbbeffdf5267b1c555b29b0",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 13,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 9,
+        "reported": 13,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-color/parsing/color-computed.html",
       "artifact": "/tmp/css-currentcolor-computed-after.json",
       "artifactSha256": "44f98a5f559ad0c5585539882e79f3306d4ba1d9b12361a2f92b5aef785f2635",
@@ -3993,6 +4113,456 @@
       "artifactSha256": "2864a5b86a94739edee368647ff743088a7d6ca1f937c7babf8937bb48036651",
       "stage": "Uniform ledger retest",
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/height-invalid.html",
+      "artifact": "/tmp/css-sizing-css-sizing-height-after.json",
+      "artifactSha256": "ba423f37e5cf8929313685e2590371f7a68cebe57165a0570d334e65904ca916",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/max-height-invalid.html",
+      "artifact": "/tmp/css-sizing-css-sizing-max-height-after.json",
+      "artifactSha256": "966b77cae513a9a03fea2bd759e031d5a311b76bc64b5594c5a34d038048944f",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/max-width-invalid.html",
+      "artifact": "/tmp/css-sizing-css-sizing-max-width-after.json",
+      "artifactSha256": "bd16b338d2ac8710dccd577d08bddb889ff5c49390e0dd9b070fb58026e7a306",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/min-height-invalid.html",
+      "artifact": "/tmp/css-sizing-css-sizing-min-height-after.json",
+      "artifactSha256": "73a0386e18b9acde8258ab506fdc3c21812cbd1e695a88f3cf685e6964fbb30d",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/min-width-invalid.html",
+      "artifact": "/tmp/css-sizing-css-sizing-min-width-after.json",
+      "artifactSha256": "00daad78343e270661498eca298e8dba8844bb3505ac647621ba0137efc104ea",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-sizing/parsing/width-invalid.html",
+      "artifact": "/tmp/css-sizing-css-sizing-width-after.json",
+      "artifactSha256": "6839fb4405f4467efd9eb00ab593720ccb1d12cecaa543069c2c079f3e266f3b",
+      "stage": "CSS dimensions grammar and used-size range",
+      "browserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/border-collapse-computed.html",
+      "artifact": "/tmp/css-table-border-collapse-computed-final.json",
+      "artifactSha256": "bc09bfd83437a60072d7864fed11306a5a152e8b821067b3a203d5208e35b750",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/border-collapse-invalid.html",
+      "artifact": "/tmp/css-table-border-collapse-invalid-final.json",
+      "artifactSha256": "ec6495525b40e64ae09f55fd73cb573b463c05f5ca083115a97d7ed2fc24dbf4",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/border-collapse-valid.html",
+      "artifact": "/tmp/css-table-border-collapse-valid-final.json",
+      "artifactSha256": "a11135debe5bf66778024aa72f3e5b9b1534b3b4cbc2da5dda3be05187110829",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/border-spacing-computed.html",
+      "artifact": "/tmp/css-table-border-spacing-computed-after.json",
+      "artifactSha256": "16725568fc2ce77374de76a1b85941e65072af82cbf15ec32e76fbf4494f05de",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/border-spacing-invalid.html",
+      "artifact": "/tmp/css-table-border-spacing-invalid-after.json",
+      "artifactSha256": "13f7d9075fb7482941e3c7b008b9aa494186316ab9515fc387333c1f249ff635",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/border-spacing-valid.html",
+      "artifact": "/tmp/css-table-border-spacing-valid-after.json",
+      "artifactSha256": "063106baee0b81ed21b007e45f1657fe0e2aa317b7552a456549fcd6116892c0",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 3,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/table-layout-computed.html",
+      "artifact": "/tmp/css-table-table-layout-computed-after.json",
+      "artifactSha256": "7a0a33ef4aaa1fcd8629c3d30222da38cda62b0bc14ca7f28990c65bc1970fed",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/table-layout-invalid.html",
+      "artifact": "/tmp/css-table-table-layout-invalid-after.json",
+      "artifactSha256": "db41293140e9cd6cbbc47871337a09aba0c021433cd65cb84dc4247b7a9f478d",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
+      "after": {
+        "classification": "pass",
+        "passed": 2,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 2,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-tables/parsing/table-layout-valid.html",
+      "artifact": "/tmp/css-table-table-layout-valid-after.json",
+      "artifactSha256": "67da9f5d4660795e3ac15074fdab4152a38e2c036788326a721ec7175531c621",
+      "stage": "CSS table values",
+      "browserRevision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8",
       "after": {
         "classification": "pass",
         "passed": 2,
@@ -9808,6 +10378,66 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/xhr/open-during-abort-event.htm",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-open-during-abort-event-after.json",
+      "artifactSha256": "91f84983914979099eb111ff43f252a002a4f28e2e45be6d12393737a45be307",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/open-during-abort-processing.htm",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-open-during-abort-processing-after.json",
+      "artifactSha256": "a3463df943891154dfc8a2d24614c7da87a0c0f010437443bb8e4abc3f530273",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/overridemimetype-blob.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/237.json",
       "artifactSha256": "480820a540097923525ab98b487d956a5de784f1a01788e6aaaa6bbcd2c3d064",
@@ -10048,6 +10678,36 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/xhr/overridemimetype-open-state-force-xml.htm",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-overridemimetype-open-state-force-xml-after.json",
+      "artifactSha256": "b33bf6c1cafe25c04f161892b67a6ed4291dd677af71b6732491c20f05919be7",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 2,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/overridemimetype-unsent-state-force-shiftjis.any.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/245.json",
       "artifactSha256": "d548a914a54ba69bb22eff88e594b8a46a28af94229ace60c4a6953115508346",
@@ -10138,6 +10798,36 @@
       "fullPassDelta": 0
     },
     {
+      "url": "http://web-platform.test:18000/xhr/response-invalid-responsetype.htm",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-response-invalid-responsetype-after.json",
+      "artifactSha256": "c1389e58d2ecb8eef3915194eab2d6f41ef8a2f4f9b1537e7fb22704b94785ef",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/xhr/responsetext-decoding.htm",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/248.json",
       "artifactSha256": "32775f56e5272cc212b699e4eb93773a2c99ac5e6b6f7bfcfc4ebffb36d37e3a",
@@ -10166,33 +10856,183 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/responsexml-get-twice.htm",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-responsexml-get-twice-after.json",
+      "artifactSha256": "ee84f288436f6ffe1d46e51a3d3ec79ea7dbf8a7c6b889fa0b82ef940499ea12",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 1,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/responsexml-invalid-type.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-responsexml-invalid-type-after.json",
+      "artifactSha256": "29d02850997769b394eca1ad865429efe8e53ffbfe2f8e67c9ef65e68ae2161c",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/responsexml-non-document-types.htm",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-responsexml-non-document-types-after.json",
+      "artifactSha256": "922294a4f338554514ddef791ff6c846697151fbd6858628b9f64daa56956433",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/send-redirect-no-location.htm",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-send-redirect-no-location-after.json",
+      "artifactSha256": "f53631d254b4edc1933b3548473a7c1e775fc28bd5fab9d614e560fbb57d8174",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/xhr/template-element.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-template-element-after.json",
+      "artifactSha256": "4d324261d33017604b4deee20d7bc3d19393f857697cfc05d890caf785957f0b",
+      "stage": "XHR inert document responses and request reentry",
+      "browserRevision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1",
+      "after": {
+        "classification": "pass",
+        "passed": 3,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 3,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T07:39:34.518241+00:00",
-    "throughBrowserRevision": "d8ae039eb025579c900d4d0162bea42bbc2bc1b3",
+    "recordedAt": "2026-11-05T08:08:17.147918+00:00",
+    "throughBrowserRevision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 214,
-    "totalMatchedRetests": 258,
+    "additionalMatchedRetests": 242,
+    "totalMatchedRetests": 286,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 142,
-    "cumulativeNetGain": 177,
-    "gainedFullPass": 177,
+    "mainlineNetGain": 166,
+    "cumulativeNetGain": 201,
+    "gainedFullPass": 201,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21217,
-      "pass": 4147,
-      "harness-error": 11447,
+      "fail": 21194,
+      "pass": 4171,
+      "harness-error": 11446,
       "unsupported-infrastructure": 1457,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4147,
-    "testedPassPercent": 10.793857365955231,
+    "passed": 4171,
+    "testedPassPercent": 10.856324830817282,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.142785688843755,
+    "wholeManifestVerifiedPassPercent": 3.160973983160671,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -10311,6 +11151,146 @@
         "artifact": "/tmp/nodelist-final-ParentNode-querySelectorAll-removed-elements.html.json",
         "stage": "Static NodeList cache follow-up",
         "revision": "d8ae039eb025579c900d4d0162bea42bbc2bc1b3"
+      },
+      {
+        "artifact": "/tmp/css-table-border-collapse-computed-final.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-border-collapse-invalid-final.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-border-collapse-valid-final.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-border-spacing-computed-after.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-border-spacing-invalid-after.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-border-spacing-valid-after.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-table-layout-computed-after.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-table-layout-invalid-after.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/tmp/css-table-table-layout-valid-after.json",
+        "stage": "CSS table values",
+        "revision": "9b8bc27f894ec55f70297eb1d4f9fe0d631b2cd8"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-open-during-abort-event-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-open-during-abort-processing-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-overridemimetype-open-state-force-xml-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-response-invalid-responsetype-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-responsexml-get-twice-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-responsexml-invalid-type-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-responsexml-non-document-types-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-send-redirect-no-location-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/xhr-document-template-element-after.json",
+        "stage": "XHR inert document responses and request reentry",
+        "revision": "179e4c18048c1cfc6c8244ffbb6de6d42f7c0fe1"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-sizing-width-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-sizing-height-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-sizing-min-width-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-sizing-min-height-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-sizing-max-width-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-sizing-max-height-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-box-width-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-box-height-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-box-max-width-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
+      },
+      {
+        "artifact": "/tmp/css-sizing-css-box-max-height-after.json",
+        "stage": "CSS dimensions grammar and used-size range",
+        "revision": "3d44a3533b9d324e22c3160718ec2cbc9a74356a"
       }
     ],
     "previousLedgerRegressions": [
