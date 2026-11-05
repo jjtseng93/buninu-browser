@@ -2428,6 +2428,216 @@
   },
   "mainlineTargetedRetests": [
     {
+      "url": "http://web-platform.test:18000/FileAPI/blob/Blob-constructor-endings.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-2-after.json",
+      "artifactSha256": "8321db44fb9bf6d05af8a45f62d26d6045eb36e13af93488432c544ba06fab11",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 2,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/blob/Blob-constructor-endings.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-3-after.json",
+      "artifactSha256": "3360ecbc30d1ad4bd74b0953a5b6cf3ba3d9f0896ebb67512f84e47f8063d7e2",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
+      "after": {
+        "classification": "pass",
+        "passed": 34,
+        "reported": 34,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 24,
+        "reported": 34,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/blob/Blob-constructor.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-1-after.json",
+      "artifactSha256": "9ffd05b1a1505e07457cab650349a1acb642402cbccca2259eacc719ba514daa",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
+      "after": {
+        "classification": "fail",
+        "passed": 71,
+        "reported": 73,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 43,
+        "reported": 73,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/blob/Blob-slice.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-4-after.json",
+      "artifactSha256": "1a91f61f695d843800e48c6667dffe1d272c5622a85eb752a7f2fcc2416d97ee",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
+      "after": {
+        "classification": "pass",
+        "passed": 150,
+        "reported": 150,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 143,
+        "reported": 150,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/file/File-constructor-endings.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-6-after.json",
+      "artifactSha256": "68f00e96fa7cf6bf568fed01ba9effb946e02b9c5075ee1d0d829664e596c866",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/file/File-constructor-endings.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-7-after.json",
+      "artifactSha256": "c77a5e74dece7d4cb48a7929bf90b190216b401ed030412ca7d31cf51804ad0a",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
+      "after": {
+        "classification": "pass",
+        "passed": 34,
+        "reported": 34,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 24,
+        "reported": 34,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/FileAPI/file/File-constructor.any.html",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-5-after.json",
+      "artifactSha256": "a6698afde5be0ccf9638f2917569c0c3cd77e1764670c25f8912067777138011",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
+      "after": {
+        "classification": "pass",
+        "passed": 51,
+        "reported": 51,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 40,
+        "reported": 51,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/FileAPI/reading-data-section/FileReader-event-handler-attributes.any.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/183.json",
       "artifactSha256": "09bf798e5c07181e9e3e4d1d6b6b9c766a1948ad0be874b79e621ce80ab4b91d",
@@ -2639,13 +2849,13 @@
     },
     {
       "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_readAsDataURL.any.html",
-      "artifact": "/tmp/wpt-mainline-current-wicq3Q/179.json",
-      "artifactSha256": "03f585032cbb34bcfe1e07711bfe1b26b60db3c61d9cf83fde083128b1a3fe2b",
-      "stage": "Uniform ledger retest",
-      "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-8-after.json",
+      "artifactSha256": "20b9270ea37457da7f81963cf72a3c44476ac5b5f6969eaa0e7746f98ac0f0c6",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
       "after": {
-        "classification": "fail",
-        "passed": 3,
+        "classification": "pass",
+        "passed": 4,
         "reported": 4,
         "done": true,
         "harnessStatus": 0,
@@ -2665,7 +2875,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/FileAPI/reading-data-section/filereader_readAsText.any.html",
@@ -2758,6 +2968,516 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/column-gap-computed.html",
+      "artifact": "/tmp/css-gap-after-column-gap-computed.html.json",
+      "artifactSha256": "8080a4d88a90619e4098818edbcf60240891e7a5c39de775c3aec469a76abcb0",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/column-gap-invalid.html",
+      "artifact": "/tmp/css-gap-after-column-gap-invalid.html.json",
+      "artifactSha256": "611c23ab0236e28ad2634beea773b624126a0ff59b73f21b655405d1ded65061",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/column-gap-valid.html",
+      "artifact": "/tmp/css-gap-after-column-gap-valid.html.json",
+      "artifactSha256": "ab802280cea4261b5d87d7875c070893fb539d0b40d6c3add0d31ffcea8d2ce0",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/gap-computed.html",
+      "artifact": "/tmp/css-gap-after-gap-computed.html.json",
+      "artifactSha256": "b34d1b4892965ec417e84073ab1e1b439df10af34f996bf3cf59cb0cf04c9061",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/gap-invalid.html",
+      "artifact": "/tmp/css-gap-after-gap-invalid.html.json",
+      "artifactSha256": "96766c66dc9bf966ef66c7d531bdb82ba595952d30be69c95ccc036f7e97cffe",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/gap-shorthand.html",
+      "artifact": "/tmp/css-gap-after-gap-shorthand.html.json",
+      "artifactSha256": "e8fc47a3ec2b7346eeb192ca0ce67cf80a46adbef1ec98dbd89b8e762c46c22a",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/gap-valid.html",
+      "artifact": "/tmp/css-gap-after-gap-valid.html.json",
+      "artifactSha256": "8ea28ffe2a25f10278fa296111bc2e1c878c8135434765ba5aec0446143bb6cf",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-column-gap-computed.html",
+      "artifact": "/tmp/css-gap-after-grid-column-gap-computed.html.json",
+      "artifactSha256": "a0604f80f702c1d9f26a26ea8348bcee1944717569f0fac0c49714f56d40fcf6",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-column-gap-invalid.html",
+      "artifact": "/tmp/css-gap-after-grid-column-gap-invalid.html.json",
+      "artifactSha256": "62b434d7534945849bd53a7afa42cc6a3ed6662d37e0abc0c239bf25ad27dfba",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-column-gap-valid.html",
+      "artifact": "/tmp/css-gap-after-grid-column-gap-valid.html.json",
+      "artifactSha256": "4642af5b89a4fa54d482a1ae55e7af47af2de3f07ed0592d0421eaa933227de3",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-gap-computed.html",
+      "artifact": "/tmp/css-gap-after-grid-gap-computed.html.json",
+      "artifactSha256": "745ebaf87c6ab95cd3168bcdd43d3931913845f7f01a92f6ea682a03331fee5d",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 11,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 11,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-gap-invalid.html",
+      "artifact": "/tmp/css-gap-after-grid-gap-invalid.html.json",
+      "artifactSha256": "193c036cd78cbe9a47a1cadd43bc214dca6e4260df248fc855c74b6080402ffd",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-gap-shorthand.html",
+      "artifact": "/tmp/css-gap-after-grid-gap-shorthand.html.json",
+      "artifactSha256": "4c81a32430dc3285b0fe6a123a2c7cb4b2e8107c25bb0c6d28e8ed5584db6517",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 12,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 12,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-gap-valid.html",
+      "artifact": "/tmp/css-gap-after-grid-gap-valid.html.json",
+      "artifactSha256": "2e0f4ab0a3c5a9828fb6969009bd807e449160c129fa0c9ec0b9ce571f7c5147",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 9,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 5,
+        "reported": 9,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-row-gap-computed.html",
+      "artifact": "/tmp/css-gap-after-grid-row-gap-computed.html.json",
+      "artifactSha256": "ad0ffba6107cf29079c59bae900108dc5525a1691583a35f55d50b081207d2ae",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-row-gap-invalid.html",
+      "artifact": "/tmp/css-gap-after-grid-row-gap-invalid.html.json",
+      "artifactSha256": "f6b03af6867015acb2260026f9182b12cedb046c6c47692e7b50ebc81f0a76f8",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/grid-row-gap-valid.html",
+      "artifact": "/tmp/css-gap-after-grid-row-gap-valid.html.json",
+      "artifactSha256": "71fbbe4b2a63c0565a2f2162c8a392c46cabe23204b1e774974f31a3e4ff9bbc",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/css/css-align/parsing/justify-self-computed.html",
       "artifact": "/tmp/wpt-mainline-current-wicq3Q/0.json",
       "artifactSha256": "5ff024acb7c42ee8d272bb9e803d486ea78b5fd08936eec28439b90505f05ecf",
@@ -2786,6 +3506,96 @@
         "runnerError": null
       },
       "fullPassDelta": 0
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/row-gap-computed.html",
+      "artifact": "/tmp/css-gap-after-row-gap-computed.html.json",
+      "artifactSha256": "83d2f482eed2a7a2fa9e2709eec3e17770b5b745b17000cb5dc492ddf8346f2e",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 6,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 6,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/row-gap-invalid.html",
+      "artifact": "/tmp/css-gap-after-row-gap-invalid.html.json",
+      "artifactSha256": "4b206e40c0896380171f5870fe0c5f7f2820646da0b631ae669fca037415ad4d",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/css/css-align/parsing/row-gap-valid.html",
+      "artifact": "/tmp/css-gap-after-row-gap-valid.html.json",
+      "artifactSha256": "e1065005f0c2a14532f17324936c7dd4bcc1f55c125673ab8460dd9bfe0836f5",
+      "stage": "CSS gap grammar and percentage flex/grid layout",
+      "browserRevision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 4,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/css/css-animations/parsing/animation-delay-computed.html",
@@ -9449,13 +10259,13 @@
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-getElementById.html",
-      "artifact": "/tmp/dom-query-Document-getElementById.html-final.json",
-      "artifactSha256": "d931d6a63d87aa23015526475b8b60f6f2ab2979b0c52755fab0ef3a967ed5e4",
-      "stage": "DOM namespace and exact tree-order ID queries",
-      "browserRevision": "a90d1b717464bea2bf7fd987ab6797f7cd404df6",
+      "artifact": "/tmp/outerhtml-6-after.json",
+      "artifactSha256": "7a20707d9efa7841dd3f848256e8934f5cccd65cec63aae1f580d3500e269197",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
       "after": {
-        "classification": "fail",
-        "passed": 16,
+        "classification": "pass",
+        "passed": 18,
         "reported": 18,
         "done": true,
         "harnessStatus": 0,
@@ -9475,7 +10285,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/dom/nodes/Document-getElementsByTagName-xhtml.xhtml",
@@ -10073,6 +10883,66 @@
         "reported": 135,
         "done": true,
         "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-compareDocumentPosition.html",
+      "artifact": "/tmp/node-comparison-after-final.json",
+      "artifactSha256": "82b0f208e0263fd3107a53389ae922ee5ada03fc41da1b5bb7dd88496875110a",
+      "stage": "Node comparison and containment; contains is earlier-fix evidence",
+      "browserRevision": "6848f7e",
+      "after": {
+        "classification": "pass",
+        "passed": 1444,
+        "reported": 1444,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 1,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/dom/nodes/Node-contains.html",
+      "artifact": "/tmp/node-contains-after.json",
+      "artifactSha256": "e898fe23362263783a23b61d7c242f055a7d973843e1e132e3c68cbe920a0982",
+      "stage": "Node comparison and containment; contains is earlier-fix evidence",
+      "browserRevision": "6848f7e",
+      "after": {
+        "classification": "pass",
+        "passed": 1482,
+        "reported": 1482,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "harness-error",
+        "passed": 0,
+        "reported": 0,
+        "done": true,
+        "harnessStatus": 1,
         "runnerError": null
       },
       "fullPassDelta": 1
@@ -11181,6 +12051,96 @@
         "classification": "fail",
         "passed": 0,
         "reported": 8,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/domparsing/outerhtml-01.html",
+      "artifact": "/tmp/outerhtml-0-after.json",
+      "artifactSha256": "7ed3d22f6e33bf909295ef5ae4ad010873ec085d47132f2a86c720e1301a460f",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/domparsing/outerhtml-02.html",
+      "artifact": "/tmp/outerhtml-1-after.json",
+      "artifactSha256": "f6ba5a22450ac3f90ab7aeb7ccc814616870f1a19914cbeeb30471ce792f2b9e",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
+      "after": {
+        "classification": "pass",
+        "passed": 5,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 5,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/domparsing/outerhtml-03.html",
+      "artifact": "/tmp/outerhtml-2-after.json",
+      "artifactSha256": "4118a69d2cf36d1bb067db0dbbf2b1b059f407c605403c08fa16567e56e413dd",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
+      "after": {
+        "classification": "pass",
+        "passed": 4,
+        "reported": 4,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 4,
         "done": true,
         "harnessStatus": 0,
         "runnerError": null
@@ -15658,6 +16618,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/html/syntax/serializing-html-fragments/outerHTML.html",
+      "artifact": "/tmp/outerhtml-7-after.json",
+      "artifactSha256": "8774cb806359749a51ab19332bdc4ec59dfed14e184fb3fbdcf28ebfd1c566fb",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
+      "after": {
+        "classification": "pass",
+        "passed": 112,
+        "reported": 112,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 112,
+        "reported": 112,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
+    },
+    {
       "url": "http://web-platform.test:18000/html/syntax/serializing-html-fragments/serializing-cdata-in-html-document.html",
       "artifact": "/data/data/com.termux/files/home/wpt-run/cdata-4-final.json",
       "artifactSha256": "391685f490c69f76c4e32c5b12eb64d2c3d5d086434ab7bb593bd6fc9a9c5e47",
@@ -15686,6 +16676,66 @@
         "runnerError": null
       },
       "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/webappapis/dynamic-markup-insertion/the-outerhtml-property/outerhtml-documentfragment.html",
+      "artifact": "/tmp/outerhtml-3-after.json",
+      "artifactSha256": "aa5e55c9e9ea23fe4331a3c5c310acb48fcfd2b6d58604be1ca58333eedc1420",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
+      "url": "http://web-platform.test:18000/html/webappapis/dynamic-markup-insertion/the-outerhtml-property/outerhtml-no-parent.html",
+      "artifact": "/tmp/outerhtml-4-after.json",
+      "artifactSha256": "0f5cc3033e817a86eb3a11a624074e7d0afb8eb1aae82ec814096925f0253602",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 0
     },
     {
       "url": "http://web-platform.test:18000/html/webappapis/scripting/events/event-handler-processing-algorithm-error/document-synthetic-errorevent.html",
@@ -16408,6 +17458,36 @@
       "fullPassDelta": 1
     },
     {
+      "url": "http://web-platform.test:18000/trusted-types/Element-outerHTML.html",
+      "artifact": "/tmp/outerhtml-5-after.json",
+      "artifactSha256": "b4366ce320ec3fa523991ffcd620c3573e77d9cece9c19166a678bb7a41a8b62",
+      "stage": "Context-aware outerHTML replacement",
+      "browserRevision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf",
+      "after": {
+        "classification": "pass",
+        "passed": 1,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "runtime": {
+        "platform": "linux",
+        "arch": "arm64",
+        "bun": "1.4.4",
+        "revision": "ea6a2c7b7c98862627760d429aa2d92221e88b0c"
+      },
+      "before": {
+        "classification": "fail",
+        "passed": 0,
+        "reported": 1,
+        "done": true,
+        "harnessStatus": 0,
+        "runnerError": null
+      },
+      "fullPassDelta": 1
+    },
+    {
       "url": "http://web-platform.test:18000/urlpattern/urlpattern-constructor.any.html",
       "artifact": "/tmp/urlpattern-final-0.json",
       "artifactSha256": "a891c8b13d48f58db0e17cdea1e7b10e2c2658c7048b67fcef8d2aac543183e6",
@@ -17039,13 +18119,13 @@
     },
     {
       "url": "http://web-platform.test:18000/xhr/formdata/set-blob.any.html",
-      "artifact": "/data/data/com.termux/files/home/wpt-run/form-data-9-after.json",
-      "artifactSha256": "46b46e846f8787400b7a9359ef33f1aa8f61af3812defd8eab866a424be7e35f",
-      "stage": "Shared form entries and FormData File event interfaces",
-      "browserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+      "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-0-after.json",
+      "artifactSha256": "cc9bc19f80b7a0467982fd038f8b6e8446cd343de5b7340ce67490917bc9b411",
+      "stage": "Blob/File conversions, native MIME slots and result exposure",
+      "browserRevision": "6e66fec",
       "after": {
-        "classification": "fail",
-        "passed": 5,
+        "classification": "pass",
+        "passed": 6,
         "reported": 6,
         "done": true,
         "harnessStatus": 0,
@@ -17065,7 +18145,7 @@
         "harnessStatus": 0,
         "runnerError": null
       },
-      "fullPassDelta": 0
+      "fullPassDelta": 1
     },
     {
       "url": "http://web-platform.test:18000/xhr/formdata/set-formelement.html",
@@ -17819,30 +18899,30 @@
     }
   ],
   "mainlineEstimate": {
-    "recordedAt": "2026-11-05T14:42:11.341836+00:00",
-    "throughBrowserRevision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079",
+    "recordedAt": "2026-11-05T15:47:52.987950+00:00",
+    "throughBrowserRevision": "6848f7ea0bd7cf8e0d86c3f86b3d406e75e0de03",
     "basis": "Frozen baseline with exact-URL outcomes replaced by a uniform 249-case mainline retest and explicitly listed subsequent targeted checks. This is not a full suite rerun.",
     "baselineResultsSha256": "36e044c9a3d2ca07fbe4dd97de5f22ff4f0bac198951d43672091119aa194f47",
     "retainedPatchRetests": 44,
-    "additionalMatchedRetests": 469,
-    "totalMatchedRetests": 513,
+    "additionalMatchedRetests": 505,
+    "totalMatchedRetests": 549,
     "previousPatchSeriesGain": 35,
-    "mainlineNetGain": 340,
-    "cumulativeNetGain": 375,
-    "gainedFullPass": 375,
+    "mainlineNetGain": 376,
+    "cumulativeNetGain": 411,
+    "gainedFullPass": 411,
     "lostFullPass": 0,
     "classification": {
-      "fail": 21027,
-      "pass": 4345,
-      "harness-error": 11438,
+      "fail": 20993,
+      "pass": 4381,
+      "harness-error": 11436,
       "unsupported-infrastructure": 1458,
       "incomplete": 1609
     },
     "eligible": 38420,
-    "passed": 4345,
-    "testedPassPercent": 11.309213951067152,
+    "passed": 4381,
+    "testedPassPercent": 11.40291514836023,
     "wholeManifestCases": 131953,
-    "wholeManifestVerifiedPassPercent": 3.292839116958311,
+    "wholeManifestVerifiedPassPercent": 3.3201215584336845,
     "uniformRetest": {
       "browserRevision": "3fbab84b1cb5702cd9a35a132a85012dbe25e685",
       "directory": "/tmp/wpt-mainline-current-wicq3Q",
@@ -19296,6 +20376,201 @@
         "artifact": "/home/johnny/tmh/wpt-run/form-data-event-after.json",
         "stage": "Shared form entries and FormData File event interfaces",
         "revision": "84ddc5b98bd8e15095c91bf6aeb011ad12cb5079"
+      },
+      {
+        "artifact": "/tmp/outerhtml-0-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/outerhtml-1-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/outerhtml-2-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/outerhtml-3-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/outerhtml-4-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/outerhtml-5-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/outerhtml-6-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/outerhtml-7-after.json",
+        "stage": "Context-aware outerHTML replacement",
+        "revision": "15305c55a79da3fbdfe5d0522b9e3759ef26bfdf"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-column-gap-computed.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-column-gap-invalid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-column-gap-valid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-gap-computed.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-gap-invalid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-gap-shorthand.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-gap-valid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-column-gap-computed.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-column-gap-invalid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-column-gap-valid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-gap-computed.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-gap-invalid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-gap-shorthand.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-gap-valid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-row-gap-computed.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-row-gap-invalid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-grid-row-gap-valid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-row-gap-computed.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-row-gap-invalid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/tmp/css-gap-after-row-gap-valid.html.json",
+        "stage": "CSS gap grammar and percentage flex/grid layout",
+        "revision": "b2e008e6345fa31150e151e2da0f0ed6e9fe5be2"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-0-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-1-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-2-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-3-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-4-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-5-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-6-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-7-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/data/data/com.termux/files/home/wpt-run/blob-api-8-after.json",
+        "stage": "Blob/File conversions, native MIME slots and result exposure",
+        "revision": "6e66fec"
+      },
+      {
+        "artifact": "/tmp/node-comparison-after-final.json",
+        "stage": "Node comparison and containment; contains is earlier-fix evidence",
+        "revision": "6848f7e"
+      },
+      {
+        "artifact": "/tmp/node-contains-after.json",
+        "stage": "Node comparison and containment; contains is earlier-fix evidence",
+        "revision": "6848f7e"
       }
     ],
     "previousLedgerRegressions": [
