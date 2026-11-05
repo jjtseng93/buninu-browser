@@ -1,6 +1,13 @@
 import { expect, test } from "bun:test";
 import { sheetTraits } from "../lib/style/selector-traits.js";
 
+test("validity dependencies include nested and escaped selectors but not declaration text", () => {
+  expect(sheetTraits('@media (min-width:1px) { form:invalid > label { color:red } }').validity).toBeTrue();
+  expect(sheetTraits(String.raw`fieldset:v\61lid { color:green }`).validity).toBeTrue();
+  expect(sheetTraits('.ordinary { content:":invalid" }').validity).toBeFalse();
+  expect(sheetTraits('input:user-invalid { color:red }').validity).toBeFalse();
+});
+
 test("finds :has() compounds and sibling-target compounds in a sheet", () => {
   const traits = sheetTraits(`
     /* .ignored:has(a) {} */
