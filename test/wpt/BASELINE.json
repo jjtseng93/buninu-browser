@@ -1254,8 +1254,13 @@
   },
   "patchSeries": {
     "count": 25,
-    "appliedToProduction": false,
-    "note": "Retests represent different cumulative patch stages, not a uniform full rerun."
+    "appliedToProduction": true,
+    "note": "Retests represent different cumulative patch stages, not a uniform full rerun.",
+    "commitRange": {
+      "first": "5987dd9",
+      "last": "0bbeb30",
+      "count": 25
+    }
   },
   "targetedRetests": [
     {

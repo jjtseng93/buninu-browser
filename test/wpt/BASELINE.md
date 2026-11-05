@@ -47,7 +47,7 @@ Partially improved files remain nonpassing. No gains are extrapolated to unteste
 
 This is a **mixed-results estimate**, not a full rerun of patch 025. Retests come from different cumulative patch stages and Linux ARM64 runtimes, while the baseline ran on Android.
 It assumes all other cases remain unchanged and cannot rule out regressions elsewhere.
-Patches remain in the independent checkout and have not been applied to production.
+Patches 001–025 are now applied to the main checkout as 25 separate commits (`5987dd9` through `0bbeb30`). The frozen baseline and mixed-results estimate above remain unchanged; application is not a new full WPT measurement.
 
 ## Tested groups
 

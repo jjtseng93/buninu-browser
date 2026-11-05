@@ -445,7 +445,7 @@ test("constructable CSSStyleSheet supports feature checks and basic rule mutatio
     const same = await sheet.replace('i { color: blue }');
     return [sheet instanceof CSSStyleSheet, sheet.cssRules[0] instanceof CSSStyleRule,
       inserted, same === sheet, sheet.cssRules[0].cssText, typeof CSSGroupingRule];
-  })()`)).toEqual([true, true, 1, true, "i { color: blue }", "function"]);
+  })()`)).toEqual([true, true, 0, true, "i { color: blue; }", "function"]);
 });
 
 test("getAttributeNode exposes a live Attr view", async () => {
@@ -658,7 +658,7 @@ test("style feature detection only finds properties the renderer implements", as
     CSS.supports("color", "red"),
     CSS.supports("animation-timeline", "scroll()"),
     CSS.supports("(display: grid)")
-  ].join(",")`)).toBe("true,false,false");
+  ].join(",")`)).toBe("true,false,true");
 });
 
 test("the root element's client size is the viewport, and computed style reports painting properties", async () => {
@@ -832,7 +832,7 @@ test("DOM records and live form state take their distinct style invalidation pat
     box.checked = true;
     void document.getElementById("after").offsetWidth;
     return color + "/" + getComputedStyle(document.getElementById("after")).display;
-  })()`)).toBe("rgba(255, 0, 0, 1)/none");
+  })()`)).toBe("rgb(255, 0, 0)/none");
 });
 
 test("childNodes, children and getElementsBy* are live collections", async () => {
@@ -2061,7 +2061,7 @@ test("dynamic linked stylesheets fire load after their rules become available", 
     document.head.appendChild(link);
   </script>`);
   for (let i = 0; i < 60 && await evaluate('sheetLoaded') === false; i++) await Bun.sleep(25);
-  expect(await evaluate('sheetLoaded')).toBe('rgba(255, 0, 0, 1)');
+  expect(await evaluate('sheetLoaded')).toBe('rgb(255, 0, 0)');
   expect(await evaluate('sheetEvents.join()')).toBe('load');
   await evaluate("styleTestLink.href='/missing.css'; window.eventsAfterHref=sheetEvents.join()");
   expect(await evaluate('eventsAfterHref')).toBe('load');
@@ -2486,7 +2486,7 @@ test("CSS.supports ignores JavaScript expandos on inline declarations", async ()
     s.customFeature='value';s['--expando']='value';s.anchorName='--anchor';
     return [CSS.supports('customFeature','value'),CSS.supports('--expando','value'),
       CSS.supports('anchor-name','--anchor'),CSS.supports('color','red'),s.customFeature];
-  })()`)).toEqual([false,false,false,true,'value']);
+  })()`)).toEqual([false,true,false,true,'value']);
 });
 
 test("isSecureContext reflects document trust and initial iframe inheritance", async () => {
