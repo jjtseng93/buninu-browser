@@ -151,6 +151,36 @@ const load = async (html, url = "https://page.test/") => {
 };
 const evaluate = (expression) => renderer.call("evaluate", expression);
 
+test('TextDecoder errors belong to the page realm and preserve conversion exceptions', async () => {
+  await load('<p>encoding</p>');
+  expect(await evaluate(`(() => {
+    const checks = [];
+    try { new TextDecoder('bad-label'); } catch(e) { checks.push(e.constructor === RangeError); }
+    try { new TextDecoder('utf8', {fatal:true}).decode(new Uint8Array([255])); }
+    catch(e) { checks.push(e.constructor === TypeError); }
+    const sentinel = new RangeError('user');
+    try { new TextDecoder({toString() { throw sentinel; }}); } catch(e) { checks.push(e === sentinel); }
+    checks.push(new TextDecoder().decode(new Uint8Array([65])) === 'A');
+    return checks.every(Boolean) && checks.length === 4;
+  })()`)).toBe(true);
+});
+
+test('workers decode text using their own encoding interface', async () => {
+  scripts.set('https://page.test/encoding-worker.js', `
+    const result = {text: new TextDecoder().decode(new Uint8Array([65]))};
+    try { new TextDecoder('bad-label'); } catch(e) { result.range = e instanceof RangeError; }
+    const sentinel = new TypeError('conversion');
+    try { new TextDecoder({toString() { throw sentinel; }}); } catch(e) { result.identity = e === sentinel; }
+    postMessage(result);
+  `);
+  await load(`<script>var workerEncoding = null; var worker = new Worker('/encoding-worker.js');
+    worker.onmessage = e => { workerEncoding = e.data; worker.terminate(); };</script>`);
+  expect(await waitFor('workerEncoding !== null', 3000)).toBe(true);
+  expect(await evaluate('workerEncoding')).toEqual({text:'A', range:true, identity:true});
+});
+
+
+
 test("the renderer reports both sandbox layers", () => {
   expect(renderer.sandbox.ses).toEqual({ installed: true, reason: null });
   expect(renderer.sandbox.seccomp.installed).toBeTrue();
