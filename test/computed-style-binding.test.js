@@ -28,8 +28,8 @@ test("stored computed declarations remain live inside the sandboxed page realm",
     box.style.display='none';const hidden=style.display;box.style.display='block';
     return [initial,changed,hidden,style.width];
   })())`));
-  expect(result).toEqual([["100px","rgba(255, 0, 0, 1)","first"],
-    ["160px","rgba(0, 0, 255, 1)","second"],"none","160px"]);
+  expect(result).toEqual([["100px","rgb(255, 0, 0)","first"],
+    ["160px","rgb(0, 0, 255)","second"],"none","160px"]);
 });
 
 test("computed property spellings stay consistent across declarations and live changes", async () => {
@@ -50,9 +50,9 @@ test("computed property spellings stay consistent across declarations and live c
       stable:names.join('|')===Array.from({length:b.length},(_,i)=>b.item(i)).join('|')};
   })()`);
   expect(result).toEqual({
-    initial:["rgba(255, 0, 0, 1)","rgba(255, 0, 0, 1)","3px","3px","2","2","2"],
-    other:["rgba(0, 0, 255, 1)","rgba(0, 0, 255, 1)","7px","7px","none","none","none"],
-    changed:["rgba(0, 128, 0, 1)","rgba(0, 128, 0, 1)","9px","9px","2","2","2"],
+    initial:["rgb(255, 0, 0)","rgb(255, 0, 0)","3px","3px","2","2","2"],
+    other:["rgb(0, 0, 255)","rgb(0, 0, 255)","7px","7px","none","none","none"],
+    changed:["rgb(0, 128, 0)","rgb(0, 128, 0)","9px","9px","2","2","2"],
     custom:["changed","lower"],names:true,absent:["","",""],stable:true,
   });
 });
@@ -129,7 +129,7 @@ test("focus invalidates subjects, ancestor paths, siblings and relational select
   const read = async action => JSON.parse(await renderer.call("evaluate", `JSON.stringify((()=>{
     ${action};return ['#a','#b','#left','#right','.nested','.related','.following'].map(s=>{const e=document.querySelector(s);return e?getComputedStyle(e).color:null})
   })())`));
-  const black="rgba(0, 0, 0, 1)",red="rgba(255, 0, 0, 1)",green="rgba(0, 128, 0, 1)",blue="rgba(0, 0, 255, 1)",purple="rgba(128, 0, 128, 1)";
+  const black="rgb(0, 0, 0)",red="rgb(255, 0, 0)",green="rgb(0, 128, 0)",blue="rgb(0, 0, 255)",purple="rgb(128, 0, 128)";
   expect(await read("document.getElementById('a').focus()"))
     .toEqual([red,black,green,black,blue,red,purple]);
   expect(await read("document.getElementById('b').focus()"))
@@ -158,8 +158,8 @@ test("metadata mutations invalidate only selectors that observe those attributes
     parent.dataset.open='';child.setAttribute('aria-expanded','true');read();child.title='visible';read();
     return [result[0],result[19],result[20],result[21]];
   })())`))).toEqual([
-    ["rgba(0, 0, 0, 1)","rgba(0, 0, 0, 1)"], ["rgba(0, 0, 0, 1)","rgba(0, 0, 0, 1)"],
-    ["rgba(0, 128, 0, 1)","rgba(255, 0, 0, 1)"], ["rgba(0, 128, 0, 1)","rgba(0, 0, 255, 1)"],
+    ["rgb(0, 0, 0)","rgb(0, 0, 0)"], ["rgb(0, 0, 0)","rgb(0, 0, 0)"],
+    ["rgb(0, 128, 0)","rgb(255, 0, 0)"], ["rgb(0, 128, 0)","rgb(0, 0, 255)"],
   ]);
 });
 
@@ -172,7 +172,7 @@ test("focus invalidation reaches descendants through nested stylesheet groups", 
   expect(JSON.parse(await renderer.call("evaluate",`JSON.stringify((()=>{
     const input=document.querySelector('input'),label=document.querySelector('span');input.focus();
     const focused=getComputedStyle(label).color;input.blur();return[focused,getComputedStyle(label).color];
-  })())`))).toEqual(["rgba(255, 0, 0, 1)","rgba(0, 0, 0, 1)"]);
+  })())`))).toEqual(["rgb(255, 0, 0)","rgb(0, 0, 0)"]);
 });
 
 test("native label activation restyles both radios and relational ancestors without a global reset", async () => {
@@ -188,7 +188,7 @@ test("native label activation restyles both radios and relational ancestors with
   await renderer.call("click",...position);
   const result = JSON.parse(await renderer.call("evaluate", `JSON.stringify([document.getElementById('first').checked,document.getElementById('second').checked,
     ...['#firstText','#secondText','form'].map(s=>getComputedStyle(document.querySelector(s)).color)])`));
-  expect(result).toEqual([false,true,"rgba(0, 0, 0, 1)","rgba(255, 0, 0, 1)","rgba(128, 0, 128, 1)"]);
+  expect(result).toEqual([false,true,"rgb(0, 0, 0)","rgb(255, 0, 0)","rgb(128, 0, 128)"]);
 });
 
 test("summary UA styles follow disclosure state and principal-summary changes incrementally", async () => {

@@ -52,7 +52,7 @@ try {
     const independent=styles[1].getPropertyValue('--tone');
     return {first,second,custom,independent,distinct:styles[0]!==styles[1],
       keys:keys.includes('fontFamily')&&keys.includes('color'),
-      values:values.every(value=>value[0]==='rgba(255, 0, 0, 1)'&&value[1]==='red')};
+      values:values.every(value=>value[0]==='rgb(255, 0, 0)'&&value[1]==='red')};
   })()`);
   assert.deepEqual(repeated,{first:1,second:2,custom:'changed',independent:'changed',distinct:true,keys:true,values:true});
   observeSerialization = false;
@@ -67,8 +67,8 @@ try {
     box.style.display='none';values.push([style.display]);box.style.display='block';
     return {layouts:__layoutCalls()-start,first:values[0],last:values[19],hidden:values[20]};
   })()`);
-  assert.deepEqual(styles, { layouts:0,first:["rgba(255, 0, 0, 1)","block","0"],
-    last:["rgba(0, 0, 255, 1)","block","19"],hidden:["none"] });
+  assert.deepEqual(styles, { layouts:0,first:["rgb(255, 0, 0)","block","0"],
+    last:["rgb(0, 0, 255)","block","19"],hidden:["none"] });
   const padding = await renderer.evaluate(`(() => {
     const box=document.getElementById('box'),child=document.getElementById('child'),start=__layoutCalls();
     box.style.width='310px';box.style.padding='2px 3px 4px 5px';
@@ -96,7 +96,7 @@ try {
   assert.equal(await renderer.evaluate(`(() => {
     const sheet=document.createElement('style');sheet.textContent='#box{width:180px!important;color:green!important}';document.head.appendChild(sheet);
     return [savedStyle.color,savedStyle.width].join('/');
-  })()`), "rgba(0, 128, 0, 1)/180px");
+  })()`), "rgb(0, 128, 0)/180px");
   assert.equal(await renderer.evaluate(`(() => {
     const box=document.getElementById('box');box.style.height='auto';box.replaceChildren();
     const child=document.createElement('div');child.style.height='70px';box.appendChild(child);savedStyle.display;
@@ -108,7 +108,7 @@ try {
     const connected=[style.width,style.height,style.color];node.remove();node.style.width='88px';
     document.body.appendChild(node);const reconnected=[style.width,style.height,style.color];
     return [connected,reconnected,keys.length===Object.keys(style).length];
-  })()`), [["77px","19px","rgba(255, 0, 0, 1)"],["88px","19px","rgba(255, 0, 0, 1)"],true]);
+  })()`), [["77px","19px","rgb(255, 0, 0)"],["88px","19px","rgb(255, 0, 0)"],true]);
   await renderer.evaluate("document.body.style.backgroundColor='rgb(11,22,33)';savedStyle.color");
   const painted = await renderer.screenshot({format:"rgba"});
   assert.deepEqual([...painted.pixels.slice(-4)], [11,22,33,255]);

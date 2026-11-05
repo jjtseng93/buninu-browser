@@ -42,7 +42,7 @@ try {
     return {values:readStyle(savedStyle),names:normalNames.includes('color')&&normalNames.includes('width'),
       aliases:[savedStyle.WebkitLineClamp,savedStyle.webkitLineClamp],keysStable:savedKeys.join('|')===Object.keys(savedStyle).join('|')};
   })()`);
-  assert.deepEqual(connected, { values: ["rgba(12, 34, 56, 1)", "77px", "first", false, false],
+  assert.deepEqual(connected, { values: ["rgb(12, 34, 56)", "77px", "first", false, false],
     names: true, aliases: ["2", "2"], keysStable: true });
 
   const changes = await renderer.evaluate(`(() => {
@@ -57,10 +57,10 @@ try {
       keysStable:savedKeys.join('|')===Object.keys(savedStyle).join('|')};
   })()`);
   assert.deepEqual(changes, {
-    customChanged: ["rgba(12, 34, 56, 1)", "77px", "second", false, false], fixedNames: true,
+    customChanged: ["rgb(12, 34, 56)", "77px", "second", false, false], fixedNames: true,
     removed: ["", "", "", true, true], fresh: ["", "", "", true, true],
     changedDetached: ["", "", "", true, true],
-    reattached: ["rgba(78, 90, 12, 1)", "88px", "second", false, false], keysStable: true,
+    reattached: ["rgb(78, 90, 12)", "88px", "second", false, false], keysStable: true,
   });
 
   const hidden = await renderer.evaluate(`(() => {
@@ -71,9 +71,9 @@ try {
     return {connected,detached,reattached:readStyle(style)};
   })()`);
   assert.deepEqual(hidden, {
-    connected: ["rgba(99, 88, 77, 1)", "48px", "inherited", false, false],
+    connected: ["rgb(99, 88, 77)", "48px", "inherited", false, false],
     detached: ["", "", "", true, true],
-    reattached: ["rgba(99, 88, 77, 1)", "48px", "inherited", false, false],
+    reattached: ["rgb(99, 88, 77)", "48px", "inherited", false, false],
   });
 
   // A descendant never queried while connected must also avoid stale style
