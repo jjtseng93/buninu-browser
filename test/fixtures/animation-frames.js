@@ -15,9 +15,9 @@ try {
   renderer.setScripting("ses"); renderer.resize(320, 220, 1); await load("first");
   const result = await renderer.evaluate(`
     new Promise(resolve => {
-      const events=[], times=[]; let cancelled, sameBatch;
+      const events=[], times=[]; let cancelled, sameBatch, errorEvents=0;
       const record=(name,time)=>{events.push(name);if(time!==undefined)times.push([name,time]);};
-      addEventListener('error',event=>{if(event.message.includes('RAF_PROBE_THROW'))event.preventDefault();});
+      addEventListener('error',event=>{if(event.message.includes('RAF_PROBE_THROW')){errorEvents++;event.preventDefault();}});
       requestAnimationFrame(function first(time){
         record('first',time);record(this===window?'this-window':'this-other');
         requestAnimationFrame(time=>record('nested',time));
@@ -34,7 +34,7 @@ try {
       const early=requestAnimationFrame(()=>record('cancelled-early'));cancelAnimationFrame(early);
       requestAnimationFrame(time=>{record('throws',time);throw new Error('RAF_PROBE_THROW');});
       requestAnimationFrame(time=>{record('after-throw',time);requestAnimationFrame(time=>{
-        record('finish',time);resolve({events,times,groups:new Set(times.map(entry=>entry[1])).size});
+        record('finish',time);resolve({events,times,errorEvents,groups:new Set(times.map(entry=>entry[1])).size});
       });});
     })
   `);
@@ -45,7 +45,9 @@ try {
     assert.ok(result.times.slice(4).every(entry => entry[1] === result.times[4][1]));
     assert.ok(result.times[4][1] > result.times[0][1]);
   }
-  assert.equal(errors.length, 1); assert.ok(errors[0].includes("RAF_PROBE_THROW")); errors.length = 0;
+  // A canceled global ErrorEvent is delivered, but suppresses console/host
+  // reporting. Subsequent animation callbacks must still run.
+  assert.equal(result.errorEvents, 1); assert.deepEqual(errors, []);
   await renderer.evaluate(`requestAnimationFrame(() => { throw new Error("old frame"); })`);
   await load("second");
   assert.equal(await renderer.evaluate(`new Promise(resolve => requestAnimationFrame(time => resolve(typeof time)))`), "number");
