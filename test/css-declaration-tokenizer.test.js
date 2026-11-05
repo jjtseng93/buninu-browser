@@ -22,3 +22,32 @@ test('inline declaration reads and mutations retain custom strings and nested va
   expect(style.height).toBe('12px');
  }finally{window.happyDOM.close();}
 });
+
+test('discard at-rules without swallowing following inline declarations',()=>{
+ const cases=[
+  '@unknown{}color:red',
+  '@unknown x { nested {a:b} --value:"};"; }color:red',
+  ' /**/ @unknown ("{") { /* } */ nested{} }color:red',
+  '@unknown x(y;z);color:red',
+  '@unknown{}@another{}color:red',
+  '@é{}color:red',
+  '@-vendor{}color:red',
+  '@--custom{}color:red',
+  '@\\66 oo{}color:red',
+ ];
+ const {window,document}=parseHTMLDocument('<div></div>');
+ try {
+  const element=document.querySelector('div');
+  for(const source of cases){
+   expect(parseDeclarationText(source).rules).toEqual([{name:'color',value:'red',important:false}]);
+   element.setAttribute('style',source);expect(element.style.cssText).toBe('color: red;');
+   element.style.cssText=source;expect(element.style.cssText).toBe('color: red;');
+  }
+  for(const source of ['@{}color:red','@1{}color:red','@-1{}color:red','{}color:red','@unknown{color:red','\u00a0@unknown{}color:red','@unknown{(]}color:red']){
+   element.style.cssText=source;expect(element.style.cssText).toBe('');
+  }
+  element.style.cssText='--block:{a:b;c:d};--text:"@foo{}";color:red';
+  expect(element.style.getPropertyValue('--block')).toBe('{a:b;c:d}');
+  expect(element.style.getPropertyValue('--text')).toBe('"@foo{}"');
+ } finally {window.happyDOM.close();}
+});
