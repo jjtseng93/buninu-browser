@@ -49,20 +49,21 @@ const hostFor=browser=>hosts.find(host=>host.pid===browser.rendererPid);
 const browsers=[];
 try{
   const browser=await createBrowser({network});browsers.push(browser);
-  assert.equal(hosts.length,2,'first navigation retains its parallel warmed spare');
-  const first=hostFor(browser),initialSpare=browser.sparePid;
-  await browser.context.navigate('https://one.test/slow');
-  assert.equal(browser.rendererPid,initialSpare);
+  assert.equal(hosts.length,1,'a pristine blank does not need a second renderer');
+  const first=hostFor(browser);
   assert.equal(browser.sparePid,null);
-  assert.equal(hosts.length,2,'committing a loading page does not immediately start another renderer');
-  assert.ok(first.closed,'cross-origin navigation closes the previous origin');
+  await browser.context.navigate('https://one.test/slow');
+  assert.equal(browser.rendererPid,first.pid,'the first HTTP origin claims the pristine blank');
+  assert.equal(browser.sparePid,null);
+  assert.equal(hosts.length,1,'committing a loading page does not immediately start another renderer');
+  assert.equal(first.closed,false);
   await advance(1000);
-  assert.equal(hosts.length,2);
+  assert.equal(hosts.length,1);
   hostFor(browser).lifecycle('load');
   await advance(999);
   assert.equal(browser.sparePid,null);
   await advance(1);
-  assert.equal(hosts.length,3,'load schedules spare startup after one second');
+  assert.equal(hosts.length,2,'load schedules spare startup after one second');
   const sameOrigin=browser.rendererPid,spare=browser.sparePid;
   await browser.context.navigate('https://one.test/fast');
   assert.equal(browser.rendererPid,sameOrigin);
@@ -74,7 +75,7 @@ try{
   await advance(29999);
   assert.equal(browser.sparePid,null);
   await advance(1);
-  assert.equal(hosts.length,4,'a missing load event has a bounded fallback');
+  assert.equal(hosts.length,3,'a missing load event has a bounded fallback');
 
   await browser.context.navigate('https://three.test/slow');
   const active=hostFor(browser),oldGeneration=active.generation;
@@ -85,7 +86,7 @@ try{
   active.lifecycle('load',oldGeneration);
   assert.equal([...timers][0],latestTimer,'a late previous-generation load does not rearm the timer');
   await advance(1000);
-  assert.equal(hosts.length,5,'load observed before commit is also respected');
+  assert.equal(hosts.length,4,'load observed before commit is also respected');
   await browser.context.navigate('https://four.test/slow');
   browser.close();
   const beforeClose=hosts.length;
@@ -97,7 +98,7 @@ try{
   const beforeDisabled=hosts.length;
   await disabled.context.navigate('https://disabled.test/fast');
   await advance(60000);
-  assert.equal(hosts.length,beforeDisabled+1);
+  assert.equal(hosts.length,beforeDisabled,'adoption works without warming spare renderers');
   assert.equal(disabled.sparePid,null);
   disabled.close();
 
@@ -105,6 +106,7 @@ try{
   // second navigation. Its eventual rejection must not clear the new spare.
   heldPid=nextPid+1;
   const competing=await createBrowser({network});browsers.push(competing);
+  await competing.context.evaluate('1'); // A used blank needs a fresh origin process.
   const oldSpare=hosts.find(host=>host.pid===heldPid);
   const failedNavigation=competing.context.navigate('https://failed.test/slow').then(()=>null,error=>error);
   await flush();
