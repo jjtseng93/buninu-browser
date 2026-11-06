@@ -855,19 +855,25 @@ test("links get the UA link style; text decorations propagate to in-flow descend
       <span id="cleared" style="text-decoration: none">still struck</span></p>
     <p id="bad" style="text-decoration: underline blue; text-decoration-color: nonsense">b</p>
     <p id="invalid" style="text-decoration: sparkly">c</p>
+    <p id="double" style="text-decoration-line: underline; text-decoration-style: double">d</p>
+    <p id="ignored" style="text-decoration: underline; text-decoration-style: dashed; text-decoration-style: sparkly">e</p>
   </body>`);
   const styles = new StyleEngine().compute(document);
   const style = (id) => styles.get(document.getElementById(id));
   expect(style("link")).toMatchObject({ color: "rgba(0, 0, 238, 1)", textDecorations: { lines: ["underline"], color: "rgba(0, 0, 238, 1)" } });
-  expect(style("inside").textDecorations).toEqual({ lines: ["underline"], color: "rgba(0, 0, 238, 1)" });
+  expect(style("inside").textDecorations).toEqual({ lines: ["underline"], color: "rgba(0, 0, 238, 1)", style: "solid" });
   expect(style("atomic").textDecorations).toBeNull();
   expect(style("anchor")).toMatchObject({ color: "rgba(0, 0, 0, 1)", textDecorations: null });
-  expect(style("own").textDecorations).toEqual({ lines: ["line-through"], color: "rgba(255, 0, 0, 1)" });
-  expect(style("nested").textDecorations).toEqual({ lines: ["line-through", "underline", "overline"], color: "rgba(0, 0, 0, 1)" });
+  expect(style("own").textDecorations).toEqual({ lines: ["line-through"], color: "rgba(255, 0, 0, 1)", style: "wavy" });
+  // Existing renderer limitation: ancestor lines share one color/style rather
+  // than retaining a separate decoration for each decorating box.
+  expect(style("nested").textDecorations).toEqual({ lines: ["line-through", "underline", "overline"], color: "rgba(0, 0, 0, 1)", style: "solid" });
   // "none" on a descendant does not remove what an ancestor draws.
-  expect(style("cleared").textDecorations).toEqual({ lines: ["line-through"], color: "rgba(255, 0, 0, 1)" });
-  expect(style("bad").textDecorations).toEqual({ lines: ["underline"], color: "rgba(0, 0, 255, 1)" });
+  expect(style("cleared").textDecorations).toEqual({ lines: ["line-through"], color: "rgba(255, 0, 0, 1)", style: "wavy" });
+  expect(style("bad").textDecorations).toEqual({ lines: ["underline"], color: "rgba(0, 0, 255, 1)", style: "solid" });
   expect(style("invalid").textDecorations).toBeNull();
+  expect(style("double").textDecorations).toEqual({ lines: ["underline"], color: "rgba(0, 0, 0, 1)", style: "double" });
+  expect(style("ignored").textDecorations.style).toBe("dashed");
   window.happyDOM.abort();
 });
 
@@ -995,4 +1001,19 @@ test("aspect-ratio parses ratios, auto fallback, inheritance and invalid declara
     expect(ratio('invalid')).toEqual({ numerator:3, denominator:2, auto:false });
     expect(ratio('reset')).toBeNull();
   } finally { window.happyDOM.abort(); }
+});
+
+test("u, ins, s, strike and del take their UA text decoration, which author styles override", () => {
+  const { document, window } = parseHTMLDocument(`<body>
+    <u id="u">a</u><ins id="ins">b</ins><s id="s">c</s><strike id="strike">d</strike><del id="del">e</del>
+    <u id="none" style="text-decoration: none">f</u><b id="b"><u id="bu">g</u></b>
+  </body>`);
+  try {
+    const styles = new StyleEngine().compute(document);
+    const lines = (id) => styles.get(document.getElementById(id)).textDecorations?.lines ?? null;
+    expect(["u", "ins", "s", "strike", "del"].map(lines)).toEqual([["underline"], ["underline"], ["line-through"], ["line-through"], ["line-through"]]);
+    expect(lines("none")).toBeNull();
+    expect(lines("bu")).toEqual(["underline"]);
+    expect(styles.get(document.getElementById("bu")).fontWeight).toBe(700);
+  } finally { window.happyDOM.close(); }
 });
