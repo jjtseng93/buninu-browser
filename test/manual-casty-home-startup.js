@@ -1,9 +1,11 @@
-// Native Termux: bun test/manual-casty-home-startup.js [output-directory] [--file] [--code-menu]
+// Native Termux: bun test/manual-casty-home-startup.js [output-directory] [--file] [--code-menu] [--passive]
 // Runs Casty without a URL, using the real HOME/config and a 1280x800 Kitty peer.
 // Compare repeated runs with the same config/transport. Inspect ready.png: DOM
 // text alone does not prove the branch sentence was laid out and painted.
 // --code-menu also saves the first 16 actual Kitty page frames after the click,
 // with arrival times in code-frames.json, for inspecting first visible output.
+// --passive records startup frames without evaluating page JS for 15 seconds.
+// Inspect startup-frames.json and its PNGs separately from the polling results.
 import {
   existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync,
   unlinkSync, writeFileSync,
@@ -176,10 +178,11 @@ async function stopCasty(proc) {
 async function main() {
   const args = Bun.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) {
-    console.log('Usage: bun test/manual-casty-home-startup.js [empty-output-directory] [--file] [--code-menu]\n\nRun in native Termux, with no other benchmark running. --file enables PNG file transport; default auto transport is inline.\nready.png is a CDP screenshot after branch text exists. kitty-ready.png is the last full page frame (URL-bar/cursor overlays excluded); timing.json records whether it arrived after that text.\n--code-menu also clicks the Code button through CDP and measures time until Download ZIP is visible, saving code-menu.png and kitty-code-menu.png.');
+    console.log('Usage: bun test/manual-casty-home-startup.js [empty-output-directory] [--file] [--code-menu] [--passive]\n\nRun in native Termux, with no other benchmark running. --file enables PNG file transport; default auto transport is inline.\nready.png is a CDP screenshot after branch text exists. kitty-ready.png is the last full page frame (URL-bar/cursor overlays excluded); timing.json records whether it arrived after that text.\n--code-menu also clicks the Code button through CDP and measures time until Download ZIP is visible, saving code-menu.png and kitty-code-menu.png.\n--passive keeps the first 64 startup page frames without evaluating page JS for 15 seconds. Inspect startup-frames.json and its PNGs for the first complete branch sentence; do not compare its delayed ready-screenshot timestamp with normal polling.');
     return;
   }
-  const positional = args.filter(arg => !['--file', '--code-menu'].includes(arg));
+  const positional = args.filter(arg => !['--file', '--code-menu', '--passive'].includes(arg));
+  const passive = args.includes('--passive');
   if (positional.length > 1 || positional.some(arg => arg.startsWith('--'))) throw Error('Unknown arguments; use --help');
   const root = resolve(import.meta.dir, '..');
   const out = resolve(positional[0] || mkdtempSync(join(tmpdir(), 'casty-home-')));
@@ -201,6 +204,7 @@ await main();
   let proc, cdp, frames = 0, ignoredImages = 0, lastFrame, lastFrameMs, branchMs, peerError;
   let terminalTail = '', outputTerminal, finishing = false, codeClickMs = null;
   const codeFrames = [];
+  const startupFrames = [];
   const events = [], abort = new AbortController();
   const started = performance.now();
   const elapsed = () => Math.round(performance.now() - started);
@@ -240,6 +244,7 @@ await main();
         lastFrame = bytes;
         lastFrameMs = elapsed();
         frames++;
+        if (passive && codeClickMs === null && startupFrames.length < 64) startupFrames.push({ms:lastFrameMs, bytes});
         // Keep already-received page frames without extra CDP reads. Flush
         // them after the experiment so file writes do not delay the click.
         if (codeClickMs !== null && codeFrames.length < 16) codeFrames.push({ms:lastFrameMs, bytes});
@@ -261,7 +266,7 @@ await main();
         },
       },
     });
-    mark('spawn', { pid: proc.pid, out, fileSupport: args.includes('--file') });
+    mark('spawn', { pid: proc.pid, out, fileSupport: args.includes('--file'), passive });
     await wait(() => existsSync(endpointFile));
     mark('cdp-listening');
     const endpoint = new URL(readFileSync(endpointFile, 'utf8'));
@@ -277,6 +282,12 @@ await main();
       return target;
     });
     cdp = await connectCdp(target.webSocketDebuggerUrl, abort.signal);
+    if (passive) {
+      // innerText can synchronously flush style/layout. Let the real Casty
+      // connection run alone before using any page JS as an observer.
+      await Bun.sleep(Math.max(0, 15000 - elapsed()));
+      mark('passive-startup-observed', { frames, savedFrames:startupFrames.length });
+    }
     // Preserve the original polling cadence and innerText query after commit;
     // measurements still include this potentially layout-flushing observer.
     await wait(async () => {
@@ -341,6 +352,14 @@ await main();
     finally {
       for (const [signal, handler] of handlers) process.off(signal, handler);
       mark('finished', { frames, ignoredImages });
+      if (startupFrames.length) {
+        const manifest = startupFrames.map(({ms, bytes}, index) => {
+          const file = `startup-frame-${index + 1}.png`;
+          writeFileSync(join(out, file), bytes);
+          return {file, ms};
+        });
+        writeFileSync(join(out, 'startup-frames.json'), JSON.stringify(manifest, null, 2));
+      }
       if (codeFrames.length) {
         const manifest = codeFrames.map(({ms, bytes}, index) => {
           const file = `code-frame-${index + 1}.png`;
