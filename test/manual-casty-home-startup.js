@@ -269,12 +269,16 @@ await main();
     await wait(async () => {
       const response = await fetch('http://' + endpoint.host + '/json/list', { signal: abort.signal });
       if (!response.ok) throw Error('Target listing failed: HTTP ' + response.status);
-      target = (await response.json()).find(target => target.type === 'page');
+      // Observe only the committed HTTP(S) target. Evaluating in the initial
+      // blank would itself make that renderer used and prevent normal startup
+      // from assigning it to the first origin. Page.navigate updates this
+      // listing after context.navigate has committed the document.
+      target = (await response.json()).find(target => target.type === 'page' && /^https?:/.test(target.url));
       return target;
     });
     cdp = await connectCdp(target.webSocketDebuggerUrl, abort.signal);
-    // Preserve the original polling cadence and innerText query so before/after
-    // measurements include the same (potentially layout-flushing) observer.
+    // Preserve the original polling cadence and innerText query after commit;
+    // measurements still include this potentially layout-flushing observer.
     await wait(async () => {
       const result = await cdp.call('Runtime.evaluate', {
         expression: `(()=>{const text=document.body?.innerText||'';const match=text.match(/This branch is[^\\n]{0,250}/);return {url:location.href,title:document.title,match:match?.[0]||'',complete:!!match&&/\\d[\\s\\S]*ahead/.test(match[0])}})()`,
