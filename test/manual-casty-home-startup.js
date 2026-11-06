@@ -9,6 +9,20 @@ import {
 import { join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 
+const peerGeometry = {width:1280, height:800, cellWidth:8, cellHeight:20, cols:160, rows:40};
+const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+
+// Casty's page occupies image 1, below the address bar and with the final
+// column reserved. jsmdcui can transmit a later URL-bar/cursor overlay; that
+// image must not replace the page used for screenshots or readiness timing.
+export function isCastyContentFrame(bytes, fields) {
+  return fields?.i === '1' && Number(fields.c) === peerGeometry.cols - 1
+    && Number(fields.r) === peerGeometry.rows - 1 && bytes.length >= 24
+    && bytes.subarray(0, 8).equals(pngSignature) && bytes.toString('ascii', 12, 16) === 'IHDR'
+    && bytes.readUInt32BE(16) === peerGeometry.width - peerGeometry.cellWidth
+    && bytes.readUInt32BE(20) === peerGeometry.height - peerGeometry.cellHeight;
+}
+
 // Only the PNG path is negotiated. Default auto transport remains inline, as in
 // the original benchmark; --file also accepts the RGB file-readability probe.
 // Exported so chunk boundaries can be tested without launching a browser.
@@ -26,8 +40,8 @@ export class KittyPeer {
     while ((match = sequence.exec(this.tail))) {
       consumed = sequence.lastIndex;
       if (match[1] !== undefined) this.graphics(match[1]);
-      else if (match[0] === '\x1b[14t') this.write('\x1b[4;800;1280t');
-      else if (match[0] === '\x1b[16t') this.write('\x1b[6;20;8t');
+      else if (match[0] === '\x1b[14t') this.write(`\x1b[4;${peerGeometry.height};${peerGeometry.width}t`);
+      else if (match[0] === '\x1b[16t') this.write(`\x1b[6;${peerGeometry.cellHeight};${peerGeometry.cellWidth}t`);
       else this.write('\x1b[?0u');
     }
     this.tail = this.tail.slice(consumed);
@@ -55,15 +69,15 @@ export class KittyPeer {
         const bytes = this.read(path);
         // Kitty's temporary-file transport transfers unlink ownership.
         if (fields.t === 't') this.remove(path);
-        this.frame(bytes, fields.t === 't' ? 'temporary-file' : 'file');
+        this.frame(bytes, fields.t === 't' ? 'temporary-file' : 'file', fields);
         return;
       }
       if (fields.t && fields.t !== 'd') return;
-      this.inline = [];
+      this.inline = {chunks:[], fields};
     } else if (fields.a || !this.inline) return;
-    this.inline.push(payload);
+    this.inline.chunks.push(payload);
     if (fields.m !== '1') {
-      this.frame(Buffer.from(this.inline.join(''), 'base64'), 'inline');
+      this.frame(Buffer.from(this.inline.chunks.join(''), 'base64'), 'inline', this.inline.fields);
       this.inline = null;
     }
   }
@@ -160,7 +174,7 @@ async function stopCasty(proc) {
 async function main() {
   const args = Bun.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) {
-    console.log('Usage: bun test/manual-casty-home-startup.js [empty-output-directory] [--file] [--code-menu]\n\nRun in native Termux, with no other benchmark running. --file enables PNG file transport; default auto transport is inline.\nready.png is a CDP screenshot after branch text exists. kitty-ready.png is the last received terminal frame; timing.json records whether it arrived after that text.\n--code-menu also clicks the Code button through CDP and measures time until Download ZIP is visible, saving code-menu.png and kitty-code-menu.png.');
+    console.log('Usage: bun test/manual-casty-home-startup.js [empty-output-directory] [--file] [--code-menu]\n\nRun in native Termux, with no other benchmark running. --file enables PNG file transport; default auto transport is inline.\nready.png is a CDP screenshot after branch text exists. kitty-ready.png is the last full page frame (URL-bar/cursor overlays excluded); timing.json records whether it arrived after that text.\n--code-menu also clicks the Code button through CDP and measures time until Download ZIP is visible, saving code-menu.png and kitty-code-menu.png.');
     return;
   }
   const positional = args.filter(arg => !['--file', '--code-menu'].includes(arg));
@@ -182,7 +196,7 @@ const { main } = await import(${JSON.stringify(Bun.pathToFileURL(join(root, 'bun
 await main();
 `);
 
-  let proc, cdp, frames = 0, lastFrame, lastFrameMs, branchMs, peerError;
+  let proc, cdp, frames = 0, ignoredImages = 0, lastFrame, lastFrameMs, branchMs, peerError;
   let terminalTail = '', outputTerminal, finishing = false;
   const events = [], abort = new AbortController();
   const started = performance.now();
@@ -218,7 +232,8 @@ await main();
     const peer = new KittyPeer({
       file: args.includes('--file'),
       write: bytes => outputTerminal.write(bytes),
-      frame(bytes, transport) {
+      frame(bytes, transport, placement) {
+        if (!isCastyContentFrame(bytes, placement)) { ignoredImages++;return; }
         lastFrame = bytes;
         lastFrameMs = elapsed();
         frames++;
@@ -231,7 +246,7 @@ await main();
         if (!finishing) abort.abort(Error(`Casty exited early: ${exitCode}\n${terminalTail}`));
       },
       terminal: {
-        cols: 160, rows: 40,
+        cols: peerGeometry.cols, rows: peerGeometry.rows,
         data(terminal, bytes) {
           outputTerminal = terminal;
           terminalTail = (terminalTail + Buffer.from(bytes).toString()).slice(-8000);
@@ -314,7 +329,7 @@ await main();
     try { await stopCasty(proc); }
     finally {
       for (const [signal, handler] of handlers) process.off(signal, handler);
-      mark('finished', { frames });
+      mark('finished', { frames, ignoredImages });
     }
   }
 }
