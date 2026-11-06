@@ -1,7 +1,7 @@
 import {test, expect} from 'bun:test';
 import {parseHTMLDocument} from '../lib/happy-dom/parser.js';
 import {StyleEngine} from '../lib/style/computed-style.js';
-import {compileShadowSelector, shadowSelectorDependsOnOutside} from '../lib/style/shadow-selectors.js';
+import {compileShadowSelector, shadowSelectorDependsOnOutside, shadowSelectorDependencies} from '../lib/style/shadow-selectors.js';
 import {touchesShadowScope} from '../lib/style/shadow-invalidation.js';
 
 function fixture(shadowSheet = ':host{color:purple}::slotted(.assigned){font-weight:bold}') {
@@ -112,5 +112,30 @@ test('nested shadow selector dependencies conservatively preserve outside invali
     f.host.after(f.get('sibling'));
     f.compute([], [f.get('sibling')]);
     expect(f.engine.incremental).toBeFalse();f.check();
+  } finally {f.window.happyDOM.close();}
+});
+
+test('scoped global state dependencies follow parsed nested selectors and sheet changes', () => {
+  const f = fixture();
+  try {
+    const dependencies = selector => shadowSelectorDependencies(f.host, compileShadowSelector(f.host, selector));
+    for (const selector of [':host(:popover-open)', ':host(:is(.north,.south))', ':host([data-note=":defined :target"])'])
+      expect(dependencies(selector)).toEqual({outside:false,defined:false,target:false});
+    for (const selector of [':host(:defined)', ':host(:not(:is(:defined)))', '::slotted(:where(:defined))', '.box:has(.child:defined)', ':host-context(:is(:defined))', '.box:nth-last-child(2 of :is(:defined,.x))'])
+      expect(dependencies(selector).defined).toBeTrue();
+    for (const selector of [':host:target', ':host(:not(:where(:target)))', '::slotted(:is(:target))', '.box:has(+ .child:target)', ':host-context(:target)', ':host(:nth-child(1 of :target))'])
+      expect(dependencies(selector).target).toBeTrue();
+    expect(shadowSelectorDependencies(f.host, undefined)).toEqual({outside:true,defined:true,target:true});
+    expect(shadowSelectorDependencies(f.host, {compiled:undefined})).toEqual({outside:true,defined:true,target:true});
+    expect(shadowSelectorDependencies(f.host, null)).toEqual({outside:false,defined:false,target:false});
+    expect(f.engine.shadowObservesState('defined')).toBeFalse();
+    expect(f.engine.shadowObservesState('target')).toBeFalse();
+    f.scopes.set(f.root, [':host(:not(:defined)){color:red}:host:target{color:blue}']);
+    f.compute();
+    expect(f.engine.shadowObservesState('defined')).toBeTrue();
+    expect(f.engine.shadowObservesState('target')).toBeTrue();
+    f.scopes.set(f.root, [':host{color:red}']);f.compute();
+    expect(f.engine.shadowObservesState('defined')).toBeFalse();
+    expect(f.engine.shadowObservesState('target')).toBeFalse();
   } finally {f.window.happyDOM.close();}
 });
