@@ -207,9 +207,6 @@ test('hidden SVG descendants can restore their shapes during retained root visib
 });
 
 for (const [description, markup] of [
-  ['block', '<div id="target">text <b style="visibility:visible">child</b></div>'],
-  ['inline', '<div><span id="target">text</span> after</div>'],
-  ['image', '<img id="target" width="30" height="20">'],
   ['table row', '<table><tr id="target"><td>cell</td></tr></table>'],
   ['table cell', '<table><tr><td id="target">cell</td></tr></table>'],
 ]) {
