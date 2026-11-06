@@ -6,8 +6,8 @@ import { LayoutEngine } from '../lib/layout/text-layout.js';
 import { buildDisplayList } from '../lib/paint/display-list.js';
 import { repaintLayout } from '../lib/layout/repaint.js';
 
-function fixture(display = 'inline', extraStyle = '') {
-  const parsed = parseHTMLDocument(`<body><div style="width:260px">before
+function fixture(display = 'inline', extraStyle = '', parentStyle = '') {
+  const parsed = parseHTMLDocument(`<body><div style="width:260px;${parentStyle}">before
     <svg id="icon" width="40" height="40" viewBox="0 0 20 20" style="display:${display};${extraStyle}">
       <path d="M2 2H18V18H2Z" fill="red"/>
     </svg> after</div><p>outside</p></body>`);
@@ -140,3 +140,89 @@ test('ignoring SVG paint is limited to existing SVG replaced elements and checks
     expect(sameLayoutInput(previous, { ...previous, svgRatio: 2 })).toBe(false);
   } finally { f.window.happyDOM.abort(); }
 });
+
+for (const display of ['inline', 'block']) {
+  for (const initial of ['visible', 'hidden']) {
+    test(`${display} SVG visibility from ${initial} updates retained paint and hit testing`, () => {
+      const f = fixture(display, `visibility:${initial}`);
+      try {
+        let previous = f.first, layout = f.layout;
+        const values = initial === 'visible' ? ['hidden', 'visible', 'hidden'] : ['visible', 'hidden', 'visible'];
+        for (const visibility of values) {
+          const before = JSON.stringify(layout);
+          f.svg.style.visibility = visibility;
+          // Hidden shapes must not leave a stale empty/visible SVG payload
+          // when the same retained run is shown or hidden again.
+          f.svg.querySelector('path').setAttribute('fill', visibility === 'visible' ? 'blue' : 'green');
+          const next = f.build(), retained = repaintLayout(layout, previous, next);
+          const painted = expectEquivalent(f, next, retained), visible = visibility === 'visible';
+          const run = imageRun(retained, f.nodeId);
+          expect(run.svg).toBe(next.nodesById.get(f.nodeId).svg);
+          expect(run.svg.shapes.length).toBe(visible ? 1 : 0);
+          expect(run.style.visibility).toBe(visibility);
+          expect(painted.items.some(item => item.op === 'drawSvg' && item.nodeId === f.nodeId)).toBe(visible);
+          expect(painted.hits.some(hit => hit.nodeId === f.nodeId)).toBe(visible);
+          expect(JSON.stringify(layout)).toBe(before);
+          previous = next;
+          layout = retained;
+        }
+      } finally { f.window.happyDOM.abort(); }
+    });
+  }
+}
+
+test('a visible SVG overrides its hidden HTML ancestor without exposing the ancestor text', () => {
+  const f = fixture('inline', '', 'visibility:hidden;height:24px;overflow:auto');
+  try {
+    let previous = f.first, layout = f.layout;
+    for (const visibility of ['visible', 'hidden', 'visible']) {
+      f.svg.style.visibility = visibility;
+      const next = f.build(), retained = repaintLayout(layout, previous, next);
+      const painted = expectEquivalent(f, next, retained);
+      expect(painted.items.some(item => item.op === 'drawSvg' && item.nodeId === f.nodeId)).toBe(visibility === 'visible');
+      expect(painted.items.filter(item => item.op === 'drawText').map(item => item.text).join('')).toBe('outside');
+      if (visibility === 'visible') expect(painted.scrollers.size).toBeGreaterThan(0);
+      previous = next;
+      layout = retained;
+    }
+  } finally { f.window.happyDOM.abort(); }
+});
+
+test('hidden SVG descendants can restore their shapes during retained root visibility changes', () => {
+  const f = fixture();
+  try {
+    const path = f.svg.querySelector('path');
+    let previous = f.first, layout = f.layout;
+    for (const [root, child, shapes] of [['hidden', 'visible', 1], ['visible', 'hidden', 0], ['visible', 'visible', 1]]) {
+      f.svg.style.visibility = root;
+      path.style.visibility = child;
+      const next = f.build(), retained = repaintLayout(layout, previous, next);
+      const painted = expectEquivalent(f, next, retained);
+      expect(imageRun(retained, f.nodeId).svg.shapes.length).toBe(shapes);
+      expect(painted.items.some(item => item.op === 'drawSvg' && item.nodeId === f.nodeId)).toBe(root === 'visible' && shapes > 0);
+      previous = next;
+      layout = retained;
+    }
+  } finally { f.window.happyDOM.abort(); }
+});
+
+for (const [description, markup] of [
+  ['block', '<div id="target">text <b style="visibility:visible">child</b></div>'],
+  ['inline', '<div><span id="target">text</span> after</div>'],
+  ['image', '<img id="target" width="30" height="20">'],
+  ['table row', '<table><tr id="target"><td>cell</td></tr></table>'],
+  ['table cell', '<table><tr><td id="target">cell</td></tr></table>'],
+]) {
+  for (const visibility of ['hidden', 'collapse']) {
+    test(`${description} visibility ${visibility} preserves the conservative layout path`, () => {
+      const { document, window } = parseHTMLDocument(`<body>${markup}</body>`);
+      try {
+        const builder = new RenderTreeBuilder(), engine = new LayoutEngine();
+        const build = () => builder.build(document, new StyleEngine().compute(document));
+        const previous = build(), layout = engine.layout(previous, { width: 300, viewportHeight: 200 });
+        document.getElementById('target').style.visibility = visibility;
+        expect(repaintLayout(layout, previous, build())).toBeNull();
+      } finally { window.happyDOM.abort(); }
+    });
+  }
+}
