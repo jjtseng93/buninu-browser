@@ -1,0 +1,24 @@
+--- a/packages/happy-dom/src/nodes/html-image-element/HTMLImageElement.ts
++++ b/packages/happy-dom/src/nodes/html-image-element/HTMLImageElement.ts
+@@ -360,6 +360,9 @@
+ 
+ 		if (attribute[PropertySymbol.name] === 'src') {
+ 			const generation = ++this.#loadGeneration;
++			const settings = new WindowBrowserContext(this[PropertySymbol.window]).getSettings();
++			// The browser renderer owns data URLs and errors too, not only network images.
++			if (!settings?.enableImageFileLoading) return;
+ 			const url = this.#parseUrl(attribute[PropertySymbol.value]);
+ 
+ 			if (!url) {
+@@ -374,10 +377,7 @@
+ 				return;
+ 			}
+ 
+-			const settings = new WindowBrowserContext(this[PropertySymbol.window]).getSettings();
+-			if (settings?.enableImageFileLoading) {
+-				this.#loadUrlSource(this.src, generation);
+-			}
++			this.#loadUrlSource(this.src, generation);
+ 		}
+ 	}
+ 

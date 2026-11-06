@@ -104,3 +104,14 @@ git -C vendor/happy-dom apply --check ../../patches/happy-dom/0008-serialize-cda
 git -C vendor/happy-dom apply ../../patches/happy-dom/0008-serialize-cdata-sections.patch
 git -C vendor/happy-dom apply --reverse --check ../../patches/happy-dom/0008-serialize-cdata-sections.patch
 ```
+
+### Renderer-owned image loading (`0009`)
+
+`0009-defer-all-image-loading-to-renderer.patch` makes disabled image loading
+also cover data URLs and invalid-source errors. Previously these escaped the
+setting and raced the renderer, dispatching duplicate load/error events and
+probing encoded images twice. DOM-only adapter tests explicitly enable loading;
+page images remain owned by the renderer. Validate with
+`bun test test/raster-codecs.test.js test/happy-dom-platform-adapters.test.js`.
+Apply after `0008`; its paths are relative to `vendor/happy-dom`, like the rest
+of this queue.

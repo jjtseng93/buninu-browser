@@ -360,6 +360,9 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 
 		if (attribute[PropertySymbol.name] === 'src') {
 			const generation = ++this.#loadGeneration;
+			const settings = new WindowBrowserContext(this[PropertySymbol.window]).getSettings();
+			// The browser renderer owns data URLs and errors too, not only network images.
+			if (!settings?.enableImageFileLoading) return;
 			const url = this.#parseUrl(attribute[PropertySymbol.value]);
 
 			if (!url) {
@@ -374,10 +377,7 @@ export default class HTMLImageElement extends HTMLElement implements ICanvasShap
 				return;
 			}
 
-			const settings = new WindowBrowserContext(this[PropertySymbol.window]).getSettings();
-			if (settings?.enableImageFileLoading) {
-				this.#loadUrlSource(this.src, generation);
-			}
+			this.#loadUrlSource(this.src, generation);
 		}
 	}
 

@@ -285,6 +285,22 @@ Page JavaScript runs behind three layers:
 `--no-sandbox` is accepted for Chromium compatibility but ignored.
 `--dangerously-allow-host-js` turns the sandbox off for every page.
 
+### Raster image compatibility
+
+Bun.Image metadata is a header probe, not a required format whitelist. If it
+cannot recognize a valid image, the shared image loader still tries the bundled
+CanvasKit decoder. Decoded dimensions come from that decoder; allocation limits
+remain enforced. This applies to HTML images, CSS backgrounds, canvas images and
+QML Image, with a matching fallback in the DOM image-size adapter.
+
+Native regression fixtures cover ICO (PNG and DIB payloads), CUR, WBMP and BMP
+variants rejected by Bun's probe: 1/4/8-bit palettes, 16-bit RGB, RLE4/RLE8 and
+OS/2 core headers. PNG, JPEG, WebP, GIF and ordinary 24-bit BMP remain covered.
+This does not add codecs absent from the bundled Skia build, nor animated playback.
+Unsupported/corrupt images follow the normal error/alt and rejected `decode()`
+path and can recover when `src` is replaced. Run `bun test test/raster-codecs.test.js`
+for the generated format fixtures and page-level loading tests.
+
 ### SVG rendering
 
 Inline SVG and SVG image resources share a CPU painter using the bundled

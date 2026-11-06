@@ -23,6 +23,7 @@ test("image size adapter uses Bun.Image metadata", async () => {
 
 test("an image whose src changes while its size is read reports only the latest image", async () => {
   const { document, window } = parseHTMLDocument("<img>");
+  window.happyDOM.settings.enableImageFileLoading = true;
   const image = document.querySelector("img");
   const events = [];
   image.addEventListener("load", () => events.push(`load ${image.naturalWidth}x${image.naturalHeight}`));
