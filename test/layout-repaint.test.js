@@ -57,6 +57,31 @@ function expectEquivalent(f, next, retained) {
   return painted;
 }
 
+for (const [description, content] of [
+  ['block', '<div id="a" style="width:100px;height:30px;background:red">shadow</div>'],
+  ['wrapped inline', '<div style="width:90px"><span id="a" style="background:red">several wrapped words</span></div>'],
+  ['undecorated inline', '<div><span id="a">shadow</span></div>'],
+  ['image', '<div><img id="a" width="30" height="20" style="border:1px solid black"></div>'],
+  ['table cell', '<table><tr><td id="a" style="padding:10%;background:red">cell</td><td>other</td></tr></table>'],
+]) {
+  test(`box shadows retain ${description} layout while updating paint bounds`, () => {
+    const f = fixture(`<body>${content}<p>after</p></body>`);
+    try {
+      let previous = f.first, layout = f.layout;
+      for (const shadow of ['2px 3px 4px 5px blue', 'inset 0 0 0 3px white', '1px 1px 2px red, -2px -3px 4px green', 'none']) {
+        const before = JSON.stringify(layout);
+        f.element.style.boxShadow = shadow;
+        const next = f.builder.build(f.document, new StyleEngine().compute(f.document));
+        const retained = repaintLayout(layout, previous, next);
+        expectEquivalent(f, next, retained);
+        expect(JSON.stringify(layout)).toBe(before);
+        layout = retained;
+        previous = next;
+      }
+    } finally { f.window.happyDOM.abort(); }
+  });
+}
+
 test('ancestor opacity updates nested positioned content and survives zero opacity', () => {
   const f = fixture(`<body><div id="a" style="position:relative;z-index:2;width:100px;height:70px;background:red">
     text <span style="opacity:.5;background:yellow">faint</span>
