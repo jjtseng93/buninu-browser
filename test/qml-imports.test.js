@@ -1,6 +1,6 @@
 import {test,expect} from 'bun:test';
 import {createBrowser} from '../lib/headless-shell.js';
-import {loadQmlGraph,parseQmldir} from '../lib/qml/loader.js';
+import {loadQmlGraph,loadQmlGraphSync,parseQmldir} from '../lib/qml/loader.js';
 const fixture=new URL('./fixtures/qml/imports/main.qml',import.meta.url);
 test('file imports: instances, scoped IDs, singleton, JS imports and qmldir versions',async()=>{
  const browser=await createBrowser({spareRenderer:false});
@@ -100,3 +100,47 @@ test('qualified built-in imports resolve both object types and enums',async()=>{
  expect(result.document.querySelector('[data-qml-type="Rectangle"]')).not.toBeNull();
  expect(result.document.querySelector('[data-qml-type="Text"]')).not.toBeNull();
 });
+
+test('qs.X resolves under the shell root, as Quickshell does, before a literal qs/X folder', async () => {
+  const files = {
+    'file:///shell/boot/shell.qml': 'import QtQuick\nimport qs.Commons\nItem {}',
+    'file:///shell/boot/Commons/qmldir': 'module qs.Commons\nTheme 1.0 Theme.qml',
+    'file:///shell/boot/Commons/Theme.qml': 'import QtQuick\nItem {}',
+    'file:///shell/page.qml': 'import QtQuick\nimport qs.Commons\nItem {}',
+  };
+  const seen = [];
+  const fetch = async (href) => { seen.push(href); return href in files ? { status: 200, body: new TextEncoder().encode(files[href]) } : { status: 404 }; };
+  // The entry document's own folder is the root.
+  await loadQmlGraph(files['file:///shell/boot/shell.qml'], 'file:///shell/boot/shell.qml', fetch);
+  expect(seen).toContain('file:///shell/boot/Commons/qmldir');
+  // A document loaded later is told the root by its host.
+  seen.length = 0;
+  await loadQmlGraph(files['file:///shell/page.qml'], 'file:///shell/page.qml', fetch, { shellRoot: 'file:///shell/boot/' });
+  expect(seen[0]).toBe('file:///shell/boot/Commons/qmldir');
+});
+
+for (const load of [loadQmlGraph, loadQmlGraphSync]) {
+ test(`${load.name}: standalone data QML needs no directory URL`, async () => {
+   const url = 'data:text/x-qml,standalone';
+   const graph = await load('import QtQuick\nItem {}', url, () => { throw Error('unexpected fetch'); });
+   expect(graph.documents.has(url)).toBe(true);
+ });
+ test(`${load.name}: shell root wins over literal qs, which remains a fallback`, async () => {
+   const url = 'file:///shell/boot/shell.qml';
+   const direct = 'file:///shell/boot/Commons/Theme.qml';
+   const literal = 'file:///shell/boot/qs/Commons/Theme.qml';
+   const files = {
+     'file:///shell/boot/Commons/qmldir': 'module qs.Commons\nTheme 1.0 Theme.qml',
+     [direct]: 'import QtQuick\nItem {}',
+     'file:///shell/boot/qs/Commons/qmldir': 'module qs.Commons\nTheme 1.0 Theme.qml',
+     [literal]: 'import QtQuick\nItem {}',
+   };
+   const fetch = href => href in files ? {status:200,body:new TextEncoder().encode(files[href])} : {status:404};
+   const source = 'import QtQuick\nimport qs.Commons\nTheme {}';
+   const graph = await load(source,url,fetch);
+   expect(graph.documents.has(direct)).toBe(true);
+   expect(graph.documents.has(literal)).toBe(false);
+   delete files['file:///shell/boot/Commons/qmldir'];
+   expect((await load(source,url,fetch)).documents.has(literal)).toBe(true);
+ });
+}

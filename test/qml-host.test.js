@@ -236,3 +236,16 @@ Item {width:500;height:400
     expect(result.line).toBeCloseTo(height / count, 5);
   } finally { b.close(); rmSync(dir, {recursive:true,force:true}); }
 }, 30000);
+
+test('dynamic compilation retains the original shell root outside the component directory', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'qml-shell-root-'));
+  const host = createQmlHost(Bun.pathToFileURL(join(dir, 'boot/shell.qml')).href);
+  try {
+    await Bun.write(join(dir, 'boot/Commons/qmldir'), 'module qs.Commons\nTheme 1.0 Theme.qml');
+    await Bun.write(join(dir, 'boot/Commons/Theme.qml'), 'import QtQuick\nText { text: "shell-root-marker" }');
+    const component = join(dir, 'pages/Page.qml');
+    await Bun.write(component, 'import QtQuick\nimport qs.Commons\nTheme {}');
+    expect(host.compile(Bun.pathToFileURL(component).href)).toContain('shell-root-marker');
+  } finally { host.dispose(); rmSync(dir, { recursive: true, force: true }); }
+});
+
