@@ -1,4 +1,4 @@
-// Native Termux: bun test/manual-casty-home-startup.js [output-directory] [--file]
+// Native Termux: bun test/manual-casty-home-startup.js [output-directory] [--file] [--code-menu]
 // Runs Casty without a URL, using the real HOME/config and a 1280x800 Kitty peer.
 // Compare repeated runs with the same config/transport. Inspect ready.png: DOM
 // text alone does not prove the branch sentence was laid out and painted.
@@ -160,10 +160,10 @@ async function stopCasty(proc) {
 async function main() {
   const args = Bun.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) {
-    console.log('Usage: bun test/manual-casty-home-startup.js [empty-output-directory] [--file]\n\nRun in native Termux, with no other benchmark running. --file enables PNG file transport; default auto transport is inline.\nready.png is a CDP screenshot after branch text exists. kitty-ready.png is the last received terminal frame; timing.json records whether it arrived after that text.');
+    console.log('Usage: bun test/manual-casty-home-startup.js [empty-output-directory] [--file] [--code-menu]\n\nRun in native Termux, with no other benchmark running. --file enables PNG file transport; default auto transport is inline.\nready.png is a CDP screenshot after branch text exists. kitty-ready.png is the last received terminal frame; timing.json records whether it arrived after that text.\n--code-menu also clicks the Code button through CDP and measures time until Download ZIP is visible, saving code-menu.png and kitty-code-menu.png.');
     return;
   }
-  const positional = args.filter(arg => arg !== '--file');
+  const positional = args.filter(arg => !['--file', '--code-menu'].includes(arg));
   if (positional.length > 1 || positional.some(arg => arg.startsWith('--'))) throw Error('Unknown arguments; use --help');
   const root = resolve(import.meta.dir, '..');
   const out = resolve(positional[0] || mkdtempSync(join(tmpdir(), 'casty-home-')));
@@ -273,6 +273,36 @@ await main();
     if (lastFrame) {
       writeFileSync(join(out, 'kitty-ready.png'), lastFrame);
       mark('last-kitty-frame', { frameMs: lastFrameMs, afterBranchText: lastFrameMs >= branchMs });
+    }
+    if (args.includes('--code-menu')) {
+      const location = await cdp.call('Runtime.evaluate', {
+        expression: `(()=>{const button=[...document.querySelectorAll('button')].find(el=>el.innerText.trim()==='Code');if(!button)throw Error('Code button missing');const r=button.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2,alreadyOpen:document.body.innerText.includes('Download ZIP')}})()`,
+        returnByValue: true,
+      });
+      if (location.exceptionDetails) throw Error(JSON.stringify(location.exceptionDetails));
+      const point = location.result?.value;
+      if (!point || point.alreadyOpen) throw Error('Code menu is missing or already open');
+      const clicked = mark('code-click', { x: point.x, y: point.y });
+      await cdp.call('Input.dispatchMouseEvent', { type:'mousePressed', button:'left', buttons:1, clickCount:1, x:point.x, y:point.y });
+      mark('code-pressed', { delayMs: elapsed() - clicked });
+      await cdp.call('Input.dispatchMouseEvent', { type:'mouseReleased', button:'left', buttons:0, clickCount:1, x:point.x, y:point.y });
+      mark('code-released', { delayMs: elapsed() - clicked });
+      await wait(async () => {
+        const result = await cdp.call('Runtime.evaluate', {
+          expression: `document.body.innerText.includes('Download ZIP')`, returnByValue: true,
+        });
+        if (result.exceptionDetails) throw Error(JSON.stringify(result.exceptionDetails));
+        return result.result?.value === true;
+      });
+      mark('code-menu-text', { delayMs: elapsed() - clicked });
+      const menu = await cdp.call('Page.captureScreenshot', { format:'png' });
+      writeFileSync(join(out, 'code-menu.png'), Buffer.from(menu.data, 'base64'));
+      const captured = mark('code-menu-screenshot', { delayMs: elapsed() - clicked });
+      await Bun.sleep(1000);
+      if (lastFrame) {
+        writeFileSync(join(out, 'kitty-code-menu.png'), lastFrame);
+        mark('code-menu-kitty-frame', { frameMs:lastFrameMs, delayMs:lastFrameMs-clicked, afterScreenshot:lastFrameMs>=captured });
+      }
     }
   } catch (error) {
     writeFileSync(join(out, 'terminal-error.txt'), terminalTail);
