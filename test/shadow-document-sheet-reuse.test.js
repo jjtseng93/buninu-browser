@@ -141,7 +141,7 @@ for (const [name, source] of [
   ['property', '@property --tone{syntax:"<color>";inherits:false;initial-value:blue}'],
   ['font-face', '@font-face{font-family:Added;src:url(added.woff2)}'],
   ['keyframes', '@keyframes added{from{opacity:0}to{opacity:1}}'],
-  ['media', '@media(min-width:1px){#leaf{width:21px}}'],
+  ['inactive media', '@media(min-width:999999px){#leaf{width:21px}}'],
   ['unknown at-rule', '@unknown something;'],
 ]) {
   test(`a newly added ${name} sheet keeps the full cascade fallback`, () => {

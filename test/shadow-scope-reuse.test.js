@@ -179,7 +179,7 @@ test('scope reuse requires known document changes, unchanged viewport and comple
     expect(f.engine.restyled).toBeGreaterThan(8);f.check();
     changeScope();f.engine.compute(f.document, f.sheets, {}, new Set(), null, f.scopes, reuse);
     expect(f.engine.restyled).toBeGreaterThan(8);f.check();
-    changeScope();f.sheets.push('@media(min-width:1px){#ordinary{font-size:32px}}');f.compute();
+    changeScope();f.sheets.push('@media(min-width:999999px){#ordinary{font-size:32px}}');f.compute();
     expect(f.engine.restyled).toBeGreaterThan(8);f.check();
     changeScope();f.compute([], [], reuse, {width:900});
     expect(f.engine.restyled).toBeGreaterThan(8);
