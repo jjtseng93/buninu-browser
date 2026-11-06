@@ -235,3 +235,62 @@ test("foreign element tag names follow the same matching rules as discovery sele
     }
   });
 });
+
+test('scoped sheet discovery stays cached while text and applicability remain live', async () => {
+  await fixture(async ({document,cache}) => {
+    const host = document.createElement('div');document.body.append(host);
+    const root = host.attachShadow({mode:'closed'});
+    root.innerHTML = '<style>.box{color:red}</style><link rel="preload" href="/scope.css"><div class="box"></div>';
+    cache.shadowAttached(root);
+    const query = root.querySelectorAll.bind(root), queries = [];
+    root.querySelectorAll = selector => {queries.push(selector);return query(selector);};
+    const sheets = cache.get('sheets',root), style = sheets[0];
+    for (let index=0;index<10;index++) {
+      host.setAttribute('data-counter',String(index));
+      root.lastChild.className = `box-${index}`;
+      style.firstChild.data = `.box{z-index:${index}}`;
+      style.setAttribute('media',index%2?'print':'screen');
+      style.setAttribute('type',index%2?'text/plain':'text/css');
+      style.disabled = Boolean(index%2);
+      expect(cache.get('sheets',root)).toBe(sheets);
+      expect(sheets[0].textContent).toBe(`.box{z-index:${index}}`);
+      expect(sheets[0].getAttribute('media')).toBe(index%2?'print':'screen');
+      expect(sheets[0].getAttribute('type')).toBe(index%2?'text/plain':'text/css');
+      expect(sheets[0].disabled).toBe(Boolean(index%2));
+    }
+    await Bun.sleep(10);
+    expect(cache.get('sheets',root)).toBe(sheets);
+    expect(queries).toEqual(["style, link[rel~='stylesheet']"]);
+    expect(cache.get('sheets')).not.toContain(style);
+  });
+});
+
+test('scoped sheet membership follows rel, ordering, moves and detached roots', async () => {
+  for (const delivered of [false,true]) await fixture(async ({document,cache}) => {
+    const hosts = [document.createElement('div'),document.createElement('div')];
+    document.body.append(...hosts);
+    const roots = hosts.map(host=>host.attachShadow({mode:'closed'}));
+    roots[0].innerHTML = '<style>.a{color:red}</style><link rel="preload" href="/a.css">';
+    roots[1].innerHTML = '<style>.b{color:blue}</style>';
+    for (const root of roots) cache.shadowAttached(root);
+    const first = roots[0].firstChild, link = roots[0].lastChild, second = roots[1].firstChild;
+    expect(cache.get('sheets',roots[0])).toEqual([first]);
+    expect(cache.get('sheets',roots[1])).toEqual([second]);
+    link.rel = 'stylesheet';if(delivered)await Bun.sleep(10);
+    expect(cache.get('sheets',roots[0])).toEqual([first,link]);
+    roots[0].prepend(link);if(delivered)await Bun.sleep(10);
+    expect(cache.get('sheets',roots[0])).toEqual([link,first]);
+    roots[1].append(first);if(delivered)await Bun.sleep(10);
+    expect(cache.get('sheets',roots[0])).toEqual([link]);
+    expect(cache.get('sheets',roots[1])).toEqual([second,first]);
+    hosts[1].remove();if(delivered)await Bun.sleep(10);
+    expect(cache.shadowRoots()).toEqual([roots[0]]);
+    expect(cache.get('sheets',roots[1])).toEqual([second,first]);
+    first.remove();
+    expect(cache.get('sheets',roots[1])).toEqual([second]); // unobserved roots cannot reuse a cached list
+    document.body.append(hosts[1]);if(delivered)await Bun.sleep(10);
+    expect(cache.get('sheets',roots[1])).toEqual([second]);
+    roots[1].append(first);
+    expect(cache.get('sheets',roots[1])).toEqual([second,first]);
+  });
+});
