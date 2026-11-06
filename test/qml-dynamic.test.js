@@ -1,8 +1,10 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { createBrowser } from '../lib/headless-shell.js';
 test('local Qt.createComponent creates DOM, shares singleton bindings and destroys instances', async () => {
-  const dir = mkdtempSync('/tmp/qml-dynamic-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-dynamic-'));
   const write = (name, text) => Bun.write(dir + '/' + name, text);
   await write(
     'qmldir',
@@ -76,7 +78,7 @@ Rectangle {
 }, 30000);
 
 test('Loader creates inline and file components on demand, updates bindings and destroys hidden content', async () => {
-  const dir = mkdtempSync('/tmp/qml-loader-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-loader-'));
   await Bun.write(
     dir + '/Child.qml',
     'import QtQuick\nText {required property string label; text:label}',
@@ -141,7 +143,7 @@ Item {
 }, 30000);
 
 test('synchronous Loader item observes a just-written bound activation in the same handler', async () => {
-  const dir = mkdtempSync('/tmp/qml-sync-loader-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-sync-loader-'));
   await Bun.write(
     dir + '/main.qml',
     `import QtQuick
@@ -166,7 +168,7 @@ Item {id:root;property bool built:false;property int answer:0
 }, 30000);
 
 test('dynamic singleton references cannot be captured by application loop variables', async () => {
-  const dir = mkdtempSync('/tmp/qml-hygiene-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-hygiene-'));
   await Bun.write(dir + '/qmldir', 'singleton Theme 1.0 Theme.qml\n');
   await Bun.write(
     dir + '/Theme.qml',
@@ -193,7 +195,7 @@ Item {property int shared:Theme.amount;Loader {source:"Child.qml"}}`,
 }, 30000);
 
 test('library scripts first imported by a delegate hoist their non-library dependencies into the library scope', async () => {
-  const dir = mkdtempSync('/tmp/qml-library-scope-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-library-scope-'));
   await Bun.write(
     dir + '/Utility.js',
     'var count=0;function next(){return ++count;}',
@@ -221,7 +223,7 @@ test('library scripts first imported by a delegate hoist their non-library depen
 }, 30000);
 
 test('alias writes detach an outer binding and Qt.binding reattaches it without replacing the alias', async () => {
-  const dir = mkdtempSync('/tmp/qml-alias-write-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-alias-write-'));
   await Bun.write(
     dir + '/Field.qml',
     'import QtQuick\nItem {property alias text:label.text;Text {id:label}}',
@@ -254,7 +256,7 @@ Item {id:root;property string source:"one"
 }, 30000);
 
 test('named data aliases place title and buttons inside their real holders', async () => {
-  const dir = mkdtempSync('/tmp/qml-named-slots-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-named-slots-'));
   await Bun.write(
     dir + '/Card.qml',
     `import QtQuick
@@ -292,7 +294,7 @@ Card {title:Text {id:title;text:"Title"} buttons:Text {id:buttons;text:"Buttons"
 
 test('destroying a loaded component notifies nested objects once and still releases sibling factories', async () => {
   const { mkdtempSync, rmSync } = await import('node:fs');
-  const dir = mkdtempSync('/tmp/qml-destruction-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-destruction-'));
   let browser;
   try {
     await Bun.write(
@@ -330,7 +332,7 @@ Item {id:root;width:300;height:200;property string gone:""
 }, 30000);
 
 test('shared JS libraries can create and release components relative to the script URL', async () => {
-  const dir = mkdtempSync('/tmp/qml-library-component-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-library-component-'));
   let browser;
   try {
     await Bun.write(dir + '/helpers/Factory.js', `.pragma library
@@ -359,7 +361,7 @@ Item {id:root;property var first:null;property var second:null
 },30000);
 
 test('children of an instantiated component resolve properties added at the use site; rejected MouseAreas pass clicks to underlying rows',async()=>{
- const dir=mkdtempSync('/tmp/qml-click-');let browser;
+ const dir=mkdtempSync(join(tmpdir(), 'qml-click-'));let browser;
  try{
   await Bun.write(dir+'/Cell.qml','import QtQuick\nRectangle {width:200;height:40;color:"red"}');
   await Bun.write(dir+'/main.qml',`import QtQuick
@@ -383,7 +385,7 @@ Rectangle {width:300;height:150
 },30000);
 
 test('dynamic objects belong to their explicit parent, not the Loader currently creating them',async()=>{
- const dir=mkdtempSync('/tmp/qml-parent-owner-');let browser;
+ const dir=mkdtempSync(join(tmpdir(), 'qml-parent-owner-'));let browser;
  try{
   await Bun.write(dir+'/Icon.qml','import QtQuick\nText {text:"surviving icon"}');
   await Bun.write(dir+'/main.qml',`import QtQuick

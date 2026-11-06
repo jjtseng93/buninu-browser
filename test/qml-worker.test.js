@@ -1,9 +1,10 @@
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { createBrowser } from '../lib/headless-shell.js';
 async function run(files, source, verify) {
-  const dir = mkdtempSync('/tmp/qml-worker-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-worker-'));
   let browser;
   try {
     for (const [name, text] of Object.entries({ ...files, 'main.qml': source }))

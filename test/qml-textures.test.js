@@ -1,10 +1,12 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { createBrowser } from '../lib/headless-shell.js';
 import { loadGraphics } from '../lib/renderer/page-renderer.js';
 
 test('ShaderEffectSource freezes, updates, hides sources and releases Loader references', async () => {
-  const dir = mkdtempSync('/tmp/qml-textures-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-textures-'));
   const browser = await createBrowser({ spareRenderer: false });
   const { CanvasKit: kit } = await loadGraphics();
   async function pixel(x,y) {

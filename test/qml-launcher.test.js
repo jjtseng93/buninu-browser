@@ -1,9 +1,10 @@
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { backendArgs, parseArgs } from '../lib/qml/launcher.js';
 test('qs accepts official -p invocation, paths with spaces and named config, rejecting unknown options', () => {
-  const dir = mkdtempSync('/tmp/qml-launcher-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-launcher-'));
   try {
     const path = join(dir, 'with spaces');
     mkdirSync(path);

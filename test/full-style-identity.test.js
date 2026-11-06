@@ -49,7 +49,7 @@ test('full cascades retain equal style, custom property and pseudo identities', 
 });
 
 for (const incremental of [false, true]) {
-  test(`style identity comparison preserves signed-zero and NaN decisions (${incremental ? 'incremental' : 'full'})`, () => {
+  test(`style identity comparison preserves normalized zero and NaN decisions (${incremental ? 'incremental' : 'full'})`, () => {
     const f = fixture('<div id="zero" style="margin:0px">zero</div><div id="nan" style="width:calc(1e309 * 0px)">non-finite</div>');
     try {
       const zero = f.get('zero'), nan = f.get('nan');
@@ -58,7 +58,9 @@ for (const incremental of [false, true]) {
       expect(Number.isNaN(nanStyle.width.percent)).toBe(true);
       zero.setAttribute('style', 'margin:-0px');
       const fresh = new StyleEngine().compute(f.document, f.sheets);
-      expect(Object.is(fresh.get(zero).margin[0], -0)).toBe(true);
+      // CSSOM serializes a literal -0px as 0px before the cascade.
+      expect(zero.style.margin).toBe('0px');
+      expect(Object.is(fresh.get(zero).margin[0], 0)).toBe(true);
       f.engine.compute(f.document, f.sheets, f.viewport, incremental ? new Set([zero, nan]) : null);
       expect(f.engine.get(zero)).toBe(zeroStyle);
       expect(f.engine.get(nan)).not.toBe(nanStyle);

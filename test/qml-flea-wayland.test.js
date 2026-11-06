@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 // Opt-in real socket test; owns its compositor and never touches a user's Land.
 import { test, expect } from 'bun:test';
 import { join } from 'node:path';
@@ -45,7 +46,7 @@ test.skipIf(!flea || !omarchy || !process.env.BUNINU_QML_WAYLAND_TEST)(
       await key(',', 'Comma');
       await until(async () => (await text()).includes('Settings'));
       await Bun.write(
-        '/tmp/buninu-flea-wayland.png',
+        join(tmpdir(), 'buninu-flea-wayland.png'),
         Buffer.from(await land.context.screenshot({ format: 'png' }), 'base64'),
       );
       await key('Escape', 'Escape');

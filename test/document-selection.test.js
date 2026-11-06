@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {createBrowser} from '../lib/headless-shell.js';
 test('drag selects document text and controls without stealing canceled mouse gestures',async()=>{
@@ -22,6 +24,6 @@ test('drag selects document text and controls without stealing canceled mouse ge
  await run('document.getElementById("a").style.userSelect="text";getSelection().selectAllChildren(document.getElementById("a"))');
  await run('globalThis.selectedRange=getSelection().getRangeAt(0);getSelection().removeAllRanges();getSelection().addRange(selectedRange)');
  expect(await run('getSelection().toString()')).toBe('abcdefghij');
- await Bun.write('/tmp/document-selection.png'  ,Buffer.from(await c.screenshot({format:'png'}),'base64'));
+ await Bun.write(join(tmpdir(), 'document-selection.png')  ,Buffer.from(await c.screenshot({format:'png'}),'base64'));
  }finally{b.close()}
 },30000);

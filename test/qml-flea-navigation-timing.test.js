@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 // Opt-in integration: unmodified packaged QML and the real installed Flea binary.
 import { test, expect } from 'bun:test';
 import { join } from 'node:path';
@@ -127,7 +128,7 @@ test.skipIf(!root || !omarchy || !binary)(
         trace,
       };
       await Bun.write(
-        '/tmp/flea-navigation-timing.json',
+        join(tmpdir(), 'flea-navigation-timing.json'),
         JSON.stringify(report, null, 2),
       );
       console.log(JSON.stringify(report));

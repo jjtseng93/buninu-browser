@@ -1,9 +1,11 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {launch} from '../frontends/wayland/index.js';
 test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('HTML Ctrl-C/V, navigator and toolbar share Land clipboard even with host denied',async()=>{
  const {start}=await import('../../buninu-land/compositor.js');
- const dir=mkdtempSync('/tmp/html-clipboard-'),old=process.env.XDG_RUNTIME_DIR;
+ const dir=mkdtempSync(join(tmpdir(), 'html-clipboard-')),old=process.env.XDG_RUNTIME_DIR;
  let land,app;const copied='Wayland 中文',writes=[];
  const wait=async fn=>{for(let i=0;i<200;i++){if(await fn())return;await Bun.sleep(20);}throw Error('Clipboard did not settle');};
  const server=Bun.serve({hostname:'127.0.0.1',port:0,fetch:()=>new Response(`<input id="field" value="Wayland 中文"><button id="read" style="position:absolute;top:50px;left:0;width:100px;height:30px" onclick="navigator.clipboard.readText().then(t=>globalThis.readResult=t)">Read</button>`,{headers:{'content-type':'text/html; charset=utf-8'}})});

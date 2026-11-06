@@ -1,9 +1,11 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { createBrowser } from '../lib/headless-shell.js';
 
 test('component handlers retain base connections when pooled delegates are reused', async () => {
-  const dir = mkdtempSync('/tmp/qml-inherited-handlers-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-inherited-handlers-'));
   let browser;
   try {
     await Bun.write(dir + '/Cell.qml', `import QtQuick

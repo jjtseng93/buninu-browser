@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {createBrowser} from '../lib/headless-shell.js';
@@ -52,7 +54,7 @@ test('CDP real pointer phases preserve dragging, focus and click targets',async(
  try{await check(c)}finally{c.close();server.stop(true);b.close()}
 },30000);
 test.skipIf(process.env.BUNINU_TEST_CHROMIUM!=='1')('Chromium reference uses the same pointer event contract',async()=>{
- const dir=mkdtempSync('/tmp/pointer-chromium-');let app;
+ const dir=mkdtempSync(join(tmpdir(), 'pointer-chromium-'));let app;
  try{app=await launch('chromium',dir);await check(app.cdp)}finally{await app?.stop();rmSync(dir,{recursive:true,force:true})}
 },30000);
 test('Wayland toolbar sends real press and motion before release, including over chrome',async()=>{
@@ -73,7 +75,7 @@ test('Wayland toolbar sends real press and motion before release, including over
 test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('real Wayland pointer draws on the unchanged manual test page',async()=>{
  const {start}=await import('../../buninu-land/compositor.js');
  const {launch:wayland}=await import('../frontends/wayland/index.js');
- const dir=mkdtempSync('/tmp/pointer-wayland-'),saved=process.env.XDG_RUNTIME_DIR;
+ const dir=mkdtempSync(join(tmpdir(), 'pointer-wayland-')),saved=process.env.XDG_RUNTIME_DIR;
  process.env.XDG_RUNTIME_DIR=dir;let land,app;
  const until=async fn=>{for(let n=0;n<200;n++){if(await fn())return;await Bun.sleep(20)}throw Error('Wayland pointer timed out')};
  try{

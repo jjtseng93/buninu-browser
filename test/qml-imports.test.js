@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {createBrowser} from '../lib/headless-shell.js';
 import {loadQmlGraph,loadQmlGraphSync,parseQmldir} from '../lib/qml/loader.js';
@@ -11,7 +13,7 @@ test('file imports: instances, scoped IDs, singleton, JS imports and qmldir vers
   expect(await text()).toContain('Shared: 1 / multiply: 42');expect(await text()).toContain('Private ID: undefined');expect(await text()).toContain('module version 1.0');
   await browser.context.evaluate('document.querySelector("[data-qml-type=MouseArea]").click()');
   expect(await text()).toContain('changed');expect(await text()).toContain('two:2:1');expect(await text()).toContain('Shared: 2');
-  await Bun.write('/tmp/qml-real-imports.png',Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'qml-real-imports.png'),Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
  }finally{browser.close();}
 },30000);
 test('qmldir version selection respects the requested minor version',()=>{

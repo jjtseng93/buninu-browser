@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { RendererHost } from '../lib/renderer/host.js';
 const wait = async (fn, predicate) => {
@@ -173,7 +175,7 @@ Item {
 
 test('unchanged Flea StableModel resizes a virtualized view synchronously and warms reusable rows', async () => {
   const { mkdtempSync, rmSync } = await import('node:fs');
-  const dir = mkdtempSync('/tmp/qml-stable-model-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-stable-model-'));
   const ui = Bun.fileURLToPath(
     new URL('./fixtures/qml/flea-theme/ui/', import.meta.url),
   );

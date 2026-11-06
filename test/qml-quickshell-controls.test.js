@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 // Opt-in comparison against the genuine binary; no Quickshell implementation source.
 import { test, expect } from 'bun:test';
 import { withQuickshellFixture } from './helpers/quickshell-fixture.js';
@@ -18,7 +20,7 @@ test.skipIf(!process.env.BUNINU_QS_ROOT)(
         await click(50, 86);
         expect(title()).toBe('Flea buttons | 3');
         await Bun.write(
-          '/tmp/quickshell-flea-buttons.png',
+          join(tmpdir(), 'quickshell-flea-buttons.png'),
           Buffer.from(
             await land.context.screenshot({ format: 'png' }),
             'base64',

@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { createBrowser } from '../lib/headless-shell.js';
 import { RendererHost } from '../lib/renderer/host.js';
@@ -58,7 +60,7 @@ test('upstream DialogButton handles click, key repeat, disabled state and animat
 }, 30000);
 
 test('inline components preserve lexical IDs and default aliases route inserted content', async () => {
-  const dir = mkdtempSync('/tmp/qml-slots-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-slots-'));
   await Bun.write(
     dir + '/Frame.qml',
     `import QtQuick
@@ -93,7 +95,7 @@ Item {id:root;property string label:"lexical";width:300;height:200
 }, 30000);
 
 test('SplitParser streams partial UTF-8 lines and Process writes stdin before exit', async () => {
-  const dir = mkdtempSync('/tmp/qml-stream-');
+  const dir = mkdtempSync(join(tmpdir(), 'qml-stream-'));
   const script = `process.stdout.write('ready\\n');process.stdin.once('data',chunk=>{process.stdout.write(Buffer.from([0xe4,0xbd]));setTimeout(()=>{process.stdout.write(Buffer.concat([Buffer.from([0xa0]),Buffer.from(':'+chunk.toString().trim()+'\\n')]));process.exit(0);},30);});`;
   await Bun.write(
     dir + '/main.qml',
@@ -207,7 +209,7 @@ Item {id:root;width:300;height:200;property int parentKeys:0;property int accept
 }, 30000);
 
 test('FileView atomic writes signal saved only after replacement and waitForJob flushes pending data', async () => {
-  const dir = mkdtempSync('/tmp/qml-file-save-'),
+  const dir = mkdtempSync(join(tmpdir(), 'qml-file-save-')),
     target = dir + '/reply';
   await Bun.write(target, 'old');
   await Bun.write(

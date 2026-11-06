@@ -25,7 +25,7 @@ test('viewport resize notifies window listeners with fresh geometry and repaints
   expect(await host.call('evaluate',`[document.getElementById('canvas').width,document.getElementById('canvas').height].join(',')`)).toBe('400,300');
   const png=Buffer.from(await host.composite('screenshot',{format:'png'}),'base64');
   expect([png.readUInt32BE(16),png.readUInt32BE(20)]).toEqual([600,450]);
-  expect(await host.call('evaluate',"getComputedStyle(document.body).backgroundColor")).toBe('rgba(17, 34, 51, 1)');
+  expect(await host.call('evaluate',"getComputedStyle(document.body).backgroundColor")).toBe('rgb(17, 34, 51)');
   await host.call('resize',400,300,1.5);
   await host.call('resize',400,300,2);
   expect(await host.call('evaluate','events.length')).toBe(1);

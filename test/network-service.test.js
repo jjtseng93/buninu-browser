@@ -405,7 +405,9 @@ test("a page cannot open the CDP endpoint, even from a data: or about:blank docu
     const network = new NetworkService({ fetch: async () => new Response("") });
     const url = `ws://127.0.0.1:${cdp.port}/devtools/browser/cdp-server`;
     for (const documentUrl of ["https://evil.test/", "data:text/html,x", "about:blank"]) {
-      expect(await socketOutcome(network.webSocket(url, [], documentUrl))).toBe("closed 1002");
+      // Bun releases differ in how a rejected HTTP upgrade maps to a close code.
+      // Neither error may establish a page WebSocket to the CDP endpoint.
+      expect(await socketOutcome(network.webSocket(url, [], documentUrl))).toMatch(/^closed (1002|1006)$/);
     }
     // A client without an Origin (casty, Playwright) still connects.
     expect(await socketOutcome(new WebSocket(url))).toBe("open");

@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 // Component tests with ordinary input data, not a replacement Flea backend.
 import { test, expect } from 'bun:test';
 import { join } from 'node:path';
@@ -86,7 +87,7 @@ Rectangle {id:root;width:800;height:600;color:Flea.Theme.color.background
           await browser.context.evaluate('JSON.stringify(qmlErrors)'),
         ).toBe('[]');
         await Bun.write(
-          '/tmp/buninu-flea-' + type + '.png',
+          join(tmpdir(), 'buninu-flea-') + type + '.png',
           Buffer.from(
             await browser.context.screenshot({ format: 'png' }),
             'base64',

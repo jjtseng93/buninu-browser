@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -32,7 +33,7 @@ test.skipIf(!flea||!omarchy||!process.env.FLEA_BIN)('Flea initially shows langua
   await until(0,parent);await until(1,['Documents','hello.md','second.js']);
   await key('ArrowUp');await until(1,[]);expect(await names(0)).toEqual(parent);
   await key('ArrowDown');await until(1,['Documents','hello.md','second.js']);expect(await names(0)).toEqual(parent);
-  await Bun.write('/tmp/flea-columns-fixed.png',Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'flea-columns-fixed.png'),Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
   expect(await browser.context.evaluate('qmlErrors')).toEqual([]);
  }finally{browser?.close();if(oldPath===undefined)delete process.env.FLEA_PATH;else process.env.FLEA_PATH=oldPath;sandbox.close();}
 },60000);

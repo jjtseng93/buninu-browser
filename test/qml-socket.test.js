@@ -1,10 +1,12 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {createServer} from 'node:net';
 import {createBrowser} from '../lib/headless-shell.js';
 
 test('local QML Socket connects, splits UTF-8 messages, writes and disconnects',async()=>{
- const dir=await mkdtemp('/tmp/qml-socket-');
+ const dir=await mkdtemp(join(tmpdir(), 'qml-socket-'));
  const peers=new Set(); let received='';
  const server=createServer(socket=>{
   peers.add(socket);socket.on('close',()=>peers.delete(socket));
@@ -35,7 +37,7 @@ Item { Socket { id: socket; path: ${JSON.stringify(dir+'/engine.sock')}; connect
 },20000);
 
 test('Socket failure can reconnect and navigation closes the live connection',async()=>{
- const dir=await mkdtemp('/tmp/qml-socket-retry-');
+ const dir=await mkdtemp(join(tmpdir(), 'qml-socket-retry-'));
  const peers=new Set();
  const server=createServer(s=>{peers.add(s);s.on('close',()=>peers.delete(s));});
  const browser=await createBrowser({spareRenderer:false});

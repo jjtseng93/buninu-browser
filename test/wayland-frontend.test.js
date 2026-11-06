@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {encodeRequest,decode,interfaces} from '../frontends/wayland/protocol.js';
 import {parseKeymap,keysym} from '../frontends/wayland/input.js';
@@ -26,7 +28,7 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Browser SHM, pointer, keyboa
  const {mkdtempSync,rmSync}=await import('node:fs');
  const {start}=await import('../../buninu-land/compositor.js');
  const {launch}=await import('../frontends/wayland/index.js');
- const dir=mkdtempSync('/tmp/buninu-wayland-test-'),old=process.env.XDG_RUNTIME_DIR;
+ const dir=mkdtempSync(join(tmpdir(), 'buninu-wayland-test-')),old=process.env.XDG_RUNTIME_DIR;
  process.env.XDG_RUNTIME_DIR=dir;let land,app;
  const wait=async(fn)=>{for(let i=0;i<500;i++){if(await fn())return;await Bun.sleep(20);}throw Error('Timed out waiting for Wayland state');};
  try{
@@ -162,7 +164,7 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('initial Wayland navigation p
  const {mkdtempSync,rmSync}=await import('node:fs');
  const {start}=await import('../../buninu-land/compositor.js');
  const {launch}=await import('../frontends/wayland/index.js');
- const dir=mkdtempSync('/tmp/buninu-initial-alert-'),old=process.env.XDG_RUNTIME_DIR;
+ const dir=mkdtempSync(join(tmpdir(), 'buninu-initial-alert-')),old=process.env.XDG_RUNTIME_DIR;
  process.env.XDG_RUNTIME_DIR=dir;let land,app,launching,launched=false;
  const until=async fn=>{for(let i=0;i<750;i++){if(fn())return;await Bun.sleep(20);}throw Error('Initial alert did not present');};
  try{

@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { join } from 'node:path';
 import { createBrowser } from '../lib/headless-shell.js';
@@ -36,17 +37,17 @@ for(const kind of ['swap','clip']) test.skipIf(!flea||!omarchy)('unchanged Flea 
       expect(pixel(await capture(),30,30)).toEqual([255,0,0,255]);
       await run('document.getElementById("move").click()');
       await until(async()=>await run('JSON.parse(document.getElementById("status").textContent).holding'));
-      const held=await capture();await Bun.write('/tmp/flea-preview-held.png',held);
+      const held=await capture();await Bun.write(join(tmpdir(), 'flea-preview-held.png'),held);
       expect(pixel(held,30,30)).toEqual([255,0,0,255]);
       expect(await run('document.getElementById("source").style.backgroundColor')).toBe('blue');
       await run('document.getElementById("finish").click()');
       await until(async()=>!(await run('JSON.parse(document.getElementById("status").textContent).holding')));
-      const done=await capture();await Bun.write('/tmp/flea-preview-released.png',done);
+      const done=await capture();await Bun.write(join(tmpdir(), 'flea-preview-released.png'),done);
       expect(pixel(done,30,30)).toEqual([0,0,255,255]);
       expect(await run('JSON.parse(document.getElementById("status").textContent).last.end')).toBe('landed');
     }else{
       await until(async()=>pixel(await capture(),200,50)[0]===255&&pixel(await capture(),200,50)[1]===0);
-      const rounded=await capture();await Bun.write('/tmp/flea-preview-rounded.png',rounded);
+      const rounded=await capture();await Bun.write(join(tmpdir(), 'flea-preview-rounded.png'),rounded);
       expect(pixel(rounded,25,25)).toEqual([255,255,255,255]);
       expect(pixel(rounded,151,21)).toEqual([255,255,255,255]);
       expect(pixel(rounded,200,50)).toEqual([255,0,0,255]);

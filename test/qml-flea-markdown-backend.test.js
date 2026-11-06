@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {join} from 'node:path';
 import {createBrowser} from '../lib/headless-shell.js';
@@ -26,6 +27,6 @@ test.skipIf(!flea||!omarchy||!process.env.FLEA_BIN)('Flea Markdown preview stack
   await browser.context.resize(600,600);await until(async()=>separated(await read()));
   expect(separated(await read())).toBe(true);
   expect(await run('issues')).toEqual([]);
-  await Bun.write('/tmp/flea-markdown-layout.png',Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'flea-markdown-layout.png'),Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
  }finally{browser?.close();if(oldPath===undefined)delete process.env.FLEA_PATH;else process.env.FLEA_PATH=oldPath;sandbox.close();}
 },60000);

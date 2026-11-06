@@ -1,10 +1,11 @@
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {join} from 'node:path';
 import {launch} from '../frontends/wayland/index.js';
 test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('QML uses shared input defaults and exchanges text through Land on demand',async()=>{
  const {start}=await import('../../buninu-land/compositor.js');
- const dir=mkdtempSync('/tmp/qml-clipboard-'),old=process.env.XDG_RUNTIME_DIR;
+ const dir=mkdtempSync(join(tmpdir(), 'qml-clipboard-')),old=process.env.XDG_RUNTIME_DIR;
  let land,app;const writes=[];
  const wait=async fn=>{for(let i=0;i<200;i++){if(await fn())return;await Bun.sleep(25);}throw Error('Clipboard did not settle');};
  try {

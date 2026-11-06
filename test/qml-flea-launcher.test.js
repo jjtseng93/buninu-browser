@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 // Actual official executable -> PATH qs wrapper -> browser -> wl_shm on own Land.
 import { test, expect } from 'bun:test';
 import { join, resolve } from 'node:path';
@@ -59,7 +60,7 @@ test.skipIf(
         .filter((s) => s.pixels);
       expect(surfaces.length).toBeGreaterThan(0);
       await Bun.write(
-        '/tmp/buninu-flea-official-launcher.png',
+        join(tmpdir(), 'buninu-flea-official-launcher.png'),
         Buffer.from(await land.context.screenshot({ format: 'png' }), 'base64'),
       );
       for (const type of ['keyDown', 'keyUp'])

@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {createBrowser} from '../lib/headless-shell.js';
 import {CdpServer} from '../lib/cdp-server.js';
@@ -28,7 +29,7 @@ test('CDP clickCount reaches DOM clicks and dblclick after cancelled click',asyn
 },30000);
 
 test('Wayland clicks reach HTML and QML double-tap handlers',async()=>{
- const b=await createBrowser({spareRenderer:false});const dir=mkdtempSync('/tmp/double-click-');
+ const b=await createBrowser({spareRenderer:false});const dir=mkdtempSync(join(tmpdir(), 'double-click-'));
  try{
   await b.context.navigate('data:text/html,'+encodeURIComponent(html));
   const p=pointer(b.context);p.tap(1000);p.tap(1180,28,24);
@@ -56,7 +57,7 @@ test('Wayland count resets on timeout, distance and leave and handles timestamp 
 test('CDP and Wayland preserve non-primary buttons without primary activation',async()=>{
  const b=await createBrowser({spareRenderer:false});const server=CdpServer.create(b.context).listen(0);
  const cdp=new CDP(`ws://127.0.0.1:${server.port}/devtools/browser/cdp-server`);
- const dir=mkdtempSync('/tmp/nonprimary-click-');
+ const dir=mkdtempSync(join(tmpdir(), 'nonprimary-click-'));
  try {
   await cdp.ready;
   const url='data:text/html,'+encodeURIComponent(`<body style="margin:0"><a id="box" href="https://example.invalid/" style="display:block;width:200px;height:100px">link</a><script>globalThis.events=[];const box=document.getElementById("box");for(const t of ['mousedown','mouseup','click','auxclick','contextmenu'])box.addEventListener(t,e=>events.push([t,e.button,e.buttons]));box.onauxclick=e=>events.push(['property',e.button]);</script>`);

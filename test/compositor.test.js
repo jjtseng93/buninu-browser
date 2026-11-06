@@ -177,7 +177,7 @@ test("a preview is shown while stylesheets load, then the styled page, then scri
     expect(events).toEqual([]);
     expect(context.lifecycleState()).toEqual([]);
     expect(await context.evaluate("document.title")).toBe("staged");
-    expect(await context.evaluate("getComputedStyle(document.body).backgroundColor")).not.toBe("rgba(0, 0, 255, 1)");
+    expect(await context.evaluate("getComputedStyle(document.body).backgroundColor")).not.toBe("rgb(0, 0, 255)");
     const preview = await context.screenshot();
 
     const framesBefore = frames;
@@ -187,7 +187,7 @@ test("a preview is shown while stylesheets load, then the styled page, then scri
     expect(events).toEqual(["DOMContentLoaded", "load"]);
     expect(context.lifecycleState()).toEqual(["DOMContentLoaded", "load"]);
     expect(frames).toBeGreaterThan(framesBefore);
-    expect(await context.evaluate("getComputedStyle(document.body).backgroundColor")).toBe("rgba(0, 0, 255, 1)");
+    expect(await context.evaluate("getComputedStyle(document.body).backgroundColor")).toBe("rgb(0, 0, 255)");
     expect(await context.evaluate("document.title")).toBe("scripted");
     expect(await context.screenshot()).not.toBe(preview);
   } finally {

@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {join} from 'node:path';
 import {createBrowser} from '../lib/headless-shell.js';
@@ -20,7 +21,7 @@ Flea.PreviewMedia {id:preview;width:640;height:360;kind:"video";autoStart:false;
   await until('players[0]?.duration>1000');
   expect(await run('players[0].hasVideo')).toBe(true);
   expect(await run('players[0].error')).toBe(0);
-  await Bun.write('/tmp/qml-flea-media-poster.png',Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'qml-flea-media-poster.png'),Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
   await run(`players[0].source=${JSON.stringify(audio)}`);
   await until('players[0]?.hasAudio&&!players[0].hasVideo&&players[0].duration>500');
   expect(await run('players[0].error')).toBe(0);

@@ -5,6 +5,11 @@ import {compositeVideo} from '../../lib/renderer/video-presentation.js';
 const sleep=Bun.sleep, report=text=>process.stdout.write(text+'\n');
 const errors=[],frames=[],messages=[];
 let seeked=0;
+const now=Date.now;
+async function until(check,message){
+  const deadline=now()+5000;
+  while(!check()){assert.ok(now()<deadline,message);await sleep(10);}
+}
 const renderer=await createPageRenderer({
   renderMinInterval:80,
   onFrame:frame=>frames.push(frame.tile),onVideo:message=>messages.push(message),
@@ -23,25 +28,27 @@ try{
   await renderer.loadDocument({url:'https://media.test/',contentType:'text/html',source:'<style>body{margin:0}video{display:block;width:200px;height:120px}#marker{width:20px;height:20px;background:red}</style><video id=v src="clip.mp4"></video><div id=marker></div><video id=native src="clip.mp4" controls style="display:none"></video>'});
   await renderer.whenLoaded();
   await renderer.evaluate('document.getElementById("v").play()');
-  await sleep(160);
+  await until(()=>messages.some(message=>message.type==='video-open')&&frames.at(-1)?.videoLayer,'initial presentation did not arrive');
   assert.ok(messages.some(message=>message.type==='video-open'),'first metadata/play starts independent presentation');
   assert.ok(frames.at(-1).videoLayer);
   frames.length=0;
   await renderer.evaluate('setTimeout(()=>{document.getElementById("marker").style.background="blue"},1)');
-  await sleep(180);
+  // Wait for the observable frame, not a 180ms wall-clock assumption under
+  // parallel CPU load. Stale frames still fail the pixel assertions below.
+  await until(()=>frames.length>0,'scheduled UI frame did not arrive');
   assert.ok(frames.length>0,'scheduled UI frame is still published');
   assert.ok(frames.every(tile=>pixel(tile,5,125).join(',')==='0,0,255,255'),'media ticks must not publish stale red UI before the scheduled rebuild');
   await renderer.evaluate('document.getElementById("v").pause()');
   assert.ok(messages.some(message=>message.type==='video-stop'),'pause stops independent presentation');
   assert.equal(frames.at(-1).videoLayer,null,'paused frame returns to normal raster');
   await renderer.evaluate('document.getElementById("v").currentTime=3');
-  await sleep(80);
+  await until(()=>seeked>0&&pixel(frames.at(-1),5,5)[0]>60,'seek did not publish its picture');
   assert.ok(seeked>0,'paused seek positions the decoder');
   assert.ok(pixel(frames.at(-1),5,5)[0]>60,'paused seek publishes its decoded picture');
   await renderer.evaluate('document.getElementById("v").style.display="none";document.getElementById("native").style.display="block"');
   await renderer.evaluate('document.getElementById("native").play()');
   const before=frames.length;
-  await sleep(140);
+  await until(()=>frames.length>before,'native controls did not repaint');
   assert.ok(frames.length>before,'native controls/local playback continue repainting');
   // Native controls can now remain above an independently composed video.
   // Check the foreground pause icon rather than requiring the old fallback.

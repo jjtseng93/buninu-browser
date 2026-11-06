@@ -328,7 +328,7 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     expect(markerLayout.result.value).toEqual({
       position: "fixed",
       display: "block",
-      background: "rgba(255, 0, 0, 1)",
+      background: "rgb(255, 0, 0)",
       x: click.x - 7,
       y: click.y - 7,
       width: 14,

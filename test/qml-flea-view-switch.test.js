@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -27,7 +28,7 @@ test.skipIf(!flea||!omarchy||!process.env.FLEA_BIN)('Flea hides retained columns
   expect(await browser.context.evaluate(`views.find(({t})=>t.includes('Pane')).v.viewMode`)).toBe('list');
   expect(await browser.context.evaluate(`views.find(({t})=>t.includes('Pane')).v.columnsArea.visible`)).toBe(false);
   await until(1,[]);
-  await Bun.write('/tmp/flea-list-switch.png',Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'flea-list-switch.png'),Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
   expect(await browser.context.evaluate('qmlErrors')).toEqual([]);
  }finally{browser?.close();if(oldPath===undefined)delete process.env.FLEA_PATH;else process.env.FLEA_PATH=oldPath;sandbox.close();}
 },60000);

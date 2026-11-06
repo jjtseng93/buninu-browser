@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {mkdtempSync,rmSync} from 'node:fs';
 
@@ -6,7 +8,7 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('Casty SGR wheel -> Land -> b
  const {start}=await import('../../buninu-land/compositor.js');
  const {mouseWheelEvent}=await import('../../casty/lib/input.js');
  const {launch}=await import('../frontends/wayland/index.js');
- const dir=mkdtempSync('/tmp/browser-wheel-'),old=process.env.XDG_RUNTIME_DIR;
+ const dir=mkdtempSync(join(tmpdir(), 'browser-wheel-')),old=process.env.XDG_RUNTIME_DIR;
  process.env.XDG_RUNTIME_DIR=dir;let land,app;
  const wait=async(fn)=>{for(let n=0;n<300;n++){if(await fn())return;await Bun.sleep(20)}throw Error('Scroll timed out')};
  try{

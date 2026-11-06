@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 // Opt-in integration: unmodified packaged QML and the real installed Flea binary.
 import { test, expect } from 'bun:test';
 import { join } from 'node:path';
@@ -56,7 +57,7 @@ test.skipIf(!root || !omarchy || !binary)(
           !(await text()).includes('hello.txt'),
       );
       await Bun.write(
-        '/tmp/buninu-flea-official-backend.png',
+        join(tmpdir(), 'buninu-flea-official-backend.png'),
         Buffer.from(
           await browser.context.screenshot({ format: 'png' }),
           'base64',

@@ -8,11 +8,20 @@ import {CDP} from '../tools/browser-lab.js';
 test('file input opens browser-owned picker, selects files, and FileReader emits asynchronous load',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'buninu-picker-'));await Bun.write(join(dir,'one.txt'),'Hello 選檔');await Bun.write(join(dir,'two.txt'),'second');
  const b=await createBrowser({spareRenderer:false}),server=CdpServer.create(b.context).listen(0),c=new CDP(`ws://127.0.0.1:${server.port}/devtools/browser/cdp-server`);
+ const originalEvaluate=c.evaluate.bind(c);
+ c.evaluate=async expression=>{
+   try{return await originalEvaluate(expression);}
+   catch(error){throw new Error(`File picker evaluation failed: ${expression}`,{cause:error});}
+ };
  try{
   await c.send('Page.navigate',{url:'data:text/html,'+encodeURIComponent(`<input id="f" type="file" multiple><script>window.events=[];f.oninput=()=>events.push('input');f.onchange=async()=>{events.push('change');window.names=[...f.files].map(f=>f.name);const r=new FileReader();r.onload=e=>{window.text=e.target.result;events.push('load')};r.readAsText(f.files[0]);};</script>`)});
   await c.evaluate('f.click();window.clickReturned=true');
   for(let i=0;i<200&&!b.context.dialogState;i++)await Bun.sleep(10);
   expect(b.context.dialogState?.type).toBe('file');
+  // DialogOpening announces state before the separate UI renderer is ready.
+  // Wait for a presented dialog using the capture request's startup budget;
+  // subsequent evaluations measure UI actions, not renderer initialization.
+  await c.send('Page.captureScreenshot',{format:'png'});
   const action=async value=>{await c.evaluate(`window.__fileAction=${JSON.stringify(value)}`);await c.send('Input.dispatchKeyEvent',{type:'keyDown',key:'Shift'});await c.send('Input.dispatchKeyEvent',{type:'keyUp',key:'Shift'});};
   await action({kind:'browse',path:dir});
   expect(await c.evaluate('document.body.textContent.includes("one.txt")')).toBe(true);

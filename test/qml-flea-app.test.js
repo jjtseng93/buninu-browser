@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 // Opt-in integration against an unchanged Flea/Omarchy checkout. This never
 // substitutes backend replies. Without FLEA_BIN the real unavailable state is expected.
 import { test, expect } from 'bun:test';
@@ -9,7 +10,7 @@ const flea = process.env.BUNINU_FLEA_ROOT,
 test.skipIf(!flea || !omarchy)(
   'unchanged Flea boots and opens, switches and closes its real settings panel',
   async () => {
-    const dir = mkdtempSync('/tmp/qml-flea-app-'),
+    const dir = mkdtempSync(join(tmpdir(), 'qml-flea-app-')),
       saved = {};
     const variables = {
       HOME: join(dir, 'home'),
@@ -76,7 +77,7 @@ test.skipIf(!flea || !omarchy)(
       await clickExpression(visibleLabel('Display'));
       await until(async () => (await text()).includes('Text size'));
       await Bun.write(
-        '/tmp/buninu-flea-settings-display.png',
+        join(tmpdir(), 'buninu-flea-settings-display.png'),
         Buffer.from(
           await browser.context.screenshot({ format: 'png' }),
           'base64',
@@ -116,7 +117,7 @@ test.skipIf(!flea || !omarchy)(
         (await text()).includes('sftp://example.invalid'),
       );
       await Bun.write(
-        '/tmp/buninu-flea-network.png',
+        join(tmpdir(), 'buninu-flea-network.png'),
         Buffer.from(
           await browser.context.screenshot({ format: 'png' }),
           'base64',
@@ -127,7 +128,7 @@ test.skipIf(!flea || !omarchy)(
         '[]',
       );
       await Bun.write(
-        '/tmp/buninu-flea-app.png',
+        join(tmpdir(), 'buninu-flea-app.png'),
         Buffer.from(
           await browser.context.screenshot({ format: 'png' }),
           'base64',

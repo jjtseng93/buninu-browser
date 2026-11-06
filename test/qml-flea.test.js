@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { createBrowser } from '../lib/headless-shell.js';
 
@@ -22,7 +24,7 @@ test('Flea EscapeHint imports a real singleton and shares reactive theme updates
     expect(JSON.parse(await colors())).toEqual(['#70e1e8', '#70e1e8']);
     expect(await browser.context.evaluate('typeof Theme')).toBe('undefined');
     await Bun.write(
-      '/tmp/browser-flea-import.png',
+      join(tmpdir(), 'browser-flea-import.png'),
       Buffer.from(
         await browser.context.screenshot({ format: 'png' }),
         'base64',

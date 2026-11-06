@@ -48,7 +48,7 @@ test("--mobile sends the mobile user agent, ignores overrides and applies touch 
     requestUserAgent: MOBILE_USER_AGENT,
     navigatorUserAgent: MOBILE_USER_AGENT,
     touch: true,
-    background: "rgba(0, 0, 255, 1)",
+    background: "rgb(0, 0, 255)",
   });
 }, 30_000);
 

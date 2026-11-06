@@ -1,10 +1,11 @@
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {join} from 'node:path';
 import {createBrowser} from '../lib/headless-shell.js';
 import {applyQmlMediaGain} from '../lib/qml/media-renderer.js';
 test('QML MP4/MP3 reuse HTML decoding, metadata, pause and millisecond seek',async()=>{
- const dir=mkdtempSync('/tmp/qml-media-');let browser;
+ const dir=mkdtempSync(join(tmpdir(), 'qml-media-'));let browser;
  try {
   const video=Bun.pathToFileURL(join(import.meta.dir,'fixtures/long-video.mp4')).href;
   const audio=Bun.pathToFileURL(join(import.meta.dir,'fixtures/tone.mp3')).href;
@@ -37,7 +38,7 @@ Rectangle {width:320;height:240;color:"black"
   await run("document.getElementById('seek').click()");
   await until(s=>Math.abs(s.position-500)<50);
   const png=await browser.context.screenshot({format:'png'});
-  await Bun.write('/tmp/qml-media-video.png',Buffer.from(png,'base64'));
+  await Bun.write(join(tmpdir(), 'qml-media-video.png'),Buffer.from(png,'base64'));
   expect(await run("mediaNodes.find(n=>n.t.includes('VideoOutput')).v.contentRect.width")).toBeGreaterThan(0);
   await run("document.getElementById('switchAudio').click()");
   const s=await until(s=>s.hasAudio&&!s.hasVideo&&s.duration>500);

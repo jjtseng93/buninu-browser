@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 // Opt-in binary comparison. No Quickshell source or dependency installation.
 // BUNINU_QS_ROOT=/path/to/extracted/sid/root bun test test/qml-quickshell-settings.test.js
 import {test,expect} from 'bun:test';
@@ -6,7 +7,7 @@ import {join} from 'node:path';
 const qsRoot=process.env.BUNINU_QS_ROOT;
 test.skipIf(!qsRoot)('real Quickshell SettingsRuler matches size, disabled tap and reset behavior',async()=>{
  const {start}=await import('../../buninu-land/compositor.js');
- const dir=mkdtempSync('/tmp/qs-settings-test-'),fixture=join(dir,'fixture'),home=join(dir,'home');
+ const dir=mkdtempSync(join(tmpdir(), 'qs-settings-test-')),fixture=join(dir,'fixture'),home=join(dir,'home');
  const oldRuntime=process.env.XDG_RUNTIME_DIR;
  let land,child;
  try{
@@ -45,13 +46,13 @@ test.skipIf(!qsRoot)('real Quickshell SettingsRuler matches size, disabled tap a
    await Bun.sleep(120);
   };
   await Bun.sleep(500);
-  await Bun.write('/tmp/qs-settings-before.png',Buffer.from(await land.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'qs-settings-before.png'),Buffer.from(await land.context.screenshot({format:'png'}),'base64'));
   await click(712,100);await until(()=>title()==='Flea — text size settings | 20 | 1');
   await click(100,300);await click(76,100);
   expect(title()).toBe('Flea — text size settings | 20 | 1');
   await click(100,300);await click(76,100);await until(()=>title()==='Flea — text size settings | 9 | 2');
   await click(380,300);await until(()=>title()==='Flea — text size settings | 14 | 2');
-  await Bun.write('/tmp/quickshell-flea-settings.png',Buffer.from(await land.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'quickshell-flea-settings.png'),Buffer.from(await land.context.screenshot({format:'png'}),'base64'));
   expect(title()).toBe('Flea — text size settings | 14 | 2');
  }finally{
   if(child){child.kill();await child.exited;}

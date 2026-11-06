@@ -1,10 +1,12 @@
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import {test,expect} from 'bun:test';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {createBrowser} from '../lib/headless-shell.js';
 import {loadGraphics} from '../lib/renderer/page-renderer.js';
 
 test('QML input selection paints full and partial ranges without changing input geometry',async()=>{
- const dir=mkdtempSync('/tmp/qml-selection-');let browser;
+ const dir=mkdtempSync(join(tmpdir(), 'qml-selection-'));let browser;
  try{
   await Bun.write(dir+'/main.qml',`import QtQuick
 Rectangle {width:360;height:160;color:"white"
@@ -31,7 +33,7 @@ Rectangle {width:360;height:160;color:"white"
 },30000);
 
 test('QML input arrows collapse and extend selection, and the caret paints and blinks',async()=>{
- const dir=mkdtempSync('/tmp/qml-caret-');let browser;
+ const dir=mkdtempSync(join(tmpdir(), 'qml-caret-'));let browser;
  try{
   await Bun.write(dir+'/main.qml',`import QtQuick
 Rectangle {width:360;height:100;color:"white"

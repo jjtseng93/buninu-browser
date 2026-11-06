@@ -77,7 +77,7 @@ test('real upstream Theme resolves palette, Commons typography and watches theme
     await Bun.write(join(current, 'theme.name'), 'second');
     await until(async () => String(await text()).includes('baseSize=18'));
     await Bun.write(
-      '/tmp/browser-real-flea-theme.png',
+      join(tmpdir(), 'browser-real-flea-theme.png'),
       Buffer.from(await b.context.screenshot({ format: 'png' }), 'base64'),
     );
   } finally {
@@ -191,7 +191,7 @@ test('upstream SettingsRuler changes shared Theme, disables taps and follows the
     await b.context.evaluate('document.getElementById("reset").click()');
     expect(await status()).toBe('Size: 14 / clicks: 2');
     expect(await font()).toBe('14px');
-    await Bun.write('/tmp/browser-flea-settings.png',Buffer.from(await b.context.screenshot({format:'png'}),'base64'));
+    await Bun.write(join(tmpdir(), 'browser-flea-settings.png'),Buffer.from(await b.context.screenshot({format:'png'}),'base64'));
   } finally {
     b.close();
     if(oldHome===undefined)delete process.env.HOME;else process.env.HOME=oldHome;

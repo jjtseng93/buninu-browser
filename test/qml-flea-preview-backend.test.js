@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { join } from 'node:path';
 import { createBrowser } from '../lib/headless-shell.js';
@@ -29,7 +30,7 @@ test.skipIf(!root||!omarchy||!binary)('official Flea backend opens and switches 
   await browser.context.press(' ',{code:'Space'});
   await until(async()=>(await run('document.body.innerText')).includes('First real Flea preview'));
   await until(async()=>!(await run('document.body.innerText')).includes('reading'));
-  await Bun.write('/tmp/flea-real-preview-first.png',Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'flea-real-preview-first.png'),Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
   await run(`qmlReaders.find(r=>r.active&&r.list).list.contentY=400`);await run('0');
   expect(await run(`qmlReaders.find(r=>r.active&&r.list).list.contentY`)).toBeGreaterThan(0);
   await browser.context.press('ArrowDown',{code:'ArrowDown'});
@@ -37,12 +38,12 @@ test.skipIf(!root||!omarchy||!binary)('official Flea backend opens and switches 
   await until(async()=>await run(`qmlReaders.some(r=>r.active&&r.path.endsWith('/second.txt')&&r.list&&r.list.contentY===0)`));
   expect(await run(`qmlReaders.find(r=>r.active&&r.path.endsWith('/second.txt')).list.contentY`)).toBe(0);
   await Bun.sleep(100);
-  await Bun.write('/tmp/flea-real-preview-second.png',Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
+  await Bun.write(join(tmpdir(), 'flea-real-preview-second.png'),Buffer.from(await browser.context.screenshot({format:'png'}),'base64'));
   await browser.context.press('ArrowDown',{code:'ArrowDown'});
   await until(async()=>await run(`[...document.querySelectorAll('img')].some(e=>e.src.endsWith('/third.png')&&e.complete&&e.naturalWidth===320)`));
   await until(async()=>!(await run('document.body.innerText')).includes('reading'));
   const png=Buffer.from(await browser.context.screenshot({format:'png'}),'base64');
-  await Bun.write('/tmp/flea-real-preview-image.png',png);
+  await Bun.write(join(tmpdir(), 'flea-real-preview-image.png'),png);
   const {CanvasKit:kit}=await import('../lib/renderer/page-renderer.js').then(m=>m.loadGraphics());
   const image=kit.MakeImageFromEncoded(png);
   try { expect([...image.readPixels(450,300,{width:1,height:1,colorType:kit.ColorType.RGBA_8888,alphaType:kit.AlphaType.Unpremul,colorSpace:kit.ColorSpace.SRGB})]).toEqual([255,0,0,255]); }

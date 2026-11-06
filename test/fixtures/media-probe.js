@@ -85,9 +85,12 @@ try {
       hold = false; pending.shift()(metadata(24));
       await finishInitial(); assert.equal(await duration(), 24);
     } else if (scenario === 'initial-source') {
+      // The replacement may probe synchronously during load(); only the old
+      // request should remain held by this fixture.
+      hold = false;
       await evaluate('v.src="replacement.mp4";v.load()');
-      hold = false; pending.shift()(metadata(123));
-      await sleep(25); assert.equal(await count(), 1);
+      pending.shift()(metadata(123));
+      await waitFor(async () => await count() === 1);
       assert.equal(await duration(), 8, 'only the replacement source can publish metadata');
     } else {
       hold = false; pending.shift()(metadata(8));

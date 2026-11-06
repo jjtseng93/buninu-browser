@@ -30,16 +30,18 @@ test('empty overrides inherit LANG; unset system defaults to C',()=>{
  expect(createQt({LANG:'C.UTF-8'}).formatDate(d,'MMMM')).toBe('November');
 });
 
-test('local QML host receives locale categories through its host capability',async()=>{
- for(const [env,expected] of [
+// Each environment starts a complete renderer/host; give each launch its own
+// deadline rather than charging both launches to the same wall-clock budget.
+for(const [env,expected] of [
   [{LC_ALL:'C.UTF-8',LANG:'en_US.UTF-8'},{name:'C',measurement:0,date:'d MM yyyy',time:'HH:mm'}],
   [{LC_ALL:'',LANG:'en_US.UTF-8',LC_MESSAGES:'',LC_TIME:'en_GB.UTF-8',LC_MEASUREMENT:'zh_TW.UTF-8'},null],
  ]) {
+ test(`local QML host receives locale categories (${env.LC_ALL || env.LC_TIME})`,async()=>{
   const child=Bun.spawn([process.execPath,new URL('./fixtures/qml-locale/check.mjs',import.meta.url).pathname],{env:{...process.env,...env},stdout:'pipe',stderr:'pipe'});
   const [output,error,code]=await Promise.all([new Response(child.stdout).text(),new Response(child.stderr).text(),child.exited]);
   expect({code,error}).toEqual({code:0,error:''});
   const result=JSON.parse(output.trim());
   if(expected)expect(result).toEqual(expected);
   else {expect(result.name).toBe('en_US');expect(result.measurement).toBe(0);expect(result.time).toBe('HH:mm');}
- }
-},15000);
+ },15000);
+}

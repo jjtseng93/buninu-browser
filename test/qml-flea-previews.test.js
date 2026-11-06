@@ -1,3 +1,4 @@
+import { tmpdir } from 'node:os';
 import { test, expect } from 'bun:test';
 import { join } from 'node:path';
 import { createBrowser } from '../lib/headless-shell.js';
@@ -55,7 +56,7 @@ Rectangle {width:800;height:600;color:Flea.Theme.color.background
         ).toBe('[]');
         expect(text).toContain(expected);
         await Bun.write(
-          '/tmp/buninu-flea-preview-' + extension + '.png',
+          join(tmpdir(), 'buninu-flea-preview-') + extension + '.png',
           Buffer.from(
             await browser.context.screenshot({ format: 'png' }),
             'base64',
@@ -141,7 +142,7 @@ Rectangle {width:800;height:600;color:Flea.Theme.color.background
         );
         expect(zoomed).toContain(':true');
         await Bun.write(
-          '/tmp/buninu-flea-preview-' + extension + '.png',
+          join(tmpdir(), 'buninu-flea-preview-') + extension + '.png',
           Buffer.from(
             await browser.context.screenshot({ format: 'png' }),
             'base64',
