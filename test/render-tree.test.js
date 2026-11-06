@@ -164,3 +164,57 @@ test("detects whether a rebuilt tree changes layout input", async () => {
   expect(visibleChange.root.children[0]).not.toBe(firstParagraph);
   window.happyDOM.abort();
 });
+
+test("published child arrays stay immutable for ordinary, generated and control nodes", async () => {
+  const { StyleEngine } = await import("../lib/style/computed-style.js");
+  const { document, window } = parseHTMLDocument(`<body><p id="label">text<br><img></p>
+    <details>generated summary</details><details><summary>marker</summary></details>
+    <input id="selected" value="abcd"><input type="checkbox" checked>
+    <textarea>value</textarea><select><option>option</option></select>
+    <svg width="10" height="10"><rect width="10" height="10"/></svg>
+    <audio controls></audio><video></video><canvas></canvas><iframe></iframe></body>`);
+  try {
+    const input = document.getElementById("selected");
+    input.focus();
+    input.setSelectionRange(1, 3);
+    const styles = new StyleEngine().compute(document, ['#label::before { content:"before" } #label::after { content:"after" }']);
+    const builder = new RenderTreeBuilder();
+    for (const tree of [builder.build(document, styles), builder.build(document, styles)]) {
+      for (const node of tree.nodesById.values()) {
+        expect(Object.isFrozen(node)).toBe(true);
+        expect(Object.isFrozen(node.children)).toBe(true);
+        expect(() => node.children.push(tree.root)).toThrow(TypeError);
+      }
+      expect([...tree.nodesById.values()].some(node => node.pseudo === "before")).toBe(true);
+      expect([...tree.nodesById.values()].some(node => node.pseudo === "summary")).toBe(true);
+      expect([...tree.nodesById.values()].some(node => node.tagName === "SPAN" && node.domNode !== input)).toBe(true);
+    }
+    // The document's empty fallback root has the same publication contract.
+    document.body.remove();
+    expect(Object.isFrozen(builder.build(document).root.children)).toBe(true);
+  } finally { window.happyDOM.abort(); }
+});
+
+test("retained child arrays and old snapshots survive later content changes", () => {
+  const { document, window } = parseHTMLDocument('<body><div id="edit">before</div><p id="keep">stable<br></p></body>');
+  try {
+    const builder = new RenderTreeBuilder();
+    const first = builder.build(document);
+    const same = builder.build(document);
+    const retained = first.root.children[1];
+    const oldChildren = first.root.children;
+    expect(same.root).toBe(first.root);
+    expect(same.root.children).toBe(oldChildren);
+
+    document.getElementById("edit").firstChild.data = "after";
+    const changed = builder.build(document);
+    expect(changed.root).not.toBe(first.root);
+    expect(changed.root.children).not.toBe(oldChildren);
+    expect(changed.root.children[1]).toBe(retained);
+    expect(renderTreeText(first)).toContain("before");
+    expect(renderTreeText(first)).not.toContain("after");
+    expect(renderTreeText(changed)).toContain("after");
+    expect(Object.isFrozen(oldChildren)).toBe(true);
+    expect(Object.isFrozen(changed.root.children)).toBe(true);
+  } finally { window.happyDOM.abort(); }
+});
