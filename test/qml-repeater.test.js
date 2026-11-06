@@ -70,3 +70,29 @@ Item {
   expect(JSON.parse(await host.call('evaluate','JSON.stringify([...document.querySelectorAll("[data-qml-type=Text]")].map(e=>e.textContent))'))).toEqual(['item:0:0','item:0:1','item:1:0','item:1:1','item']);
  }finally{host.close();}
 },30000);
+
+test('a Column lays out a Repeater whose model fills late where the Repeater is declared', async () => {
+  const host=new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('resize',300,300,1);
+    await host.call('loadDocument',{url:'https://qml.test/late.qml',contentType:'text/x-qml',source:`
+import QtQuick
+Rectangle {
+ id: root; width: 300; height: 300
+ property var late: []
+ Timer { interval: 20; running: true; onTriggered: root.late = ["A1", "A2"] }
+ Column {
+  Repeater { model: root.late; Text { height: 20; text: modelData } }
+  Repeater { model: ["B1", "B2"]; Text { height: 20; text: modelData } }
+  Text { height: 20; text: "C" }
+ }
+}`});
+    await host.call('whenLoaded');
+    await Bun.sleep(200);
+    // Each row's top, read in the order the Column placed them.
+    const order = await host.call('evaluate', `[...document.querySelectorAll('[data-qml-type="Text"]')]
+      .map((e) => [e.textContent, parseFloat(e.style.top) || 0]).sort((a, b) => a[1] - b[1]).map((r) => r[0]).join(",")`);
+    expect(order).toBe('A1,A2,B1,B2,C');
+  } finally { await host.close(); }
+});
