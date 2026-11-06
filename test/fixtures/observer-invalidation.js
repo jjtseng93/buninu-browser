@@ -8,9 +8,11 @@ const font = await Bun.file(new URL("../../usr/share/fonts/DejaVuSansMono.ttf", 
 const sleep = Bun.sleep;
 let finishFont;
 const fontResponse = new Promise(resolve => { finishFont = resolve; });
+const traces = [];
 const renderer = await createPageRenderer({
   fetchResource: async url => ({ ok: false, status: 404, url, body: new Uint8Array() }),
   pageFetch: () => fontResponse,
+  trace: message => traces.push(message),
 });
 const evaluate = code => renderer.evaluate(code);
 const eventually = async (code, check, message) => {
@@ -32,6 +34,7 @@ try {
       #scroller{position:absolute;top:80px;width:100px;height:100px;overflow:auto}
       #inside{position:absolute;top:150px;width:20px;height:20px}
       #below{position:absolute;top:500px;width:20px;height:20px}</style>
+    <script id=metadata type="application/json">{"phase":0}</script>
     <div id=box></div><div id=viewport></div>
     <div id=scroller><div style="position:relative;height:300px"><div id=inside></div></div></div>
     <div id=below></div><div style="height:1000px"></div>` });
@@ -55,6 +58,21 @@ try {
     await sleep(30);
   }
   assert.equal(measurements, 0, "metadata flushes must not remeasure unchanged observer targets");
+  assert.deepEqual(await evaluate("[sizes,intersections]"), [[100], [true]]);
+
+  // Text in a non-rendered script still invalidates the render-tree input.
+  // Once rebuilding proves it equal, that checkpoint must not advance the
+  // geometry version and enqueue a redundant observer measurement.
+  for (let i = 1; i <= 3; i++) {
+    traces.length = 0;
+    assert.equal(await evaluate(`document.getElementById('metadata').firstChild.data='{"phase":${i}}';document.body.clientWidth`), 400);
+    assert.ok(traces.some(message => message.includes("unchanged layout input")), "non-rendered text must exercise the equal-input checkpoint");
+    // Building the immutable tree legitimately reads #box's style. Count
+    // only the subsequent scheduled observer work after the synchronous flush.
+    measurements = 0;
+    await sleep(30);
+    assert.equal(measurements, 0, "equal layout input must not remeasure unchanged observer targets");
+  }
   assert.deepEqual(await evaluate("[sizes,intersections]"), [[100], [true]]);
   StyleEngine.prototype.get = originalGet;
 
