@@ -73,6 +73,14 @@ try {
   await renderer.showFragment('https://shadow.test/#ordinary');
   assert.deepEqual(await pixel(10,50),[128,0,128,255]);
   assert.equal(fullScoped,0,'ordinary :target invalidation remains incremental beside unobserving shadow roots');
+  await evaluate(`document.querySelector('style').textContent+='button{color:black}button:focus{color:red}';globalThis.button=document.createElement('button');button.textContent='FOCUS';document.getElementById('ordinary').append(button);getComputedStyle(button).color`);
+  await renderer.screenshot();
+  incremental=0;fullScoped=0;
+  assert.equal(await evaluate(`button.focus();getComputedStyle(button).color`),'rgb(255, 0, 0)');
+  assert.equal(fullScoped,0,'unchanged BODY/HTML focus-within ancestors must not restyle the whole scoped document');
+  assert.ok(incremental>0,'focus still restyles its affected ordinary subject');
+  assert.equal(await evaluate(`button.blur();getComputedStyle(button).color`),'rgb(0, 0, 0)');
+  assert.equal(fullScoped,0,'blur retains the same ancestor self-check path');
   assert.deepEqual(errors,[],'verification compares ordinary, closed-shadow, and non-rendered light DOM correctly');
   process.stdout.write('shadow incremental rendering passed\n');
 } finally {

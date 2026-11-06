@@ -45,14 +45,12 @@ test('ordinary subtrees update incrementally alongside closed shadow roots', () 
   } finally {f.window.happyDOM.close();}
 });
 
-test('slot changes, host ancestry, and shadow nodes retain coherent full traversal', () => {
+test('slot changes and shadow nodes retain coherent full traversal', () => {
   const f = fixture();
   try {
     const cases = [
       [f.host.firstElementChild, () => f.host.firstElementChild.removeAttribute('slot')],
       [f.root.firstElementChild, () => f.root.firstElementChild.style.color = 'red'],
-      [f.get('outer'), () => f.get('outer').style.fontSize = '27px'],
-      [f.document.body, () => f.document.body.style.setProperty('--new', 'green')],
     ];
     for (const [node, change] of cases) {
       change();f.compute([], [node]);expect(f.engine.incremental).toBeFalse();f.check();
@@ -60,6 +58,55 @@ test('slot changes, host ancestry, and shadow nodes retain coherent full travers
     expect(touchesShadowScope(f.root, [f.root])).toBeTrue();
     expect(touchesShadowScope(f.host.firstChild, [f.root])).toBeTrue();
     expect(touchesShadowScope(f.get('branch'), [f.root])).toBeFalse();
+  } finally {f.window.happyDOM.close();}
+});
+
+test('unchanged ancestor self checks do not restyle unrelated shadow trees', () => {
+  const f = fixture();
+  try {
+    const branch = f.get('branch');branch.tabIndex = 0;f.compute([branch]);
+    const shadowStyle = f.engine.get(f.root.firstElementChild);
+    branch.focus();
+    f.compute([], [f.document.documentElement, f.document.body, f.get('ordinary'), branch]);
+    expect(f.engine.incremental).toBeTrue();
+    expect(f.engine.restyled).toBe(4);expect(f.engine.changedStyles).toBe(0);
+    expect(f.engine.get(f.root.firstElementChild)).toBe(shadowStyle);f.check();
+    // The exception is self-only: a dirty ancestor still invalidates its
+    // descendants' selector matches and must use a coherent full traversal.
+    f.compute([f.get('outer')]);expect(f.engine.incremental).toBeFalse();f.check();
+  } finally {f.window.happyDOM.close();}
+});
+
+test('changed ancestor outputs propagate composed inheritance through hosts and slots', () => {
+  const f = fixture('.inner,slot,::slotted(.assigned){width:inherit;background:var(--accent)}.inner{height:2rem}');
+  try {
+    const outer = f.get('outer'), inner = f.root.firstElementChild;
+    f.sheets.push('#outer{width:120px;--accent:red}#host{width:inherit}');
+    f.engine.compute(f.document, f.sheets, {}, null, null, f.scopes);
+    expect(f.engine.get(inner).width).toBe(120);
+    outer.style.width = '240px';f.compute([], [outer]);
+    expect(f.engine.incremental).toBeTrue();
+    expect(f.engine.get(f.host).width).toBe(240);
+    expect(f.engine.get(inner).width).toBe(240);
+    expect(f.engine.get(f.host.firstElementChild).width).toBe(240);f.check();
+    outer.style.setProperty('--accent', 'green');f.compute([], [outer]);
+    expect(f.engine.incremental).toBeTrue();f.check();
+    outer.style.fontSize = '27px';f.compute([], [outer]);
+    expect(f.engine.incremental).toBeTrue();expect(f.engine.get(inner).fontSize).toBe(27);f.check();
+    f.document.documentElement.style.fontSize = '20px';
+    f.compute([], [f.document.documentElement]);
+    expect(f.engine.incremental).toBeTrue();expect(f.engine.get(inner).height).toBe(40);f.check();
+  } finally {f.window.happyDOM.close();}
+});
+
+test('inherited ancestor selector state retains full scoped invalidation', () => {
+  const f = fixture(':host(:lang(en)){color:green}.inner:lang(en){color:blue}');
+  try {
+    f.document.body.lang = 'en';f.compute([], [f.document.body]);
+    expect(f.engine.incremental).toBeFalse();f.check();
+    f.scopes.set(f.root, [':host(:read-write){color:green}.inner:read-write{color:blue}']);f.compute();
+    f.get('outer').setAttribute('contenteditable', 'true');f.compute([], [f.get('outer')]);
+    expect(f.engine.incremental).toBeFalse();f.check();
   } finally {f.window.happyDOM.close();}
 });
 
@@ -100,7 +147,7 @@ test('nested shadow selector dependencies conservatively preserve outside invali
     const depends = selector => shadowSelectorDependsOnOutside(f.host, compileShadowSelector(f.host, selector));
     for (const selector of [':host', ':host(.enabled)', ':host([open])', '.inner', ':is(:host,.inner)', '::slotted(.assigned)', ':host(:popover-open)', ':host(:is(.north,.south))', ':host(:where(:not(.disabled)))'])
       expect(depends(selector)).toBeFalse();
-    for (const selector of [':host-context(.theme)', ':is(:host-context(.theme),.inner)', ':where(:not(:host-context(.theme)))', ':host(:has(+ .enabled))', ':host(:nth-child(2))', ':host:first-child', '.inner:has(.enabled)', ':host(:is(.first + .second))', ':host(:not(:has(+ .enabled)))', ':host:valid'])
+    for (const selector of [':host-context(.theme)', ':is(:host-context(.theme),.inner)', ':where(:not(:host-context(.theme)))', ':host(:has(+ .enabled))', ':host(:nth-child(2))', ':host:first-child', '.inner:has(.enabled)', ':host(:is(.first + .second))', ':host(:not(:has(+ .enabled)))', ':host:valid', ':host(:lang(en))', '.inner:dir(rtl)', '::slotted(:read-write)', ':host(:not(:is(:disabled)))', '.inner:enabled', ':host(:read-only)'])
       expect(depends(selector)).toBeTrue();
     f.scopes.set(f.root, [':host-context(body:has(.enabled)){color:red}']);
     f.compute();
