@@ -4,7 +4,7 @@ import {StyleEngine} from '../../lib/style/computed-style.js';
 
 const errors = [];
 const original = StyleEngine.prototype.compute;
-let incremental = 0, fullScoped = 0, rendererEngine = null;
+let incremental = 0, fullScoped = 0, retainedScopes = 0, rendererEngine = null;
 StyleEngine.prototype.compute = function (...args) {
   rendererEngine ??= this;
   const result = original.apply(this, args);
@@ -13,6 +13,7 @@ StyleEngine.prototype.compute = function (...args) {
   if (this === rendererEngine && args[5]?.size) {
     if (this.incremental) incremental++;
     else fullScoped++;
+    if (args[6]?.reuseUnchangedShadowScopes && this.restyled < args[0].querySelectorAll('*').length / 2) retainedScopes++;
   }
   return result;
 };
@@ -26,10 +27,11 @@ const pixel = async (x,y) => {
 };
 try {
   renderer.resize(120,120,1);renderer.setScripting('host');
-  await renderer.loadDocument({url:'https://shadow.test/',contentType:'text/html',source:'<!doctype html><style>body{margin:0}#host{display:block;height:40px}#ordinary{height:40px;width:40px;background:red}#ordinary.blue{background:blue}</style><late-host id="host"><span slot="main">L</span><b>UNSLOTTED</b></late-host><main><div id="ordinary"></div></main>'});
+  await renderer.loadDocument({url:'https://shadow.test/',contentType:'text/html',source:'<!doctype html><style>body{margin:0}#host{display:block;height:40px}#ordinary{height:40px;width:40px;background:red}#ordinary.blue{background:blue}</style><late-host id="host"><span slot="main">L</span><b>UNSLOTTED</b></late-host><main><div id="ordinary"></div></main><section>'+ '<span></span>'.repeat(200) + '</section>'});
   await renderer.whenLoaded();
   await evaluate(`globalThis.host=document.getElementById('host');globalThis.root=host.attachShadow({mode:'closed'});root.innerHTML='<style>:host{color:purple}.box{height:40px;width:40px;background:green}</style><div class="box"><slot name="main"><i>FALLBACK</i></slot></div>'`);
   assert.deepEqual(await pixel(30,10),[0,128,0,255]);
+  assert.ok(retainedScopes>0,'attaching a closed root must preserve unrelated computed styles');
   assert.deepEqual(await pixel(10,50),[255,0,0,255]);
   incremental=0;
   assert.equal(await evaluate(`document.getElementById('ordinary').className='blue';getComputedStyle(document.getElementById('ordinary')).backgroundColor`),'rgb(0, 0, 255)');
@@ -40,6 +42,13 @@ try {
   assert.deepEqual(await pixel(30,10),[255,0,0,255]);
   assert.equal(await evaluate(`host.firstElementChild.removeAttribute('slot');root.querySelector('slot').textContent='NEW';getComputedStyle(host).color`),'rgb(128, 0, 128)');
   await renderer.screenshot();
+  retainedScopes=0;
+  // A scope edit and an ordinary mutation in the same batch must both survive
+  // dirty-set collection, including synchronous computed-style reads.
+  await evaluate(`root.querySelector('style').textContent+=':host{font-size:18px}';document.getElementById('ordinary').className='';getComputedStyle(host).fontSize`);
+  assert.deepEqual(await pixel(10,50),[255,0,0,255]);
+  assert.ok(retainedScopes>0,'scoped stylesheet edits must retain unrelated branches');
+  await evaluate(`document.getElementById('ordinary').className='blue'`);
   // Definitions and hash changes without scoped selector dependencies must
   // not invalidate the document just because it contains a shadow root.
   incremental=0;fullScoped=0;
