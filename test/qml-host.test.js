@@ -249,3 +249,22 @@ test('dynamic compilation retains the original shell root outside the component 
   } finally { host.dispose(); rmSync(dir, { recursive: true, force: true }); }
 });
 
+test('QML host supplies missing HOME and preserves an explicit value', async () => {
+  const module = new URL('../lib/qml/host.js', import.meta.url).href;
+  for (const home of [undefined, '', '/explicit/home']) {
+    const env = { ...process.env, BUN_RUNTIME_TRANSPILER_CACHE_PATH: '0' };
+    if (home === undefined) delete env.HOME; else env.HOME = home;
+    const proc = Bun.spawn([process.execPath, '-e', `
+      import {createQmlHost} from ${JSON.stringify(module)};
+      import {homedir} from 'node:os';
+      const host=createQmlHost('file:///tmp/home-test.qml');
+      console.log(JSON.stringify({actual:host.env('HOME'),expected:process.env.HOME || homedir()}));
+      host.dispose();
+    `], {env, stdout:'pipe', stderr:'pipe'});
+    const output = await new Response(proc.stdout).text();
+    const error = await new Response(proc.stderr).text();
+    expect(await proc.exited, error).toBe(0);
+    const {actual,expected} = JSON.parse(output);
+    expect(actual).toBe(expected); expect(actual.length).toBeGreaterThan(0);
+  }
+});
