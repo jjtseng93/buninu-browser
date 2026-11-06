@@ -169,7 +169,7 @@ test('shadow-root dirty records force their host while unknown records fall back
   } finally {f.window.happyDOM.close();}
 });
 
-test('scope reuse requires unchanged document rules, viewport and complete dirty metadata', () => {
+test('scope reuse requires known document changes, unchanged viewport and complete dirty metadata', () => {
   const f = fixture();
   try {
     const scope = f.attach();f.compute();
@@ -179,7 +179,7 @@ test('scope reuse requires unchanged document rules, viewport and complete dirty
     expect(f.engine.restyled).toBeGreaterThan(8);f.check();
     changeScope();f.engine.compute(f.document, f.sheets, {}, new Set(), null, f.scopes, reuse);
     expect(f.engine.restyled).toBeGreaterThan(8);f.check();
-    changeScope();f.sheets.push('#ordinary{font-size:32px}');f.compute();
+    changeScope();f.sheets.push('@media(min-width:1px){#ordinary{font-size:32px}}');f.compute();
     expect(f.engine.restyled).toBeGreaterThan(8);f.check();
     changeScope();f.compute([], [], reuse, {width:900});
     expect(f.engine.restyled).toBeGreaterThan(8);
