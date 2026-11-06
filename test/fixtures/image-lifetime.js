@@ -59,12 +59,26 @@ try {
   await until(async () => await renderer.evaluate("saved[0].complete"));
   assert.deepEqual(await pixel(), [0, 0, 255, 255], "same-size replacement invalidates the raster cache");
   await renderer.evaluate("document.body.replaceChildren()");
-  assert.equal(alive, 0, "removed images release native handles even when script retains DOM nodes");
+  assert.equal(alive, 100, "retained detached images remain usable as canvas sources");
+  assert.equal(await renderer.evaluate(`(() => {
+    const c=document.createElement('canvas').getContext('2d');
+    c.drawImage(saved[0],0,0);return c.getImageData(0,0,1,1).data[2];
+  })()`), 255, "detaching an image must not discard its decoded canvas pixels");
+  await renderer.evaluate("saved.slice(1).forEach(image=>image.removeAttribute('src'))");
+  assert.equal(alive, 1, "source removal releases retained resources");
   await renderer.evaluate("document.body.appendChild(saved[0])");
   await until(async () => await renderer.evaluate("saved[0].complete"));
-  assert.equal(alive, 1, "reattaching a removed image reloads its resource");
+  assert.equal(alive, 1, "reattaching a retained image reuses its resource");
   assert.deepEqual(await pixel(), [0, 0, 255, 255]);
-  await renderer.evaluate("document.body.replaceChildren(); document.body.style.height='100px'");
+  await renderer.evaluate("document.body.replaceChildren(); saved[0].removeAttribute('src'); document.body.style.height='100px'");
+  assert.equal(alive, 0);
+  for (const attach of [false, true]) {
+    await renderer.evaluate("globalThis.transient = new Image(); transient.src='/red.png'; transient.decode()");
+    assert.equal(alive, 1);
+    if (attach) await renderer.evaluate("document.body.appendChild(transient)");
+    await renderer.evaluate("transient.remove(); delete globalThis.transient");
+    await until(async () => { Bun.gc(true); await sleep(10); return alive === 0; });
+  }
   for (let i=0;i<8;i++) {
     await renderer.evaluate(`document.body.style.backgroundImage='url(/red-bg-${i}.png)'`);
     await until(() => alive === 1);
