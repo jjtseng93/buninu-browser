@@ -1,5 +1,6 @@
 import { test, expect } from 'bun:test';
 import { RendererHost } from '../lib/renderer/host.js';
+import { loadGraphics } from '../lib/renderer/page-renderer.js';
 async function fixture(source, run) {
   const host = new RendererHost({ timeout: 20000 });
   try {
@@ -98,7 +99,7 @@ Item {id:root;width:400;height:200;property string link:""
   );
 }, 30000);
 
-test('ShapePath linear gradients draw through the existing page canvas while solid paths retain SVG', async () => {
+test('ShapePath gradients and solid paths retain their rendered colors through shared SVG', async () => {
   await fixture(
     `import QtQuick
 import QtQuick.Shapes
@@ -112,12 +113,16 @@ Item {width:200;height:100
  Shape {x:110;width:40;height:40;ShapePath {fillColor:"green";strokeWidth:0;PathSvg {path:"M0 0H40V40H0Z"}}}
 }`,
     async (h) => {
-      const pixels = JSON.parse(
-        await h.call(
-          'evaluate',
-          `(()=>{const c=document.querySelector('canvas[data-qml-gradient]').getContext('2d');return JSON.stringify([Array.from(c.getImageData(5,20,1,1).data),Array.from(c.getImageData(95,20,1,1).data)]);})()`,
-        ),
-      );
+      const {CanvasKit: kit} = await loadGraphics();
+      const image = kit.MakeImageFromEncoded(Buffer.from(await h.call('screenshot', {format:'png'}), 'base64'));
+      let pixels;
+      try {
+        pixels = [5,95,125].map(x => Array.from(image.readPixels(x,20,{
+          width:1,height:1,colorType:kit.ColorType.RGBA_8888,
+          alphaType:kit.AlphaType.Unpremul,colorSpace:kit.ColorSpace.SRGB,
+        })));
+      } finally {image?.delete();}
+      expect(pixels[2]).toEqual([0,128,0,255]);
       expect(pixels[0][0]).toBeGreaterThan(220);
       expect(pixels[0][2]).toBeLessThan(35);
       expect(pixels[1][2]).toBeGreaterThan(220);

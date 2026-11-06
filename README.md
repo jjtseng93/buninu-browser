@@ -285,6 +285,33 @@ Page JavaScript runs behind three layers:
 `--no-sandbox` is accepted for Chromium compatibility but ignored.
 `--dangerously-allow-host-js` turns the sandbox off for every page.
 
+### SVG rendering
+
+Inline SVG and SVG image resources share a CPU painter using the bundled
+CanvasKit. The normal image loader accepts SVG for `<img>`, `Image.decode()`,
+CSS backgrounds, canvas `drawImage()` and QML Image. Image resources retain a
+raster snapshot for canvas/background consumers; ordinary image elements draw
+vector geometry at their displayed size rather than stretching that snapshot.
+
+Supported static features include basic paths/shapes, transforms, nested SVG
+viewports, `preserveAspectRatio`, local `<use>` references, linear/radial
+gradients, clip paths, group opacity and stroke caps/joins/dashes. This is not
+complete SVG support: SVG text, patterns, masks, filters, animation and external
+SVG resources are not implemented. Referenced `<use>` instances currently inherit
+presentation attributes but do not fully implement shadow-tree CSS styling;
+object-bounding-box clips on groups and mixed clip rules are approximate.
+SVG images are parsed inertly: scripts and foreign objects are not executed,
+and source size, element count, traversal depth and raster allocation are bounded.
+
+[Bun's Press Kit](https://bun.com/press-kit) exercises actual SVG image sources
+(`/logo.svg` and `/icon.svg`), not raster thumbnails. Additional regression tests
+cover gradients, references/cycles, clipping, opacity, image ownership and the
+HTML/QML loading paths:
+
+```sh
+bun test test/svg.test.js test/svg-image.test.js test/svg-integration.test.js
+```
+
 ### Rendering and loading
 
 Each renderer has two threads, following Chromium's main and compositor

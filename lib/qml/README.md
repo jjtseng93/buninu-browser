@@ -500,14 +500,17 @@ Flickable, ListView/GridView and basic Shape paths.
   PlainText is literal. Styled/Rich/Auto text builds inert restricted DOM;
   local Markdown uses Bun's Markdown renderer. Line counts and wrapped filename captions are supported. Mixed-format metrics
   and multiline ellipsis are approximate, and rich-text embedded images are unsupported.
-- SVG-shaped icons reuse the browser's inline SVG painter. ShapePath linear
-  gradients use an ordinary page canvas on the existing CanvasKit instance:
-  no image encode/decode or raster readback is introduced for that path.
-- Raster Image uses the normal browser decoder. Basic file/data/HTTP SVG images
-  use inert inline SVG DOM instead of a PNG conversion. SVG text, gradients,
-  filters, masks and external resources are not implemented by that path.
+- SVG-shaped icons and ShapePath linear gradients use the browser's shared
+  CPU SVG painter. Canvas remains the fallback for QML texture fills and
+  independently rounded rectangle corners.
+- Image uses the normal browser image loader for both raster and SVG sources,
+  including file/data/HTTP URLs. SVG supports basic shapes, local use references,
+  linear/radial gradients, clip paths and group opacity; it does not execute
+  scripts or load external resources. SVG text, patterns, masks, filters and
+  animation remain unsupported. See [shared SVG rendering](../../README.md#svg-rendering)
+  for scope and tests.
   `sourceSize`, EXIF autoTransform, tiled fill and precise Qt decode/cache policy
-  are not complete; raster size remains governed by the existing browser decoder.
+  are not complete; image size remains governed by the existing browser decoder.
 - Text selection/editing, accepted signals, focus, Keys.forwardTo and key
   acceptance work with actual DOM events. Editing keys do not trigger ancestor
   shortcuts; Escape can propagate. Hidden prebuilt controls cannot steal focus. FocusScope ancestors track active
