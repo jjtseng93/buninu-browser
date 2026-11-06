@@ -71,12 +71,14 @@ try {
   assert.equal(await renderer.evaluate('document.getElementById("v").currentTime'),2);
   assert.equal(outputs.length,1,'refilling does not reset the measured audio stream');
 
-  // Controls enabled during the async reopen prevent presentation: the lazy
-  // page decoder must seek before it can draw an ordinary local frame.
+  // Controls retain independent presentation; unsupported rotation still
+  // requires positioning the lazy page decoder before drawing a local frame.
+  await renderer.evaluate('document.getElementById("v").setAttribute("controls", "")');
+  assert.equal(opens(), firstOpens + 1);
   const controlOpens=opens();
   beginRefill(3);
   await waitFor(()=>Boolean(finishOpen));
-  await renderer.evaluate('document.getElementById("v").setAttribute("controls", "")');
+  await renderer.evaluate('document.getElementById("v").style.transform="rotate(10deg)"');
   const controls=decoders.at(-1);
   finishOpen();
   await waitFor(()=>controls.frames>0);
@@ -85,7 +87,7 @@ try {
   assert.equal(opens(),controlOpens);
   assert.equal(await renderer.evaluate('document.getElementById("v").currentTime'),3);
 
-  await renderer.evaluate('document.getElementById("v").removeAttribute("controls");document.getElementById("v").style.width="101px"');
+  await renderer.evaluate('document.getElementById("v").style.transform="none";document.getElementById("v").style.width="101px"');
   await waitFor(()=>opens()>controlOpens);
   const multipleOpens=opens();
   beginRefill(4);

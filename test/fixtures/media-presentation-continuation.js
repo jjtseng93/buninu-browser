@@ -86,8 +86,8 @@ try {
     assert.equal(decoders.length, 2, 'one staged decoder');
     assert.equal(await waiting(), beforeWaiting, 'queued EOF does not dispatch waiting');
     assert.equal(typed('video-stop').length, 0);
-    if (scenario === 'pause' || scenario === 'controls' || scenario === 'seek' || scenario === 'source') {
-      const action = { pause: 'v.pause()', controls: 'v.setAttribute("controls","");v.style.width="101px"',
+    if (scenario === 'pause' || scenario === 'layout' || scenario === 'seek' || scenario === 'source') {
+      const action = { pause: 'v.pause()', layout: 'v.style.transform="rotate(10deg)"',
         seek: 'v.currentTime=4', source: 'v.src="different.mp4";v.load()' }[scenario];
       await evaluate(action);
       await waitFor(() => typed('video-stop').length > 0);
@@ -96,6 +96,10 @@ try {
       assert.equal(typed('video-extend').length, 0, 'canceled source/position/layout never extends');
       assert.equal(staged.closed, 1);
     } else {
+      if (scenario === 'controls') {
+        await evaluate('v.setAttribute("controls", "");v.style.width="101px"');
+        assert.equal(typed('video-stop').length, 0, 'controls retain independent presentation');
+      }
       finishOpen();
       if (scenario === 'format') {
         await waitFor(() => typed('video-open').length > 1);
