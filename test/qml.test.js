@@ -81,3 +81,35 @@ test('Quickshell multiply fixture uses editable DOM controls and click handlers'
   for(let i=1;i<rects.length;i++)expect(rects[i][1]).toBeGreaterThanOrEqual(rects[i-1][1]+rects[i-1][3]);
  }finally{host.close();}
 },30000);
+test('font.underline and font.strikeout draw as text-decoration lines and follow bindings',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start(); await host.call('resize',320,200,1);
+  await host.call('loadDocument',{url,contentType:'text/x-qml',source:`import QtQuick
+Rectangle {
+  id: root
+  width: 320; height: 200
+  property bool on: false
+  onClicked: on = !on
+  Text { id: under; objectName: "under"; font.underline: true; text: "u" }
+  Text { objectName: "strike"; y: 30; font.strikeout: true; text: "s" }
+  Text { objectName: "both"; y: 60; font.underline: true; font.strikeout: true; text: "b" }
+  Text { objectName: "bound"; y: 90; font.underline: parent.on; text: "x" }
+  Text { objectName: "plain"; y: 120; text: "p" }
+  Text { id: rich; y: 150; textFormat: Text.StyledText; text: "<b>B</b><i>I</i><u>U</u><s>S</s><u style='text-decoration:none'>plain</u>" }
+}`});
+  await host.call('whenLoaded');
+  const line=(name)=>host.call('evaluate',`[...document.querySelectorAll('[data-qml-node]')].find(e=>e.__qmlValue?.objectName===${JSON.stringify(name)}||e.dataset.qmlObjectName===${JSON.stringify(name)})?.style.textDecorationLine ?? null`);
+  const lines=async()=>Promise.all(['under','strike','both','plain'].map(line));
+  expect(await lines()).toEqual(['underline','line-through','underline line-through','none']);
+  expect(await line('bound')).toBe('none');
+  await host.call('evaluate', 'document.getElementById("root").click()');
+  expect(await line('bound')).toBe('underline');
+  await host.call('evaluate', 'document.getElementById("root").click()');
+  expect(await line('bound')).toBe('none');
+  expect(await host.call('evaluate', `(()=>{
+    const elements=[...document.getElementById('rich').querySelectorAll('b,i,u,s')];
+    return elements.map(el=>{const s=getComputedStyle(el);return [s.fontWeight,s.fontStyle,s.textDecorationLine]});
+  })()`)).toEqual([['700','normal','none'],['400','italic','none'],['400','normal','underline'],['400','normal','line-through'],['400','normal','none']]);
+ }finally{await host.close();}
+});
