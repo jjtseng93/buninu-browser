@@ -1,6 +1,34 @@
 import {test, expect} from 'bun:test';
 import {parseCSSComponentValues as parse, trimCSSWhitespace} from '../lib/style/css-value-tokens.js';
 
+test('CSS trimming removes only edge CSS whitespace without altering values or identifiers', () => {
+  for (const source of ['', ' ', '\t\n\r\f ', ' \r\n\t\f '.repeat(10000)])
+    expect(trimCSSWhitespace(source)).toBe('');
+  for (const value of ['red', 'var(--x, 1px)', 'calc(1px + 2px)', '" padded "', 'a \t\n b',
+    '\0', '\v', '\u00a0', '\u0085', '\u2003', '\u2028', '\ufeff', '\ud800', '😀', '\\20 ']) {
+    const expected = value === '\\20 ' ? '\\20' : value;
+    expect(trimCSSWhitespace(value)).toBe(expected);
+    expect(trimCSSWhitespace(` \t\r\n\f${value}\f\n\r\t `)).toBe(expected);
+  }
+  // Non-CSS spaces stop trimming; whitespace further inside remains intact.
+  expect(trimCSSWhitespace(' \u00a0 \tred\n \u2003 ')).toBe('\u00a0 \tred\n \u2003');
+  expect(trimCSSWhitespace(' '.repeat(65536) + 'red' + '\n'.repeat(65536))).toBe('red');
+});
+
+test('CSS trimming preserves the replace protocol for non-string callers', () => {
+  let calls = 0;
+  const input = {replace(pattern, replacement) {
+    expect(pattern).toBeInstanceOf(RegExp);
+    expect(replacement).toBe('');
+    calls++;
+    return `custom ${calls}`;
+  }};
+  expect(trimCSSWhitespace(input)).toBe('custom 1');
+  expect(trimCSSWhitespace(input)).toBe('custom 2');
+  expect(trimCSSWhitespace(new String(' \tred\n'))).toBe('red');
+  for (const invalid of [undefined, null, 1, true])expect(() => trimCSSWhitespace(invalid)).toThrow();
+});
+
 test('CSS component values distinguish ASCII whitespace from non-ASCII name characters', () => {
   const name = 'AZaz_09-\u00a0\u2003Kſ😀\ud800';
   expect(parse(` \t\n\r\f${name}\t `)).toEqual({
