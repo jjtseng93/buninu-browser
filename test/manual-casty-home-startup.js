@@ -2,6 +2,8 @@
 // Runs Casty without a URL, using the real HOME/config and a 1280x800 Kitty peer.
 // Compare repeated runs with the same config/transport. Inspect ready.png: DOM
 // text alone does not prove the branch sentence was laid out and painted.
+// --code-menu also saves the first 16 actual Kitty page frames after the click,
+// with arrival times in code-frames.json, for inspecting first visible output.
 import {
   existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync,
   unlinkSync, writeFileSync,
@@ -197,7 +199,8 @@ await main();
 `);
 
   let proc, cdp, frames = 0, ignoredImages = 0, lastFrame, lastFrameMs, branchMs, peerError;
-  let terminalTail = '', outputTerminal, finishing = false;
+  let terminalTail = '', outputTerminal, finishing = false, codeClickMs = null;
+  const codeFrames = [];
   const events = [], abort = new AbortController();
   const started = performance.now();
   const elapsed = () => Math.round(performance.now() - started);
@@ -237,6 +240,9 @@ await main();
         lastFrame = bytes;
         lastFrameMs = elapsed();
         frames++;
+        // Keep already-received page frames without extra CDP reads. Flush
+        // them after the experiment so file writes do not delay the click.
+        if (codeClickMs !== null && codeFrames.length < 16) codeFrames.push({ms:lastFrameMs, bytes});
         if (frames === 1) { mark('first-kitty-frame', { transport }); writeFileSync(join(out, 'first.png'), bytes); }
       },
     });
@@ -298,6 +304,7 @@ await main();
       const point = location.result?.value;
       if (!point || point.alreadyOpen) throw Error('Code menu is missing or already open');
       const clicked = mark('code-click', { x: point.x, y: point.y });
+      codeClickMs = clicked;
       await cdp.call('Input.dispatchMouseEvent', { type:'mousePressed', button:'left', buttons:1, clickCount:1, x:point.x, y:point.y });
       mark('code-pressed', { delayMs: elapsed() - clicked });
       await cdp.call('Input.dispatchMouseEvent', { type:'mouseReleased', button:'left', buttons:0, clickCount:1, x:point.x, y:point.y });
@@ -330,6 +337,14 @@ await main();
     finally {
       for (const [signal, handler] of handlers) process.off(signal, handler);
       mark('finished', { frames, ignoredImages });
+      if (codeFrames.length) {
+        const manifest = codeFrames.map(({ms, bytes}, index) => {
+          const file = `code-frame-${index + 1}.png`;
+          writeFileSync(join(out, file), bytes);
+          return {file, ms, delayMs:ms-codeClickMs};
+        });
+        writeFileSync(join(out, 'code-frames.json'), JSON.stringify(manifest, null, 2));
+      }
     }
   }
 }
