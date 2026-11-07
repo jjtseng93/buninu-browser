@@ -2510,6 +2510,34 @@ test('object member fast reads preserve proxy traps and page-local array inherit
  expect(JSON.parse(await evaluate('JSON.stringify(traps)'))).toEqual(['get:x','getter','own:x','get:0','own:0','key:string','get:x','getter','own:x']);
 });
 
+test('thin member reads preserve SES boundaries, local prototype getters and method evaluation order',async()=>{
+ await load('<!doctype html><div id="member-target" title="visible">text</div>');
+ expect(await evaluate(`(() => {
+   const order=[],symbol=Symbol('method');
+   const fn=new Proxy(function(value){'use strict';order.push(this===object?'receiver':'wrong');return value;},{
+     get(target,key,receiver){if(key==='name'||key==='length')throw Error('unexpected function metadata');return Reflect.get(target,key,receiver);},
+     getPrototypeOf(){throw Error('unexpected function prototype');}
+   });
+   const object={get [symbol](){order.push('getter');return fn;}};
+   const key={[Symbol.toPrimitive](hint){order.push('key:'+hint);return symbol;}};
+   const called=object[key]((order.push('argument'),42));
+   let getterReads=0;
+   Object.defineProperty(Array.prototype,'91',{configurable:true,get(){getterReads++;return this.length+3;}});
+   const values=[1,2], own=[1,2];Object.defineProperty(own,'91',{value:undefined});
+   const inherited=values[91],shadowed=own[91];
+   Array.prototype.memberSum=function(value){return this.length+value;};
+   Number.prototype.memberThis=function(){'use strict';return [typeof this,this];};
+   const bytes=new Uint8Array([7,8]),node=document.getElementById('member-target');
+   const reads=[bytes[0],bytes[1],node.id,node.getAttribute('title'),values.memberSum(5),(2).memberThis()];
+   const blocked=!Reflect.set(Object.getPrototypeOf([]),'memberHostPollution',1);
+   return {called,order,inherited,shadowed:shadowed===undefined,getterReads,reads,
+     safe:[typeof Bun,typeof process,Function('return typeof process')(),Object.isFrozen(Object.getPrototypeOf([])),blocked]};
+ })()`)).toEqual({called:42,order:['key:string','getter','argument','receiver'],inherited:5,shadowed:true,getterReads:1,
+   reads:[7,8,'member-target','visible',7,['number',2]],safe:['undefined','undefined','undefined',true,true]});
+ await load('<p>new page</p>');
+ expect(await evaluate('[typeof [1,2][91],typeof [].memberSum,typeof (2).memberThis]')).toEqual(['undefined','undefined','undefined']);
+});
+
 test('Permissions and Clipboard promise methods reject invalid receivers without synchronous throws',async()=>{
  await load('<p>Promise Web APIs</p>');
  const rows=await evaluate(`(async()=>{
