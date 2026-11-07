@@ -180,3 +180,36 @@ FloatingWindow {
   expect(await host.call('evaluate','[dot.width,dot.height,dot.visible]')).toEqual([8,8,true]);
  }finally{host.close();}
 },20000);
+
+test('attached windows follow ancestor moves without global invalidation during delegate churn',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try {
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,window-dependencies',contentType:'text/x-qml',source:`import QtQuick
+import Quickshell
+ShellRoot {
+ FloatingWindow {id:a
+  Item {id:branch;Item {id:leaf}}
+  ListView {id:list;width:100;height:60;model:1000
+   delegate:Item {width:100;height:20}
+  }
+ }
+ FloatingWindow {id:b}
+ Component.onCompleted:{globalThis.a=a;globalThis.b=b;globalThis.branch=branch;globalThis.leaf=leaf;globalThis.list=list;}
+}`});
+  await host.call('whenLoaded');
+  expect(await host.call('evaluate','leaf.Window.window===a')).toBe(true);
+  await host.call('evaluate',`globalThis.windowWrites=0;
+   (()=>{let current=leaf.Window.window;
+    Object.defineProperty(leaf.Window,'window',{configurable:true,get:()=>current,set:v=>{windowWrites++;current=v}});
+   })();list.positionViewAtIndex(500,0);`);
+  expect(await host.call('evaluate','list.itemAtIndex(500)!==null')).toBe(true);
+  expect(await host.call('evaluate','windowWrites')).toBe(0);
+  await host.call('evaluate','branch.parent=b');
+  expect(await host.call('evaluate','leaf.Window.window===b')).toBe(true);
+  await host.call('evaluate','branch.parent=null');
+  expect(await host.call('evaluate','leaf.Window.window')).toBe(null);
+  await host.call('evaluate','branch.parent=a');
+  expect(await host.call('evaluate','leaf.Window.window===a')).toBe(true);
+ }finally{host.close();}
+},30000);

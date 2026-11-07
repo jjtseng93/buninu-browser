@@ -122,3 +122,25 @@ Item {id:root;width:100;height:100;property bool shown:true
   await click('detach');await click('toggle');expect(await display()).toBe('block');
  }finally{host.close();}
 },30000);
+
+test('initial delegate styles retain individual CSS value parsing for quoted and malformed strings',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try {
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,initial-style-values',contentType:'text/x-qml',source:`import QtQuick
+Item {width:400;height:200
+ Text {id:quoted;text:"quoted";font.family:"'A; B', serif";color:"rgb(10, 20, 30)";x:4;width:90}
+ Text {id:malformed;text:"malformed";font.family:"bad; position:fixed";color:"rgb(1,2,3";x:5;width:90}
+ Text {id:safe;text:"safe";font.family:"serif";color:"rgb(10, 20, 30)";x:6;width:90}
+}`});
+  await host.call('whenLoaded');
+  expect(await host.call('evaluate',`(()=>{
+   const values=[['quoted',"'A; B', serif",'rgb(10, 20, 30)',4],['malformed','bad; position:fixed','rgb(1,2,3',5],['safe','serif','rgb(10, 20, 30)',6]];
+   return values.map(([id,family,color,x])=>{
+    const s=document.getElementById(id).style,expected=document.createElement('span').style;
+    expected.fontFamily=family;expected.color=color;
+    return s.position==='absolute'&&s.left===x+'px'&&s.width==='90px'&&s.fontFamily===expected.fontFamily&&s.color===expected.color;
+   });
+  })()`)).toEqual([true,true,true]);
+ }finally{host.close();}
+},30000);
