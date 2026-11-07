@@ -62,7 +62,7 @@ test('page client metrics use untransformed padding boxes and active standards-m
     expect(await evaluate(`cm(document.createElement('div'))`)).toEqual([0,0,0,0]);
     expect(await evaluate(`by('scroller').scrollTo(100,80);[...cm(by('scroller')),by('scroller').scrollLeft,by('scroller').scrollTop]`)).toEqual([114,74,5,5,100,80]);
     expect(await evaluate(`by('scaled').style.width='150px';cm(by('scaled'))`)).toEqual([164,74,5,5]);
-    expect(await evaluate(`document.documentElement.style.display='none';cm(document.documentElement)`)).toEqual([0,0,0,0]);
+    expect(await evaluate(`document.documentElement.style.display='none';cm(document.documentElement)`)).toEqual([500,400,0,0]);
     expect(await evaluate(`cm(by('scaled'))`)).toEqual([0,0,0,0]);
     expect(await evaluate(`document.documentElement.style.display='';document.body.style.display='none';cm(document.body)`)).toEqual([0,0,0,0]);
     expect(await evaluate(`cm(by('scaled'))`)).toEqual([0,0,0,0]);
@@ -76,4 +76,12 @@ test('page client metrics use untransformed padding boxes and active standards-m
       expect(await evaluate(`document.body.style.cssText='display:inline';document.documentElement.style.display='${display}';document.body.clientWidth>0`)).toBe(true);
     }
   }finally{await host.close();}
+},30000);
+
+test('root dimensions avoid synchronous restyles and preserve pending descendant layout',async()=>{
+  const child=Bun.spawn([process.execPath,new URL('./fixtures/client-metrics-lazy.js',import.meta.url).pathname],
+    {stdout:'pipe',stderr:'pipe'});
+  const [exit,stderr]=await Promise.all([child.exited,new Response(child.stderr).text()]);
+  expect(stderr).toBe('');
+  expect(exit).toBe(0);
 },30000);
