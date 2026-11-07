@@ -91,3 +91,28 @@ test('rule notifications and reentrant value conversion use the shared CSSOM rev
   expect(()=>{s.left={toString(){throw Error('conversion');}};}).toThrow('conversion');
   expect(s.left).toBe('5px');expect(changes).toBe(5);
 }));
+
+test('changing inline styles serialize without cloning a whole declaration',()=>fixture(({element})=>{
+  const s=element.style;
+  s.cssText='position:absolute;left:0px;border:2px solid red;padding:4px;margin:0px;font:italic 14px serif;border-radius:4px';
+  const original=Manager.prototype.clone;
+  let clones=0;
+  Manager.prototype.clone=function(){clones++;return original.call(this);};
+  try {
+    for(let i=1;i<=50;i++) {
+      s.left=i+'px';
+      expect(s.cssText).toContain(`left: ${i}px;`);
+      expect(s.cssText).toContain('border-radius: 4px;');
+      expect(s.cssText).toContain('font: italic 14px serif;');
+    }
+    expect(clones).toBe(0);
+  }finally{Manager.prototype.clone=original;}
+}));
+
+test('border image shorthand selection preserves border reset and declaration order',()=>fixture(({element})=>{
+  const s=element.style;
+  s.cssText='border:2px solid red;all:initial;border-image:initial';
+  expect(s.cssText).toBe('border-top: 2px solid red; border-right: 2px solid red; border-bottom: 2px solid red; border-left: 2px solid red; all: initial; border-image-source: initial; border-image-slice: initial; border-image-width: initial; border-image-outset: initial; border-image-repeat: initial;');
+  s.cssText='padding:2px;border-image:initial';
+  expect(s.cssText).toBe('padding: 2px; border-image: initial;');
+}));
