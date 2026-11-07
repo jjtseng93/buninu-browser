@@ -16,6 +16,16 @@ marked `wayland handle`; the frontend lives entirely in this directory.
 沿用現有 Browser controller 與 renderer，不新增依賴；僅為傳送 fd 使用 libc。
 預設仍是 Casty，只有指定 `--wayland` 才啟用。入口整合標記為 `wayland handle`。
 
+Both HTML and QML first show a static dark window with `Starting...` and the
+requested URL/path, before initializing the renderer or waiting for the network.
+The small bitmap font needs no CanvasKit initialization. The placeholder redraws
+only on resize, is replaced by the first content/dialog frame, and can be closed
+during startup. Measure pixel generation with `bun test/benchmark-wayland-startup.mjs`.
+
+HTML 與 QML 都會先顯示暗色占位視窗，寫上 `Starting...` 及網址／路徑，
+不必等待 renderer 初始化或網路回應。小型點陣字不需載入 CanvasKit；僅在
+視窗尺寸改變時重畫，首張內容或對話框出現後即取代占位畫面，啟動中也能關閉。
+
 ## Address bar / 網址列
 
 Ordinary pages have a 32-pixel address bar. Click the URL or press Alt+L to edit;

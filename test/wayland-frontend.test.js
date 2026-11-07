@@ -172,7 +172,9 @@ test.skipIf(process.env.BUNINU_TEST_WAYLAND!=='1')('initial Wayland navigation p
   launching=launch({socket:dir+'/wayland-buninu',width:640,height:448,
     url:'data:text/html,'+encodeURIComponent('<script>alert("initial");document.title="Alert answered";</script><p>Ready</p>')});
   launching.then(value=>{app=value;launched=true;},()=>{});
-  await until(()=>land.compositor.wm.renderSurfaces().some(s=>s.pixels));
+  // The static startup frame is visible before input is ready; wait for the dialog.
+  await until(()=>land.compositor.wm.renderSurfaces().some(s=>s.pixels)
+    && !land.compositor.wm.visible[0]?.surface.xdg.toplevel.title.startsWith("Starting:"));
   expect(launched).toBe(false);
   // Non-background pixels demonstrate an actual dialog frame, not just a
   // mapped xdg_toplevel. Dismiss through the compositor's Wayland keyboard.

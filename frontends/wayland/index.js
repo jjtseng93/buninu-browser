@@ -7,6 +7,8 @@ import {attachInput} from './input.js';
 import {attachClipboard} from './clipboard.js';
 import {WaylandUrlBar,BAR_HEIGHT} from './urlbar.js';
 import {readClipboard,writeClipboard} from '../../lib/clipboard.js';
+import {attachStartup} from './startup-frame.js';
+import {writeLog} from '../../lib/log.js';
 
 // qml handle begin: local QML clipboard uses this frontend's Wayland seat
 import {qmlWindowConstraints} from '../../lib/qml/window-constraints.js';
@@ -20,11 +22,20 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
 
   let browser,client,window,off,titleTimer,toolbar,stopInput,closed=false,busy=false,dirty=true,ready=false;
   let pageDirty=true,pageBytes,pageSize='',navigation=0,navigating=0;
+  let startup;
   let resolveDone;const done=new Promise(resolve=>resolveDone=resolve);
   const close=()=>{if(closed)return;closed=true;clearInterval(titleTimer);off?.();stopInput?.();toolbar?.dispose();try{window?.close();}finally{client?.close();browser?.close();resolveDone();}};
   const fail=e=>{console.error(`Wayland frontend: ${e.message}`);close();};
   try{
     client=new WaylandClient(socket);await client.initialize();
+    // Present before renderer, chrome, resource fetches, or document scripts.
+    window=new WaylandWindow(client,{width,height:height+((chrome??true)?BAR_HEIGHT:0),title:`Starting: ${url}`});
+    startup=attachStartup(window,url,t=>writeLog('wayland-startup',JSON.stringify(t)));
+    window.onConfigure=()=>{if(!closed)startup.draw();};
+    window.onReady=()=>{if(!closed)startup.draw();};
+    client.onClose=close;window.onClose=close;
+    await client.sync();
+    if(closed)return {client,window,close,done};
     attachClipboard(client,done);
     const clipboard={
       read:async()=>{
@@ -37,6 +48,7 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
       write:text=>client.clipboard?client.clipboard.write(text):writeClipboard(text),
     };
     browser=await createBrowser({spareRenderer:false,clipboard});
+    if(closed){browser.close();return {browser,client,window,close,done};}
 
     // qml handle begin: operation-triggered local QML clipboard bridge
     await attachQmlClipboard(client,browser,done);
@@ -46,8 +58,8 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
       close,changed:()=>{dirty=true;if(ready)void draw();},
       clipboard,
     }).initialize();
-    window=new WaylandWindow(client,{width,height:height+(toolbar?BAR_HEIGHT:0)});
-    client.onClose=close;window.onClose=close;
+    // Closing during chrome initialization must not create input listeners or timers.
+    if(closed){toolbar?.dispose();return {browser,client,window,toolbar,close,done};}
 
     // qml handle begin: forward declarative window constraints to xdg_toplevel
     const syncQmlConstraints=qmlWindowConstraints(client,window,browser.context);
@@ -76,7 +88,11 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
         }
         toolbar?.updateURL(browser.context.url);
         const parts=toolbar?[toolbar.pixels(w).subarray(0,w*bar*4),pageBytes]:pageBytes;
-        if(!closed&&!window.present(parts,w,h))dirty=true;
+        if(!closed){
+          const presented=window.present(parts,w,h);
+          if(!presented)dirty=true;
+          if(presented)startup.stop();
+        }
         if(!closed){const title=String(await browser.context.title()||'Buninu Browser');if(generation===navigation&&!closed)client.request(window.toplevel,'set_title',title);}
       }catch(e){
         if(!closed&&generation===navigation){
@@ -114,7 +130,8 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
         if(title!==lastTitle){lastTitle=title;client.request(window.toplevel,'set_title',title);}
       }catch(e){if(!closed&&generation===navigation)fail(e);}finally{readingTitle=false;}
     },500);
-    window.onConfigure=()=>{pageDirty=true;dirty=true;draw();};window.onReady=draw;
+    window.onConfigure=()=>{if(!closed)startup.draw();pageDirty=true;dirty=true;draw();};
+    window.onReady=()=>{if(!closed)startup.draw();draw();};
     off=browser.context.onFrame(()=>{pageDirty=true;dirty=true;draw();});
     const input=toolbar?{
       press:(...args)=>toolbar.press(...args).catch(e=>toolbar.flash(e.message)),

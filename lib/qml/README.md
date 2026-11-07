@@ -30,6 +30,14 @@ presents ordinary `wl_shm` buffers. One browser frontend currently owns one nati
 window; multiple QML `FloatingWindow` objects do not create multiple OS windows.
 The root fills the supplied viewport and follows its resize events.
 
+Like ordinary web pages, Wayland QML applications map a dark startup window with the document path before
+starting the renderer. This static CPU bitmap uses a small bundled ASCII atlas,
+not CanvasKit or a font loader; non-ASCII paths are URL-escaped. It redraws only
+when the window size changes and is replaced by the first document frame.
+Closing the startup window also closes the pending browser. Measure its pixel
+generation with `bun test/benchmark-wayland-startup.mjs`; the actual Wayland transfer
+and compositor display latency are separate costs.
+
 ## Opt-in `qs` wrapper and official Flea binary
 
 `lib/qml/qs` is an executable Bun launcher, accepting `-p/--path` (file or
