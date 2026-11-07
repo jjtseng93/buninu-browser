@@ -6,7 +6,9 @@ import {captureViewport} from '../../lib/paint/frame.js';
 
 const {CanvasKit:kit} = await loadGraphics();
 lockdown({errorTaming:'safe',overrideTaming:'severe',consoleTaming:'unsafe',localeTaming:'unsafe',stackFiltering:'concise',reporting:'none'});
-let readbacks = 0, checks = 0;
+let readbacks = 0, clears = 0, checks = 0;
+const clear=kit.Canvas.prototype.clear;
+kit.Canvas.prototype.clear=function(...args){clears++;return clear.apply(this,args)};
 const makeSurface = kit.MakeSurface, makeRasterDirectSurface=kit.MakeRasterDirectSurface;
 const trackSurface = surface => {
   const snapshot = surface.makeImageSnapshot.bind(surface);
@@ -84,12 +86,15 @@ for (const alpha of [255,127]) {
   try {
     for (const client of clients) await load(client);
     seed(candidate,alpha);
-    const before = readbacks;
+    const before = clears, beforeReads = readbacks;
     await reference.renderer.evaluate("document.getElementById('marker').style.background='orange'");
-    const referenceReads = readbacks-before;
-    const middle = readbacks;
+    const referenceClears = clears-before;
+    const middle = clears;
     await candidate.renderer.evaluate("document.getElementById('marker').style.background='orange'");
-    assert.equal(referenceReads,3);assert.equal(readbacks-middle,alpha===255?2:3);compare('warm');
+    assert.equal(referenceClears,3);assert.equal(clears-middle,alpha===255?2:3);
+    // The page background makes both rasters opaque, even for an alpha video;
+    // owned surface storage now avoids readPixels for all of these passes.
+    assert.equal(readbacks-beforeReads,0);compare('warm');
     const oldTile = candidate.tile, oldPixels = oldTile.pixels.slice(), oldBase = oldTile.videoLayer.base.slice(), oldMask = oldTile.videoLayer.mask.slice();
     const raw = await candidate.renderer.screenshot({format:'rgba'});
     assert.deepEqual(raw.pixels,captureViewport(candidate.tile,0,0,320,220).pixels);

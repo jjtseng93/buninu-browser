@@ -2,13 +2,14 @@ import {test, expect} from 'bun:test';
 import {loadGraphics} from '../lib/renderer/page-renderer.js';
 import {visibleItems} from '../lib/paint/display-list.js';
 import {rasterVideoMask,videoMaskBounds,videoMaskItems} from '../lib/renderer/video-mask.js';
+import {makeRasterSurface} from '../lib/renderer/raster-surface.js';
 const {CanvasKit:kit,builtinTypefaces}=await loadGraphics();
 const width=160,height=120;
 const info={width,height,colorType:kit.ColorType.RGBA_8888,alphaType:kit.AlphaType.Unpremul,colorSpace:kit.ColorSpace.SRGB};
 
-function scene({scale=1,rect={x:15.2,y:22.4,width:57.3,height:37.2},transform,opacity=1,clip=false,rounded=false,transparent=false,shadow=false}) {
+function scene({scale=1,rect={x:15.2,y:22.4,width:57.3,height:37.2},transform,opacity=1,clip=false,rounded=false,transparent=false,shadow=false,owned=false}) {
   const region={x:7.3,y:11.7,width:width/scale,height:height/scale};
-  const surface=kit.MakeSurface(width,height),canvas=surface.getCanvas();
+  const surface=owned?makeRasterSurface(kit,width,height):kit.MakeSurface(width,height),canvas=surface.getCanvas();
   const background=kit.Color(31,47,71,transparent?0.5:1);
   const video={rect,transform,opacity,bounds:{...rect}};
   if(transform)video.bounds={x:rect.x*transform.a+transform.e,y:rect.y*transform.d+transform.f,width:rect.width*transform.a,height:rect.height*transform.d};
@@ -54,6 +55,15 @@ function scene({scale=1,rect={x:15.2,y:22.4,width:57.3,height:37.2},transform,op
   function normal(){canvas.clear(background);paint(null);surface.flush();const img=surface.makeImageSnapshot();try{return img.readPixels(0,0,info);}finally{img.delete();}}
   return {video,region,surface,canvas,background,paint,normal,scale,items,get drawn(){return drawn;}};
 }
+
+for(const transparent of[false,true])test(`owned video mask matches snapshot readback, transparent=${transparent}`,()=>{
+ const s=scene({owned:true,transparent,rounded:true,opacity:.6});
+ // The same premultiplied backing and painter must be compared: Skia's
+ // unpremultiplied MakeSurface blend rounding is independently different.
+ const fallback={flush:()=>s.surface.flush(),makeImageSnapshot:()=>s.surface.makeImageSnapshot()};
+ const result=surface=>rasterVideoMask({kit,canvas:s.canvas,surface,width,height,pixels:s.normal(),region:s.region,scale:s.scale,background:s.background,paint:s.paint});
+ try{expect(Bun.deepEquals(result(s.surface),result(fallback))).toBe(true)}finally{s.surface.dispose()}
+});
 
 for(const [label,options] of Object.entries({
   shadowTail:{shadow:true,rect:{x:74,y:30,width:60,height:60}},
