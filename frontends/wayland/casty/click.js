@@ -1,11 +1,11 @@
 // Shared trusted-click synthesis for Chrome DevTools Protocol.
 import { appendFileSync, mkdirSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname } from 'node:path';
+import { castyPath } from './config.js';
 
 // CASTY_DEBUG_CLICK=1 logs each click to ~/.casty/click.log
-const DEBUG_CLICK = !!process.env.CASTY_DEBUG_CLICK;
-const DEBUG_LOG = join(homedir(), '.casty', 'click.log');
+const DEBUG_LOG = castyPath('click.log');
+const DEBUG_CLICK = !!process.env.CASTY_DEBUG_CLICK && !!DEBUG_LOG;
 
 const DESCRIBE = `const d = el => !el ? null : el.tagName.toLowerCase()
   + (el.id ? '#' + el.id : '')
@@ -89,7 +89,7 @@ export async function dispatchClick(client, x, y, { clickCount = 1, button = 'le
       t: new Date().toISOString(), source, button, css: [x, y], clickCount, before, clicked: after,
     });
     try {
-      mkdirSync(join(homedir(), '.casty'), { recursive: true });
+      mkdirSync(dirname(DEBUG_LOG), { recursive: true });
       appendFileSync(DEBUG_LOG, line + '\n');
     } catch {}
   }

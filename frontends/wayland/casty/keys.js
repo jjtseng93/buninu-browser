@@ -2,11 +2,9 @@
 // Customizable via ~/.casty/keys.json
 // Only defines actions casty intercepts; everything else passes through to Chrome.
 
-import { homedir } from 'node:os';
-import { join } from 'node:path';
-import { loadJsonFile } from './config.js';
+import { castyPath, loadJsonFile } from './config.js';
 
-const configPath = join(homedir(), '.casty', 'keys.json');
+const configPath = castyPath('keys.json');
 
 // Default key bindings
 // Key names: "ctrl+c", "alt+left", "f5", "ctrl+shift+r", etc.

@@ -1,4 +1,4 @@
-import { homedir } from 'node:os';
+import { homeDirectory } from '../../../lib/home-directory.js';
 import { join, win32 } from 'node:path';
 
 // Windows can move the Downloads known folder away from %USERPROFILE%. Query
@@ -19,10 +19,10 @@ function windowsDownloads() {
   }
 }
 
-export function downloadsDirectory({ platform = process.platform, home = homedir(), queryWindows = windowsDownloads } = {}) {
+export function downloadsDirectory({ platform = process.platform, home = homeDirectory(), queryWindows = windowsDownloads } = {}) {
   if (platform === 'win32') {
     const known = queryWindows();
-    return known && win32.isAbsolute(known) ? known : win32.join(home, 'Downloads');
+    return known && win32.isAbsolute(known) ? known : home ? win32.join(home, 'Downloads') : process.cwd();
   }
-  return join(home, 'Downloads');
+  return home ? join(home, 'Downloads') : process.cwd();
 }

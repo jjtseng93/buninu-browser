@@ -3,11 +3,10 @@
 // Alt+L to enter edit mode → Enter to navigate, Escape to cancel
 
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
 // Wayland adapter: no terminal cursor escapes.
 const hideCursor = () => {};
-import { loadConfig, loadJsonFile } from './config.js';
+import { castyPath, loadConfig, loadJsonFile } from './config.js';
 import { searchBookmarks } from './bookmarks.js';
 import { displayWidth, fitWidth, promptView, visualColToCharIdx } from './prompt-width.js';
 
@@ -20,7 +19,7 @@ const LEFT_KEYS = new Set(['\x1b[D', '\x1bOD', '\x1b[1;5D', '\x1b[5D']);
 const RIGHT_KEYS = new Set(['\x1b[C', '\x1bOC', '\x1b[1;5C', '\x1b[5C']);
 const HOME_KEYS = new Set(['\x1b[H', '\x1bOH', '\x1b[1~', '\x1b[7~']);
 const END_KEYS = new Set(['\x1b[F', '\x1bOF', '\x1b[4~', '\x1b[8~']);
-export const HISTORY_PATH = join(homedir(), '.casty', 'history.json');
+export const HISTORY_PATH = castyPath('history.json');
 
 function hasScheme(str) {
   return /^[a-z][a-z0-9+.-]*:/i.test(str);

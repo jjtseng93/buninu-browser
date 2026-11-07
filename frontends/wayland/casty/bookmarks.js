@@ -1,11 +1,9 @@
 // Bookmarks
 // Reads ~/.casty/bookmarks.json, searchable via /b in the address bar
 
-import { homedir } from 'node:os';
-import { join } from 'node:path';
-import { loadJsonFile } from './config.js';
+import { castyPath, loadJsonFile } from './config.js';
 
-const bookmarkPath = join(homedir(), '.casty', 'bookmarks.json');
+const bookmarkPath = castyPath('bookmarks.json');
 
 // Load bookmarks (normalized to [{ name, url }, ...])
 export function loadBookmarks() {

@@ -258,13 +258,37 @@ test('QML host supplies missing HOME and preserves an explicit value', async () 
       import {createQmlHost} from ${JSON.stringify(module)};
       import {homedir} from 'node:os';
       const host=createQmlHost('file:///tmp/home-test.qml');
-      console.log(JSON.stringify({actual:host.env('HOME'),expected:process.env.HOME || homedir()}));
+      let expected=process.env.HOME ?? null;
+      if (!expected) { try { expected=homedir(); } catch {} }
+      console.log(JSON.stringify({actual:host.env('HOME'),expected}));
       host.dispose();
     `], {env, stdout:'pipe', stderr:'pipe'});
     const output = await new Response(proc.stdout).text();
     const error = await new Response(proc.stderr).text();
     expect(await proc.exited, error).toBe(0);
     const {actual,expected} = JSON.parse(output);
-    expect(actual).toBe(expected); expect(actual.length).toBeGreaterThan(0);
+    expect(actual).toBe(expected);
+    if (home) expect(actual).toBe(home);
   }
+});
+
+test('QML host import does not query HOME and tolerates missing account metadata', async () => {
+  const module = new URL('../lib/qml/host.js', import.meta.url).href;
+  const env = { ...process.env, BUN_RUNTIME_TRANSPILER_CACHE_PATH: '0' };
+  delete env.HOME;
+  const proc = Bun.spawn([process.execPath, '-e', `
+    import {mock} from 'bun:test';
+    import * as os from 'node:os';
+    let calls=0;
+    mock.module('node:os',()=>({...os,homedir(){calls++;throw Object.assign(new Error('uv_os_homedir'),{code:'ENOENT'});}}));
+    const {createQmlHost}=await import(${JSON.stringify(module)});
+    const importCalls=calls;
+    const host=createQmlHost('file:///tmp/home-test.qml');
+    console.log(JSON.stringify({importCalls,calls,home:host.env('HOME')}));
+    host.dispose();
+  `], {env, stdout:'pipe', stderr:'pipe'});
+  const output = await new Response(proc.stdout).text();
+  const error = await new Response(proc.stderr).text();
+  expect(await proc.exited, error).toBe(0);
+  expect(JSON.parse(output)).toEqual({importCalls:0,calls:1,home:null});
 });

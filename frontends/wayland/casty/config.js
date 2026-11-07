@@ -2,16 +2,22 @@
 // Customizable via ~/.casty/config.json (falls back to defaults)
 
 import { readFileSync } from 'node:fs';
-import { homedir } from 'node:os';
+import { homeDirectory } from '../../../lib/home-directory.js';
 import { join } from 'node:path';
 
 // Safely load and parse a JSON file (returns fallback on parse error or missing file)
 export function loadJsonFile(filePath, fallback) {
+  if (!filePath) return fallback;
   try { return JSON.parse(readFileSync(filePath, 'utf8')); }
   catch { return fallback; }
 }
 
-const configPath = join(homedir(), '.casty', 'config.json');
+export function castyPath(name) {
+  const home = homeDirectory();
+  return home ? join(home, '.casty', name) : null;
+}
+
+const configPath = castyPath('config.json');
 
 // Detect system locale (e.g. "en-US", "ja", "zh-CN")
 function detectLocale() {
