@@ -47,7 +47,7 @@ async function open(definitions, usesMetrics) {
 }
 
 async function capture(renderer) {
-  const geometry = renderer.inspect("#auto,#metric", ["width"]);
+  const geometry = renderer.inspect("#auto,#metric", ["width", "fontFamily", "fontSize"]);
   const image = await renderer.screenshot({ format: "rgba" });
   return { geometry, pixels: Buffer.from(image.pixels) };
 }
@@ -69,8 +69,10 @@ try {
           await Bun.sleep(0);
         }
         snapshots.push(await capture(live.renderer));
-        if (index) assert.equal(computations.some(entry => entry.full), usesMetrics,
-          `${name}: only font-relative computed lengths require a full cascade`);
+        // Editing definitions is a stylesheet change and may conservatively
+        // restyle the document. Font completion alone is covered separately.
+        if (index && usesMetrics) assert.ok(computations.some(entry => entry.full),
+          `${name}: font-relative computed lengths must be recomputed`);
         assert.equal(live.requests(), 2, `${name}: cached sources and unused definitions must not refetch fonts`);
         computations = null;
       }
@@ -89,6 +91,10 @@ try {
     assert.deepEqual(snapshots.at(-1), snapshots[0], "restoring definitions must restore geometry and pixels");
     if (usesMetrics) assert.notEqual(snapshots[1].geometry[1].style.width, snapshots[0].geometry[1].style.width,
       "ch lengths must use the replacement font metrics");
+    else for (const [index, [name]] of phases.entries()) {
+      assert.deepEqual(snapshots[index].geometry.map(item => item.style), snapshots[0].geometry.map(item => item.style),
+        `${name}: ordinary computed CSS stays unchanged while the selected face changes used geometry`);
+    }
   }
   process.stdout.write("font definition invalidation integration passed\n");
 } finally {

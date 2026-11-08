@@ -48,7 +48,7 @@ test("font completion refreshes geometry with pixel parity while avoiding unnece
   expect(out).toContain("font metrics invalidation integration passed");
 }, 30_000);
 
-test("font definition edits refresh geometry and pixels without unnecessary full cascades", async () => {
+test("font definition edits refresh computed metrics and match fresh geometry and pixels", async () => {
   const child = Bun.spawn([process.execPath, new URL("./fixtures/font-definition-invalidation.js", import.meta.url).pathname], {
     stdout: "pipe", stderr: "pipe",
   });
