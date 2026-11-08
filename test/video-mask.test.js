@@ -102,3 +102,22 @@ test('unbounded transforms use the full pass; wholly offscreen video needs no ex
     expect(result.base).toEqual(pixels);expect(result.mask.some(Boolean)).toBe(false);expect(s.drawn).toBe(before);
   }finally{s.surface.dispose();}
 });
+
+for (const owned of [false,true]) for(const transparent of [false,true])
+for(const cropped of [false,true]) for(const blackAlreadyRasterized of [false,true])
+test(`shared mask preserves private output: owned=${owned} transparent=${transparent} cropped=${cropped} black=${blackAlreadyRasterized}`,()=>{
+ const s=scene({owned,transparent,rounded:true,opacity:.6,shadow:true});
+ try{
+  const pixels=s.normal();
+  if(blackAlreadyRasterized){s.canvas.clear(s.background);s.paint(false);s.surface.flush();const image=s.surface.makeImageSnapshot();try{pixels.set(image.readPixels(0,0,info));}finally{image.delete();}}
+  const common={kit,canvas:s.canvas,surface:s.surface,width,height,pixels,region:s.region,scale:s.scale,background:s.background,paint:s.paint,
+   bounds:cropped?videoMaskBounds(s.video,s.region,s.scale,width,height):null,blackAlreadyRasterized};
+  const reference=rasterVideoMask(common),actual=rasterVideoMask({...common,shared:true});
+  expect(actual.base).toEqual(reference.base);expect(actual.mask).toEqual(reference.mask);
+  expect(actual.base.buffer instanceof SharedArrayBuffer).toBe(true);
+  expect(actual.mask.buffer instanceof SharedArrayBuffer).toBe(true);
+  const before={base:new Uint8Array(actual.base),mask:new Uint8Array(actual.mask)};
+  pixels.fill(91);s.normal();rasterVideoMask({...common,shared:true});
+  expect(actual.base).toEqual(before.base);expect(actual.mask).toEqual(before.mask);
+ }finally{s.surface.dispose();}
+});

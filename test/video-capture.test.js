@@ -5,7 +5,7 @@ import {captureVideoViewport, compositeVideo} from '../lib/renderer/video-presen
 
 function fixture(width = 19, height = 31, sourceOffset = 0, shared = false) {
   const base = new Uint8Array(shared ? new SharedArrayBuffer(width * height * 4) : new ArrayBuffer(width * height * 4));
-  const mask = new Uint8Array(base.length);
+  const mask = new Uint8Array(shared ? new SharedArrayBuffer(base.length) : new ArrayBuffer(base.length));
   for (let i = 0; i < width * height; i++) {
     const at = i * 4, kind = i < width * 4 ? 0 : i % 4;
     base.set(kind === 2 ? [20, 30, 40, 200] : [0, 0, 0, kind === 1 ? 93 : 255], at);
@@ -167,4 +167,22 @@ test('partial-width and out-of-tile crops preserve the initialized crop fallback
       compare(tile, frame, [tile.x - 4, tile.y - 3, 16, 8], undefined, format);
     }
   } finally { Bun.allocUnsafe = allocate; }
+});
+
+
+test('shared immutable layer snapshots survive capture consumption and retirement', async () => {
+  const {tile,frame}=fixture(20,40,0,true);
+  const base=new Uint8Array(tile.videoLayer.base),mask=new Uint8Array(tile.videoLayer.mask);
+  for(const format of ['rgba','bgra'])for(const viewport of [[tile.x,tile.y,16,8],[tile.x+1,tile.y+2,8,6],[tile.x-3,tile.y-3,12,8]])
+    compare(tile,frame,viewport,undefined,format);
+  expect(tile.videoLayer.base).toEqual(base);expect(tile.videoLayer.mask).toEqual(mask);
+  const released=[],leases=new FrameLeaseTracker(serial=>released.push(serial));
+  leases.replace(1,tile);
+  let release;const wait=new Promise(resolve=>release=resolve);
+  const capture=leases.capture(async old=>{await wait;return captureVideoViewport(old,frame,tile.x,tile.y,16,8,undefined,'rgba')});
+  const next=fixture(20,40,0,true).tile;leases.replace(2,next);next.videoLayer.base.fill(42);next.videoLayer.mask.fill(0);
+  expect(released).toEqual([]);release();const result=await capture;
+  expect(released).toEqual([1]);expect(tile.videoLayer.base).toEqual(base);expect(tile.videoLayer.mask).toEqual(mask);
+  expect(result.pixels.buffer instanceof ArrayBuffer).toBe(true);result.pixels.buffer.transfer(0);
+  expect(tile.videoLayer.base.byteLength).toBe(base.length);expect(tile.videoLayer.mask.byteLength).toBe(mask.length);
 });
