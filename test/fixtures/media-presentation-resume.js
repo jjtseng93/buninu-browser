@@ -6,7 +6,7 @@ import {createBytePipe} from '../../lib/media/byte-pipe.js';
 const pipe=createBytePipe();pipe.append(new Uint8Array(1024));let epoch=1;
 pipe.snapshotAt=()=>({id:epoch,startTime:0,endTime:Infinity,bytes:pipe.bytes()});
 const decoders=[],messages=[],outputs=[],errors=[];
-const renderer=await createPageRenderer({onFrame(){},onVideo:message=>messages.push(message),
+const renderer=await createPageRenderer({onFrame(){},onVideo:message=>{messages.push(message);if(message.type==='video-open')renderer.videoReport({id:message.id,prepared:true});},
  fetchResource:async()=>({ok:true,contentType:'video/mp4',body:mode.startsWith('file')?new Uint8Array(1024):pipe}),reportError:e=>errors.push(String(e)),
  videoDecoder:{probe:async()=>({duration:30,video:{width:20,height:12},audio:{sampleRate:1000}}),
  async decode(){const record={seeks:[],frames:0,at:0};decoders.push(record);return{width:20,height:12,fps:10,

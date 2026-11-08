@@ -123,7 +123,7 @@ test("a delayed open that has passed its epoch reports the boundary without deco
     expect(video.resumeTime).toBe(12);
     expect(sought).toBe(0);
     expect(decoded).toBe(0);
-    expect(reports).toEqual([{ id: 7, end: 12 }]);
+    expect(reports).toEqual([{ id: 7, end: 12 }, { id: 7, revision: 0, prepared: true }]);
   } finally { video.stop(); }
 });
 

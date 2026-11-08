@@ -58,6 +58,7 @@ try{
   await expectClock('paused time does not extrapolate',0.2);
   const beforeResumeDecoder=audioDecodes;
   await evaluate('m.play()');
+  await waitFor(()=>outputs.length===2,'prepared resume output stream');
   assert.equal(outputs.length,2,'resume creates exactly one new output stream');
   assert.equal(audioDecodes,beforeResumeDecoder,'resume reuses retained decoded PCM');
   await expectClock('resume before first timing uses new stream anchor',1);
@@ -113,6 +114,7 @@ try{
   await expectClock('paused seek position is authoritative',1.6);
   assert.equal(outputs.length,4,'paused seek does not create an output stream');
   await evaluate('m.play()');
+  await waitFor(()=>outputs.length===5,'prepared paused-seek output stream');
   assert.equal(outputs.length,5);
   await expectClock('play after paused seek holds sought anchor',1.6);
   signal(4,{event:'ready'});timing(4,0);
