@@ -208,3 +208,24 @@ Item {width:400;height:200
   expect(await host.call('evaluate','document.getElementById("status").textContent')).toBe('2:3');
  });
 });
+
+test('RichText measures heading boxes, block spacing and wrapping without overlapping paragraphs', async () => {
+ await fixture(`import QtQuick
+Item {width:640;height:480
+ Text {id:rich;width:220;wrapMode:Text.Wrap;font.pixelSize:12;textFormat:Text.RichText
+  text:"<h1 style='margin-bottom:0.6em'>My First Heading</h1><p style='margin-bottom:0.6em'>My first paragraph.</p><p>Long text that wraps onto several lines in a narrow preview pane.</p>"
+ }
+ Component.onCompleted:globalThis.rich=rich
+}`,async host=>{
+ const inspect=()=>host.call('evaluate',`(()=>{const e=__qmlRuntime.element(rich),h=e.querySelector('h1').getBoundingClientRect(),ps=[...e.querySelectorAll('p')].map(p=>p.getBoundingClientRect());return {height:rich.implicitHeight,top:e.getBoundingClientRect().top,hBottom:h.bottom,pTop:ps[0].top,bottom:ps[1].bottom}})()`);
+ const wide=await inspect();
+ expect(wide.pTop).toBeGreaterThan(wide.hBottom);
+ expect(wide.height).toBeGreaterThanOrEqual(wide.bottom-wide.top-0.1);
+ await host.call('evaluate','rich.width=100');
+ const narrow=await inspect();
+ expect(narrow.height).toBeGreaterThan(wide.height);
+ expect(narrow.height).toBeGreaterThanOrEqual(narrow.bottom-narrow.top-0.1);
+ await host.call('evaluate','rich.font.pixelSize=20');
+ expect((await inspect()).height).toBeGreaterThan(narrow.height);
+ });
+},30000);
