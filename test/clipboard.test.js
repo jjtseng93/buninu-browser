@@ -40,7 +40,7 @@ test('Windows also uses Bun.which-resolved xclip before its platform fallback',a
  expect(seen).toEqual(['xclip']);
 });
 
-test('clipboard read is one-shot, preserves empty/text values, and prefers xclip on Windows too',async()=>{
+test('clipboard read is one-shot, retains text on empty host reads, and prefers xclip on Windows too',async()=>{
  const {readClipboard}=await import('../lib/clipboard.js');
  const calls=[];let value='中文\n';
  const options={platform:'win32',which:name=>name==='xclip'?'/bin/xclip':null,spawn:(args)=>{
@@ -48,7 +48,7 @@ test('clipboard read is one-shot, preserves empty/text values, and prefers xclip
  }};
  expect(await readClipboard(options)).toBe('中文\n');
  expect(calls).toEqual([['/bin/xclip','-selection','clipboard','-o']]);
- value='';expect(await readClipboard(options)).toBe('');
+ value='';expect(await readClipboard(options)).toBe('中文\n');
  await Bun.sleep(30);expect(calls).toHaveLength(2);
  await expect(readClipboard({...options,which:()=>null})).rejects.toThrow('No working');
 });
@@ -68,3 +68,32 @@ test('execCommand copy snapshots a temporary selected textarea and uses the exis
   expect(await host.call('evaluate','copied')).toBe(true);
  }finally{host.close();}
 },20000);
+
+test('host clipboard retains local copies on denial, refreshes later, and explicit clearing drops cache',async()=>{
+ const {readClipboard}=await import('../lib/clipboard.js');
+ let fail=true,value='';let reads=0;
+ const options={platform:'linux',which:n=>n==='xclip'?'/bin/xclip':null,spawn:(args)=>{
+   const reading=args.includes('-o');if(reading)reads++;
+   return {stdout:new Response(value).body,exited:Promise.resolve(fail?1:0),kill(){}};
+ }};
+ await expect(readClipboard(options)).rejects.toThrow('No working');
+ await expect(writeClipboard('local',options)).rejects.toThrow('No working');
+ expect(await readClipboard(options)).toBe('local');
+ fail=false;expect(await readClipboard(options)).toBe('local');
+ value='external';expect(await readClipboard(options)).toBe('external');
+ await writeClipboard('',options);value='';expect(await readClipboard(options)).toBe('');
+ expect(reads).toBe(5);
+});
+
+test('a slow clipboard read cannot overwrite a newer local copy',async()=>{
+ const {readClipboard}=await import('../lib/clipboard.js');
+ let finish;
+ const options={which:n=>n==='xclip'?'/bin/xclip':null,spawn:(args)=>({
+   stdout:new Response('stale').body,
+   exited:args.includes('-o')?new Promise(r=>finish=r):Promise.resolve(0),kill(){}
+ })};
+ const pending=readClipboard(options);
+ await writeClipboard('new copy',options);
+ finish(0);
+ expect(await pending).toBe('new copy');
+});

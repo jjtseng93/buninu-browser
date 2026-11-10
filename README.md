@@ -258,9 +258,13 @@ Pages can copy or read text with `navigator.clipboard.writeText()` and
 `navigator.clipboard.readText()` after a user click or key press on HTTPS
 (or localhost). Each operation consumes that activation. The controller accesses the clipboard,
 preferring `xclip -selection clipboard`, with platform clipboard commands as
-fallbacks. Clipboard command access stays outside the page sandbox; unavailable
-providers reject the promise instead of reporting success. Reads happen only
-on request, with no clipboard polling. HTML inputs and textareas share selection,
+fallbacks. Clipboard command access stays outside the page sandbox; failed
+writes reject the promise instead of reporting host success. Reads always try the
+host first, then retain the last local text on denied or empty reads, as in Land
+(Android may return empty text while backgrounded). Without cached text, read
+errors still reject. Explicitly writing empty text clears the cache; an external
+clear cannot be distinguished from a denied empty read. Reads happen only on
+request, with no clipboard polling. HTML inputs and textareas share selection,
 caret blinking, Shift+arrows, and Ctrl+C/X/V editing with QML controls. Paste
 replaces the selection, or inserts at the cursor. Up/Down currently follow
 explicit textarea line breaks, not soft-wrapped visual lines.
