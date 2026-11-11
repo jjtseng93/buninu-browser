@@ -294,3 +294,50 @@ test('scoped sheet membership follows rel, ordering, moves and detached roots', 
     expect(cache.get('sheets',roots[1])).toEqual([second,first]);
   });
 });
+
+
+test('resource mutations retain unrelated shadow scope discovery', async () => {
+  for (const delivered of [false, true]) await fixture(async ({document,cache}) => {
+    const hosts = [document.createElement('div'), document.createElement('div')];
+    document.body.append(...hosts);
+    const roots = hosts.map(host => host.attachShadow({mode:'closed'}));
+    for (const root of roots) { root.innerHTML='<style>p{color:red}</style><p>text</p>'; cache.shadowAttached(root); }
+    const first = cache.get('sheets',roots[0]), second = cache.get('sheets',roots[1]);
+    roots[0].append(document.createElement('style'));
+    if(delivered) await Bun.sleep(10);
+    expect(cache.get('sheets',roots[0])).toHaveLength(2);
+    expect(cache.get('sheets',roots[1])).toBe(second);
+    document.body.append(document.createElement('div'));
+    if(delivered) await Bun.sleep(10);
+    expect(cache.get('sheets',roots[1])).toBe(second);
+    roots[1].append(first[0]);
+    if(delivered) await Bun.sleep(10);
+    expect(cache.get('sheets',roots[0])).toHaveLength(1);
+    expect(cache.get('sheets',roots[1])).toEqual([second[0],first[0]]);
+  });
+});
+
+
+test('shadow roots retain aggregate resource lists across unrelated edits',async()=>{
+ for(const delivered of [false,true]) await fixture(async({document,cache})=>{
+  const host=document.createElement('div');document.body.append(host);
+  const root=host.attachShadow({mode:'closed'});
+  root.innerHTML='<img src="shadow.png"><video></video><div>content</div>';
+  cache.shadowAttached(root);
+  const images=cache.get('images'),media=cache.get('media');
+  root.lastChild.append(document.createElement('span'));
+  document.body.append(document.createElement('p'));
+  if(delivered)await Bun.sleep(10);
+  expect(cache.get('images')).toBe(images);
+  expect(cache.get('media')).toBe(media);
+  const added=document.createElement('img');root.append(added);
+  if(delivered)await Bun.sleep(10);
+  expect(cache.get('images')).toEqual([...images,added]);
+  expect(cache.get('media')).toBe(media);
+  host.remove();if(delivered)await Bun.sleep(10);
+  expect(cache.get('images')).toEqual([images[0]]);
+  expect(cache.get('media')).toEqual([media[0]]);
+  document.body.append(host);if(delivered)await Bun.sleep(10);
+  expect(cache.get('images')).toEqual([...images,added]);
+ });
+});

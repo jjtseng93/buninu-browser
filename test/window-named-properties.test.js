@@ -1,6 +1,75 @@
 import {test, expect} from 'bun:test';
 import {RendererHost} from '../lib/renderer/host.js';
 import {parseHTMLDocument} from '../lib/happy-dom/parser.js';
+import {windowNamedProperties} from '../lib/renderer/window-named-properties.js';
+
+test('named access indexes names without rescanning on misses, style writes or text changes', async () => {
+  const {document, window} = parseHTMLDocument('<form name="formName"></form><div id="one">text</div><div id="two"></div>');
+  try {
+    let queries = 0;
+    const query = document.querySelectorAll.bind(document);
+    document.querySelectorAll = (...args) => { queries++; return query(...args); };
+    const named = windowNamedProperties(document, {wrap:x=>x, live:x=>x}, null);
+    const one = named.one;
+    expect(named.formName.tagName).toBe('FORM');
+    const initial = queries;
+    for (let i=0;i<100;i++) expect(named['missing'+i]).toBeUndefined();
+    one.style.color = 'red';
+    one.firstChild.data = 'new';
+    one.appendChild(document.createTextNode('more'));
+    expect(named.one).toBe(one);
+    expect(queries).toBe(initial);
+    one.id = 'renamed';
+    expect(named.one).toBeUndefined();
+    expect(named.renamed).toBe(one);
+    const odd = 'x"]\\\u0000';
+    one.id = odd;
+    expect(named[odd]).toBe(one);
+    expect(named['absent"]']).toBeUndefined();
+    one.id = 'two';
+    const group = named.two;
+    expect(group.length).toBe(2);
+    expect(group[0]).toBe(one);
+    document.body.appendChild(one);
+    expect(group[1]).toBe(one);
+    one.remove();
+    expect(group.length).toBe(1);
+    const form = named.formName;
+    form.setAttribute('name','later');
+    await Promise.resolve(); // also invalidate after normal observer delivery
+    expect(named.formName).toBeUndefined();
+    expect(named.later).toBe(form);
+    document.body.innerHTML = '<span id="final"></span>';
+    expect(named.later).toBeUndefined();
+    expect(named.final.tagName).toBe('SPAN');
+    expect(queries).toBe(initial);
+  } finally { await window.happyDOM.close(); }
+});
+
+test('named index updates moved and removed subtrees without stale entries', async () => {
+  const {document, window} = parseHTMLDocument('<section><div id="first"><form name="deep"></form></div></section><aside></aside>');
+  try {
+    const named = windowNamedProperties(document, {wrap:x=>x,live:x=>x}, null);
+    const form = named.deep, first = named.first;
+    const section = document.querySelector('section'), aside = document.querySelector('aside');
+    // Drain an attribute change and a subtree move in the same lookup.
+    first.id = 'renamed';
+    aside.append(first);
+    expect(named.first).toBeUndefined();
+    expect(named.renamed).toBe(first);
+    expect(named.deep).toBe(form);
+    aside.remove();
+    form.setAttribute('name','moved');
+    section.append(form); // a descendant survives removal of its old ancestor
+    expect(named.renamed).toBeUndefined();
+    expect(named.deep).toBeUndefined();
+    expect(named.moved).toBe(form);
+    section.remove();
+    expect(named.moved).toBeUndefined();
+    document.body.append(section);
+    expect(named.moved).toBe(form);
+  } finally { await window.happyDOM.close(); }
+});
 
 test('Window named elements are live, shadowable, and available in classic scripts and inline handlers', async () => {
   const host = new RendererHost();
@@ -19,6 +88,35 @@ test('Window named elements are live, shadowable, and available in classic scrip
     expect(await host.call('evaluate', `eval('(async()=>{\\nresult.value="first"\\nresult.value += " second"\\n})()'); result.value`)).toBe('first second');
   } finally {host.close();}
 },20000);
+
+test('named index preserves frame precedence, eligible names and ordinary tree boundaries', async () => {
+  const {document, window} = parseHTMLDocument('<div id="shared"></div><iframe name="shared"></iframe><input name="excluded"><form id="same" name="same"></form><section></section>');
+  try {
+    const frameWindow = {};
+    const named = windowNamedProperties(document, {
+      wrap: element => element.tagName === 'IFRAME' ? {contentWindow:frameWindow} : element,
+      live: value => value,
+    }, null);
+    expect(named.shared).toBe(frameWindow);
+    expect(named.excluded).toBeUndefined();
+    expect(named.same.tagName).toBe('FORM');
+    document.querySelector('iframe').remove();
+    expect(named.shared.tagName).toBe('DIV');
+    const host = document.querySelector('section');
+    host.attachShadow({mode:'open'}).innerHTML = '<div id="hiddenName"></div>';
+    expect(named.hiddenName).toBeUndefined();
+    const template = document.createElement('template');
+    template.innerHTML = '<div id="templateName"></div>';
+    document.body.append(template);
+    expect(named.templateName).toBeUndefined();
+    document.body.append(template.content);
+    expect(named.templateName.tagName).toBe('DIV');
+    host.innerHTML = '<img name="added">';
+    expect(named.added.tagName).toBe('IMG');
+    host.remove();
+    expect(named.added).toBeUndefined();
+  } finally { await window.happyDOM.close(); }
+});
 
 test('type selectors accept underscores, including escaped punctuation and selector lists', () => {
   const {document} = parseHTMLDocument('<x_widget></x_widget><g:family_creation></g:family_creation>');
