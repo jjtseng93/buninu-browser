@@ -151,6 +151,23 @@ const load = async (html, url = "https://page.test/") => {
 };
 const evaluate = (expression) => renderer.call("evaluate", expression);
 
+test('top-level function declarations can replace their outer binding', async () => {
+  for (const strict of ['', '"use strict";']) {
+    await load(`<script>${strict}
+      function lazy() { lazy = function () { return 42; }; return lazy(); }
+      var oldLazy = lazy, originalName = lazy.name, source = lazy.toString();
+      var first = lazy(), second = lazy(), saved = oldLazy();
+      function recursive(n) { return n ? n * recursive(n - 1) : 1; }
+      var factorial = recursive(5);
+      var named = function inner() { try { inner = 123; } catch {} return typeof inner; };
+      var innerType = named();
+    </script>`);
+    expect(await evaluate('[first,second,saved,originalName,factorial,innerType]'))
+      .toEqual([42,42,42,'lazy',120,'function']);
+    expect(await evaluate('source')).toBe('function lazy() { lazy = function () { return 42; }; return lazy(); }');
+  }
+});
+
 test('ProgressEvent dispatches through page DOM bindings', async () => {
   await load('<p id="target">progress</p>');
   expect(await evaluate(`(() => {

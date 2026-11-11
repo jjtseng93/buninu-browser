@@ -163,7 +163,7 @@ test("global variable reads go through the script's global binding, keeping thei
   const shorthand = "function s() { return { Q, n, m: Q }; }";
   expect(run(`(${shorthand})`)()).toEqual({ Q: global.Q, n: 2, m: global.Q });
   const code = rewriteClassicScript(shorthand).code;
-  const own = code.slice(code.indexOf("function s"));
+  const own = code.slice(code.indexOf("function /*$buninu$decl:"));
   expect(restoreSourceText(own.slice(0, own.lastIndexOf("}") + 1))).toBe(shorthand);
   expect(restoreSourceText("(function () { return typeof $buninu$g.Q; })")).toBe("(function () { return typeof Q; })");
   // A block-level function outside functions (Annex B) leaves the script's identifiers as written.
