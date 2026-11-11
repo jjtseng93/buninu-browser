@@ -12,17 +12,11 @@ directly as JavaScript and WebAssembly.
 > general-purpose browser engine or replacement for Chromium. The headless
 > shell is the initial frontend; a standard Wayland frontend is experimental.
 
-## Experimental Wayland frontend
-
-`bun index.js --wayland URL` opens a standard Wayland SHM window using
-`WAYLAND_DISPLAY` and `XDG_RUNTIME_DIR`. Casty remains the default.
-See [frontend details and limitations](frontends/wayland/README.md).
-See the [experimental QML runtime and Flea/Omastorm container recipes](lib/qml/README.md)
-for local QML applications. This does not yet provide full Quickshell/Flea/Omastorm
-compatibility. For input checks, open `test/manual-pointer-scroll.html` through
-either frontend.
-
 ## Usage
+
+The default frontend, [Casty](https://github.com/jjtseng93/casty), displays web
+pages in your terminal through the Kitty graphics protocol. It requires a
+terminal that supports Kitty graphics.
 
 ```sh
 # Install Bun if you don't have it
@@ -46,26 +40,7 @@ npx buninu-browser buninu.org -- --chromium
 # phone-width layout)
 npx buninu-browser github.com \
   -- --mobile
-
-# The engine alone, as a CDP
-# endpoint for any client
-npx buninu-browser --headless \
-  --remote-debugging-port=9222 --window-size=1280,800
-
-# capture a page and exit
-npx buninu-browser --headless --screenshot=page.png \
-  --window-size=1280,800 https://example.com
 ```
-
-`--window-size=WIDTH,HEIGHT` sets the initial viewport for both headless CDP
-and screenshot modes (default 800×600 CSS pixels, DPR 1). CDP clients can
-subsequently change it with `Emulation.setDeviceMetricsOverride`.
-
-Screenshot mode waits for the page's `load` event before capture. For content
-that appears later, add `--screenshot-wait=1000` (real milliseconds). The output
-format follows the filename extension: PNG, JPEG, or WebP. Chromium's
-`--virtual-time-budget` is not implemented; a real-time delay does not advance
-page timers the same way.
 
 The first run downloads this package
 (about 50 MB: fonts, CanvasKit and
@@ -92,25 +67,89 @@ identity and retains the Android phone profile. These flags select browser
 identities, not native WebKit or Chromium engines. API callers can use
 `createBrowser({ webkit: false })` to select the Chromium identity.
 
-The first argument picks a frontend;
-the rest is passed on:
+### Frontends and command routing
 
-- `--casty`, or anything else: casty
-  in the terminal (the default; every
-  argument goes to casty)
-- `--headless`: the engine alone, as
-  a CDP endpoint
-- `--win32`: casty with a native Windows
-  window (Windows only)
-- `--gtk`, `--appkit`, `--qt`: native
-  windowed frontends (reserved, not implemented yet)
-- `--help`/`-h`, `--version`/`-V`,
-  `--readme`: this launcher's help,
-  version and backend details, and
-  this README
+The frontend selector must be the first argument. Use `npx buninu-browser`,
+`bunx buninu-browser`, or `bun index.js` from a local checkout with the same
+arguments.
 
-casty's and the engine's options:
-`--casty --help`, `--headless --help`.
+| First argument | Behavior |
+| --- | --- |
+| No selector, or `--casty` | Terminal frontend; remaining arguments go to Casty. Requires Kitty graphics. |
+| `--headless` | Engine only, exposing CDP without a local window. |
+| `--win32` | Casty's native Windows window; remaining arguments go to Casty. Windows only. |
+| `--wayland` | Experimental Wayland window for a URL or local file; accepts `--window-size=WIDTH,HEIGHT`. See [Wayland details](#experimental-wayland-frontend). |
+| `--quickshell-wayland` | Experimental QML application in a Wayland window. |
+| `--quickshell-headless` | Experimental QML application exposed through CDP. |
+| `--quickshell-casty` | Experimental QML application displayed through Casty. |
+| `--gtk`, `--appkit`, `--qt` | Reserved; not implemented. |
+
+```sh
+# Native Windows window
+npx buninu-browser --win32 https://example.com
+
+# Existing Wayland compositor (for example, buninu-land)
+npx buninu-browser --wayland https://example.com --window-size=1280,800
+
+# A local document through the terminal frontend
+npx buninu-browser file:///absolute/path/to/document.html
+
+# Run a QML file or a directory containing shell.qml
+npx buninu-browser --quickshell-wayland -p /absolute/path/to/shell.qml
+
+# Headless QML, with engine options after --
+npx buninu-browser --quickshell-headless -p /absolute/path/to/config \
+  -- --remote-debugging-port=9222 --window-size=1280,800
+
+# Named QML configuration through Casty
+# First -- separates QML options; second -- introduces engine options
+npx buninu-browser --quickshell-casty -c my-config -- -- --chromium
+```
+
+The QML entries accept `-p`/`--path FILE_OR_DIRECTORY` and
+`-c`/`--config NAME` (under `$XDG_CONFIG_HOME/quickshell`). Without either,
+they use the default Quickshell configuration lookup. They also honor
+`QS_CONFIG_PATH`, `QS_CONFIG_NAME` and `QML_IMPORT_PATH`. Arguments after `--`
+go to the selected backend. This is the experimental Buninu QML runtime,
+not native Qt/Quickshell; see [supported features and recipes](lib/qml/README.md).
+
+### Engine options
+
+Pass these directly after `--headless`. With the Casty or Win32 frontend,
+put engine options after `--`; options before it belong to Casty.
+The standalone Wayland entry currently accepts a URL/file and `--window-size`,
+not the full engine option set.
+
+| Option | Behavior |
+| --- | --- |
+| `--remote-debugging-port=PORT` | CDP port; default `9222`, or `0` to choose a free port. |
+| `--webkit` | Default desktop WebKit/Safari compatibility identity. |
+| `--chromium` | Desktop Chromium compatibility identity. |
+| `--mobile` | Phone identity, layout and touch media features; takes priority over desktop identity flags. |
+| `--no-sandbox` | Accepted for Chromium CLI compatibility; ignored. |
+| `--dangerously-allow-host-js` | Disables the page sandbox for every page; exposes host JavaScript capabilities. Only use with trusted content. |
+
+For engine diagnostics, `BUNINU_LOG=1` writes `./buninu-browser.log`;
+`BUNINU_LOG=/path/to/file.log` chooses a file. See [diagnostics](#diagnostics)
+and [render scheduling](#render-scheduling) for further controls.
+
+### Help and documentation
+
+```sh
+npx buninu-browser --help
+npx buninu-browser --casty --help
+npx buninu-browser --headless --help
+npx buninu-browser --wayland --help
+npx buninu-browser --quickshell-wayland --help
+npx buninu-browser --quickshell-headless --help
+npx buninu-browser --quickshell-casty --help
+npx buninu-browser --version
+npx buninu-browser --readme
+```
+
+Launcher aliases: `-h`/`-help` for `--help`, `-V`/`-version` for
+`--version`, and `--docs` for `--readme`. Casty's own options and commands
+are documented in [Casty's README](https://github.com/jjtseng93/casty#readme).
 
 ### JavaScript dialogs
 
@@ -200,6 +239,35 @@ With an older npm, delete the npx
 cache directory: `~/.npm/_npx`
 (Windows:
 `%LocalAppData%\npm-cache\_npx`).
+
+### Screenshots and viewport size
+
+```sh
+# The engine alone, as a CDP
+# endpoint for any client
+npx buninu-browser --headless \
+  --remote-debugging-port=9222 --window-size=1280,800
+
+# capture a page and exit
+npx buninu-browser --headless --screenshot=page.png \
+  --window-size=1280,800 https://example.com
+```
+
+| Option | Behavior |
+| --- | --- |
+| `--window-size=WIDTH,HEIGHT` | Initial viewport in CSS pixels; default `800,600`. |
+| `--screenshot[=FILE]` | Capture a page and exit; default `screenshot.png`. Extension selects PNG, JPEG or WebP. |
+| `--screenshot-wait=MILLISECONDS` | Additional real-time wait after page load before capture. |
+
+`--window-size=WIDTH,HEIGHT` sets the initial viewport for both headless CDP
+and screenshot modes (default 800×600 CSS pixels, DPR 1). CDP clients can
+subsequently change it with `Emulation.setDeviceMetricsOverride`.
+
+Screenshot mode waits for the page's `load` event before capture. For content
+that appears later, add `--screenshot-wait=1000` (real milliseconds). The output
+format follows the filename extension: PNG, JPEG, or WebP. Chromium's
+`--virtual-time-budget` is not implemented; a real-time delay does not advance
+page timers the same way.
 
 ## Why replace Chromium Headless Shell
 
@@ -300,10 +368,16 @@ QML Image, with a matching fallback in the DOM image-size adapter.
 Native regression fixtures cover ICO (PNG and DIB payloads), CUR, WBMP and BMP
 variants rejected by Bun's probe: 1/4/8-bit palettes, 16-bit RGB, RLE4/RLE8 and
 OS/2 core headers. PNG, JPEG, WebP, GIF and ordinary 24-bit BMP remain covered.
-This does not add codecs absent from the bundled Skia build, nor animated playback.
+This fallback does not add codecs absent from the bundled Skia build.
 Unsupported/corrupt images follow the normal error/alt and rejected `decode()`
 path and can recover when `src` is replaced. Run `bun test test/raster-codecs.test.js`
 for the generated format fixtures and page-level loading tests.
+
+Animated GIFs play in ordinary images, CSS backgrounds, and standalone image
+documents using the bundled CPU CanvasKit decoder. Frame delays, transparency,
+disposal, and finite/infinite loops are supported; no video backend is required.
+Animation updates repaint without relayout and release their decoders on source
+replacement or document disposal. Animated WebP/APNG are not enabled by this path.
 
 ### SVG rendering
 
@@ -620,6 +694,16 @@ output and writes the log.
 ```sh
 BUNINU_LOG=1 npx buninu-browser github.com
 ```
+
+## Experimental Wayland frontend
+
+`bun index.js --wayland URL` opens a standard Wayland SHM window using
+`WAYLAND_DISPLAY` and `XDG_RUNTIME_DIR`. Casty remains the default.
+See [frontend details and limitations](frontends/wayland/README.md).
+See the [experimental QML runtime and Flea/Omastorm container recipes](lib/qml/README.md)
+for local QML applications. This does not yet provide full Quickshell/Flea/Omastorm
+compatibility. For input checks, open `test/manual-pointer-scroll.html` through
+either frontend.
 
 ## Open-source components
 
