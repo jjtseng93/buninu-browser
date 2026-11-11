@@ -38,6 +38,9 @@ export async function main(args = Bun.argv.slice(2)) {
 
 Usage: buninu-browser [options] [URL]
 
+An optional URL or local file is loaded into one discoverable page target.
+Without a URL, the endpoint waits for a CDP client to create/navigate a target.
+
 Options:
   --remote-debugging-port=<port>  CDP port (0 picks a free one; default 9222)
   --no-sandbox                    Accepted for Chromium compatibility and ignored
