@@ -1287,13 +1287,17 @@ test("pages can wrap Promise methods without modifying another realm", async () 
   expect(await evaluate("typeof promiseCalls")).toBe("undefined");
 });
 
-test("page RegExp instances can override their own toString without changing the intrinsic", async () => {
+test("page RegExp instances can override their own methods without changing the intrinsic", async () => {
   await load(`<script>
     const pattern = /demo/;
     pattern.toString = () => "custom";
-    window.regexpOverride = [pattern.toString(), (/other/).toString()];
+    pattern.exec = () => null;
+    let protoWrite = "allowed";
+    try { RegExp.prototype.exec = () => null; } catch (error) { protoWrite = error.constructor.name; }
+    window.regexpOverride = [pattern.toString(), (/other/).toString(), pattern.test("demo"),
+      (/demo/).test("demo"), protoWrite];
   </script>`);
-  expect(await evaluate("regexpOverride")).toEqual(["custom", "/other/"]);
+  expect(await evaluate("regexpOverride")).toEqual(["custom", "/other/", false, true, "TypeError"]);
 });
 
 test("import methods keep their names and receivers alongside real dynamic imports", async () => {

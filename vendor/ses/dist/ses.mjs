@@ -8108,7 +8108,8 @@ const methods = {
    * is accepted.
    */
   '%SetPrototype%': '*',
-  // Page scripts may assign an own toString method to a RegExp instance.
+  // Page scripts may assign own properties (e.g. toString, exec) to a RegExp
+  // instance; RegExp.prototype itself stays read-only.
   '%RegExpPrototype%': '*',
 };$h͏_once.severeEnablements(severeEnablements);
 })()
