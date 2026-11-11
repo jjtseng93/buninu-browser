@@ -59,7 +59,6 @@ test.skipIf(!flea || !omarchy)(
       const expected = {
         PdfViewer: 'QtQuick.Pdf',
         PreviewPdf: 'QtQuick.Pdf',
-        PreviewAnimation: 'AnimatedImage',
       };
       for (const [file, message] of blocked) {
         expect(expected[file.slice(0, -4)]).toBeDefined();

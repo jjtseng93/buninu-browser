@@ -511,7 +511,11 @@ Flickable, ListView/GridView and basic Shape paths.
 - SVG-shaped icons and ShapePath linear gradients use the browser's shared
   CPU SVG painter. Canvas remains the fallback for QML texture fills and
   independently rounded rectangle corners.
-- Image uses the normal browser image loader for both raster and SVG sources,
+- AnimatedImage uses the same CPU GIF decoder as ordinary browser images.
+  It supports autoplay, playing/paused controls, and reports currentFrame/frameCount;
+  arbitrary currentFrame seeking is not implemented yet. It does not require a
+  Qt image plugin or video decoder.
+- Image remains static for GIFs and uses the normal browser image loader for both raster and SVG sources,
   including file/data/HTTP URLs. SVG supports basic shapes, local use references,
   linear/radial gradients, clip paths and group opacity; it does not execute
   scripts or load external resources. SVG text, patterns, masks, filters and

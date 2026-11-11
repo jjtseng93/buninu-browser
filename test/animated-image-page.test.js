@@ -2,6 +2,9 @@ import {test,expect} from 'bun:test';
 import {createBrowser} from '../lib/headless-shell.js';
 import {loadGraphics} from '../lib/renderer/page-renderer.js';
 import {animatedGif} from './fixtures/animated-gif.js';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
 const gif='data:image/gif;base64,'+animatedGif().toString('base64');
 async function pixel(browser,x=5,y=5){
  const k=(await loadGraphics()).CanvasKit;
@@ -25,6 +28,29 @@ test('HTML img and CSS backgrounds animate through screenshot painting; src remo
   expect(await pixel(b)).toEqual([0,0,255,255]);
   await Bun.sleep(350);expect(await pixel(b)).toEqual([0,0,255,255]);
  }finally{await b.close()}
+},20000);
+test('QML AnimatedImage plays, pauses and restarts with frame metadata',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'qml-gif-'));const file=join(dir,'main.qml');
+ await Bun.write(file,`import QtQuick
+import Quickshell
+FloatingWindow { width: 100; height: 100
+ AnimatedImage { id: animation; width: 40; height: 40; source: "${gif}"
+ Component.onCompleted: globalThis.animation = animation }
+ Image { x: 50; width: 40; height: 40; source: "${gif}" }
+}`);
+ const b=await createBrowser({spareRenderer:false});
+ try{
+  await b.context.navigate(Bun.pathToFileURL(file).href);
+  await changes(b,5,5);
+  expect(await b.context.evaluate('animation.frameCount')).toBe(2);
+  expect(await pixel(b,55,5)).toEqual([255,0,0,255]);
+  await b.context.evaluate('animation.paused=true');
+  const before=await pixel(b);await Bun.sleep(400);expect(await pixel(b)).toEqual(before);
+  await b.context.evaluate('animation.paused=false');await changes(b,5,5);
+  await b.context.evaluate('animation.playing=false');await Bun.sleep(50);
+  const stopped=await pixel(b);await Bun.sleep(400);expect(await pixel(b)).toEqual(stopped);
+  await b.context.evaluate('animation.playing=true');await changes(b,5,5);
+ }finally{await b.close();await rm(dir,{recursive:true,force:true})}
 },20000);
 test('live rendering advances without screenshot polling and releases GIF decoders and frames',async()=>{
  const child=Bun.spawn([process.execPath,Bun.fileURLToPath(new URL('./fixtures/animated-image-lifetime.js',import.meta.url))],{stdout:'pipe',stderr:'pipe'});
