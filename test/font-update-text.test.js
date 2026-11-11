@@ -4,10 +4,28 @@ import { loadGraphics } from '../lib/renderer/page-renderer.js';
 const face = (family, source, extra = {}) => ({ family, sources: [{ url: source }], weight: [400, 400], style: 'normal', ...extra });
 const run = (text, family, extra = {}) => ({ text, style: { fontFamily: [family], ...extra } });
 const bytes = await Bun.file(new URL('../usr/share/fonts/DejaVuSansMono.ttf', import.meta.url)).bytes();
-async function make(fetch) {
+async function make(fetch, availableFamilies) {
  const { CanvasKit, builtinTypefaces, fontCollection } = await loadGraphics();
- return new DocumentFonts({CanvasKit, builtins: builtinTypefaces, defaultCollection: fontCollection, fetch});
+ return new DocumentFonts({CanvasKit, builtins: builtinTypefaces, defaultCollection: fontCollection, fetch, availableFamilies});
 }
+test('immutable text coverage invalidates for changed faces and installed families, while mutable runs remain live', async()=>{
+ const requests=[],available=new Set(['local']);
+ const fonts=await make(async({url})=>{requests.push(url);return {status:200,body:bytes}},available);
+ const fixed=Object.freeze({text:'hello',style:Object.freeze({fontFamily:Object.freeze(['Local','Remote'])})});
+ const mutable=run('hello','Remote');
+ try {
+  fonts.setFaces([face('Remote','https://font.test/first')]);
+  fonts.updateText([fixed]);await fonts.ready();expect(requests).toEqual([]);
+  fonts.updateText([fixed]);expect(requests).toEqual([]);
+  available.delete('local');available.add('other'); // same size, different contents
+  fonts.updateText([fixed]);await fonts.ready();expect(requests).toEqual(['https://font.test/first']);
+  fonts.setFaces([face('Remote','https://font.test/second')]);
+  fonts.updateText([fixed]);await fonts.ready();expect(requests.at(-1)).toBe('https://font.test/second');
+  fonts.setFaces([face('Remote','https://font.test/latin',{unicodeRanges:[[0,127]]}),face('Remote','https://font.test/cjk',{unicodeRanges:[[0x4e00,0x9fff]]})]);
+  fonts.updateText([mutable]);await fonts.ready();expect(requests.at(-1)).toBe('https://font.test/latin');
+  mutable.text='中文';fonts.updateText([mutable]);await fonts.ready();expect(requests.at(-1)).toBe('https://font.test/cjk');
+ }finally{fonts.dispose()}
+});
 test('prepared text retains the installed index and accepts live text, weight, style and Unicode changes', async () => {
  const requests = []; const fonts = await make(async ({url}) => { requests.push(url); return {status:200,body:bytes}; });
  let installed = 0; const original = fonts.setFaces; fonts.setFaces = function(faces){installed++;return original.call(this,faces)};

@@ -58,6 +58,18 @@ try {
       values:values.every(value=>value[0]==='rgb(255, 0, 0)'&&value[1]==='red')};
   })()`);
   assert.deepEqual(repeated,{creationReads:0,creationSerializations:0,first:1,second:2,custom:'changed',independent:'changed',distinct:true,keys:true,values:true});
+  const sharedGeometry = await renderer.evaluate(`(() => {
+    const box=document.getElementById('box'),before=__serializationCalls();
+    const widths=[];
+    for(let i=0;i<40;i++) {
+      const style=getComputedStyle(box);
+      widths.push(style.width);
+      // Style-only and geometry reads must not evict one another.
+      style.color;
+    }
+    return {count:__serializationCalls()-before,widths};
+  })()`);
+  assert.deepEqual(sharedGeometry,{count:1,widths:Array(40).fill('200px')});
   observeSerialization = false;
   const styles = await renderer.evaluate(`(() => {
     const box=document.getElementById('box'),style=getComputedStyle(box),start=__layoutCalls();

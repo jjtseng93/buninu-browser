@@ -113,6 +113,28 @@ test("computed transform matrices retain every translation and resolve nested le
     .toEqual(["matrix(1, 0, 0, 1, 56, 630)","matrix(2, 0, 0, 2, 90, 70)"]);
 });
 
+test("fresh declarations resolve resized percentage boxes without reusing old dimensions", async () => {
+  await renderer.call('loadDocument', {url:'https://page.test/',contentType:'text/html',status:200,
+    source:'<!doctype html><div id="parent" style="width:200px;height:100px"><div id="child" style="width:50%;height:50%;transform:translate(50%,50%)"></div></div>'});
+  await renderer.call('whenLoaded');
+  expect(await renderer.call('evaluate', `(() => {
+    const parent=document.getElementById('parent'),child=document.getElementById('child');
+    const saved=getComputedStyle(child),read=s=>[s.width,s.height,s.transform];
+    const result=[read(saved),read(getComputedStyle(child))];
+    parent.style.width='320px';parent.style.height='180px';
+    result.push(read(getComputedStyle(child)),read(saved));
+    parent.style.width='200px';parent.style.height='100px';
+    result.push(read(getComputedStyle(child)));
+    return result;
+  })()`)).toEqual([
+    ['100px','50px','matrix(1, 0, 0, 1, 50, 25)'],
+    ['100px','50px','matrix(1, 0, 0, 1, 50, 25)'],
+    ['160px','90px','matrix(1, 0, 0, 1, 80, 45)'],
+    ['160px','90px','matrix(1, 0, 0, 1, 80, 45)'],
+    ['100px','50px','matrix(1, 0, 0, 1, 50, 25)'],
+  ]);
+});
+
 test("focus invalidates subjects, ancestor paths, siblings and relational selectors", async () => {
   await renderer.call("loadDocument", {
     url:"https://page.test/",contentType:"text/html",status:200,

@@ -29,3 +29,5 @@ test(
   () => fixture("hidden-style-renderer"),
   60_000,
 );
+test('hidden geometry reads skip layout without losing pending visible changes',
+  () => fixture('hidden-geometry-read'), 30_000);
