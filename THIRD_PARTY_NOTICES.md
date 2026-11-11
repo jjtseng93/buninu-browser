@@ -205,7 +205,7 @@ must be symlinks to the system copies instead, as documented in `usr/README.md`.
 
 | Distributed path | Component and source | License |
 |---|---|---|
-| `usr/lib/canvaskit/canvaskit.js`, `canvaskit.wasm` | CanvasKit 0.41.1 from the official `canvaskit-wasm` npm release | BSD-3-Clause; `LICENSES/BSD-3-Clause-Skia.txt` |
+| `usr/lib/canvaskit/canvaskit.js`, `canvaskit.wasm` | CanvasKit 0.41.1 from the official `canvaskit-wasm` npm release; the WASM is unmodified, the JS loader carries two `wasmBinary` fixes recorded in [`patches/canvaskit/`](patches/canvaskit/README.md) | BSD-3-Clause; `LICENSES/BSD-3-Clause-Skia.txt` |
 | `usr/share/fonts/DejaVuSansMono.ttf`, `DejaVuSansMono-Bold.ttf` | DejaVu fonts 2.37 from Debian `fonts-dejavu-core` | Bitstream Vera; `LICENSES/Bitstream-Vera.txt` |
 | `usr/share/fonts/NotoSansCJK-Regular.ttc` | Noto Sans CJK 2.004 from Android system fonts | SIL Open Font License 1.1; `LICENSES/OFL-1.1.txt` |
 | `usr/share/fonts/NotoColorEmoji.ttf`, `NotoColorEmojiFlags.ttf` | Noto Color Emoji 2.047 from Android system fonts | SIL Open Font License 1.1 |
@@ -231,7 +231,8 @@ binary and CanvasKit's upstream build configuration:
 | zlib | `LICENSES/zlib.txt` (zlib) | https://github.com/madler/zlib |
 | Emscripten-generated runtime | `LICENSES/emscripten.txt` (MIT or University of Illinois/NCSA) | https://github.com/emscripten-core/emscripten |
 
-The top-level artifact is the official `canvaskit-wasm` 0.41.1 release,
+The top-level artifact is the official `canvaskit-wasm` 0.41.1 release (with the
+JS loader patch above),
 corresponding to Skia commit `3c68f3ffd7c9bc781494cdb85e718ff1e6f49d84`.
 That release's `DEPS` pins Brotli at
 `6d03dfbedda1615c4cba1211f8d81735575209c8`. The exact revisions of the
