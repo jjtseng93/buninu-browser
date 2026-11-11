@@ -1,0 +1,78 @@
+diff --git a/packages/happy-dom/src/config/HTMLElementConfig.ts b/packages/happy-dom/src/config/HTMLElementConfig.ts
+index 348b99fb..85f2ca75 100644
+--- a/packages/happy-dom/src/config/HTMLElementConfig.ts
++++ b/packages/happy-dom/src/config/HTMLElementConfig.ts
+@@ -78,7 +78,7 @@ export default <
+ 	},
+ 	textarea: {
+ 		className: 'HTMLTextAreaElement',
+-		contentModel: HTMLElementConfigContentModelEnum.anyDescendants
++		contentModel: HTMLElementConfigContentModelEnum.rcdata
+ 	},
+ 	script: {
+ 		className: 'HTMLScriptElement',
+@@ -499,7 +499,7 @@ export default <
+ 	},
+ 	title: {
+ 		className: 'HTMLTitleElement',
+-		contentModel: HTMLElementConfigContentModelEnum.anyDescendants
++		contentModel: HTMLElementConfigContentModelEnum.rcdata
+ 	},
+ 	tr: {
+ 		className: 'HTMLTableRowElement',
+diff --git a/packages/happy-dom/src/config/HTMLElementConfigContentModelEnum.ts b/packages/happy-dom/src/config/HTMLElementConfigContentModelEnum.ts
+index 1c609f61..cc331ee6 100644
+--- a/packages/happy-dom/src/config/HTMLElementConfigContentModelEnum.ts
++++ b/packages/happy-dom/src/config/HTMLElementConfigContentModelEnum.ts
+@@ -1,5 +1,6 @@
+ enum HTMLElementConfigContentModelEnum {
+ 	rawText = 'rawText',
++	rcdata = 'rcdata',
+ 	noSelfDescendants = 'noSelfDescendants',
+ 	noFirstLevelSelfDescendants = 'noFirstLevelSelfDescendants',
+ 	noForbiddenFirstLevelDescendants = 'noForbiddenFirstLevelDescendants',
+diff --git a/packages/happy-dom/src/html-parser/HTMLParser.ts b/packages/happy-dom/src/html-parser/HTMLParser.ts
+index 9ed2724c..44b4efcf 100755
+--- a/packages/happy-dom/src/html-parser/HTMLParser.ts
++++ b/packages/happy-dom/src/html-parser/HTMLParser.ts
+@@ -326,6 +326,18 @@ export default class HTMLParser {
+ 					break;
+ 			}
+ 
++			if (this.currentNode && this.readState === MarkupReadStateEnum.any &&
++				(<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.html &&
++				HTMLElementConfig[(<Element>this.currentNode)[PropertySymbol.localName]]?.contentModel === HTMLElementConfigContentModelEnum.rcdata) {
++				const tag = (<Element>this.currentNode)[PropertySymbol.localName];
++				const end = new RegExp('</' + tag + '(?=[\\t\\n\\f\\r />])[^>]*>', 'gi');
++				end.lastIndex = this.markupRegExp.lastIndex;
++				const closing = end.exec(html);
++				const text = html.slice(this.markupRegExp.lastIndex, closing?.index ?? html.length);
++				this.parseRawTextElementContent(tag, text);
++				this.markupRegExp.lastIndex = closing ? end.lastIndex : html.length;
++			}
++
+ 			lastIndex = this.markupRegExp.lastIndex;
+ 		}
+ 
+@@ -603,7 +615,8 @@ export default class HTMLParser {
+ 			// Raw text elements (e.g. <script>) should be appended after the raw text has been added as content to the element.
+ 			// <html>, <head> and <body> are special elements with context constraints. They are already available in the document.
+ 			if (
+-				(!config || config.contentModel !== HTMLElementConfigContentModelEnum.rawText) &&
++				(!config || (config.contentModel !== HTMLElementConfigContentModelEnum.rawText &&
++					config.contentModel !== HTMLElementConfigContentModelEnum.rcdata)) &&
+ 				this.nextElement !== documentElement &&
+ 				this.nextElement !== head &&
+ 				this.nextElement !== body
+@@ -799,6 +812,11 @@ export default class HTMLParser {
+ 
+ 		// Plain text elements such as <script> and <style> should only contain text.
+ 		// Plain text elements should not decode entities. See #1564.
++		if (upperTagName === 'TEXTAREA' || upperTagName === 'TITLE') {
++			text = XMLEncodeUtility.decodeHTMLEntities(text.replace(/\r\n?/g, '\n').replace(/\0/g, '\uFFFD'));
++			// The tree builder ignores one leading LF in a textarea start tag.
++			if (upperTagName === 'TEXTAREA' && text.startsWith('\n')) text = text.slice(1);
++		}
+ 		this.currentNode![PropertySymbol.appendChild](this.rootDocument!.createTextNode(text), true);
+ 
+ 		const rawTextElement = this.currentNode;

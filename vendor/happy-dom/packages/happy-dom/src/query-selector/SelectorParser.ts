@@ -692,7 +692,11 @@ export default class SelectorParser {
 	private static cssUnescape(value: string): string {
 		return value.replace(CSS_UNESCAPE_REGEXP, (_match, hex, char) => {
 			if (hex) {
-				return String.fromCodePoint(parseInt(hex, 16));
+				const codePoint = parseInt(hex, 16);
+				// Zero, surrogates and values past U+10FFFF become U+FFFD (CSS Syntax §4.3.7).
+				return codePoint === 0 || (codePoint >= 0xd800 && codePoint <= 0xdfff) || codePoint > 0x10ffff
+					? '\uFFFD'
+					: String.fromCodePoint(codePoint);
 			}
 			return char;
 		});

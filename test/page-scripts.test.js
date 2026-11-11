@@ -2265,9 +2265,14 @@ test("selectors with CSS escapes parse, in type selectors and around combinators
   const selectors = [String.raw`style\=\"\"`, String.raw`#a\:b`, String.raw`.x\,y > span`, String.raw`.p\(q\)`,
     String.raw`my\-el`, String.raw`\64 iv`,
     // CSS.escape() output for names starting with a digit, and an escaped quote in a value.
-    String.raw`#\31 23`, String.raw`.\31 x p`, String.raw`[data-k="a\"b"]`, String.raw`[d\61 ta-k]`];
+    String.raw`#\31 23`, String.raw`.\31 x p`, String.raw`[data-k="a\"b"]`, String.raw`[d\61 ta-k]`,
+    // Zero, surrogates and code points past U+10FFFF decode to U+FFFD instead of throwing.
+    String.raw`#\110000 x`, String.raw`.\0 a`, String.raw`#\d800`];
   expect(await evaluate(`${JSON.stringify(selectors)}.map((selector) => document.querySelectorAll(selector).length)`))
-    .toEqual([0, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    .toEqual([0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0]);
+  await load(`<p id="�x">1</p><p class="�a">2</p>`);
+  expect(await evaluate(`[String.raw\`#\\110000 x\`, String.raw\`.\\0 a\`].map((selector) => document.querySelectorAll(selector).length)`))
+    .toEqual([1, 1]);
 });
 
 test("a canvas 2d context samples colours through CanvasKit", async () => {

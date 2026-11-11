@@ -1,16 +1,8 @@
 diff --git a/packages/happy-dom/src/html-parser/HTMLParser.ts b/packages/happy-dom/src/html-parser/HTMLParser.ts
-index 8d56e4f..44b4efc 100755
+index 4475370e..9ed2724c 100755
 --- a/packages/happy-dom/src/html-parser/HTMLParser.ts
 +++ b/packages/happy-dom/src/html-parser/HTMLParser.ts
-@@ -327,6 +327,7 @@ export default class HTMLParser {
- 			}
- 
- 			if (this.currentNode && this.readState === MarkupReadStateEnum.any &&
-+				(<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.html &&
- 				HTMLElementConfig[(<Element>this.currentNode)[PropertySymbol.localName]]?.contentModel === HTMLElementConfigContentModelEnum.rcdata) {
- 				const tag = (<Element>this.currentNode)[PropertySymbol.localName];
- 				const end = new RegExp('</' + tag + '(?=[\\t\\n\\f\\r />])[^>]*>', 'gi');
-@@ -478,12 +479,14 @@ export default class HTMLParser {
+@@ -467,12 +467,14 @@ export default class HTMLParser {
  
  		const tagName = this.nextElement![PropertySymbol.tagName]!;
  		const lowerTagName = tagName.toLowerCase();
