@@ -1562,6 +1562,25 @@ test("aborting fetch cancels the controller's HTTP request", async () => {
   expect(pageFetchAborted).toBe(true);
 });
 
+test("console previews do not execute object hooks or throw on cyclic values", async () => {
+  await load(`<script>
+    var consoleEffects = [];
+    const object = { get value() { consoleEffects.push('getter'); throw Error('getter'); },
+      toJSON() { consoleEffects.push('json'); throw Error('json'); },
+      toString() { consoleEffects.push('string'); throw Error('string'); },
+      [Symbol.toStringTag]: 'Logged' };
+    object.self = object;
+    console.log(object);
+    console.warn(new Proxy(object, {
+      get(target,key) { consoleEffects.push('get'); return Reflect.get(target,key); },
+      ownKeys(target) { consoleEffects.push('keys'); return Reflect.ownKeys(target); }
+    }));
+    var consoleFinished = true;
+  </script>`);
+  expect(await evaluate('consoleFinished')).toBe(true);
+  expect(await evaluate('consoleEffects')).toEqual([]);
+});
+
 test("host mode: page globals that wrap host APIs do not call themselves, and rejections are not fatal", async () => {
   const host = new RendererHost({ timeout: 20_000, args: ["--dangerously-allow-host-js"] });
   try {
@@ -2529,7 +2548,20 @@ test('object member fast reads preserve proxy traps and page-local array inherit
  try{revocable.proxy.x;}catch(error){fastValues.push(error.name);}
  </script>`);
  expect(JSON.parse(await evaluate('JSON.stringify(fastValues)'))).toEqual([null,null,null,'inherited',7,'TypeError']);
- expect(JSON.parse(await evaluate('JSON.stringify(traps)'))).toEqual(['get:x','getter','own:x','get:0','own:0','key:string','get:x','getter','own:x']);
+ expect(JSON.parse(await evaluate('JSON.stringify(traps)'))).toEqual(['get:x','getter','get:0','key:string','get:x','getter']);
+});
+
+test('undefined ordinary proxy reads never consult property descriptors',async()=>{
+ await load('<p>proxy reads</p>');
+ expect(await evaluate(`(() => {
+   const events=[];
+   const proxy=new Proxy({}, {get(target,key){events.push(String(key));return undefined;},
+     getOwnPropertyDescriptor(){throw Error('unexpected descriptor lookup');}});
+   const key={[Symbol.toPrimitive](){events.push('coerce');return 'converted';}};
+   const values=[proxy.missing,proxy[key]];
+   let called=false;try {proxy.absent((called=true));}catch(error){values.push(error.name);}
+   return {events,called,values:values.map(value=>value===undefined?'undefined':value)};
+ })()`)).toEqual({events:['missing','coerce','converted','absent'],called:true,values:['undefined','undefined','TypeError']});
 });
 
 test('thin member reads preserve SES boundaries, local prototype getters and method evaluation order',async()=>{
