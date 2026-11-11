@@ -12,11 +12,37 @@ directly as JavaScript and WebAssembly.
 > general-purpose browser engine or replacement for Chromium. The headless
 > shell is the initial frontend; a standard Wayland frontend is experimental.
 
+## Contents
+
+- [Usage](#usage)
+  - [Frontends](#frontends-and-command-routing)
+  - [Clipboard and text editing](#clipboard-and-text-editing)
+  - [Downloads](#downloads)
+  - [Sound](#sound)
+  - [Screenshots and viewport size](#screenshots-and-viewport-size)
+- [Why replace Chromium Headless Shell](#why-replace-chromium-headless-shell)
+- [Design](#design)
+- [Experimental Wayland frontend](#experimental-wayland-frontend)
+- [Open-source components](#open-source-components)
+
 ## Usage
 
 The default frontend, [Casty](https://github.com/jjtseng93/casty), displays web
 pages in your terminal through the Kitty graphics protocol. It requires a
 terminal that supports Kitty graphics.
+
+### Requirements
+
+- [Bun](https://bun.sh) 1.4.2 or
+  later on `PATH`, also with npx:
+  the engine and casty run on Bun.
+- For casty, a terminal with the
+  [Kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/)
+  (kitty, Ghostty, WezTerm, Konsole):
+  casty draws pages as images.
+  `--headless` needs no terminal.
+
+### Basic browsing
 
 ```sh
 # Install Bun if you don't have it
@@ -27,28 +53,21 @@ npx buninu-browser
 
 # Open a URL
 npx buninu-browser buninu.org
-
-# WebKit/Safari compatibility identity is the default
-npx buninu-browser https://youtu.be/jf-pn0a-Twk
-
-# Switch back to the Chromium compatibility identity
-npx buninu-browser buninu.org -- --chromium
-
-# Arguments after -- go to the
-# browser engine; --mobile presents
-# it as a phone (mobile user agent,
-# phone-width layout)
-npx buninu-browser github.com \
-  -- --mobile
 ```
 
-The first run downloads this package
+After opening a page, press **Alt+L** to edit the address, **Ctrl+E** to open
+Casty's command line, or **Ctrl+Q** to quit. In the address bar, **Ctrl+C**
+copies selected text and **Ctrl+V** pastes. See [Casty's controls](https://github.com/jjtseng93/casty#readme)
+for the complete keyboard and mouse controls. Native Win32 uses the same Casty
+controls; Wayland has its own [address bar](frontends/wayland/README.md).
+
+The first terminal/Win32 run downloads this package
 (about 50 MB: fonts, CanvasKit and
 the video decoder), then the terminal
 frontend
 [`@drxiaozhi/casty`](https://www.npmjs.com/package/@drxiaozhi/casty)
 ([source on GitHub](https://github.com/jjtseng93/casty)).
-npx asks before each install.
+npx may ask for confirmation before installing a missing package.
 
 The launcher sets `CASTY_BROWSER` to
 this package's `buninu-browser.js`
@@ -57,15 +76,6 @@ and Bun are both installed, otherwise
 with `bunx`, or `bun x`.
 No adjacent casty checkout is needed. From a local Buninu Browser checkout,
 `bun index.js [URL] [-- BROWSER_FLAGS...]` uses the same package-based launcher.
-
-The engine defaults to a WebKit/Safari compatibility identity in casty,
-headless, and screenshot modes. `--webkit` explicitly selects this default;
-`--chromium` selects the previous desktop Chromium identity. Pass these flags
-after `--` through casty, or directly after `--headless`. If both desktop flags
-are supplied, the last one wins. `--mobile` takes priority over either desktop
-identity and retains the Android phone profile. These flags select browser
-identities, not native WebKit or Chromium engines. API callers can use
-`createBrowser({ webkit: false })` to select the Chromium identity.
 
 ### Frontends and command routing
 
@@ -76,7 +86,7 @@ arguments.
 | First argument | Behavior |
 | --- | --- |
 | No selector, or `--casty` | Terminal frontend; remaining arguments go to Casty. Requires Kitty graphics. |
-| `--headless` | Engine only, exposing CDP without a local window. |
+| `--headless` | Engine only, exposing the Chrome DevTools Protocol (CDP) for Casty or automation clients, without a local window. |
 | `--win32` | Casty's native Windows window; remaining arguments go to Casty. Windows only. |
 | `--wayland` | Experimental Wayland window for a URL or local file; accepts `--window-size=WIDTH,HEIGHT`. See [Wayland details](#experimental-wayland-frontend). |
 | `--quickshell-wayland` | Experimental QML application in a Wayland window. |
@@ -112,6 +122,9 @@ they use the default Quickshell configuration lookup. They also honor
 `QS_CONFIG_PATH`, `QS_CONFIG_NAME` and `QML_IMPORT_PATH`. Arguments after `--`
 go to the selected backend. This is the experimental Buninu QML runtime,
 not native Qt/Quickshell; see [supported features and recipes](lib/qml/README.md).
+Local QML runs as a trusted application with Bun/host capabilities, rather than
+inside the ordinary web-page sandbox. Only run QML files you trust; see
+[QML isolation](lib/qml/README.md#local-host-services-and-isolation).
 
 ### Engine options
 
@@ -133,6 +146,32 @@ For engine diagnostics, `BUNINU_LOG=1` writes `./buninu-browser.log`;
 `BUNINU_LOG=/path/to/file.log` chooses a file. See [diagnostics](#diagnostics)
 and [render scheduling](#render-scheduling) for further controls.
 
+The engine defaults to a WebKit/Safari compatibility identity in casty,
+headless, and screenshot modes. `--webkit` explicitly selects this default;
+`--chromium` selects the previous desktop Chromium identity. Pass these flags
+after `--` through casty, or directly after `--headless`. If both desktop flags
+are supplied, the last one wins. `--mobile` takes priority over either desktop
+identity and retains the Android phone profile. These flags select browser
+identities, not native WebKit or Chromium engines. API callers can use
+`createBrowser({ webkit: false })` to select the Chromium identity.
+
+```sh
+# WebKit/Safari compatibility identity is the default
+npx buninu-browser https://youtu.be/jf-pn0a-Twk
+
+# Switch back to the Chromium compatibility identity
+npx buninu-browser buninu.org -- --chromium
+
+# Arguments after -- go to the
+# browser engine; --mobile presents
+# it as a phone (mobile user agent,
+# phone-width layout)
+npx buninu-browser github.com \
+  -- --mobile
+```
+
+For sound in the YouTube example, first start an [audio server](#sound).
+
 ### Help and documentation
 
 ```sh
@@ -151,7 +190,7 @@ Launcher aliases: `-h`/`-help` for `--help`, `-V`/`-version` for
 `--version`, and `--docs` for `--readme`. Casty's own options and commands
 are documented in [Casty's README](https://github.com/jjtseng93/casty#readme).
 
-### JavaScript dialogs
+### Dialogs and file selection
 
 `alert()`, `confirm()` and `prompt()` show a browser-owned modal dialog in the
 page image, including through Casty and the Wayland frontend. For example,
@@ -172,6 +211,54 @@ asynchronous `FileReader` are supported. Only selected file contents and names
 reach the page, not their host paths. The current chooser accepts at most
 32 MiB per selection; it does not yet filter the listing by `accept`.
 
+### Clipboard and text editing
+
+Pages can copy or read text with `navigator.clipboard.writeText()` and
+`navigator.clipboard.readText()` after a user click or key press on HTTPS
+(or localhost). Each operation consumes that activation. The controller accesses the clipboard,
+preferring `xclip -selection clipboard`, with platform clipboard commands as
+fallbacks. Clipboard command access stays outside the page sandbox; failed
+writes reject the promise instead of reporting host success. Reads always try the
+host first, then retain the last local text on denied or empty reads, as in Land
+(Android may return empty text while backgrounded). Without cached text, read
+errors still reject. Explicitly writing empty text clears the cache; an external
+clear cannot be distinguished from a denied empty read. Reads happen only on
+request, with no clipboard polling. HTML inputs and textareas share selection,
+caret blinking, Shift+arrows, and Ctrl+C/X/V editing with QML controls. Paste
+replaces the selection, or inserts at the cursor. Up/Down currently follow
+explicit textarea line breaks, not soft-wrapped visual lines.
+
+PowerShell clipboard quoting and newline handling are reused from jsmdcui
+under its [MIT license](LICENSES/jsmdcui.txt).
+
+### Downloads
+
+Clicked `a download` links (including `data:` and `blob:` URLs up to 64 MB) and responses with `Content-Disposition: attachment`
+save to the user's Downloads folder by default (including a relocated Windows
+Downloads folder); the directory is created when needed. A CDP
+client can set the directory with `Browser.setDownloadBehavior` and receive
+`Browser.downloadWillBegin` and `Browser.downloadProgress` events. Standalone
+text and structured-document previews have a Download button at the top right
+that saves the original response bytes. As in Chromium, `allowAndName` saves
+the file under its download GUID; `allow` keeps the suggested filename.
+
+### Sound
+
+Sound, a video's included, plays through a PulseAudio native-protocol server
+on `127.0.0.1:4713`, such as [jspulse](https://github.com/jjtseng93/jspulse)
+or PulseAudio itself; without one, video plays silently. Start jspulse with
+the backend appropriate for your platform:
+
+```sh
+npx @drxiaozhi/jspulse --sles   # Android OpenSL ES
+npx @drxiaozhi/jspulse --alsa   # Linux ALSA
+npx @drxiaozhi/jspulse --win32  # Windows waveform audio
+```
+
+Keep the server on its default port, `4713`, when using Buninu Browser.
+Although jspulse supports `-p` / `--port`, the browser currently connects to
+`127.0.0.1:4713` and does not read `PULSE_SERVER`.
+
 ### Websites with self-signed certificates
 
 To browse a website with an untrusted self-signed HTTPS certificate, set
@@ -189,25 +276,12 @@ child processes, including requests to other sites. Use it only for trusted
 test sites; avoid exporting it globally. Without this variable, certificate
 verification remains enabled.
 
-### Requirements
-
-- [Bun](https://bun.sh) 1.4.2 or
-  later on `PATH`, also with npx:
-  the engine and casty run on Bun.
-- For casty, a terminal with the
-  [Kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/)
-  (kitty, Ghostty, WezTerm, Konsole):
-  casty draws pages as images.
-  `--headless` needs no terminal.
-
 ### Updating
 
-npx checks the registry on each start
-and installs a newer buninu-browser
-or casty by itself; only the first
-install asks. casty prints its
-version on the last line when it
-exits.
+When npx resolves an unversioned package through its download cache, it checks
+for a newer version. A matching local or global installation can be reused,
+so this is not a guarantee that every invocation updates both packages.
+Casty prints its version on the last line when it exits.
 
 To reinstall from scratch, remove
 the cached copies:
@@ -220,11 +294,9 @@ npm cache npx ls
 #   03ebb78f79e8ceae: buninu-browser
 #   0a9f496dd562f3e1: @drxiaozhi/casty
 
-# Remove both. A key is a hash of
-# the package name, so these are
-# the same on every machine
-npm cache npx rm 03ebb78f79e8ceae \
-  0a9f496dd562f3e1
+# Remove the keys printed by your own listing. These hashes are examples:
+# the complete package specification (including a version) affects the key.
+npm cache npx rm BROWSER_KEY CASTY_KEY
 
 # Or remove everything npx cached,
 # other tools' packages too
@@ -246,7 +318,10 @@ cache directory: `~/.npm/_npx`
 # The engine alone, as a CDP
 # endpoint for any client
 npx buninu-browser --headless \
-  --remote-debugging-port=9222 --window-size=1280,800
+  --remote-debugging-port=9222 --window-size=1280,800 https://example.com
+
+# Attach from a Kitty graphics terminal; keep the remote viewport unchanged
+bunx @drxiaozhi/casty --attach 9222
 
 # capture a page and exit
 npx buninu-browser --headless --screenshot=page.png \
@@ -258,6 +333,12 @@ npx buninu-browser --headless --screenshot=page.png \
 | `--window-size=WIDTH,HEIGHT` | Initial viewport in CSS pixels; default `800,600`. |
 | `--screenshot[=FILE]` | Capture a page and exit; default `screenshot.png`. Extension selects PNG, JPEG or WebP. |
 | `--screenshot-wait=MILLISECONDS` | Additional real-time wait after page load before capture. |
+
+A supplied URL or local file loads automatically into one discoverable page
+target. Casty `--attach` uses that existing target; it does not reload the page
+or take ownership of the browser process. Without a URL, headless mode waits
+for a CDP client to create and navigate a target. QML headless uses the same
+mechanism for its selected `shell.qml`.
 
 `--window-size=WIDTH,HEIGHT` sets the initial viewport for both headless CDP
 and screenshot modes (default 800×600 CSS pixels, DPR 1). CDP clients can
@@ -283,8 +364,8 @@ without a native Chromium binary.
 
 Compatibility with casty is therefore part of the initial vertical slice
 rather than a later layer: CDP discovery, target lifecycle, navigation,
-screenshots and screencast, viewport, and input. Early development and every
-screen test so far have been done in casty itself. casty launches the
+screenshots and screencast, viewport, and input. Early development used Casty; current tests also exercise headless and
+Wayland rendering. casty launches the
 browser named by `CASTY_BROWSER` before looking for Chromium. The package
 launcher sets this automatically and obtains casty through the package runner:
 
@@ -294,8 +375,8 @@ npx buninu-browser buninu.org
 
 ## Design
 
-Future Win32, GTK, Android, and other windowed frontends should remain thin
-platform adapters. They provide a native window and drawing surface, forward
+The existing Win32 and Wayland frontends, and future GTK, Android or other
+windowed frontends, follow the same thin platform-adapter design. They provide a native window and drawing surface, forward
 input, clipboard, and IME events, and present frames produced by the shared
 engine; DOM, JavaScript, navigation, layout, paint, networking, and automation
 remain in the platform-independent core.
@@ -322,40 +403,28 @@ not start a browser process or CDP listener.
 
 ### Page sandbox
 
-Pages can copy or read text with `navigator.clipboard.writeText()` and
-`navigator.clipboard.readText()` after a user click or key press on HTTPS
-(or localhost). Each operation consumes that activation. The controller accesses the clipboard,
-preferring `xclip -selection clipboard`, with platform clipboard commands as
-fallbacks. Clipboard command access stays outside the page sandbox; failed
-writes reject the promise instead of reporting host success. Reads always try the
-host first, then retain the last local text on denied or empty reads, as in Land
-(Android may return empty text while backgrounded). Without cached text, read
-errors still reject. Explicitly writing empty text clears the cache; an external
-clear cannot be distinguished from a denied empty read. Reads happen only on
-request, with no clipboard polling. HTML inputs and textareas share selection,
-caret blinking, Shift+arrows, and Ctrl+C/X/V editing with QML controls. Paste
-replaces the selection, or inserts at the cursor. Up/Down currently follow
-explicit textarea line breaks, not soft-wrapped visual lines.
-
-PowerShell clipboard quoting and newline handling are reused from jsmdcui
-under its [MIT license](LICENSES/jsmdcui.txt).
-
-Page JavaScript runs behind three layers:
+Ordinary web pages use the following isolation mechanisms:
 
 1. **SES and bindings.** The renderer calls `lockdown()`, and each document
    gets its own compartment. That compartment sees only project-owned DOM
    and Web API bindings, never Bun, `process`, or Happy DOM objects.
 2. **Process isolation.** The controller spawns one renderer per origin with
-   an empty environment, talks to it over IPC, and kills and restarts it if
-   it misses a deadline. Cookies, CORS, redirects, and history stay in the
-   controller. A cross-origin navigation moves to a fresh, pre-warmed
+   a restricted environment and talks to it over IPC. Startup and navigation
+   have no deadline; a method watchdog is only enabled when an API caller
+   explicitly configures `rendererTimeout`. Cookies, CORS, redirects, and
+   history stay in the controller. A cross-origin navigation moves to a fresh, pre-warmed
    process. Isolation is per origin rather than per site because no Public
    Suffix List is bundled.
-3. **seccomp.** Before lockdown, each renderer installs a syscall allowlist
-   modelled on Chromium's baseline policy.
+3. **seccomp (Linux/Android).** On supported systems, the renderer installs
+   a syscall allowlist modelled on Chromium's baseline policy. This layer is
+   not installed on Windows or macOS; startup logs report whether installation
+   succeeded.
 
 `--no-sandbox` is accepted for Chromium compatibility but ignored.
 `--dangerously-allow-host-js` turns the sandbox off for every page.
+Local QML uses a dedicated host-capable renderer with SES and seccomp disabled;
+it is trusted application code, not sandboxed website content. Clipboard host
+commands remain controller-owned for ordinary pages; see [clipboard access](#clipboard-and-text-editing).
 
 ### Raster image compatibility
 
@@ -440,18 +509,9 @@ Casty can follow document scrolling.
 
 Casty also sends a private `clip` on `Page.startScreencast`. It takes precedence over fallback max limits and crops at native pixel density, without resizing. Width/height are CSS units; output pixels still follow device scale. This extension is not standard CDP. A clip with both width and height equal to zero requests update notifications only: the server sends a fixed 1×1 PNG placeholder without rendering or encoding a preview. Ordinary captureScreenshot still rejects zero-sized clips.
 
-Casty 也會在 `Page.startScreencast` 傳入私有 `clip`；優先於相容用的 max 限制，以原像素密度裁切、不縮放。寬高是 CSS 單位，實體像素仍隨 device scale 換算。此擴充不是標準 CDP。寬高都為零時只發送更新通知：server 回傳固定 1×1 PNG 佔位資料，不渲染或編碼預覽；一般 captureScreenshot 仍拒絕零尺寸。
-
-標準 CDP `clip` 也適用於 raw 截圖；小數 CSS 尺寸保留到最後才換算成實體像素，
-避免字體大小改變後差一列而觸發 bunterm 縮放。`clip.scale: 1` 的全寬裁切
-直接借用連續像素，不重新縮放；Casty 透過 viewport 位置跟隨頁面捲動。
-
 Read-only captures interrupted by an origin renderer swap retry once against
 its replacement, after the new renderer has loaded its document. Scroll
 commands are never replayed, avoiding duplicate input.
-
-跨來源導航更換 renderer 時，唯讀截圖會等待新的 renderer 載入文件後重試一次；
-捲動命令不會重送，避免重複套用輸入。
 
 DOM-triggered rendering coalesces updates with a 16 ms minimum wait, increased
 to twice the last style/layout rebuild time for expensive documents. This is
@@ -459,39 +519,14 @@ separate from Casty's screenshot interval and is not a 60 FPS guarantee:
 raster work and frame delivery still take time. More frequent updates can
 increase CPU usage on continuously animated pages.
 
-DOM 變更觸發的繪製會以至少 16 ms 等待合併更新；排版昂貴時則延長為上次
-樣式／排版重建耗時的兩倍。這與 Casty 的截圖間隔不同，也不保證 60 FPS；
-光柵繪製與畫面傳遞仍需時間，持續動畫的 CPU 用量可能增加。
-
 The compositor now connects to an authenticated, length-prefixed loopback
 socket before the sandbox is installed, instead of reading numeric fd 3.
 It connects directly to the controller, so a busy page main thread cannot
-block screenshot or scroll requests. This removes the previous Windows-only
-compositor disablement; the same tests can run on Windows, but this change
-has so far been executed on Linux only. No additional native library is used.
-
-原生 bunterm 可與 Casty 協商 RGBA／BGRA 原始像素檔案。renderer 經二進位通道
-交給 controller 寫檔，不放寬 seccomp；標準截圖與不支援 raw 的終端維持原路徑。
-compositor 改用沙箱啟用前建立、帶驗證的本機連線，不再依賴 fd 3，因此移除了
-Windows 專用的停用條件；目前已實測 Linux，Windows 仍待真機驗證。
+block screenshot or scroll requests. The same transport is used on Windows instead of disabling the compositor
+there. No additional native library is used.
 
 `bun tools/bench-raw-capture.js` measures changing-viewport capture delivery
 (including controller file writes for raw), not terminal FPS.
-
-`<video>` can decode and display MP4 video frames with basic playback and
-seeking. Video bytes are fetched through the controller; the renderer uses
-vendored wasmpeg JavaScript and WebAssembly without native media bindings.
-Audio plays through a PulseAudio server on 127.0.0.1:4713, such as jspulse.
-No npm install is needed for the decoder.
-
-Clicked `a download` links (including `data:` and `blob:` URLs up to 64 MB) and responses with `Content-Disposition: attachment`
-save to the user's Downloads folder by default (including a relocated Windows
-Downloads folder); the directory is created when needed. A CDP
-client can set the directory with `Browser.setDownloadBehavior` and receive
-`Browser.downloadWillBegin` and `Browser.downloadProgress` events. Standalone
-text and structured-document previews have a Download button at the top right
-that saves the original response bytes. As in Chromium, `allowAndName` saves
-the file under its download GUID; `allow` keeps the suggested filename.
 
 Documents load in stages:
 
@@ -554,6 +589,12 @@ npx buninu-browser github.com -- --mobile
 
 ### Video and audio
 
+`<video>` can decode and display MP4 video frames with basic playback and
+seeking. Video bytes are fetched through the controller; the renderer uses
+vendored wasmpeg JavaScript and WebAssembly without native media bindings.
+Audio plays through a PulseAudio server on 127.0.0.1:4713, such as jspulse.
+No npm install is needed for the decoder.
+
 The default desktop WebKit/Safari compatibility identity (also selectable with
 `--webkit`) matches Bun's JavaScriptCore more closely than the optional
 `--chromium` identity. It presents macOS Safari even on other operating systems, sets the
@@ -579,20 +620,7 @@ progress track seeks, and page script has `play()`, `pause()`,
 events. wasmpeg decodes what its LGPL build supports (H.264, HEVC, VP8/VP9,
 MPEG-4, Theora, MPEG-1/2; MP3, AAC, FLAC, Vorbis, Opus, WAV).
 
-Sound, a video's included, plays through a PulseAudio native-protocol server
-on `127.0.0.1:4713`, such as [jspulse](https://github.com/jjtseng93/jspulse)
-or PulseAudio itself; without one, video plays silently. Start jspulse with
-the backend appropriate for your platform:
-
-```sh
-npx @drxiaozhi/jspulse --sles   # Android OpenSL ES
-npx @drxiaozhi/jspulse --alsa   # Linux ALSA
-npx @drxiaozhi/jspulse --win32  # Windows waveform audio
-```
-
-Keep the server on its default port, `4713`, when using Buninu Browser.
-Although jspulse supports `-p` / `--port`, the browser currently connects to
-`127.0.0.1:4713` and does not read `PULSE_SERVER`.
+Sound uses the [audio server configured in Usage](#sound).
 
 The controller
 holds the connection, since renderers cannot open sockets. For media playback
@@ -627,8 +655,9 @@ release the context's output. `AudioBuffer`, `createBuffer()`,
 `decodeAudioData()` and `AudioBufferSourceNode` support decoded sample playback,
 offsets, duration, looping, rate/detune and ended events. Compressed audio uses
 the existing WASM decoder and is resampled to the context rate; the current
-software graph downmixes buffer channels before stereo output. Offline contexts,
-filters and AudioWorklets are not implemented yet.
+software graph downmixes buffer channels before stereo output.
+`BiquadFilterNode` provides software filtering through `createBiquadFilter()`.
+Offline contexts and AudioWorklets are not implemented yet.
 
 [Clumsy Bird](https://ellisonleao.github.io/clumsy-bird/) is an interactive
 reference for sample playback, Canvas image patterns, detached image dimensions
