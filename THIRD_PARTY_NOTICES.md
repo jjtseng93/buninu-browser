@@ -152,6 +152,28 @@ reimplemented in JavaScript, and no Chromium source text is copied:
   tile (`lib/renderer/page-renderer.js`), after the display-item reuse in
   `third_party/blink/renderer/platform/graphics/paint/paint_controller.cc`.
 
+MathML layout (`lib/layout/mathml.js`) is ported from these BSD-3-Clause files
+(Copyright 2019-2020 The Chromium Authors), translated to JavaScript:
+
+- `third_party/blink/renderer/core/layout/mathml/math_row_layout_algorithm.cc`,
+  `math_fraction_layout_algorithm.cc`, `math_radical_layout_algorithm.cc`,
+  `math_scripts_layout_algorithm.cc`, `math_under_over_layout_algorithm.cc`,
+  `math_space_layout_algorithm.cc`, `math_padded_layout_algorithm.cc` and
+  `math_layout_utils.cc`: the placement rules and the fallback constants used
+  when the font has no OpenType MATH table.
+- `third_party/blink/renderer/core/mathml/mathml_operator_element.cc`: the
+  operator dictionary categories (spacing and flags) and form inference.
+- `third_party/blink/renderer/platform/text/mathml_operator_dictionary.cc`: the
+  compact operator dictionary table and its lookup, which Chromium generated
+  from the MathML Core specification's script.
+
+The MathML user-agent declarations in `lib/style/computed-style.js` (`math`,
+`mtd`, `mfrac`, `merror`, `mphantom`) come from
+`third_party/blink/renderer/core/css/mathml.css` (BSD-2-Clause, Copyright (C)
+2014 Google Inc.; full text in `LICENSES/chromium-mathml-css.txt`). Stretched delimiters, radical signs and display-size large
+operators are drawn by this project's own vector fallbacks, since the bundled
+fonts have no MATH table.
+
 ## PulseAudio native protocol (independent implementation)
 
 `lib/audio/pulse-client.js` is the client side of the PulseAudio native

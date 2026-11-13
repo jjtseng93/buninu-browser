@@ -656,12 +656,13 @@ export default class HTMLParser {
 			}
 
 			// Check if the tag is a void element and should be closed immediately.
-			// Elements in the SVG namespace can be self-closed (e.g. "/>").
+			// Elements in the SVG and MathML namespaces can be self-closed (e.g. "/>").
 			// "/>" will be ignored in the HTML namespace.
 			if (
 				config?.contentModel === HTMLElementConfigContentModelEnum.noDescendants ||
 				(isSelfClosed &&
-					(<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.svg)
+					((<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.svg ||
+						(<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.mathML))
 			) {
 				this.nodeStack.pop();
 				this.tagNameStack.pop();
@@ -692,7 +693,15 @@ export default class HTMLParser {
 			(<Element>this.currentNode)[PropertySymbol.namespaceURI] === NamespaceURI.html
 				? StringUtility.asciiUpperCase(tagName)
 				: SVGElementConfig[StringUtility.asciiLowerCase(tagName)]?.localName || tagName;
-		const index = this.tagNameStack.lastIndexOf(name);
+		// An end tag may close an element of the other namespace: </mtext> while inside an HTML
+		// <span> in the mtext, or </p> while inside MathML. Foreign tag names are stored as
+		// written, HTML ones in upper case, so the later of both spellings is the one closed.
+		const foreign = SVGElementConfig[StringUtility.asciiLowerCase(tagName)]?.localName || StringUtility.asciiLowerCase(tagName);
+		const index = Math.max(
+			this.tagNameStack.lastIndexOf(name),
+			this.tagNameStack.lastIndexOf(StringUtility.asciiUpperCase(tagName)),
+			this.tagNameStack.lastIndexOf(foreign)
+		);
 
 		// We close all tags up until the first tag that matches the end tag.
 		if (index !== -1) {
@@ -866,6 +875,21 @@ export default class HTMLParser {
 				NamespaceURI.svg,
 				SVGElementConfig[lowerTagName]?.localName || tagName
 			);
+		}
+
+		// "math" starts MathML content, and MathML descendants stay in the MathML namespace
+		// (HTML §13.2.6.5). The token elements mi, mo, mn, ms and mtext are text integration
+		// points: other than mglyph and malignmark, a start tag inside them is HTML again.
+		if (lowerTagName === 'math') {
+			return this.rootDocument!.createElementNS(NamespaceURI.mathML, 'math');
+		}
+
+		if (namespaceURI === NamespaceURI.mathML) {
+			const parentName = (<Element>this.currentNode)[PropertySymbol.localName];
+			const textIntegrationPoint = ['mi', 'mo', 'mn', 'ms', 'mtext'].includes(parentName);
+			if (!textIntegrationPoint || lowerTagName === 'mglyph' || lowerTagName === 'malignmark') {
+				return this.rootDocument!.createElementNS(NamespaceURI.mathML, lowerTagName);
+			}
 		}
 
 		// New element.
