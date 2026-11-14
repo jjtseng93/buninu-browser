@@ -101,9 +101,11 @@ Actual infrastructure gaps are recorded separately:
 
 - WebDriver automation: permissions, virtual devices, multi-window operations,
   input actions and similar commands need a browser adapter, not an apt package.
-- PAC proxy setup is recorded when the manifest requires it. WebSocket DNS does
-  not yet use the HTTP loopback adapter; HTTP/3/WebTransport, unusual hostnames,
-  certificate trust and transport-specific setups need additional work.
+- PAC proxy setup is recorded when the manifest requires it. Page WebSockets to
+  WPT domains go through the same loopback adapter as HTTP (NetworkService's
+  `webSocket` option), keeping the original Host header; HTTP/3/WebTransport,
+  unusual hostnames, certificate trust and transport-specific setups need
+  additional work.
 - Reftests require readiness handling and screenshot/reference comparison with
   fuzzy tolerances; they are not testharness pages. Print reftests need printing.
   Visual/manual tests require a separate procedure; wdspec needs WebDriver;

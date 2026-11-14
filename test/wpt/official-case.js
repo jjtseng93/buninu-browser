@@ -1,5 +1,6 @@
 import {createBrowser} from '../../lib/headless-shell.js';
 import {NetworkService} from '../../lib/network/network-service.js';
+import http2 from 'node:http2';
 const [url, output, timeout='15000']=process.argv.slice(2);
 const collector=`\n;(()=>{const results=[];globalThis.__buninuWpt={results,done:false};add_result_callback(t=>results.push({name:t.name,status:t.status,message:t.message}));add_completion_callback((tests,status)=>{globalThis.__buninuWpt.status={status:status.status,message:status.message};globalThis.__buninuWpt.done=true;});})();`;
 const infrastructure=[], networkErrors=[];
@@ -29,6 +30,25 @@ try {
    }
    return response;
   } catch(error){networkErrors.push({url:String(input),error:String(error)});throw error;}
+ },
+ // ws:/wss: to a WPT domain go to the loopback server too, with the original Host header.
+ webSocket:(url,options)=>{
+  const original=new URL(url),target=new URL(url);
+  if(missingDomains.has(original.hostname)||original.hostname.endsWith('.invalid'))throw new TypeError('Expected nonexistent test domain');
+  if(!domains.has(original.hostname)&&!['127.0.0.1','localhost','[::1]'].includes(original.hostname)){
+   infrastructure.push('Unmapped host: '+original.hostname);throw Error('Unmapped WPT host');
+  }
+  target.hostname='127.0.0.1';
+  return new WebSocket(target.href,{...options,headers:{...options.headers,Host:original.host},tls:{rejectUnauthorized:false}});
+ },
+ // The HTTP/2 session a WebSocket over HTTP/2 (RFC 8441) opens, to the same loopback server.
+ http2Connect:(authority,options)=>{
+  const original=new URL(authority),target=new URL(authority);
+  if(!domains.has(original.hostname)&&!['127.0.0.1','localhost','[::1]'].includes(original.hostname)){
+   infrastructure.push('Unmapped host: '+original.hostname);throw Error('Unmapped WPT host');
+  }
+  target.hostname='127.0.0.1';
+  return http2.connect(target.origin,{...options,servername:original.hostname,rejectUnauthorized:false});
  }});
  browser=await createBrowser({network,spareRenderer:false,rendererTimeout:Number(timeout)});
  await browser.context.navigate(url);
