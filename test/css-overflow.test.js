@@ -151,3 +151,21 @@ test('computed overflow and actual wheel/programmatic scrolling share the same a
     expect(await evaluate(`getComputedStyle(box).overflow`)).toBe('scroll hidden');
   } finally {host.close();}
 },30000);
+
+test('visibility-hidden content contributes scroll extents without intercepting wheels', async () => {
+  const host = new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('loadDocument',{url:'https://test.local/',contentType:'text/html',source:`<!doctype html><style>
+      body{margin:0}#box{position:absolute;width:100px;height:100px;overflow:scroll}
+      #spacer{height:800px;width:300px;visibility:hidden;background:red}
+    </style><div id=box><div id=spacer>hidden</div></div>`});
+    await host.call('whenLoaded');
+    const evaluate = s => host.call('evaluate',s);
+    expect(await evaluate(`window.box=document.getElementById('box');[box.scrollWidth,box.scrollHeight]`)).toEqual([300,800]);
+    expect(await evaluate(`document.elementFromPoint(20,20).id`)).toBe('box');
+    await host.call('wheel',20,20,30,60);
+    expect(await evaluate(`[box.scrollLeft,box.scrollTop]`)).toEqual([30,60]);
+    expect(await evaluate(`box.scrollTop=9999;box.scrollTop`)).toBe(700);
+  } finally {host.close();}
+},30000);
