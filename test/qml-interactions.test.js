@@ -246,7 +246,7 @@ test('FocusScope ancestors track active focus and restore their last focused chi
       contentType: 'text/x-qml',
       source: `import QtQuick
 Item {width:400;height:200
- FocusScope {id:scope;width:200;height:60
+ FocusScope {id:scope;width:200;height:60;focus:true
   TextInput {id:input;width:200;height:30;focus:true;text:"input"}
  }
  Button {id:outside;y:70;text:"Outside"}
@@ -275,6 +275,45 @@ Item {width:400;height:200
         'document.getElementById("status").textContent',
       ),
     ).toBe('true:true:false');
+  } finally {
+    host.close();
+  }
+}, 30000);
+
+// Qt: focus:true makes an item its scope's focus child, and it takes active focus only when that
+// scope holds it. A Loader is a focus scope, so a view loaded into one whose focus is false never
+// takes the keyboard from the item that has it, and forceActiveFocus on the loaded scope later
+// lands on its own focus child.
+test('focus:true inside an unfocused Loader or FocusScope does not take active focus', async () => {
+  const host = new RendererHost({ timeout: 20000 });
+  try {
+    await host.start();
+    await host.call('loadDocument', {
+      url: 'data:text/x-qml,focus-scopes',
+      contentType: 'text/x-qml',
+      source: `import QtQuick
+Item {width:400;height:200
+ FocusScope {id:left;width:200;height:60;focus:true
+  TextInput {id:leftInput;width:200;height:30;focus:true;text:"left"}
+ }
+ FocusScope {id:quiet;y:100;width:200;height:30
+  TextInput {id:quietInput;width:200;height:30;focus:true;text:"quiet"}
+ }
+ Loader {id:later;x:200;width:200;height:60;active:false
+  sourceComponent: FocusScope {property alias field: rightInput;focus:true
+   TextInput {id:rightInput;width:200;height:30;focus:true;text:"right"}
+  }
+ }
+ Timer {interval:50;running:true;onTriggered:later.active=true}
+ Timer {interval:600;running:true;onTriggered:later.item.forceActiveFocus()}
+ Text {id:status;y:150;text:leftInput.activeFocus+":"+quietInput.activeFocus+":"+(later.item?later.item.field.activeFocus:"none")}
+}`,
+    });
+    await host.call('whenLoaded');
+    const status = () => host.call('evaluate', 'document.getElementById("status").textContent');
+    expect(await settle(status, (v) => !v.endsWith('none'))).toBe('true:false:false');
+    // forceActiveFocus on the loaded scope lands on its own focus child.
+    expect(await settle(status, (v) => v !== 'true:false:false')).toBe('false:false:true');
   } finally {
     host.close();
   }

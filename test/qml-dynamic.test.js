@@ -401,3 +401,38 @@ Item {id:root;width:300;height:150
   expect(text).toContain('surviving icon');expect(text).not.toContain('temporary maker');
  }finally{browser?.close();rmSync(dir,{recursive:true,force:true});}
 },30000);
+
+// Qt draws an Item only inside a window's tree: createObject(null), or a parent set to null,
+// keeps it off screen (still measurable) until it gets a parent again.
+test('a parentless item from createObject(null) or parent = null is not drawn', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'qml-parentless-'));
+  await Bun.write(dir + '/Tile.qml', `import QtQuick
+Rectangle {width:120;height:120;color:"red";property alias label: t
+ Text {id:t;text:"tile text"}}`);
+  await Bun.write(dir + '/main.qml', `import QtQuick
+Rectangle {id:root;width:300;height:200;color:"white"
+ property var tile: Qt.createComponent("Tile.qml").createObject(null)
+ property var parked: Qt.createComponent("Tile.qml").createObject(root, {x: 150})
+ Timer {interval:100;running:true;onTriggered:{root.parked.parent=null;root.done=1}}
+ Timer {interval:400;running:true;onTriggered:{root.tile.parent=root;root.done=2}}
+ property int done: 0
+ Text {id:status;y:180;text:root.done+":"+root.tile.label.implicitWidth}
+}`);
+  const browser = await createBrowser({ spareRenderer: false });
+  try {
+    await browser.context.resize(300, 200, 1);
+    await browser.context.navigate(Bun.pathToFileURL(dir + '/main.qml').href);
+    const evaluate = (code) => browser.context.evaluate(code);
+    const shown = () => evaluate(`[...document.querySelectorAll('[data-qml-type="Text"]')].filter(e => e.textContent === 'tile text' && e.isConnected && !e.closest('[data-qml-detached]')).length`);
+    for (let i = 0; i < 100 && !(await evaluate('document.getElementById("status")?.textContent?.startsWith("1:")')); i++) await Bun.sleep(20);
+    // The parentless tile and the one whose parent was cleared are both held off screen.
+    expect(await shown()).toBe(0);
+    // Off screen but still laid out: its text still measures.
+    expect(Number((await evaluate('document.getElementById("status").textContent')).split(':')[1])).toBeGreaterThan(0);
+    for (let i = 0; i < 100 && !(await evaluate('document.getElementById("status")?.textContent?.startsWith("2:")')); i++) await Bun.sleep(20);
+    expect(await shown()).toBe(1);
+  } finally {
+    await browser.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+}, 30000);

@@ -374,6 +374,14 @@ export default class HTMLIFrameElement extends HTMLElement {
 			return;
 		}
 
+		// With Happy DOM's own frame loading disabled the embedder loads every frame, src and
+		// srcdoc alike, and fires the iframe's load or error itself: build no child frame here
+		// and dispatch no synthetic event, or a srcdoc frame would load twice.
+		if (browserFrame.page.context.browser.settings.disableIframePageLoading) {
+			this.#unloadPage();
+			return;
+		}
+
 		if (srcdoc !== null) {
 			if (this.#loadedSrcdoc === srcdoc) {
 				return;
