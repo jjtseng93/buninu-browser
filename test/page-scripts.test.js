@@ -210,6 +210,32 @@ test('workers decode text using their own encoding interface', async () => {
   expect(await evaluate('workerEncoding')).toEqual({text:'A', range:true, identity:true});
 });
 
+// WebSocket, ImageData and createImageBitmap are exposed to dedicated workers too.
+test("a dedicated worker opens a WebSocket and makes an ImageBitmap", async () => {
+  const server = Bun.serve({
+    port: 0,
+    fetch(request, server) { return server.upgrade(request) ? undefined : new Response("no", { status: 400 }); },
+    websocket: { message(socket, message) { socket.send("echo:" + message); } },
+  });
+  try {
+    scripts.set('https://page.test/socket-worker.js', `
+      const result = { types: [typeof WebSocket, typeof ImageData, typeof createImageBitmap, typeof CloseEvent],
+        scope: [self instanceof WorkerGlobalScope, self instanceof DedicatedWorkerGlobalScope, ({}) instanceof WorkerGlobalScope] };
+      createImageBitmap(new ImageData(3, 2)).then((bitmap) => { result.bitmap = [bitmap.width, bitmap.height]; });
+      const ws = new WebSocket('ws://127.0.0.1:${server.port}/');
+      ws.onopen = () => ws.send('from-worker');
+      ws.onmessage = (event) => { result.echo = event.data; ws.close(); };
+      ws.onclose = (event) => { result.closed = event.code; postMessage(result); };
+    `);
+    await load(`<script>var workerSocket = null; var worker = new Worker('/socket-worker.js');
+      worker.onmessage = e => { workerSocket = e.data; worker.terminate(); };</script>`);
+    expect(await waitFor('workerSocket !== null', 5000)).toBe(true);
+    expect(await evaluate('workerSocket')).toEqual({ types: ["function", "function", "function", "function"], scope: [true, true, false], bitmap: [3, 2], echo: "echo:from-worker", closed: 1005 });
+  } finally {
+    server.stop(true);
+  }
+});
+
 test('TextEncoder exposes page errors, mutable methods and native UTF-8 encoding', async () => {
   await load('<p>encoding</p>');
   expect(await evaluate(`(() => {
@@ -1669,6 +1695,203 @@ test("WebSocket connects through the controller: text, binary, subprotocol, Orig
     expect(await evaluate("log.join('|')")).toBe("open:chat:1|echo:hi|bytes:1,2,3|close:1000:done:3");
     expect(await evaluate("bad.join(',')")).toBe("SyntaxError,SyntaxError");
     expect(seen).toEqual([{ origin: "https://page.test", protocol: "chat" }]);
+  } finally {
+    server.stop(true);
+  }
+});
+
+// WebIDL puts onmessage and addEventListener on WebSocket.prototype. A page that wraps the
+// prototype's onmessage accessor (as xterm.js front ends such as jsgotty do, falling back to
+// addEventListener when it finds no setter) must still see each message exactly once.
+test("WebSocket handlers live on the prototype, so a page wrapping onmessage gets each message once", async () => {
+  const server = Bun.serve({
+    port: 0,
+    fetch(request, server) { return server.upgrade(request) ? undefined : new Response("no", { status: 400 }); },
+    websocket: { open(socket) { socket.send("one"); socket.send("two"); }, message() {} },
+  });
+  try {
+    await load(`<script>
+      var got = [];
+      var shape = [typeof Object.getOwnPropertyDescriptor(WebSocket.prototype, 'onmessage')?.set,
+        typeof WebSocket.prototype.addEventListener, WebSocket.prototype.OPEN];
+      let descriptor = null;
+      for (let proto = WebSocket.prototype; proto; proto = Object.getPrototypeOf(proto)) {
+        descriptor = Object.getOwnPropertyDescriptor(proto, 'onmessage');
+        if (descriptor) break;
+      }
+      Object.defineProperty(WebSocket.prototype, 'onmessage', { configurable: true,
+        get() { return this.__wrappedOnMessage || null; },
+        set(handler) {
+          this.__wrappedOnMessage = handler;
+          const wrapped = function (event) { return handler.call(this, event); };
+          if (descriptor && descriptor.set) descriptor.set.call(this, wrapped);
+          else this.addEventListener('message', wrapped);
+        } });
+      var ws = new WebSocket('ws://127.0.0.1:${server.port}/');
+      ws.onmessage = (event) => got.push(event.data);
+      var own = Object.keys(ws).join(',');
+    </script>`);
+    for (let i = 0; i < 50 && String(await evaluate("got.join()")).split(",").length < 2; i++) await Bun.sleep(50);
+    await Bun.sleep(200);
+    expect(await evaluate("got.join()")).toBe("one,two");
+    expect(await evaluate("shape.join()")).toBe("function,function,1");
+    expect(await evaluate("own")).toBe("__wrappedOnMessage");
+  } finally {
+    server.stop(true);
+  }
+});
+
+// An <img> loads a blob: URL the page made from its own bytes (kitty terminal images in
+// xterm.js front ends do exactly this), and an Image probe reports its natural size.
+test("an img loads a blob: URL made by URL.createObjectURL", async () => {
+  await load(`<img id="shown"><script>
+    var got = [];
+    const b64 = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGP8z8DwnwEJMDEgAQBDzQEB2tYjSgAAAABJRU5ErkJggg==";
+    const bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], {type: "image/png"}));
+    const probe = new Image();
+    probe.onload = () => got.push("probe:" + probe.naturalWidth + "x" + probe.naturalHeight);
+    probe.onerror = () => got.push("probe:error");
+    probe.src = url;
+    const shown = document.getElementById("shown");
+    shown.onload = () => got.push("shown:" + shown.naturalWidth);
+    shown.onerror = () => got.push("shown:error");
+    shown.src = url;
+  </script>`);
+  for (let i = 0; i < 60 && String(await evaluate("got.length")) !== "2"; i++) await Bun.sleep(50);
+  expect(String(await evaluate("got.sort().join()"))).toBe("probe:2x2,shown:2");
+});
+
+// ImageData is constructible and is what canvas readback returns; createImageBitmap snapshots
+// a Blob, an ImageData, a canvas or an <img>, with crop, resize and flipY, and canvas draws it.
+test("ImageData and createImageBitmap work with canvas as in a browser", async () => {
+  await load(`<canvas id="c" width="4" height="4"></canvas><script>
+    var out = {};
+    (async () => {
+      try {
+        const px = (ctx, x, y) => Array.from(ctx.getImageData(x, y, 1, 1).data).join(",");
+        // 2x1: red, then green.
+        const data = new ImageData(new Uint8ClampedArray([255,0,0,255, 0,255,0,255]), 2, 1);
+        out.data = [data.width, data.height, data.data.length, data instanceof ImageData, String(data)];
+        const errors = [];
+        for (const make of [() => new ImageData(0, 1), () => new ImageData(new Uint8ClampedArray(6), 1), () => new ImageData(new Uint8ClampedArray(8), 3), () => new ImageData(new Uint8ClampedArray(8), 1, 3)]) {
+          try { make(); errors.push("none"); } catch (e) { errors.push(e.name); }
+        }
+        out.errors = errors;
+        const c = document.getElementById("c"), ctx = c.getContext("2d");
+        out.readback = [ctx.getImageData(0, 0, 1, 1) instanceof ImageData, ctx.createImageData(2, 2) instanceof ImageData];
+        ctx.putImageData(data, 2, 3);
+        const copy = ctx.createImageData(data);
+        out.put = [px(ctx, 2, 3), px(ctx, 3, 3), copy.width, copy.height, Array.from(copy.data).join("")];
+        const more = [];
+        for (const make of [() => new ImageData({}, 1), () => new ImageData(1, 1, { colorSpace: "rec2020" }), () => new ImageData(1, 1, 5)]) {
+          try { make(); more.push("none"); } catch (e) { more.push(e instanceof TypeError ? e.name : "foreign " + e.name); }
+        }
+        more.push(new ImageData(1, 1, { colorSpace: "display-p3" }).colorSpace);
+        out.more = more;
+
+        const fromData = await createImageBitmap(data);
+        out.fromData = [fromData instanceof ImageBitmap, fromData.width, fromData.height, String(fromData)];
+        ctx.drawImage(fromData, 0, 0);
+        out.drawn = [px(ctx, 0, 0), px(ctx, 1, 0)];
+
+        // Crop to the green pixel and scale it to 2x2, pixelated.
+        const cropped = await createImageBitmap(data, 1, 0, 1, 1, { resizeWidth: 2, resizeHeight: 2, resizeQuality: "pixelated" });
+        ctx.clearRect(0, 0, 4, 4);
+        ctx.drawImage(cropped, 0, 0);
+        out.cropped = [cropped.width, cropped.height, px(ctx, 1, 1)];
+
+        // A vertical pair flipped: blue on top becomes the bottom.
+        const tall = new ImageData(new Uint8ClampedArray([0,0,255,255, 255,255,0,255]), 1, 2);
+        const flipped = await createImageBitmap(tall, { imageOrientation: "flipY" });
+        ctx.clearRect(0, 0, 4, 4);
+        ctx.drawImage(flipped, 0, 0);
+        out.flipped = [px(ctx, 0, 0), px(ctx, 0, 1)];
+
+        // A PNG Blob from a canvas, and the canvas itself, as sources.
+        const blob = await new Promise((resolve) => c.toBlob(resolve, "image/png"));
+        const fromBlob = await createImageBitmap(blob);
+        const fromCanvas = await createImageBitmap(c, { resizeWidth: 2 });
+        out.sizes = [fromBlob.width, fromBlob.height, fromCanvas.width, fromCanvas.height];
+        const pattern = ctx.createPattern(fromBlob, "repeat");
+        out.pattern = pattern !== null;
+
+        // An <img> loaded from an object URL.
+        const img = new Image();
+        await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = URL.createObjectURL(blob); });
+        const fromImg = await createImageBitmap(img);
+        out.img = [fromImg.width, fromImg.height];
+
+        fromData.close();
+        out.closed = [fromData.width, fromData.height];
+        try { ctx.drawImage(fromData, 0, 0); out.closedDraw = "drew"; } catch (e) { out.closedDraw = e.name; }
+
+        const rejections = [];
+        for (const make of [() => createImageBitmap(data, 0, 0, 0, 1), () => createImageBitmap(new Blob(["not an image"])), () => createImageBitmap({}), () => createImageBitmap(data, { resizeWidth: 0 }),
+            () => createImageBitmap(data, { resizeWidth: -1 }), () => createImageBitmap(data, { resizeHeight: Infinity }), () => createImageBitmap(data, { premultiplyAlpha: "maybe" }),
+            () => createImageBitmap(data, { resizeQuality: "best" }), () => createImageBitmap(data, 0, 0), () => createImageBitmap(data, 0, 0, 1, 1, 1)]) {
+          try { await make(); rejections.push("resolved"); } catch (e) { rejections.push(e.name); }
+        }
+        out.rejections = rejections;
+      } catch (e) { out.failed = String(e && e.stack || e); }
+      out.done = true;
+    })();
+  </script>`);
+  for (let i = 0; i < 100 && !(await evaluate("out.done === true")); i++) await Bun.sleep(50);
+  const out = JSON.parse(await evaluate("JSON.stringify(out)"));
+  expect(out.failed).toBeUndefined();
+  expect(out.data).toEqual([2, 1, 8, true, "[object ImageData]"]);
+  expect(out.errors).toEqual(["IndexSizeError", "InvalidStateError", "IndexSizeError", "IndexSizeError"]);
+  expect(out.readback).toEqual([true, true]);
+  expect(out.put).toEqual(["255,0,0,255", "0,255,0,255", 2, 1, "00000000"]);
+  expect(out.more).toEqual(["TypeError", "TypeError", "TypeError", "display-p3"]);
+  expect(out.fromData).toEqual([true, 2, 1, "[object ImageBitmap]"]);
+  expect(out.drawn).toEqual(["255,0,0,255", "0,255,0,255"]);
+  expect(out.cropped).toEqual([2, 2, "0,255,0,255"]);
+  expect(out.flipped).toEqual(["255,255,0,255", "0,0,255,255"]);
+  expect(out.sizes).toEqual([4, 4, 2, 2]);
+  expect(out.pattern).toBe(true);
+  expect(out.img).toEqual([4, 4]);
+  expect(out.closed).toEqual([0, 0]);
+  expect(out.closedDraw).toBe("InvalidStateError");
+  expect(out.rejections).toEqual(["RangeError", "InvalidStateError", "TypeError", "InvalidStateError",
+    "TypeError", "TypeError", "TypeError", "TypeError", "TypeError", "TypeError"]);
+});
+
+// WebSocket is an EventTarget whose events are a trusted Event, MessageEvent and CloseEvent.
+test("WebSocket is an EventTarget firing Event, MessageEvent and CloseEvent", async () => {
+  const server = Bun.serve({
+    port: 0,
+    fetch(request, server) { return server.upgrade(request) ? undefined : new Response("no", { status: 400 }); },
+    websocket: { open(socket) { socket.send("hi"); }, message(socket) { socket.close(4001, "bye"); } },
+  });
+  try {
+    await load(`<script>
+      var seen = [];
+      var ws = new WebSocket('ws://127.0.0.1:${server.port}/');
+      var shape = [ws instanceof EventTarget, Object.getPrototypeOf(WebSocket.prototype) === EventTarget.prototype, typeof CloseEvent];
+      ws.addEventListener('open', (e) => seen.push(['open', e instanceof Event, e.isTrusted, e.target === ws]));
+      ws.onmessage = (e) => { seen.push(['message', e instanceof MessageEvent, e.data, e.origin, e.isTrusted]); ws.send('x'); };
+      ws.onclose = (e) => seen.push(['close', e instanceof CloseEvent, e.code, e.reason, e.wasClean, e.isTrusted, String(e)]);
+      var made = new CloseEvent('close', { code: 1000, reason: 'r', wasClean: true });
+      var built = [made.code, made.reason, made.wasClean, made.isTrusted, new CloseEvent('x').code];
+      var idl = [];
+      for (const read of [() => WebSocket.prototype.readyState, () => WebSocket.prototype.onmessage, () => CloseEvent.prototype.code,
+          () => WebSocket.prototype.send.call(null, 'x'), () => new WebSocket(), () => ws.send()]) {
+        try { read(); idl.push('none'); } catch (e) { idl.push(e instanceof TypeError); }
+      }
+      idl.push(Object.getPrototypeOf(WebSocket) === EventTarget, Object.getPrototypeOf(CloseEvent) === Event,
+        Object.getOwnPropertyDescriptor(WebSocket, 'prototype').writable, WebSocket.OPEN, WebSocket.prototype.CLOSED);
+    </script>`);
+    for (let i = 0; i < 60 && !String(await evaluate("seen.length")).startsWith("3"); i++) await Bun.sleep(50);
+    expect(await evaluate("shape")).toEqual([true, true, "function"]);
+    const seen = await evaluate("seen");
+    expect(seen[0]).toEqual(["open", true, true, true]);
+    expect(seen[1]).toEqual(["message", true, "hi", `ws://127.0.0.1:${server.port}`, true]);
+    expect(seen[2]).toEqual(["close", true, 4001, "bye", true, true, "[object CloseEvent]"]);
+    expect(await evaluate("built")).toEqual([1000, "r", true, false, 0]);
+    expect(await evaluate("idl")).toEqual([true, true, true, true, true, true, true, true, false, 1, 3]);
   } finally {
     server.stop(true);
   }
