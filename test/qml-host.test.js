@@ -17,11 +17,14 @@ test('local QML has a fresh host process; same-directory HTML and HTTP QML stay 
   const dir = mkdtempSync(join(tmpdir(), 'qml-host-'));
   await Bun.write(join(dir, 'main.qml'), 'import QtQuick\nText {text: "host"}');
   await Bun.write(join(dir, 'plain.html'), '<title>plain</title>');
-  const b = await createBrowser({ spareRenderer: false });
+  const b = await createBrowser();
   try {
     await b.context.navigate(Bun.pathToFileURL(join(dir, 'main.qml')).href);
     const pid = await b.context.evaluate('process.pid');
     expect(typeof pid).toBe('number');
+    // Ordinary web spares cannot serve QML and must not compete with startup.
+    await Bun.sleep(1200);
+    expect(b.sparePid).toBe(null);
     expect(await b.context.evaluate('typeof __qmlHost.read')).toBe('function');
     await b.context.reload();
     expect(await b.context.evaluate('process.pid')).not.toBe(pid);
