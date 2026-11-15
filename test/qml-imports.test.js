@@ -146,3 +146,21 @@ for (const load of [loadQmlGraph, loadQmlGraphSync]) {
    expect((await load(source,url,fetch)).documents.has(literal)).toBe(true);
  });
 }
+
+test('shared qmldir resolution keeps versions separate and observes changes on the next load', () => {
+ const url='file:///app/main.qml';
+ const files={
+  'file:///app/types/qmldir':'Thing 1.0 Old.qml\nThing 1.2 New.qml',
+  'file:///app/types/Old.qml':'import QtQuick\nItem {}',
+  'file:///app/types/New.qml':'import QtQuick\nItem {}',
+ };
+ const fetch=href=>href in files?{status:200,body:new TextEncoder().encode(files[href])}:{status:404};
+ const source='import QtQuick\nimport "types" 1.0 as Old\nimport "types" 1.2 as New\nItem { Old.Thing {} New.Thing {} }';
+ const first=loadQmlGraphSync(source,url,fetch);
+ expect(first.documents.get(url).types.get('Old.Thing').url).toBe('file:///app/types/Old.qml');
+ expect(first.documents.get(url).types.get('New.Thing').url).toBe('file:///app/types/New.qml');
+ files['file:///app/types/qmldir']='Thing 1.0 Old.qml';
+ const second=loadQmlGraphSync(source,url,fetch);
+ expect(second.documents.get(url).types.get('New.Thing').url).toBe('file:///app/types/Old.qml');
+ expect(second.documents.has('file:///app/types/New.qml')).toBe(false);
+});
