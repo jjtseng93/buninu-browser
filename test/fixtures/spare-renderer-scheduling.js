@@ -2,7 +2,7 @@
 import {mock} from 'bun:test';
 import {strict as assert} from 'node:assert';
 
-let now=0,nextPid=100,heldPid=null;
+let now=0,nextPid=100,heldPid=null,failQmlStart=false;
 const timers=new Set(),hosts=[];
 const originalSetTimeout=globalThis.setTimeout,originalClearTimeout=globalThis.clearTimeout;
 globalThis.setTimeout=(callback,delay,...args)=>{
@@ -21,7 +21,8 @@ class FakeHost {
   constructor(options){this.options=options;this.pid=nextPid++;this.generation=0;this.closed=false;hosts.push(this);}
   start(){
     if(!this.ready){
-      if(this.pid===heldPid){this.opening=Promise.withResolvers();this.ready=this.opening.promise;}
+      if(failQmlStart&&this.options.args.includes('--buninu-qml-host')){failQmlStart=false;this.ready=Promise.reject(Error('QML startup failed'));}
+      else if(this.pid===heldPid){this.opening=Promise.withResolvers();this.ready=this.opening.promise;}
       else this.ready=Promise.resolve();
     }
     return this.ready;
@@ -114,6 +115,43 @@ try{
   await advance(1000);
   assert.notEqual(application.sparePid,null,'ordinary HTML resumes spare warmup');
   application.close();
+
+  // Confirmed local QML may start in parallel with a slow initial blank,
+  // but cannot become current until that blank has completed initialization.
+  for (const outcome of ['success', 'failure', 'qml-failure', 'closed']) {
+    heldPid = nextPid;
+    failQmlStart = outcome === 'qml-failure';
+    const pending = await createBrowser({network, waitForRenderer:false});
+    browsers.push(pending);
+    const blank = hosts.find(h => h.pid === heldPid);
+    const ready = pending.ready.then(()=>null,error=>error);
+    const previousCount = hosts.length;
+    const navigation = pending.context.navigate(new URL('./qml/imports/main.qml',import.meta.url).href)
+      .then(()=>null,error=>error);
+    for(let i=0;i<100 && hosts.length===previousCount;i++) await Bun.sleep(10);
+    assert.equal(hosts.length,previousCount+1,'QML starts before the held blank finishes');
+    const prepared = hosts.at(-1);
+    assert.ok(prepared.options.args.includes('--buninu-qml-host'));
+    assert.equal(pending.rendererPid,null,'prepared application has not replaced the starting blank');
+    if(outcome==='closed') {
+      pending.close();
+      assert.ok(prepared.closed,'close also terminates a prepared application');
+    }
+    if(outcome==='failure') blank.opening.reject(Error('initial startup failed'));
+    else blank.opening.resolve();
+    const error = await navigation;
+    await ready;
+    if(outcome==='success') {
+      assert.equal(error,null);
+      assert.equal(pending.rendererPid,prepared.pid,'commit adopts the already started application');
+      assert.equal(hosts.length,previousCount+1,'commit does not start a second application');
+      assert.ok(blank.closed);
+    } else {
+      assert.ok(error);
+      assert.ok(prepared.closed,'failed navigation releases its prepared application');
+    }
+    pending.close();
+  }
 
   // An old spare can be acquired while still starting, then superseded by a
   // second navigation. Its eventual rejection must not clear the new spare.
