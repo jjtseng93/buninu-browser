@@ -1,0 +1,29 @@
+--- a/dist/ses.mjs
++++ b/dist/ses.mjs
+@@ -9020,7 +9020,7 @@
+ })()
+ ,
+ // === 35. ses ./src/transforms.js ===
+-({imports:$h͏_imports,liveVar:$h͏_live,onceVar:$h͏_once,import:$h͏_import,importMeta:$h͏____meta})=>(function(){'use strict';let FERAL_REG_EXP,SyntaxError,freezeRegexp,regexpReplace,regexpSearch,sealRegexp,stringSlice,stringSplit,freeze,getSourceURL;$h͏_imports([["./commons.js", [["FERAL_REG_EXP",[$h͏_a => (FERAL_REG_EXP = $h͏_a)]],["SyntaxError",[$h͏_a => (SyntaxError = $h͏_a)]],["freezeRegexp",[$h͏_a => (freezeRegexp = $h͏_a)]],["regexpReplace",[$h͏_a => (regexpReplace = $h͏_a)]],["regexpSearch",[$h͏_a => (regexpSearch = $h͏_a)]],["sealRegexp",[$h͏_a => (sealRegexp = $h͏_a)]],["stringSlice",[$h͏_a => (stringSlice = $h͏_a)]],["stringSplit",[$h͏_a => (stringSplit = $h͏_a)]],["freeze",[$h͏_a => (freeze = $h͏_a)]]]],["./get-source-url.js", [["getSourceURL",[$h͏_a => (getSourceURL = $h͏_a)]]]]]);
++({imports:$h͏_imports,liveVar:$h͏_live,onceVar:$h͏_once,import:$h͏_import,importMeta:$h͏____meta})=>(function(){'use strict';let FERAL_REG_EXP,SyntaxError,freezeRegexp,regexpReplace,regexpSearch,sealRegexp,stringIncludes,stringSlice,stringSplit,freeze,getSourceURL;$h͏_imports([["./commons.js", [["FERAL_REG_EXP",[$h͏_a => (FERAL_REG_EXP = $h͏_a)]],["SyntaxError",[$h͏_a => (SyntaxError = $h͏_a)]],["freezeRegexp",[$h͏_a => (freezeRegexp = $h͏_a)]],["regexpReplace",[$h͏_a => (regexpReplace = $h͏_a)]],["regexpSearch",[$h͏_a => (regexpSearch = $h͏_a)]],["sealRegexp",[$h͏_a => (sealRegexp = $h͏_a)]],["stringIncludes",[$h͏_a => (stringIncludes = $h͏_a)]],["stringSlice",[$h͏_a => (stringSlice = $h͏_a)]],["stringSplit",[$h͏_a => (stringSplit = $h͏_a)]],["freeze",[$h͏_a => (freeze = $h͏_a)]]]],["./get-source-url.js", [["getSourceURL",[$h͏_a => (getSourceURL = $h͏_a)]]]]]);
+ 
+ 
+ 
+@@ -9166,6 +9166,9 @@
+  * @returns {string}
+  */
+        const rejectImportExpressions = src => {
++  // The pattern requires the literal keyword, even with unusual whitespace.
++  // Use the captured intrinsic: page changes to String.prototype cannot bypass checks.
++  if (!stringIncludes(src, 'import')) return src;
+   const lineNumber = getLineNumber(src, importPattern);
+   if (lineNumber < 0) {
+     return src;
+@@ -9194,6 +9197,7 @@
+  * @returns {string}
+  */$h͏_once.rejectImportExpressions(rejectImportExpressions);
+        const evadeImportExpressionTest = src => {
++  if (!stringIncludes(src, 'import')) return src;
+   const replaceFn = (_, p1, p2) => `${p1}__import__${p2}`;
+   return regexpReplace(importPattern, src, replaceFn);
+ };
