@@ -74,7 +74,8 @@ test('the cascade computes numeric math with final font size, root size and view
     document.documentElement.style.fontSize='30px';
     engine.compute(document,[],{width:1000,height:600},new Set(),new Set([document.documentElement]));
     expect(engine.get(x).fontWeight).toBe(30);
-    x.style.fontWeight='calc(1ex / 1px)';expect(compute().fontWeight).toBe(400);
+    // Without font measurement ex is 0.5em, as ch is (CSS Values 4 §6.1.1): 15 at the root's 30px.
+    x.style.fontWeight='calc(1ex / 1px)';expect(compute().fontWeight).toBe(15);
     x.style.fontWeight='calc(sign(2cqw - 10px) * 500)';expect(compute().fontWeight).toBe(400);
     x.style.cssText='font:700 24px serif;font-weight:calc(1cqw / 1px)';
     expect(compute().fontWeight).toBe(400);

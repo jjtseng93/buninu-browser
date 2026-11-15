@@ -33,10 +33,13 @@ test('sizing declarations reject invalid dimensions without replacing CSSOM valu
       expect(style.getPropertyValue(name)).toBe('');
       // Valid specified syntax remains available to CSSOM without claiming
       // intrinsic sizing/font metrics which layout cannot implement yet.
-      for(const input of ['1ex','1cap','1ic','1lh','1rch','fit-content(20%)','min-content']) {
+      for(const input of ['1cap','1ic','1lh','1rch','fit-content(20%)','min-content']) {
         style.setProperty(name,input);expect(style.getPropertyValue(name)).toBe(input);
         expect(supportsDeclaration(name,input)).toBeFalse();
       }
+      // ex is computed: the font's measured x-height, else 0.5em (CSS Values 4 §6.1.1).
+      style.setProperty(name,'1ex');expect(style.getPropertyValue(name)).toBe('1ex');
+      expect(supportsDeclaration(name,'1ex')).toBeTrue();
     }
   } finally {window.happyDOM.close();}
 });

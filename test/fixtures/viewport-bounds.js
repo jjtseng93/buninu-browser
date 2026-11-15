@@ -64,13 +64,17 @@ try {
   `);
 
   const empty = await countsStyles(`(() => {
-    const elements=['leaf','ownNone','emptyContents','emptyInline','path'].map(id=>document.getElementById(id));
+    const elements=['leaf','ownNone','emptyContents','path'].map(id=>document.getElementById(id));
     elements.push(detached);
     const range=document.createRange();range.selectNodeContents(leaf);
     return [...elements.map(sizes),rect({getBoundingClientRect:()=>range.getBoundingClientRect()})];
   })()`);
   check(empty.every(values => values.every(value => value === 0)), "boxless geometry is zero");
   equal(styleReads, 0, "boxless bounds and sizes do not materialize hidden styles");
+  // An empty inline element is not boxless (CSS 2 §9.4.2): it sits on its line, zero wide,
+  // its font's content area tall, so observers and lazy loaders (MathJax) can find it.
+  equal(await evaluate(`sizes(document.getElementById('emptyInline')).map(Math.round)`),
+    [0, 11, 0, 16, 0, 16, 0, 0, 0, 16, 0, 0], "an empty inline element sits on its line with zero width");
   equal(await countsStyles(`(() => {
     leaf.scrollTo(20,30);leaf.scrollTop=12;leaf.scrollLeft=3;
     return [leaf.scrollLeft,leaf.scrollTop];
