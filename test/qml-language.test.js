@@ -165,3 +165,36 @@ Item {id:root;width:300;height:200
     host.close();
   }
 }, 30000);
+
+
+test('repeated inline components keep independent property scopes around shared JS local declarations', async () => {
+  const host = new RendererHost({ timeout: 20000 });
+  try {
+    await host.start();
+    await host.call('loadDocument', {
+      url: 'data:text/x-qml,repeated-local-scopes', contentType: 'text/x-qml',
+      source: `import QtQuick
+Item {
+ component Cell: Item {
+  property int value: 0
+  property int i: 99
+  property int error: 88
+  function run({n=value}={}) {
+   var sum=n
+   for(var i=0;i<3;i++)sum+=i
+   try {throw 4} catch(error){sum+=error}
+   for(let value of [1,2])sum+=value
+   return sum+":"+i+":"+value
+  }
+  Text {text:run()}
+ }
+ Cell {value:7}
+ Cell {value:20}
+}`,
+    });
+    await host.call('whenLoaded');
+    expect(JSON.parse(await host.call('evaluate',
+      'JSON.stringify([...document.querySelectorAll("[data-qml-type=Text]")].map(e=>e.textContent))'
+    ))).toEqual(['17:3:7', '30:3:20']);
+  } finally { host.close(); }
+}, 30000);
