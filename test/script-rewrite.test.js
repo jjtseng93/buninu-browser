@@ -125,6 +125,21 @@ test("only parsed, non-strict programs are reported as sloppy-mode code", () => 
   expect(rewriteClassicScript("x = this; function f() { return this; }").code).not.toMatch(/[^(]this[^)]/);
 });
 
+test('source restoration preserves long literals and all direct-eval marker stages', () => {
+  const memberSource = 'function long(value) { return "' + 'A'.repeat(4096) + '" + value.name; }';
+  expect(restoreSourceText(rewriteMemberReads(memberSource).code)).toBe(memberSource);
+  const evalSource = 'function evaluator(source) { eval(source); return { introduced, called: introduced() }; }';
+  const rewritten = rewriteDirectEval(evalSource).code;
+  for (const marker of ['env','ecall','esh']) expect(rewritten).toContain(`/*$buninu$${marker}*/`);
+  expect(restoreSourceText(rewritten)).toBe(evalSource);
+  // Declaration decoding precedes direct-eval restoration. A prefilter based
+  // only on the original string would miss a marker introduced by that step.
+  const exposed = '/*$buninu$env*/const hidden=1;/*$buninu$endenv*/';
+  const encoded = encodeURIComponent(exposed).replaceAll('*','%2A');
+  expect(restoreSourceText('function /*$buninu$decl:' + encoded + '*/() {}')).toBe('function () {}');
+  expect(restoreSourceText('function sqrt() { [native code] }')).toBe('function sqrt() { [native code] }');
+});
+
 test("the classic-script pipeline parses once when earlier rewrites change nothing, with the same result", () => {
   const sources = [
     "var a = 1; function f() { return this; }",
