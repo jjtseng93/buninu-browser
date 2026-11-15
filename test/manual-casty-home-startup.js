@@ -156,7 +156,7 @@ function hasOwnedProcessGroup(pid) {
   return false;
 }
 
-async function stopCasty(proc) {
+export async function stopCasty(proc) {
   if (!proc) return;
   try { proc.terminal?.write('\x11'); } catch {}
   await Promise.race([proc.exited, Bun.sleep(2000)]);
