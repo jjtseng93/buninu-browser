@@ -1545,6 +1545,13 @@ test("direct eval sees the caller's variables, and functions print the source th
   });
 });
 
+test('direct-eval typeof functions keep exact source text and live local declarations', async () => {
+  const source = 'function evalTypes(source) { eval(source); return [typeof missing, typeof (missing), typeof ((missing))]; }';
+  await load(`<script>${source}</script>`);
+  expect(await evaluate('evalTypes.toString()')).toBe(source);
+  expect(await evaluate('evalTypes("var missing = 42")')).toEqual(['number','number','number']);
+});
+
 test("Web APIs look like a browser's built-ins: native functions, interface prototypes and tags", async () => {
   await load(`<script>
     const descriptor = Object.getOwnPropertyDescriptor(Navigator.prototype, "userAgent");

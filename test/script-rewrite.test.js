@@ -140,6 +140,14 @@ test('source restoration preserves long literals and all direct-eval marker stag
   expect(restoreSourceText('function sqrt() { [native code] }')).toBe('function sqrt() { [native code] }');
 });
 
+test('direct-eval typeof restoration removes only the inserted parentheses', () => {
+  for (const expression of ['typeof missing', 'typeof (missing)', 'typeof ((missing))',
+    'typeof /* before */ missing', 'typeof ( /* inside */ missing /* after */ )']) {
+    const source = `function probe(source) { eval(source); return ${expression}; }`;
+    expect(restoreSourceText(rewriteDirectEval(source).code)).toBe(source);
+  }
+});
+
 test("the classic-script pipeline parses once when earlier rewrites change nothing, with the same result", () => {
   const sources = [
     "var a = 1; function f() { return this; }",
