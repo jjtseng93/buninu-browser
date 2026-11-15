@@ -111,8 +111,8 @@ test("module worker failures and malformed responses repeat preparation locally"
   })).rejects.toBeInstanceOf(SyntaxError);
 });
 
-test("real worker prepares classic and module sources without executing them", async () => {
-  const rewrite = await startScriptRewriter();
+test.each([false, true])("real worker prepares classic and module sources without executing them (lazy=%s)", async lazy => {
+  const rewrite = await startScriptRewriter({ lazy });
   expect(rewrite).not.toBeNull();
   try {
     const source = "throw new Error('Source must not execute'); var result = 2;";
@@ -130,4 +130,54 @@ test("real worker prepares classic and module sources without executing them", a
     // A syntax error concerns one source only; subsequent requests still work.
     expect(await rewrite("var ok = 1;")).toEqual(prepareClassicScript("var ok = 1;"));
   } finally { rewrite?.close(); }
+});
+
+test('lazy rewriter starts once for concurrent calls and closes during startup', async () => {
+  for (const closeEarly of [false, true]) {
+    let creates=0;
+    const worker=new FakeWorker();
+    const rewrite=await startScriptRewriter({lazy:true,createWorker:()=>{creates++;return worker}});
+    expect(creates).toBe(0);
+    const done=Promise.allSettled([rewrite('first'),rewrite('second')]);
+    expect(creates).toBe(1);
+    if(closeEarly) rewrite.close();
+    else {
+      worker.emit('message',{data:{type:'ready'}});
+      for(let n=0;n<5;n++)await Promise.resolve();
+      expect(worker.messages).toHaveLength(2);
+      for(const m of worker.messages)worker.emit('message',{data:{id:m.id,result:m.source}});
+    }
+    expect((await done).map(r=>r.status)).toEqual(closeEarly?['rejected','rejected']:['fulfilled','fulfilled']);
+    rewrite.close();
+    expect(worker.terminated).toBeTrue();
+    await expect(rewrite('later')).rejects.toThrow();
+    expect(creates).toBe(1);
+  }
+});
+
+test('closing an unused lazy rewriter never creates a worker', async () => {
+  let creates=0;
+  const rewrite=await startScriptRewriter({lazy:true,createWorker:()=>{creates++;return new FakeWorker()}});
+  rewrite.close();
+  await expect(rewrite('late')).rejects.toThrow();
+  expect(creates).toBe(0);
+});
+
+test('lazy worker startup failure retains synchronous module fallback without retrying', async () => {
+  let creates=0;
+  const rewrite=await startScriptRewriter({lazy:true,createWorker(){creates++;throw Error('unavailable')}});
+  try {
+    for(let n=0;n<2;n++)expect(await prepareModuleOffThread(moduleSource,'host',rewrite)).toEqual(prepareModuleSource(moduleSource,'host'));
+    expect(creates).toBe(1);
+  } finally { rewrite.close(); }
+});
+
+test('an external abort cancels a lazy worker before it reports ready', async () => {
+  const controller=new AbortController(),worker=new FakeWorker();
+  const rewrite=await startScriptRewriter({lazy:true,signal:controller.signal,createWorker:()=>worker});
+  const done=Promise.allSettled([rewrite('pending')]);
+  controller.abort();
+  expect((await done)[0].status).toBe('rejected');
+  expect(worker.terminated).toBeTrue();
+  rewrite.close();
 });
