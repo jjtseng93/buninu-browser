@@ -29,7 +29,7 @@ test('dynamic accessibility MathML stays unpainted after style changes and scrol
       await host.call('scroll', 0, 250);
       expect(await host.call('screenshot')).toBe(baseline);
     }
-  } finally { await host.stop?.(); }
+  } finally { host.close(); }
 }, 60000);
 
 function laidOut(html, width = 400) {
@@ -156,5 +156,5 @@ test('MathML elements have MathMLElement inline style, and observers see empty i
         if (seen.a && seen.b) { observer.disconnect(); resolve(seen); } });
       observer.observe(document.getElementById('a')); observer.observe(document.getElementById('b')); })`))
       .toEqual({ a: [true, 1], b: [true, 1] });
-  } finally { await host.stop?.(); }
+  } finally { host.close(); }
 }, 60000);
