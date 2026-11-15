@@ -4,6 +4,30 @@ import { layoutText } from "../lib/layout/text-layout.js";
 import { operatorCategory, mathLength } from "../lib/layout/mathml.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
 import { StyleEngine } from "../lib/style/computed-style.js";
+import { buildDisplayList } from "../lib/paint/display-list.js";
+
+test('MathML token text respects its own visual effects and restored visibility', () => {
+  const { document, window } = parseHTMLDocument(`<body><math><mi id="token">secret</mi><mi>visible</mi></math></body>`);
+  const builder = new RenderTreeBuilder();
+  const token = document.getElementById('token');
+  const paint = () => {
+    const tree = builder.build(document, new StyleEngine().compute(document));
+    return buildDisplayList(layoutText(tree, {width:400}), tree);
+  };
+  try {
+    for (const css of ['opacity:0', 'visibility:hidden']) {
+      token.setAttribute('style', css);
+      expect(paint().items.filter(item => item.op === 'drawText').map(item => item.text)).toEqual(['visible']);
+      token.removeAttribute('style');
+      expect(paint().items.filter(item => item.op === 'drawText').map(item => item.text)).toEqual(['secret', 'visible']);
+    }
+    token.setAttribute('style', 'opacity:0.5');
+    expect(paint().items.find(item => item.text === 'secret').opacity).toBe(0.5);
+    // An ancestor can hide the whole formula as an accessibility-only copy.
+    document.querySelector('math').setAttribute('style', 'opacity:0');
+    expect(paint().items.filter(item => item.op === 'drawText')).toEqual([]);
+  } finally { window.happyDOM.close(); }
+});
 
 // 18px text, 10px per character, so 1em = 18px and one math unit (1/18em) = 1px.
 function layoutMath(markup, width = 400) {
