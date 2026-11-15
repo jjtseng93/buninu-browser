@@ -40,3 +40,34 @@ test('variable resolution keeps caller cycle tracking and does not reuse mutable
   // Keep explicit invalid arguments distinct from an omitted cycle set.
   expect(() => resolveVariables('var(--x)', variables, null)).toThrow();
 });
+
+test('large inherited custom maps preserve siblings, order and incremental removal', () => {
+  const {window, document} = parseHTMLDocument('<main><div id="override"><span></span></div><aside></aside></main>');
+  const parent=document.querySelector('main'), child=document.querySelector('div');
+  const leaf=document.querySelector('span'), sibling=document.querySelector('aside');
+  const engine=new StyleEngine(), sheets=['span,aside {width:var(--v127)}'];
+  try {
+    for(let i=0;i<256;i++)parent.style.setProperty('--v'+i,i+'px');
+    child.style.setProperty('--v127','999px');
+    child.style.setProperty('--only-child','yes');
+    engine.compute(document,sheets);
+    const original=engine.customPropertiesOf(parent), copied=engine.customPropertiesOf(child);
+    expect(copied).not.toBe(original);
+    expect([...copied.keys()]).toEqual([...original.keys(),'--only-child']);
+    expect(copied.get('--v255')).toBe('255px');
+    expect(original.has('--only-child')).toBe(false);
+    expect(engine.customPropertiesOf(sibling)).toBe(original);
+    expect(engine.get(leaf).width).toBe(999);
+    expect(engine.get(sibling).width).toBe(127);
+    parent.style.setProperty('--v127','888px');
+    engine.compute(document,sheets,{},new Set([parent]));
+    expect(engine.get(leaf).width).toBe(999);
+    expect(engine.get(sibling).width).toBe(888);
+    expect(original.get('--v127')).toBe('127px');
+    child.style.removeProperty('--v127');
+    child.style.removeProperty('--only-child');
+    engine.compute(document,sheets,{},new Set([child]));
+    expect(engine.get(leaf).width).toBe(888);
+    expect(engine.customPropertiesOf(child)).toBe(engine.customPropertiesOf(parent));
+  } finally {window.happyDOM.close();}
+});
