@@ -2940,6 +2940,36 @@ test("primitive string reads preserve UTF-16 indices, coercion and prototype fal
 });
 
 
+test('string index classification keeps noncanonical and out-of-range keys on the page prototype', async () => {
+  await load('<p>string index keys</p>');
+  expect(await evaluate(`(() => {
+    const keys=['','01','-0','+1','1e0','1.0','0x1',' 1 ','Infinity','NaN','9007199254740993','99'];
+    const seen=[];
+    for(const key of keys) Object.defineProperty(String.prototype,key,{
+      configurable:true,get:function(){'use strict';seen.push([key,typeof this]);return 'fallback:'+key;}
+    });
+    const text='a😀';
+    const values=keys.map(key=>text[key]);
+    let indexGetter=0;
+    Object.defineProperty(String.prototype,'1',{configurable:true,get(){indexGetter++;return 'outside';}});
+    const indices=[text['0'],text['1'].charCodeAt(0),text['2'].charCodeAt(0),text[1n].charCodeAt(0),''['1']];
+    const symbol=Symbol('method'),events=[];
+    Object.defineProperty(String.prototype,symbol,{configurable:true,get:function(){
+      'use strict';events.push(['getter',typeof this]);
+      return function(value){'use strict';events.push(['call',typeof this,this]);return value;};
+    }});
+    const key={ [Symbol.toPrimitive](hint){events.push(['key',hint]);return symbol;} };
+    const called=text[key]((events.push(['argument']),42));
+    return {values,seen,indices,indexGetter,called,events};
+  })()`)).toEqual({
+    values:['fallback:','fallback:01','fallback:-0','fallback:+1','fallback:1e0','fallback:1.0',
+      'fallback:0x1','fallback: 1 ','fallback:Infinity','fallback:NaN','fallback:9007199254740993','fallback:99'],
+    seen:['','01','-0','+1','1e0','1.0','0x1',' 1 ','Infinity','NaN','9007199254740993','99'].map(key=>[key,'string']),
+    indices:['a',55357,56832,55357,'outside'],indexGetter:1,called:42,
+    events:[['key','string'],['getter','string'],['argument'],['call','string','a😀']],
+  });
+});
+
 test('user activation follows trusted input, is visible inside handlers and resets on navigation', async () => {
   await load('<input id="pick" type="file"><script>window.states=[];document.addEventListener("keydown",e=>states.push([e.isTrusted,navigator.userActivation.isActive,navigator.userActivation.hasBeenActive]));</script>');
   expect(await evaluate('[navigator.userActivation.isActive,navigator.userActivation.hasBeenActive]')).toEqual([false,false]);
