@@ -6,7 +6,8 @@ import {existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathS
 import {join, resolve} from 'node:path';
 import {tmpdir} from 'node:os';
 import {KittyPeer, isCastyContentFrame} from './manual-casty-home-startup.js';
-import {parseArguments,fileFingerprint,inputFingerprint,sameFingerprint} from './manual-youtube-stability-support.js';
+import {parseArguments,fileFingerprint,inputFingerprint,sameFingerprint,stopCasty,
+  createPlaybackProgress,resetPlaybackProgress,observePlayback,playbackPass} from './manual-youtube-stability-support.js';
 
 const harnessRoot = resolve(import.meta.dir,'..');
 const options = parseArguments(Bun.argv.slice(2),harnessRoot);
@@ -45,7 +46,8 @@ const manifest = {schema:1,inputs:await inputFingerprint(fingerprintOptions),
 writeFileSync(join(out,'manifest.json'),JSON.stringify(manifest,null,2));
 const endpointFile = join(out, 'endpoint');
 const runtimeFile = join(out, 'browser-runtime.json');
-writeFileSync(join(out, 'browser.mjs'), `
+const wrapperFile = join(out, 'browser.mjs');
+writeFileSync(wrapperFile, `
 import {writeFileSync} from 'node:fs';
 writeFileSync(${JSON.stringify(runtimeFile)},JSON.stringify({bun:Bun.version,revision:Bun.revision,
   platform:process.platform,arch:process.arch,execPath:process.execPath}));
@@ -58,6 +60,10 @@ console.error = (...args) => {
 const {main} = await import(${JSON.stringify(Bun.pathToFileURL(join(root, 'buninu-browser.js')).href)});
 await main();
 `);
+// The generated wrapper contains round-specific paths. Verify it within this
+// run, separately from the manifest compared across the whole cohort.
+const wrapperBefore = await fileFingerprint(wrapperFile);
+writeFileSync(join(out,'wrapper-integrity.json'),JSON.stringify({before:wrapperBefore},null,2));
 
 function connectCdp(url, signal) {
   return new Promise((resolveReady, rejectReady) => {
@@ -102,38 +108,6 @@ function connectCdp(url, signal) {
   });
 }
 
-// A Bun.Terminal child has its own process group and session. Never signal
-// a group unless /proc still proves both are the PID created by this script.
-function hasOwnedProcessGroup(pid) {
-  try {
-    for (const name of readdirSync('/proc')) {
-      if (!/^\d+$/.test(name)) continue;
-      try {
-        const stat = readFileSync(`/proc/${name}/stat`, 'utf8');
-        const fields = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
-        if (Number(fields[2]) === pid && Number(fields[3]) === pid) return true;
-      } catch {}
-    }
-  } catch {}
-  return false;
-}
-async function stopCasty(proc) {
-  if (!proc) return;
-  try {proc.terminal?.write('\x11');} catch {}
-  await Promise.race([proc.exited, Bun.sleep(2000)]);
-  for (const signal of ['SIGTERM', 'SIGKILL']) {
-    if (hasOwnedProcessGroup(proc.pid)) {
-      try {process.kill(-proc.pid, signal);} catch (error) {if (error.code !== 'ESRCH') throw error;}
-    }
-    if (proc.exitCode === null) {
-      try {proc.kill(signal);} catch (error) {if (error.code !== 'ESRCH') throw error;}
-    }
-    if (signal === 'SIGTERM') await Bun.sleep(300);
-  }
-  await Promise.race([proc.exited, Bun.sleep(1000)]);
-  try {proc.terminal?.close();} catch {}
-}
-
 // Observe only after Casty's explicit Page.navigate has committed. Never
 // install startup scripts, seek the video, spoof the UA, or modify BotGuard.
 const observation = `(() => {
@@ -156,7 +130,7 @@ const observation = `(() => {
     watchId:read(() => new URL(location.href).searchParams.get('v')),
     ad:!!player && (player.classList.contains('ad-showing') || player.classList.contains('ad-interrupting')),
     adState:read(() => player?.getAdState?.()),playerState:read(() => player?.getPlayerState?.()),stats,
-    video:video?{time:video.currentTime,duration:Number.isFinite(video.duration)?video.duration:null,paused:video.paused,
+    video:video?{time:video.currentTime,duration:Number.isFinite(video.duration)?video.duration:null,paused:video.paused,seeking:video.seeking,
       ended:video.ended,readyState:video.readyState,networkState:video.networkState,rate:video.playbackRate,
       width:video.videoWidth,height:video.videoHeight,muted:video.muted,volume:video.volume,buffered:ranges,
       error:video.error?{code:video.error.code,message:String(video.error.message||'').slice(0,200)}:null,
@@ -166,8 +140,7 @@ const observation = `(() => {
 
 let proc, cdp, outputTerminal, peerError, lastFrame, lastFrameMs = -Infinity, lastHash;
 let frames = 0, distinctFrames = 0, ignoredImages = 0, terminalTail = '', finishing = false;
-let previousSample = null, mainObservedSeconds = 0, mainStartedMs = null, mainStartFrames = 0, mainStartDistinct = 0;
-let maximumMainTime = 0, firstDecoded = null;
+const progress = createPlaybackProgress();
 const abort = new AbortController(), started = performance.now();
 const elapsed = () => Math.round(performance.now() - started);
 const results = {pass:false,playbackThresholdReached:false,url:targetUrl,out,limitMs,cadenceMs};
@@ -235,43 +208,30 @@ try {
       state = response.result?.value;
       if (!state || typeof state !== 'object') throw Error('Observation did not return an object');
     } catch (error) {
-      check();mark('observation-error',{message:String(error)});await Bun.sleep(cadenceMs);continue;
+      check();resetPlaybackProgress(progress);mark('observation-error',{message:String(error)});await Bun.sleep(cadenceMs);continue;
     }
     const now = elapsed(), video = state.video;
-    const main = !state.ad && (state.videoId===targetId || (!state.videoId && state.watchId===targetId));
-    const playing = main && video && !video.paused && !video.ended && !video.error && video.rate===1
-      && video.readyState>=2 && video.width>0 && video.height>0;
-    const seconds = previousSample ? (now-previousSample.ms)/1000 : 0;
-    const received = frames-(previousSample?.frames??0), changed = distinctFrames-(previousSample?.distinctFrames??0);
-    if (playing) {
-      maximumMainTime = Math.max(maximumMainTime,video.time);
-      if (firstDecoded === null && Number.isFinite(video.decoded)) firstDecoded = video.decoded;
-      if (mainStartedMs===null) {
-        mainStartedMs=now;mainStartFrames=frames;mainStartDistinct=distinctFrames;
-        if (lastFrame) writeFileSync(join(out,'main-start-kitty.png'),lastFrame);
-      }
-      if (previousSample?.playing) {
-        const advance = video.time-previousSample.time;
-        // Count continuous progression, not a seek/resume jump or a clock
-        // racing ahead of real time. No code in this script seeks the media.
-        if (advance>0 && advance<=seconds*1.75+1) mainObservedSeconds+=Math.min(advance,seconds);
-      }
-    }
+    const sample = observePlayback(progress,state,{targetId,ms:now,frames,distinctFrames});
+    const {main,playing,seconds,received,changed} = sample;
+    const {mainObservedSeconds,mainStartFrames,mainStartDistinct,firstDecoded} = progress;
+    if (sample.resetReason) mark('progress-reset',{reason:sample.resetReason});
+    if (sample.started && lastFrame) writeFileSync(join(out,'main-start-kitty.png'),lastFrame);
     mark('sample',{evalMs:now-sampleStart,frames,distinctFrames,frameAgeMs:now-lastFrameMs,
       fps:seconds?Number((received/seconds).toFixed(2)):0,
       changedFps:seconds?Number((changed/seconds).toFixed(2)):0,
       main,mainObservedSeconds:Number(mainObservedSeconds.toFixed(2)),state});
-    if (main && state.stats?.debug_error && /reject|fatal/i.test(state.stats.debug_error)) {
-      results.playerError = state.stats.debug_error;
-      throw Error('Player rejected normal playback: ' + state.stats.debug_error);
+    if (progress.error) {
+      results.playerError = progress.error;
+      throw Error(progress.error);
     }
     // DOM currentTime alone cannot pass: require at least 65 seconds observed
     // main-video progression, decoded dimensions, and changing Kitty frames.
     if (playing && video.time>65 && mainObservedSeconds>=65 && firstDecoded !== null && video.decoded > firstDecoded + 30 && frames-mainStartFrames>=20
       && distinctFrames-mainStartDistinct>=10 && now-lastFrameMs<5000 && changed>0
-      && Number.isFinite(previousSample?.decoded) && video.decoded>previousSample.decoded) {
-      const visibility = await cdp.call('Runtime.evaluate',{returnByValue:true,expression:`(()=>{const v=document.querySelector('video.html5-main-video')||document.querySelector('video');if(!v)return null;const r=v.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height,visible:r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&r.left<innerWidth&&r.top<innerHeight}})()`});
+      && sample.recentDecodedAdvance) {
+      const visibility = await cdp.call('Runtime.evaluate',{returnByValue:true,expression:`(()=>{const v=document.querySelector('video.html5-main-video')||document.querySelector('video');if(!v)return null;const r=v.getBoundingClientRect();let shown=true;for(let n=v;n;n=n.parentElement){const s=getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden'||s.visibility==='collapse'||Number(s.opacity)===0){shown=false;break;}}return {x:r.x,y:r.y,width:r.width,height:r.height,visible:shown&&r.width>0&&r.height>0&&r.right>0&&r.bottom>0&&r.left<innerWidth&&r.top<innerHeight}})()`});
       if (!visibility.exceptionDetails && visibility.result?.value?.visible) {
+        check();
         results.playbackThresholdReached=true;
         results.success=mark('playback-threshold-reached',{videoTime:video.time,mainObservedSeconds,decoded:video.decoded,firstDecoded,videoRect:visibility.result.value});
         if (lastFrame) writeFileSync(join(out,'success-kitty.png'),lastFrame);
@@ -279,7 +239,6 @@ try {
       }
       mark('video-not-visible',{detail:visibility.result?.value,exception:visibility.exceptionDetails});
     }
-    previousSample={ms:now,time:video?.time,decoded:video?.decoded,playing,frames,distinctFrames};
     await Bun.sleep(cadenceMs);
   }
 } catch (error) {
@@ -287,22 +246,30 @@ try {
   process.exitCode=1;
 } finally {
   finishing=true;clearTimeout(timeout);cdp?.close();
-  try {await stopCasty(proc);} catch (error) {results.cleanupError=String(error);process.exitCode=1;}
+  try {results.cleanupVerified=await stopCasty(proc);} catch (error) {results.cleanupVerified=false;results.cleanupError=String(error);process.exitCode=1;}
   try {
     const after = await inputFingerprint(fingerprintOptions);
     const actualRuntimePath = manifest.browserRuntime ? realpathSync(manifest.browserRuntime.execPath) : null;
     const browserBinary = actualRuntimePath ? await fileFingerprint(actualRuntimePath) : null;
+    const wrapperAfter = await fileFingerprint(wrapperFile);
+    results.wrapperUnchanged = !!wrapperBefore.sha256 && sameFingerprint(wrapperBefore,wrapperAfter);
+    writeFileSync(join(out,'wrapper-integrity.json'),JSON.stringify({before:wrapperBefore,after:wrapperAfter,unchanged:results.wrapperUnchanged},null,2));
     results.inputsUnchanged = sameFingerprint(manifest.inputs,after)
       && actualRuntimePath === anticipatedBrowserRuntime.execPath
       && !!browserBinary && sameFingerprint(anticipatedBrowserRuntime.binary,browserBinary);
     writeFileSync(join(out,'manifest-after.json'),JSON.stringify({inputs:after,browserBinary},null,2));
-    if (!results.inputsUnchanged) {results.verificationError='Runtime, environment, configuration or source inputs changed, or browser runtime was not recorded';process.exitCode=1;}
+    if (!results.inputsUnchanged || !results.wrapperUnchanged) {results.verificationError='Runtime, environment, configuration, source inputs or generated wrapper changed, or browser runtime was not recorded';process.exitCode=1;}
   } catch (error) {results.verificationError=String(error);process.exitCode=1;}
-  results.pass = Boolean(results.playbackThresholdReached && results.inputsUnchanged === true && !results.cleanupError && !results.error);
+  results.aborted=abort.signal.aborted;
+  if (results.aborted && !results.error) results.error=String(abort.signal.reason);
+  if (peerError && !results.error) results.error=String(peerError);
+  results.pass = playbackPass(results,results.aborted);
+  if (!results.pass) process.exitCode=1;
   for (const [signal,handler] of handlers) process.off(signal,handler);
   if (lastFrame) writeFileSync(join(out,'last-kitty.png'),lastFrame);
   writeFileSync(join(out,'terminal-tail.txt'),terminalTail);
-  Object.assign(results,{elapsedMs:elapsed(),frames,distinctFrames,ignoredImages,mainObservedSeconds,maximumMainTime});
+  Object.assign(results,{elapsedMs:elapsed(),frames,distinctFrames,ignoredImages,
+    mainObservedSeconds:progress.mainObservedSeconds,maximumMainTime:progress.maximumMainTime});
   writeFileSync(join(out,'result.json'),JSON.stringify(results,null,2));
   mark('finished',{pass:results.pass,frames,distinctFrames,out});
 }

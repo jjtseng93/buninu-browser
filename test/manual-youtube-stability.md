@@ -20,6 +20,12 @@ normal progression, normal playback rate, recent decoded-frame advancement,
 changing Kitty content frames, visible video bounds, and no observed player
 rejection or media error. Progress is accumulated across qualifying sampled
 intervals; this does not establish that every intervening frame was smooth.
+Ordinary buffering preserves previously observed progress without crediting
+stalled or uncertain intervals. Seeking, backward or excessive time jumps,
+decoded-counter resets, advertisements, or a different video discard earlier
+progress and frame baselines. An observation failure also restarts accounting.
+The player must report the requested video ID; the address alone earns no
+credit. Main-video errors remain failures even if playback later recovers.
 Inspect `success-kitty.png` and the progression samples to confirm the intended
 video is visible; full-page image changes alone cannot prove video-region motion.
 
@@ -28,6 +34,8 @@ until cleanup and end-of-run input verification succeed. Read `samples.jsonl`,
 `last-kitty.png`, and `terminal-tail.txt` for a failed trial. The harness invokes
 player inspection methods, so these are observed playback trials rather than
 completely passive capture.
+Cleanup must observe Casty's exit and verify that its PTY process group no
+longer exists. An interruption or verification error also prevents passing.
 
 The manifest hashes browser/Casty runtime files and assets, installed
 dependencies, the harness helpers, the Kitty peer, configuration files, and
@@ -37,6 +45,11 @@ an unrelated environment change conservatively changes its digest. Runtime
 binaries are hashed before launch and after cleanup. The small browser wrapper
 reports the actual executable and Bun version, and verification fails if its
 resolved path differs from the executable chosen by Casty's runtime resolver.
+The generated wrapper is hashed separately in `wrapper-integrity.json` before
+and after each run. Its paths differ between output directories, so its digest
+does not enter the manifest compared across runs. These before/after checks
+detect persistent changes, not edits that are restored before verification;
+do not edit any tested inputs during a run.
 
 For ten consecutive passes, use the same complete `manifest.json` for every
 round, inspect every successful capture, and reset the streak on any failed
