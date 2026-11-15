@@ -46,7 +46,7 @@ Rectangle {
  function twice(n: int): int {return n*2}
  onReady: if (settings.tnum) counter=twice(3); else counter=-1
  Component.onCompleted: root.ready()
- Text {id:result;text:counter+":"+pos.x+":"+typeof unset+":"+((root as Item)===root)+":"+((plain as Item)===null)+":"+(("tnum" in settings))}
+ Text {id:result;text:counter+":"+pos.x+":"+typeof unset+":"+(((root as Item) as Item)===root)+":"+((plain as Item)===null)+":"+(("tnum" in settings))}
 }`,
     });
     await host.call('whenLoaded');
