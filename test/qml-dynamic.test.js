@@ -176,8 +176,8 @@ test('dynamic singleton references cannot be captured by application loop variab
   );
   await Bun.write(
     dir + '/Child.qml',
-    `import QtQuick
-Text {text:{var total=0;for(var r=0;r<3;r++){var n0=r;var j0=r;total+=Theme.amount+n0-j0;}return total}}`,
+    String.raw`import QtQuick
+Text {text:{var $qml$runtime=1;var \u0024qml$$runtime=2;var total=0;for(var r=0;r<3;r++){var n0=r;var j0=r;total+=Theme.amount+n0-j0;}return total}}`,
   );
   await Bun.write(
     dir + '/main.qml',
