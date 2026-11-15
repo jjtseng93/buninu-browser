@@ -2759,6 +2759,24 @@ test('page member keys preserve primitive conversions, symbols and observable ob
  expect(JSON.parse(await evaluate('JSON.stringify(conversions)'))).toEqual(['string','string']);
 });
 
+test('nullish member reads evaluate keys without coercing them or evaluating call arguments',async()=>{
+ await load('<p>nullish member reads</p>');
+ expect(await evaluate(`(() => {
+   let expressions=0,coercions=0,argumentsRead=0;
+   const key={ [Symbol.toPrimitive](){coercions++;throw new RangeError('key coercion');} };
+   const nextKey=()=>{expressions++;return key;};
+   const errors=[];
+   for(const receiver of [null,undefined]) {
+     try{receiver[nextKey()];}catch(error){errors.push(error.name);}
+     try{receiver[nextKey()](argumentsRead++);}catch(error){errors.push(error.name);}
+   }
+   try{null[(() => {expressions++;throw new SyntaxError('key expression');})()];}
+   catch(error){errors.push(error.name);}
+   return {expressions,coercions,argumentsRead,errors};
+ })()`)).toEqual({expressions:5,coercions:0,argumentsRead:0,
+   errors:['TypeError','TypeError','TypeError','TypeError','SyntaxError']});
+});
+
 test('object member fast reads preserve proxy traps and page-local array inheritance',async()=>{
  await load(`<script>
  window.traps=[];
