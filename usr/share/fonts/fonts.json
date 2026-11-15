@@ -1,5 +1,6 @@
 {
   "fonts": {
+    "DejaVu Serif": { "file": "DejaVuSerif.ttf", "license": "LICENSE-DejaVu.txt" },
     "DejaVu Sans Mono": { "file": "DejaVuSansMono.ttf", "license": "LICENSE-DejaVu.txt" },
     "DejaVu Sans Mono Bold": { "file": "DejaVuSansMono-Bold.ttf", "license": "LICENSE-DejaVu.txt" },
     "Noto Sans CJK": {
@@ -21,6 +22,7 @@
       "fallback": ["Noto Color Emoji", "Noto Color Emoji Flags", "Noto Sans CJK", "Noto Sans Symbols", "Noto Sans Symbols2"]
     },
     "ui": {
+      "serif": "DejaVu Serif",
       "regular": "Roboto",
       "fallback": ["Noto Sans CJK", "Noto Color Emoji", "Noto Color Emoji Flags", "Noto Sans Symbols", "Noto Sans Symbols2"]
     }

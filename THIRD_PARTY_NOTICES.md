@@ -228,7 +228,7 @@ must be symlinks to the system copies instead, as documented in `usr/README.md`.
 | Distributed path | Component and source | License |
 |---|---|---|
 | `usr/lib/canvaskit/canvaskit.js`, `canvaskit.wasm` | CanvasKit 0.41.1 from the official `canvaskit-wasm` npm release; the WASM is unmodified, the JS loader carries two `wasmBinary` fixes recorded in [`patches/canvaskit/`](patches/canvaskit/README.md) | BSD-3-Clause; `LICENSES/BSD-3-Clause-Skia.txt` |
-| `usr/share/fonts/DejaVuSansMono.ttf`, `DejaVuSansMono-Bold.ttf` | DejaVu fonts 2.37 from Debian `fonts-dejavu-core` | Bitstream Vera; `LICENSES/Bitstream-Vera.txt` |
+| `usr/share/fonts/DejaVuSansMono.ttf`, `DejaVuSansMono-Bold.ttf`, `DejaVuSerif.ttf` | DejaVu fonts 2.37 from Debian `fonts-dejavu-core` | Bitstream Vera; `LICENSES/Bitstream-Vera.txt` |
 | `usr/share/fonts/NotoSansCJK-Regular.ttc` | Noto Sans CJK 2.004 from Android system fonts | SIL Open Font License 1.1; `LICENSES/OFL-1.1.txt` |
 | `usr/share/fonts/NotoColorEmoji.ttf`, `NotoColorEmojiFlags.ttf` | Noto Color Emoji 2.047 from Android system fonts | SIL Open Font License 1.1 |
 | `usr/share/fonts/NotoSansSymbols-Regular-Subsetted.ttf`, `NotoSansSymbols-Regular-Subsetted2.ttf` | Android Noto Sans Symbols subsets | SIL Open Font License 1.1 |

@@ -1,4 +1,4 @@
-Bitstream Vera License (DejaVu Sans Mono; DejaVu changes are in the public domain)
+Bitstream Vera License (DejaVu Sans Mono and DejaVu Serif; DejaVu changes are in the public domain)
 Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.
 Bitstream Vera is a trademark of Bitstream, Inc.
 
