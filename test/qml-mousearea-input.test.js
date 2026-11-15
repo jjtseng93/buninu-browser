@@ -43,3 +43,29 @@ Item {id:scene;width:300;height:150;property string query:"old"
   expect(await host.call('evaluate','document.getElementById("field").value')).toBe('new');
  }finally{host.close()}
 },30000);
+
+test('hidden QML thumbnail geometry maps into a tap containment mask',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start();await host.call('resize',400,200,1);
+  await host.call('loadDocument',{url:'data:text/x-qml,hidden-hit',contentType:'text/x-qml',source:`import QtQuick
+Item {id:scene;width:400;height:200;property int taps:0
+ Item {id:tile;x:100;y:20;width:130;height:124
+  Item {x:30;y:12;width:64;height:64
+   Image {id:thumb;width:64;height:64;visible:false}
+  }
+  Item {anchors.fill:parent
+   containmentMask:QtObject {function contains(p:point):bool {var q=thumb.mapFromItem(tile,p.x,p.y);return q.x>=0&&q.y>=0&&q.x<64&&q.y<64}}
+   TapHandler {onTapped:scene.taps++}
+  }
+ }
+ Component.onCompleted:{globalThis.root=scene;globalThis.tile=tile;globalThis.thumb=thumb}
+}`});await host.call('whenLoaded');
+  expect(await host.call('evaluate','thumb.mapFromItem(tile,40,22)')).toEqual({x:10,y:10});
+  expect(await host.call('evaluate','thumb.mapToItem(tile,10,10)')).toEqual({x:40,y:22});
+  await host.call('click',145,45);
+  expect(await host.call('evaluate','root.taps')).toBe(1);
+  await host.call('click',105,25);
+  expect(await host.call('evaluate','root.taps')).toBe(1);
+ }finally{host.close()}
+},30000);
