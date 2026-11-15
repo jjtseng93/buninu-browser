@@ -62,6 +62,17 @@ Rectangle {
     expect(after.lineHeight).toBe('30px');
     await host.call('evaluate', 'document.getElementById("root").click()');
     expect(JSON.parse(await styles())).toEqual(before);
+    for (const edit of [
+      'box.setAttribute("style","width:1px;z-index:99")',
+      'box.removeAttribute("style")',
+      'box.style.cssText="width:2px;z-index:88"',
+    ]) {
+      await host.call('evaluate', `(()=>{const box=document.getElementById("box");${edit};document.getElementById("root").click()})()`);
+      expect(JSON.parse(await styles())).toEqual(after);
+      expect(await host.call('evaluate','document.getElementById("box").style.zIndex')).toBe('0');
+      await host.call('evaluate','document.getElementById("root").click()');
+      expect(JSON.parse(await styles())).toEqual(before);
+    }
   } finally {
     host.close();
   }
