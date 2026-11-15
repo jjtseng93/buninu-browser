@@ -102,6 +102,19 @@ try{
   assert.equal(disabled.sparePid,null);
   disabled.close();
 
+  const application=await createBrowser({network});browsers.push(application);
+  const beforeApplication=hosts.length;
+  await application.context.navigate(new URL('./qml/imports/main.qml',import.meta.url).href);
+  assert.equal(hosts.length,beforeApplication+1,'QML creates only its application host, not a disposable web spare');
+  assert.ok(hostFor(application).options.args.includes('--buninu-qml-host'));
+  await advance(60000);
+  assert.equal(application.sparePid,null);
+  await application.context.navigate('https://after-qml.test/fast');
+  assert.ok(!hostFor(application).options.args.includes('--buninu-qml-host'));
+  await advance(1000);
+  assert.notEqual(application.sparePid,null,'ordinary HTML resumes spare warmup');
+  application.close();
+
   // An old spare can be acquired while still starting, then superseded by a
   // second navigation. Its eventual rejection must not clear the new spare.
   heldPid=nextPid+1;
