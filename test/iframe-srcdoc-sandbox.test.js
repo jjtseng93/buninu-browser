@@ -83,3 +83,72 @@ test('the sandbox attribute applies when the frame next navigates', async () => 
     expect(await host.call('evaluate', `document.getElementById('f').contentDocument`)).toBe(null);
   } finally { host.close(); }
 }, 20000);
+
+test('a srcdoc fragment scrolls without replacing the document or firing load again', async () => {
+  const content = `<a id="jump" href="#target">jump</a><div style="height:1200px"></div><h2 id="target">Target</h2><div style="height:400px"></div><script>
+    setTimeout(() => { document.getElementById('jump').click();
+      setTimeout(() => { parent.fragmentResult = {y:scrollY, text:document.getElementById('target').textContent}; }, 100);
+    }, 600);
+  </script>`;
+  const host = await page('<iframe id="f" srcdoc="'+content.replaceAll('&','&amp;').replaceAll('"','&quot;')+'"></iframe>');
+  try {
+    expect(await until(host, `document.getElementById('f').contentDocument?.getElementById('target')?.textContent`)).toBe('Target');
+    await host.call('evaluate', `globalThis.loads=0; document.getElementById('f').addEventListener('load',()=>globalThis.loads++);`);
+    const result = await until(host, 'globalThis.fragmentResult');
+    expect(result?.text).toBe('Target');
+    expect(result?.y).toBeGreaterThan(0);
+    expect(await host.call('evaluate', 'globalThis.loads')).toBe(0);
+  } finally { await host.close(); }
+}, 20000);
+
+test('physical fragment clicks scroll with scripts disabled and keep the srcdoc document', async () => {
+  const host = await page('<iframe id="f" sandbox onload="globalThis.loads=(globalThis.loads||0)+1" srcdoc="<a href=&#34;#目錄&#34;>jump</a><div style=&#34;height:1200px&#34;></div><div id=目錄 style=&#34;height:400px;background:rgb(255,0,0)&#34;>Target</div>"></iframe>');
+  try {
+    expect(await until(host, 'globalThis.loads')).toBe(1);
+    await host.call('click', 28, 28);
+    await Bun.sleep(200);
+    expect(await host.call('evaluate', 'globalThis.loads')).toBe(1);
+    const {loadGraphics} = await import('../lib/renderer/page-renderer.js');
+    const k = (await loadGraphics()).CanvasKit;
+    const img = k.MakeImageFromEncoded(Buffer.from(await host.call('screenshot', {format:'png'}), 'base64'));
+    try {
+      expect(Array.from(img.readPixels(50,50,{width:1,height:1,colorType:k.ColorType.RGBA_8888,
+        alphaType:k.AlphaType.Unpremul,colorSpace:k.ColorSpace.SRGB}))).toEqual([255,0,0,255]);
+    } finally {img.delete();}
+  } finally { await host.close(); }
+}, 20000);
+
+test('physical iframe links honor the embedder navigation interception', async () => {
+  const host = await page('<iframe id="f" data-buninu-navigation sandbox onload="globalThis.loads=(globalThis.loads||0)+1" srcdoc="<a href=&#34;https://example.test/other#目錄&#34;>outside</a>"></iframe>');
+  try {
+    expect(await until(host, 'globalThis.loads')).toBe(1);
+    await host.call('evaluate', `document.getElementById('f').addEventListener('buninu-navigation', e => {globalThis.destination="intercepted";e.preventDefault();});`);
+    await host.call('click', 28, 28);
+    expect(await host.call('evaluate', 'globalThis.destination')).toBe('intercepted');
+    await Bun.sleep(100);
+    expect(await host.call('evaluate', 'globalThis.loads')).toBe(1);
+  } finally { await host.close(); }
+}, 20000);
+
+
+test('allowing sandboxed fragment scrolling never enables scripts, event handlers or javascript URLs', async () => {
+  const attack = "document.getElementById('target').style.background='rgb(0,255,0)'";
+  const content = `<body onhashchange="${attack}"><a style="display:block;height:24px" href="#target" onclick="${attack}">jump</a><a style="display:block;height:24px" href="javascript:${attack}">script</a><div style="height:1200px"></div><div id="target" style="height:400px;background:rgb(255,0,0)">Target</div><script>${attack}</script></body>`;
+  const host = await page('<iframe id="f" sandbox onload="globalThis.loads=(globalThis.loads||0)+1" srcdoc="'+content.replaceAll('&','&amp;').replaceAll('"','&quot;')+'"></iframe>');
+  try {
+    expect(await until(host, 'globalThis.loads')).toBe(1);
+    await host.call('click', 28, 52); // javascript: link
+    await host.call('click', 28, 28); // fragment, with onclick and onhashchange
+    await Bun.sleep(200);
+    expect(await host.call('evaluate', 'globalThis.loads')).toBe(1);
+    expect(await host.call('evaluate', `document.getElementById('f').contentDocument`)).toBe(null);
+    expect(await host.call('evaluate', `document.getElementById('f').getAttribute('sandbox')`)).toBe('');
+    const {loadGraphics} = await import('../lib/renderer/page-renderer.js');
+    const k = (await loadGraphics()).CanvasKit;
+    const img = k.MakeImageFromEncoded(Buffer.from(await host.call('screenshot', {format:'png'}), 'base64'));
+    try {
+      expect(Array.from(img.readPixels(50,50,{width:1,height:1,colorType:k.ColorType.RGBA_8888,
+        alphaType:k.AlphaType.Unpremul,colorSpace:k.ColorSpace.SRGB}))).toEqual([255,0,0,255]);
+    } finally {img.delete();}
+  } finally { await host.close(); }
+}, 20000);
