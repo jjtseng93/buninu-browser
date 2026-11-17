@@ -72,3 +72,28 @@ FloatingWindow {id:window;width:200;height:100
   expect(await settled()).toBeGreaterThan(changed);
  }finally{host.close()}
 },30000);
+
+test('nonvisual QML animations keep Window frame observers active until stopped',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try {
+  await host.start();
+  await host.call('loadDocument',{url:'data:text/x-qml,animated-window',contentType:'text/x-qml',source:`import QtQuick
+import Quickshell
+FloatingWindow {id:window;width:200;height:100;property int frames:0;property real counter:0
+ onAfterAnimating:frames++
+ FrameAnimation {id:clock;running:true}
+ NumberAnimation {id:animation;target:window;property:"counter";from:0;to:1;duration:100;loops:Animation.Infinite;running:false}
+ Component.onCompleted:globalThis.fixture={window:window,clock:clock,animation:animation}
+}`});
+  await host.call('whenLoaded');
+  const run=s=>host.call('evaluate',s);
+  let before=await run('fixture.window.frames');await Bun.sleep(150);
+  expect(await run('fixture.window.frames')).toBeGreaterThan(before);
+  await run('fixture.clock.running=false;fixture.animation.running=true');
+  before=await run('fixture.window.frames');await Bun.sleep(150);
+  expect(await run('fixture.window.frames')).toBeGreaterThan(before);
+  await run('fixture.animation.running=false');await Bun.sleep(100);
+  before=await run('fixture.window.frames');await Bun.sleep(100);
+  expect(await run('fixture.window.frames')).toBe(before);
+ }finally{host.close()}
+},30000);
