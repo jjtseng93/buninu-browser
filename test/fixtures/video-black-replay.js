@@ -34,8 +34,15 @@ function framePixels(alpha) {
 }
 async function makeClient(alpha) {
   const client = {messages:[],errors:[],tile:null,frame:null};
+  let allocation = 0;
   client.renderer = await createPageRenderer({renderMinInterval:1000,
-    allocateFramePixels:bytes=>new Uint8Array(new SharedArrayBuffer(bytes)),
+    allocateFramePixels(bytes) {
+      const offset = [0, 4, 1][allocation++ % 3];
+      const storage = new Uint8Array(new SharedArrayBuffer(offset + bytes + 3));
+      storage.fill(0xca, 0, offset);
+      storage.fill(0xca, offset + bytes);
+      return storage.subarray(offset, offset + bytes);
+    },
     onFrame:frame=>{client.tile=frame.tile;},onVideo:message=>client.messages.push(message),
     reportError:error=>client.errors.push(String(error)),
     fetchResource:async url=>({ok:true,url,body:new Uint8Array([1]),contentType:'video/mp4'}),
@@ -71,6 +78,9 @@ for (const alpha of [255,127]) {
   function compare(label,fast=alpha===255) {
     const before = reference.tile, after = candidate.tile;
     assert.ok(after.pixels.buffer instanceof SharedArrayBuffer,label+' allocator ownership');
+    const storage = new Uint8Array(after.pixels.buffer);
+    assert.ok(storage.subarray(0,after.pixels.byteOffset).every(byte=>byte===0xca),label+' untouched prefix');
+    assert.ok(storage.subarray(after.pixels.byteOffset+after.pixels.byteLength).every(byte=>byte===0xca),label+' untouched suffix');
     assert.equal(Boolean(after.videoLayer),Boolean(before.videoLayer),label+' eligibility');
     if (before.videoLayer) {
       assert.deepEqual(after.videoLayer.rect,before.videoLayer.rect,label+' rect');
