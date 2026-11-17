@@ -1,3 +1,4 @@
+import {configureQmlCache} from '../../lib/qml/cache-options.js';
 import {readFileSync,unlinkSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -152,8 +153,10 @@ export async function launch({url='about:blank',width=800,height=600,socket,chro
   }catch(e){close();throw e;}
 }
 if(import.meta.main){
-  const args=Bun.argv.slice(2).filter(a=>a!=='--');
-  if(args.some(a=>['-h','--help'].includes(a))){console.log('Usage: buninu-browser --wayland [URL or file] [--window-size=800,600]\nUses WAYLAND_DISPLAY; socket directory: XDG_RUNTIME_DIR, TMPDIR, system temp. Experimental wl_shm frontend.');process.exit(0);}
+  const rawArgs=Bun.argv.slice(2).filter(a=>a!=='--');
+  configureQmlCache(rawArgs);
+  const args=rawArgs.filter(a=>a!=='--cache'&&!a.startsWith('--cache='));
+  if(args.some(a=>['-h','--help'].includes(a))){console.log('Usage: buninu-browser --wayland [URL or file] [--window-size=800,600] [--cache=js|bytecode]\nUses WAYLAND_DISPLAY; socket directory: XDG_RUNTIME_DIR, TMPDIR, system temp. Experimental wl_shm frontend.');process.exit(0);}
   let width=800,height=600,url='about:blank';
   for(const arg of args){if(arg.startsWith('--window-size=')){[width,height]=arg.slice(14).split(',').map(Number);}else if(arg.startsWith('-'))throw Error(`Unknown Wayland option: ${arg}`);else url=arg;}
   if(!Number.isInteger(width)||!Number.isInteger(height)||width<1||height<1||width>8192||height>8192)throw Error('Invalid window size');

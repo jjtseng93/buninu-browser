@@ -19,6 +19,7 @@ directly as JavaScript and WebAssembly.
   - [Clipboard and text editing](#clipboard-and-text-editing)
   - [Downloads](#downloads)
   - [Sound](#sound)
+  - [Local QML compilation cache](#local-qml-compilation-cache)
   - [Screenshots and viewport size](#screenshots-and-viewport-size)
 - [Why replace Chromium Headless Shell](#why-replace-chromium-headless-shell)
 - [Design](#design)
@@ -311,6 +312,41 @@ With an older npm, delete the npx
 cache directory: `~/.npm/_npx`
 (Windows:
 `%LocalAppData%\npm-cache\_npx`).
+
+### Local QML compilation cache
+
+For local QML applications, `--cache` (or `--cache=js`) reuses compiled
+JavaScript. `--cache=bytecode` additionally builds Bun bytecode:
+
+```sh
+bun index.js file:///absolute/path/shell.qml -- --cache=bytecode
+bun index.js --wayland file:///absolute/path/shell.qml --cache=js
+bun index.js --headless --cache=bytecode file:///absolute/path/shell.qml
+```
+
+This caches dynamic local components loaded through Loader / Qt.createComponent,
+not the initial document or ordinary web pages. Cache files are stored beside
+sources: `Card.qml.cjs`, `Card.qml.cjs.jsc` and `Card.qml.cjs.meta.json`.
+Source/dependency changes, compiler changes and Bun/platform changes invalidate
+cached results. Unwritable cache directories fall back to normal compilation.
+Bytecode costs additional disk space and compilation time on the first run.
+The `js` level does not generate bytecode; Bun may still use an existing valid
+`.jsc` beside a cached module. Without `--cache`, neither level is used.
+
+In the address bar, inspect this page's cache statistics:
+
+```js
+javascript:alert(JSON.stringify(navigator.buninu.qmlCache, null, 2))
+```
+
+This read-only API is exposed only to local QML applications. `entries` includes
+per-component cache results, timings and invalidation reasons. Both levels enable
+`BUN_JSC_verboseDiskCache=1` in QML renderer processes. The controller correlates
+native JSC hit/miss output with each module load; `confirmedHits: null` means no
+unambiguous native result was observed, not a successful hit. `hits` counts JS
+cache reuse separately from bytecode hits (which can also occur immediately
+after building a new cache). Diagnostics go to stderr and, when enabled, the
+existing `BUNINU_LOG` file. Statistics reset with the QML document.
 
 ### Screenshots and viewport size
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import {configureQmlCache} from './lib/qml/cache-options.js';
 
 /**
  * Buninu Browser executable and public module entry point.
@@ -27,6 +28,7 @@ export { computeElementStyle, parseDeclarations, StyleEngine } from "./lib/style
 export { RenderTreeBuilder, renderTreeText } from "./lib/render-tree/index.js";
 
 export async function main(args = Bun.argv.slice(2)) {
+  configureQmlCache(args);
   const has = (...names) => names.some((name) => args.includes(name));
   if (has("--version", "-V", "-version")) {
     console.log(`buninu-browser ${packageInfo.version}`);
@@ -52,6 +54,7 @@ Options:
                                   for JavaScriptCore; CDP user agent overrides are ignored
   --chromium                      Use the previous desktop Chromium compatibility identity
                                   Last desktop identity flag wins; --mobile takes priority
+  --cache[=js|bytecode]          Cache compiled local QML components beside their sources
   --screenshot[=FILE]             Capture one PNG and exit (default screenshot.png)
   --window-size=WIDTH,HEIGHT      Initial viewport size in CSS pixels (default 800,600)
   --screenshot-wait=MILLISECONDS  Wait after page load before capturing
