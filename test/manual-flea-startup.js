@@ -7,7 +7,7 @@ import { CDP } from '../tools/browser-lab.js';
 
 const args = process.argv.slice(2);
 if (args.includes('--help') || args.includes('-h')) {
-  console.log('bun test/manual-flea-startup.js [--flea=../flea-qml] [--runs=3] [--output=/tmp/results]\nMeasures a fresh headless process at 900x600, using three temporary folders.\nSaves JSON timings, first-folder PNGs and stderr logs. This excludes Casty/terminal display latency.');
+  console.log('bun test/manual-flea-startup.js [--flea=../flea-qml] [--runs=3] [--output=/tmp/results]\nMeasures a fresh headless process at 900x600, using three temporary folders and isolated XDG state/config/data/cache for each run.\nSaves JSON timings, first-folder PNGs and stderr logs. This excludes Casty/terminal display latency.');
   process.exit(0);
 }
 const option = (key, fallback) => args.find(a => a.startsWith(key + '='))?.slice(key.length + 1) ?? fallback;
@@ -23,14 +23,19 @@ const fixture = mkdtempSync(join(tmpdir(), 'flea-startup-folders-'));
 const names = ['startup-alpha', 'startup-beta', 'startup-gamma'];
 for (const name of names) mkdirSync(join(fixture, name));
 const results = [];
+const profiles = [];
 try {
   for (let round = 1; round <= runs; round++) {
+    const profile = mkdtempSync(join(tmpdir(), 'flea-startup-profile-'));
+    profiles.push(profile);
+    const isolated = Object.fromEntries(['STATE', 'CONFIG', 'DATA', 'CACHE'].map(kind =>
+      [`XDG_${kind}_HOME`, join(profile, kind.toLowerCase())]));
     const started = performance.now();
     const elapsed = () => performance.now() - started;
     let stderr = '', cdp;
     const child = Bun.spawn([process.execPath, join(root, 'index.js'), '--headless',
       '--remote-debugging-port=0', '--window-size=900,600', Bun.pathToFileURL(entry).href], {
-      cwd: root, env: { ...process.env, FLEA_PATH: fixture, BUNINU_LOG: join(output, `run-${round}.log`) },
+      cwd: root, env: { ...process.env, ...isolated, FLEA_PATH: fixture, BUNINU_LOG: join(output, `run-${round}.log`) },
       stdout: 'ignore', stderr: 'pipe',
     });
     const drain = (async () => { for await (const chunk of child.stderr) stderr += Buffer.from(chunk).toString(); })();
@@ -81,11 +86,13 @@ try {
     }
   }
 } finally {
+  for (const profile of profiles) rmSync(profile, { recursive: true, force: true });
   rmSync(fixture, { recursive: true, force: true });
   await Bun.write(join(output, 'results.json'), JSON.stringify({
     bun: Bun.version, bunRevision: Bun.revision, executable: process.execPath,
     platform: process.platform, arch: process.arch, entry,
     viewport: { width: 900, height: 600 }, samplingIntervalMs: 100,
+    profile: 'fresh isolated XDG state/config/data/cache per run',
     scope: 'headless CLI to folder detection and CDP screenshot; excludes terminal presentation', results,
   }, null, 2));
   console.log('Results: ' + output);
