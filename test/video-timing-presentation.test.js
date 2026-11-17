@@ -17,6 +17,8 @@ function queuedVideo(changed = () => {}) {
     })),
     nextTime: 10.4,
     frame: null,
+    prepared: true, // The first decode turn already queued these three frames.
+    revision: 0,
     eof: false,
     reportedEnd: false,
   });
