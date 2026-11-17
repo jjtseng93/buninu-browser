@@ -1,5 +1,5 @@
 ;; Scan UTF-16 code units, returning indices into the original JavaScript string.
-;; mode 0 finds the closing brace; 59/123 find a semicolon/open brace.
+;; mode 0 finds a closing brace; 59/123 a semicolon/open brace; 1 either rule delimiter.
 (module
   (memory (export "memory") 1 128) ;; 8 MiB limit, including one vector of padding
   (func (export "scan") (param $i i32) (param $end i32) (param $mode i32) (result i32)
@@ -48,10 +48,12 @@
             (local.set $depth (i32.add (local.get $depth) (i32.const 1))) (br $bits)))
           (if (i32.eq (local.get $c) (i32.const 41)) (then
             (if (local.get $depth) (then (local.set $depth (i32.sub (local.get $depth) (i32.const 1))))) (br $bits)))
-          (if (i32.and (i32.eq (local.get $c) (local.get $mode)) (i32.eqz (local.get $depth)))
-            (then (return (local.get $pos))))
+          (if (i32.and (i32.eq (local.get $c) (i32.const 59)) (i32.eqz (local.get $depth)))
+            (then (if (i32.ne (local.get $mode) (i32.const 123)) (then (return (local.get $pos))))))
           (if (i32.ge_u (local.get $c) (i32.const 123)) (then
-            (return (select (local.get $pos) (i32.const -1) (i32.eq (local.get $c) (local.get $mode))))))))
+            (return (select (local.get $pos) (i32.const -1)
+              (i32.and (i32.eq (local.get $c) (i32.const 123))
+                       (i32.ne (local.get $mode) (i32.const 59)))))))))
         (br $bits)))
       (local.set $i (i32.add (local.get $i) (i32.const 16))) (br $chunks)))
     (select (i32.const -1) (local.get $end) (local.get $mode))))

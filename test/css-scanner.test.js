@@ -41,6 +41,21 @@ test('nested stylesheet parsing in a viewport getter preserves the outer input',
   expect(parsed(padding + outer, viewport)).toEqual(parsed(outer, {width:400}));
 });
 
+test('rule preludes share a delimiter scan while keyframes still scan for their opening brace', () => {
+  const css = `@layer base;
+    @media screen { .f(x;y{ color:red } .tail{ color:blue } }
+    @keyframes move { invalid; from {opacity:0} to {opacity:1} }
+    } .after-unmatched-brace {}`;
+  for (const prefix of ['', padding]) {
+    const {rules, keyframes} = parsed(prefix + css, {width:400});
+    // A semicolon inside parentheses stays in the prelude. An unquoted
+    // opening brace still starts the rule, even with an unmatched parenthesis.
+    expect(rules.map(rule => rule[0])).toEqual(['.f(x;y', '.tail']);
+    // "invalid; from" is one invalid keyframe selector.
+    expect(keyframes.get('move').map(frame => frame.offset)).toEqual([1]);
+  }
+});
+
 test('bounds and synchronous exceptions preserve the next scan', () => {
   const scannerFor = text => scanStyleSheet(text, scanner => scanner);
   const scalar = scannerFor('');
