@@ -6,6 +6,28 @@ import {
   parseStyleSheet,
 } from "../lib/style/computed-style.js";
 
+test("public declaration inputs retain custom iterable semantics", () => {
+  const { document, window } = parseHTMLDocument('<div></div>');
+  const element = document.querySelector('div');
+  let iterations = 0;
+  const declaration = {name:'width', value:'91px', specificity:0, order:0};
+  const iterable = {
+    *[Symbol.iterator]() { iterations++; yield ['width', declaration]; },
+    forEach() { throw Error('must consume the public iterator'); },
+  };
+  try {
+    expect(computeElementStyle(element, null, iterable).width).toBe(91);
+    const map = new Map([['width', declaration]]);
+    Object.defineProperty(map, Symbol.iterator, {value: function* () {
+      iterations++; yield ['width', {...declaration, value:'82px'}];
+    }});
+    expect(computeElementStyle(element, null, map).width).toBe(82);
+    expect(iterations).toBe(2);
+    expect(map.get('width')).toBe(declaration);
+    expect(declaration.value).toBe('91px');
+  } finally { window.happyDOM.abort(); }
+});
+
 test("escaped selector punctuation does not consume following stylesheet rules", () => {
   const { document, window } = parseHTMLDocument(`<div id="quoted" class="[feature:'alt']"></div><div id="punctuation" class="braces{}paren(,)"></div><div id="after" class="after"></div>`);
   const css = String.raw`@layer utilities {
