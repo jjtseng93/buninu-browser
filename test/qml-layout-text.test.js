@@ -229,3 +229,25 @@ Item {width:640;height:480
  expect((await inspect()).height).toBeGreaterThan(narrow.height);
  });
 },30000);
+
+test('RichText measured height matches painted blocks across fallback fonts and line-height modes', async () => {
+ await fixture(`import QtQuick
+Item {width:640;height:600
+ Text {id:rich;width:240;wrapMode:Text.Wrap;font.pixelSize:16;textFormat:Text.RichText
+  text:"<p>中文第一行 第二行</p><p><b>Bold text</b><br>next line</p><p><span style='font-size:24px'>Large text</span> end</p>"
+ }
+ Component.onCompleted:globalThis.rich=rich
+}`,async host=>{
+  const inspect=()=>host.call('evaluate',`(()=>{const e=__qmlRuntime.element(rich),ps=[...e.querySelectorAll('p')].map(p=>p.getBoundingClientRect());return {height:rich.contentHeight,implicit:rich.implicitHeight,bottom:ps.at(-1).bottom-e.getBoundingClientRect().top,gaps:ps.slice(1).map((p,i)=>p.top-ps[i].bottom),line:e.style.lineHeight}})()`);
+  for(const change of ['', 'rich.font.bold=true;rich.font.italic=true', 'rich.font.pixelSize=22;rich.width=150', 'rich.lineHeight=1.5', 'rich.lineHeightMode=1;rich.lineHeight=32']) {
+   if(change)await host.call('evaluate',change);
+   const actual=await inspect();
+   expect(actual.height).toBeGreaterThan(0);
+   expect(actual.height).toBeCloseTo(actual.bottom,4);
+   expect(actual.implicit).toBeCloseTo(actual.height,4);
+   for(const gap of actual.gaps)expect(gap).toBeGreaterThanOrEqual(-0.01);
+   if(change.includes('lineHeightMode'))expect(actual.line).toBe('32px');
+   else expect(actual.line.endsWith('px')).toBe(false);
+  }
+ });
+},30000);

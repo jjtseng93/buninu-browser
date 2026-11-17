@@ -231,12 +231,13 @@ Item {width:500;height:400
  Text {id:status;y:350;text:md.contentHeight+":"+md.lineCount}
 }`);
     await b.context.navigate(Bun.pathToFileURL(join(dir, "main.qml")).href);
-    const result = JSON.parse(await b.context.evaluate( `JSON.stringify({text:document.getElementById('md').textContent,code:document.getElementById('md').querySelector('pre').textContent,br:document.getElementById('md').querySelectorAll('br').length,line:parseFloat(document.getElementById('md').style.lineHeight),metrics:document.getElementById('status').textContent})`));
+    const result = JSON.parse(await b.context.evaluate( `JSON.stringify({text:document.getElementById('md').textContent,code:document.getElementById('md').querySelector('pre').textContent,br:document.getElementById('md').querySelectorAll('br').length,bottom:document.getElementById('md').querySelector('pre').getBoundingClientRect().bottom-document.getElementById('md').getBoundingClientRect().top,metrics:document.getElementById('status').textContent})`));
     expect(result.text).toContain('中文第一行 第二行');
     expect(result.code).toBe('code one\ncode two\n');
     expect(result.br).toBe(1);
     const [height, count] = result.metrics.split(':').map(Number);
-    expect(result.line).toBeCloseTo(height / count, 5);
+    expect(count).toBe(5);
+    expect(height).toBeCloseTo(result.bottom, 4);
   } finally { b.close(); rmSync(dir, {recursive:true,force:true}); }
 }, 30000);
 
