@@ -30,6 +30,19 @@ try {
   assert.deepEqual(result,{sizes:Array.from({length:40},()=>[500,400]),rootLayouts:0,rootStyles:0,
     childLayouts:1,childStyles:1,width:139});
 
+  // A synchronous client read can leave paint pending. Hit testing and
+  // scrolling immediately afterwards must use the latest box and overflow.
+  assert.deepEqual(await renderer.evaluate(`(()=>{
+    const box=document.getElementById('box');
+    box.style.width='1300px';
+    const wide=box.clientWidth,hit=document.elementFromPoint(450,10)===box;
+    window.scrollTo(700,0);
+    const scrolled=window.scrollX;
+    box.style.width='100px';
+    const narrow=box.clientWidth;
+    return [wide,hit,scrolled,narrow,window.scrollX,document.elementFromPoint(450,10)===box];
+  })()`),[1300,true,700,100,0,false]);
+
   // Root border offsets remain live geometry queries; hiding the root does
   // not change its viewport dimensions, but still hides descendants.
   assert.deepEqual(await renderer.evaluate(`(()=>{
