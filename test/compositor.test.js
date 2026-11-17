@@ -106,6 +106,12 @@ test("video continues presenting while page JavaScript blocks, then freezes on p
     await Bun.sleep(600);
     const second = await host.composite("screenshot");
     expect(Bun.hash(second)).not.toBe(Bun.hash(first));
+    // The video is advancing, but a crop beyond its right edge is static.
+    // Both capture formats must include exactly the same background pixels.
+    const clip = { x: 160, y: 0, width: 3, height: 2, scale: 1 };
+    const raw = JSON.parse(await host.composite("screenshot", { format: "rgba", clip }));
+    const crop = await host.composite("screenshot", { format: "png", clip });
+    expect(crop).toBe(Buffer.from(await encodeImage(await Bun.file(raw.path).bytes(), 3, 2)).toString("base64"));
     expect(await busy).toBe(true);
     await host.call("evaluate", "document.getElementById('v').pause()");
     const paused = await host.composite("screenshot");
