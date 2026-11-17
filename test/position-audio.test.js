@@ -34,6 +34,7 @@ test("network starvation waits for data without replaying an earlier prefix", as
   let sound = track(pipe, 2), completed = false;
   const job = advanceAudio(() => sound, 4, {
     needsMore: () => true,
+    onEnd: () => { throw Error("an incomplete snapshot cannot end the track"); },
     reopen: async () => { sound = track(pipe, 8); return true; },
   }).then(value => { completed = true; return value; });
   await Bun.sleep(30);
@@ -59,11 +60,25 @@ test("a cancelled seek cannot reopen a stale decoder after data arrives", async 
   expect(reopened).toBe(false);
 });
 
-test("an ended prefix or failed reopen never claims to have reached the target", async () => {
+test("seeking beyond final PCM reports EOF at the decoded position", async () => {
   const pipe = createBytePipe();
   pipe.append(new Uint8Array(1));
+  pipe.finish();
   const sound = track(pipe, 2);
-  expect(await advanceAudio(() => sound, 8, { needsMore: () => false, reopen: async () => false })).toBe(false);
+  const ends = [];
+  expect(await advanceAudio(() => sound, 8, {
+    needsMore: () => false, onEnd: source => ends.push(source.position),
+  })).toBe(false);
+  expect(ends).toEqual([2]);
+});
+
+test("a failed source cannot masquerade as a silent tail", async () => {
+  const pipe = createBytePipe();
+  pipe.fail(new Error("stream interrupted"));
+  const sound = track(pipe, 2);
+  await expect(advanceAudio(() => sound, 8, {
+    needsMore: () => false, onEnd: () => { throw Error("unexpected EOF"); },
+  })).rejects.toThrow("stream interrupted");
 });
 
 test("a seek before the first audio epoch cannot keep reopening an unreachable prefix", async () => {
