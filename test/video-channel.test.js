@@ -111,7 +111,7 @@ test('closing after ready clears stale pixels and reports fallback exactly once'
   }finally{fixture.dispose();}
 },5000);
 
-test('independent decoder transfers live pixels and retains measured-audio gating',async()=>{
+test('independent decoder waits for audio timing and resumes video after output failure',async()=>{
   const reports=[];const channel=await startVideoChannel(()=>{},r=>reports.push(r));
   try {
     const bytes=await Bun.file(new URL('./fixtures/long-video.mp4',import.meta.url)).bytes();
@@ -127,6 +127,18 @@ test('independent decoder transfers live pixels and retains measured-audio gatin
     expect(channel.frame.time).toBeGreaterThanOrEqual(.4);
     expect(channel.frame.pixels.byteLength).toBe(channel.frame.width*channel.frame.height*4);
     expect(first.pixels.byteLength).toBe(first.width*first.height*4);
+    // A replacement audio device can be pending at the current media time.
+    // Wait longer than one picture interval (this fixture is 4 FPS).
+    const anchor = channel.frame.time;
+    channel.bind(10, null, undefined, anchor, undefined, true);
+    channel.timing(4, anchor + 2); // stale device
+    await Bun.sleep(350);
+    expect(channel.frame.time).toBe(anchor);
+    // The renderer explicitly detaches a failed device and releases the video
+    // clock. Actual pixels must advance without another audio timing message.
+    channel.bind(10, null, undefined, anchor, undefined, false);
+    for (let i = 0; i < 100 && channel.frame.time === anchor; i++) await Bun.sleep(20);
+    expect(channel.frame.time).toBeGreaterThan(anchor);
     expect(reports.some(r=>r.error)).toBe(false);
   }finally{channel.stop();channel.worker.terminate();}
 },15000);
