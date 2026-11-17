@@ -7,6 +7,21 @@ const {CanvasKit:kit,builtinTypefaces}=await loadGraphics();
 const width=160,height=120;
 const info={width,height,colorType:kit.ColorType.RGBA_8888,alphaType:kit.AlphaType.Unpremul,colorSpace:kit.ColorSpace.SRGB};
 
+test('video mask subtraction clamps every channel across 64 KiB blocks and partial vectors', () => {
+  const width = 16385, height = 2, bytes = width * height * 4;
+  const black = Uint8Array.from({length:bytes}, (_, i) => i % 251);
+  const white = Uint8Array.from({length:bytes}, (_, i) => (i * 73) % 256);
+  const expected = white.map((value, i) => Math.max(0, value - black[i]));
+  const canvas = {save() {}, restore() {}, clear() {}};
+  const surface = {flush() {}, makeImageSnapshot() {
+    return {readPixels: () => white.slice(), delete() {}};
+  }};
+  const {mask, base} = rasterVideoMask({kit, canvas, surface, width, height,
+    pixels:black, paint() {}, blackAlreadyRasterized:true});
+  expect(Bun.deepEquals(mask, expected)).toBe(true);
+  expect(Bun.deepEquals(base, black)).toBe(true);
+});
+
 function scene({scale=1,rect={x:15.2,y:22.4,width:57.3,height:37.2},transform,opacity=1,clip=false,rounded=false,transparent=false,shadow=false,owned=false}) {
   const region={x:7.3,y:11.7,width:width/scale,height:height/scale};
   const surface=owned?makeRasterSurface(kit,width,height):kit.MakeSurface(width,height),canvas=surface.getCanvas();
