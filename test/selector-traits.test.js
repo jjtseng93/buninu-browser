@@ -30,6 +30,18 @@ test("focus pseudo-class features retain their complete names", () => {
   expect(traits.descendantStateCompounds.map(entry=>entry.states)).toEqual([[":focus"],[":focus-visible"],[":focus-within"]]);
 });
 
+test("repeated compounds retain each rule's descendant targets and sibling dependencies", () => {
+  const traits = sheetTraits(String.raw`
+    .menu\:wide:hover > .first {}
+    .menu\:wide:hover > #second {}
+    .menu\:wide:hover + .neighbor .third {}
+  `);
+  expect([...traits.descendantTargets.get(".menu:wide")]).toEqual([".first", "#second"]);
+  expect(traits.siblingFeatures.has(".menu:wide")).toBeTrue();
+  expect(traits.siblingStateFeatures.has(":hover")).toBeTrue();
+  expect([...traits.descendantTargets.get(".neighbor")]).toEqual([".third"]);
+});
+
 test("nested rule groups retain their first selector's invalidation dependencies", () => {
   const traits=sheetTraits('@media(min-width:1px){@layer app{.panel:focus-within .label{color:red}.panel:has([data-open]){color:blue}}}');
   expect(traits.descendantStateCompounds.map(entry=>entry.states)).toEqual([[":focus-within"]]);
