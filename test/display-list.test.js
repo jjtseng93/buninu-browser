@@ -315,3 +315,11 @@ test("counters() joins nested levels while sibling resets replace the same level
     expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['7.2.3','7.2.3','7.2']);
   } finally {window.happyDOM.abort();}
 });
+
+test("generated counters format each level independently of marker suffixes", () => {
+  const {window,displayList}=displayListFor('<i><b></b></i><em></em>',
+    'body{counter-reset:n 4}i{counter-reset:n 27}b::after{content:counters(n,"/",upper-alpha) ":" counter(n,lower-roman)}em{counter-set:n -1}em::after{content:counter(n,decimal-leading-zero)}');
+  try {
+    expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['D/AA:xxvii','-1']);
+  } finally {window.happyDOM.abort();}
+});
