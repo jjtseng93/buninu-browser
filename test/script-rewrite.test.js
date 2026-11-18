@@ -60,6 +60,8 @@ test("constructor reads go through the helper; writes, delete and optional chain
   const trigger = " (async () => {}).constructor;";
   expect(rewrite(`y = a . constructor ['constructor'];${trigger}`))
     .toBe("y = $buninu$constructor($buninu$constructor(a) ) ; ($buninu$constructor(async () => {}));");
+  expect(rewrite(String.raw`a.constr\u0075ctor; b["constr\x75ctor"];` + trigger))
+    .toBe("$buninu$constructor(a); $buninu$constructor(b); ($buninu$constructor(async () => {}));");
   // Calls keep the receiver (the helper's second argument).
   // A constructed one is parenthesized so `new` applies to the result.
   expect(rewrite(`b.constructor(1); new c.constructor(); new d.constructor;${trigger}`))
