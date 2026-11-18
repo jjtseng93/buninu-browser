@@ -589,3 +589,15 @@ test('computed image lists resolve gradient stop colors without changing inline 
   `)).toEqual(['linear-gradient(to right, rgb(255, 0, 0) 10%, rgba(0, 0, 0, 0))',
     'linear-gradient(rgb(0, 0, 0), rgb(0, 255, 0) 80%)','linear-gradient(black, #0f0 80%)']);
 });
+
+test('computed CSS image URLs follow the base URL and retain local fragments', async () => {
+  expect(await evaluate(`
+    const base=document.createElement('base');base.href='https://example.test/dir/';document.head.append(base);
+    one.style.maskImage='url("#part"), url("../a b.png")';
+    one.style.backgroundImage='url(r.png)';
+    const before=[one.style.maskImage,a.maskImage,a.backgroundImage];
+    base.href='https://another.test/';
+    return [...before,a.backgroundImage];
+  `)).toEqual(['url("#part"), url("../a b.png")','url("#part"), url("https://example.test/a%20b.png")',
+    'url("https://example.test/dir/r.png")','url("https://another.test/r.png")']);
+});
