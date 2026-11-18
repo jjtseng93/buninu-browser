@@ -282,3 +282,12 @@ test('filter percentages compute to factors and invalid replacements preserve th
     return [one.style.filter,getComputedStyle(one).webkitFilter];
   `)).toEqual(['brightness(50%) opacity(100%) invert()','brightness(0.5) opacity(1) invert(1)']);
 });
+
+test('hue rotation accepts typed angle math and rejects unitless nonzero values', async () => {
+  expect(await evaluate(`
+    const s=one.style,c=getComputedStyle(one);
+    s.filter='hue-rotate(-.5turn)';const initial=[s.filter,c.filter];
+    s.filter='hue-rotate(calc(90deg + .25turn))';s.filter='hue-rotate(1)';
+    return [initial,s.filter,c.filter];
+  `)).toEqual([['hue-rotate(-0.5turn)','hue-rotate(-180deg)'],'hue-rotate(calc(180deg))','hue-rotate(180deg)']);
+});
