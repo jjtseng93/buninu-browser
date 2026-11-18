@@ -25,6 +25,9 @@ try{
   for(const node of [subject,foreign])for(const value of tokens){
     node.setAttribute('class',value);check(node,`${node.tagName} setAttribute ${JSON.stringify(value)}`);
   }
+  subject.className=Array.from({length:32},(_,i)=>'token'+i).join(' ')+' a b a';
+  check(subject,'long class list with repeated tokens');
+  subject.classList.remove('a');check(subject,'mutated long class list');
   subject.className='a b';check(subject,'className');
   subject.classList.remove('a');check(subject,'classList.remove');
   subject.classList.add('a');check(subject,'classList.add');
