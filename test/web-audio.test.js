@@ -277,3 +277,22 @@ test('stereo buffers keep separate channels through gain, filter and partial PCM
     expect(pcm.filter((_,i)=>i%2===1).every(sample=>sample===0)).toBe(true);
   } finally {f.dispose();}
 });
+
+test('PannerNode renders source direction and listener movement into stereo PCM',()=>{
+  const f=setup(), c=f.context;
+  try {
+    const buffer=c.createBuffer(1,2048,8000);
+    buffer.getChannelData(0).fill(.5);
+    const src=c.createBufferSource(), p=c.createPanner();
+    src.buffer=buffer;src.connect(p).connect(c.destination);src.start();p.setPosition(1,0,0);
+    expect([...f.pull().slice(0,2)]).toEqual([0,16384]);
+    p.positionX.value=-2;
+    expect([...f.pull().slice(0,2)]).toEqual([8192,0]);
+    c.listener.setPosition(-3,0,0);
+    expect([...f.pull().slice(0,2)]).toEqual([0,16384]);
+    c.listener.setOrientation(0,0,1,0,1,0);
+    expect([...f.pull().slice(0,2)]).toEqual([16384,0]);
+    p.coneInnerAngle=90;p.coneOuterAngle=180;p.coneOuterGain=0;
+    expect([...f.pull().slice(0,2)]).toEqual([0,0]);
+  } finally {f.dispose();}
+});
