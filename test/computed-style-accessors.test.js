@@ -250,3 +250,18 @@ test('pending text stroke expands after substitution with longhand priority pres
     return [first,c.webkitTextStroke];
   `)).toEqual(['1px rgb(0, 0, 255)','4px rgb(0, 0, 255)']);
 });
+
+test('size containment excludes children from intrinsic sizing and preserves specified dimensions', async () => {
+  expect(await evaluate(`
+    const box=document.createElement('div');
+    box.style.cssText='display:inline-block;padding:2px';
+    box.innerHTML='<div style="width:80px;height:32px"></div>';
+    document.body.appendChild(box);
+    const state=()=>[getComputedStyle(box).contain,box.offsetWidth,box.offsetHeight];
+    box.style.contain='paint size layout';const size=state();
+    box.style.contain='size inline-size';const retained=box.style.contain;
+    box.style.contain='inline-size';const inline=state();
+    box.style.contain='size';box.style.height='18px';
+    return [size,retained,inline,state(),box.firstChild.offsetHeight];
+  `)).toEqual([['size layout paint',4,4],'size layout paint',['inline-size',4,36],['size',4,22],32]);
+});
