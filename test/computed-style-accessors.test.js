@@ -144,3 +144,18 @@ test('stylesheet aliases affect geometry and agree with CSS feature queries', as
     return [one.getBoundingClientRect().width,a.userSelect,CSS.supports('-webkit-transform','scaleX(2)')];
   `)).toEqual([200,'none',true]);
 });
+
+test('accent color validates declarations, inherits and resolves currentColor and var()', async () => {
+  expect(await evaluate(`
+    const s=one.style;
+    document.body.style.accentColor='red';
+    const inherited=a.accentColor;
+    s.cssText='accent-color:blue;accent-color:none;color:lime';
+    s.setProperty('accent-color','red blue');
+    const kept=[s.accentColor,a.getPropertyValue('accent-color')];
+    s.accentColor='currentColor';const current=a.accentColor;
+    s.accentColor='var(--missing, none)';const invalid=a.accentColor;
+    s.accentColor='auto';
+    return [inherited,kept,current,invalid,a.accentColor,CSS.supports('accent-color','none')];
+  `)).toEqual(['rgb(255, 0, 0)',['blue','rgb(0, 0, 255)'],'rgb(0, 255, 0)','rgb(255, 0, 0)','auto',false]);
+});

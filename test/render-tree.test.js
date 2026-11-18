@@ -101,7 +101,7 @@ test("form controls render their live value, placeholder, selection and checked 
   const { document, window } = parseHTMLDocument(`<body>
     <textarea id="area" rows="3">initial</textarea>
     <input id="empty" placeholder="type here"><input id="secret" type="password" value="abc">
-    <input id="box" type="checkbox" checked><input id="off" type="checkbox"><input type="hidden" value="h">
+    <input id="tinted" type="radio" checked style="accent-color:white"><input id="box" type="checkbox" checked><input id="off" type="checkbox"><input type="hidden" value="h">
     <select id="pick"><option>one</option><option selected>two</option></select>
     <input id="submit" type="submit"><button id="button"><b>bold</b> label</button>
   </body>`);
@@ -118,6 +118,7 @@ test("form controls render their live value, placeholder, selection and checked 
   expect(text("empty")).toBe("type here");
   expect(node("empty").children[0].style.color).toBe("rgba(117, 117, 117, 1)");
   expect(text("secret")).toBe("•••");
+  expect(node("tinted").style).toMatchObject({backgroundColor:"rgba(255, 255, 255, 1)",color:"rgba(0, 0, 0, 1)"});
   expect(text("box")).toBe("✓");
   expect(node("box").style.backgroundColor).toBe("rgba(0, 117, 255, 1)");
   expect(text("off")).toBe("");
