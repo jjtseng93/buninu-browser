@@ -3064,3 +3064,27 @@ test('video playback enters a subtitle, pauses on exit, and reactivates it after
   await evaluate('v.currentTime=.5');
   expect(await waitFor("events.length===3 && t.activeCues[0]===c",3000)).toBe(true);
 },12000);
+
+test('DOM constructor inheritance, global event methods and CSS flex serialization',async()=>{
+  await load('<div></div>');
+  expect(await evaluate(`(() => {
+    let calls=0;
+    function handler(){calls++;}
+    addEventListener('sample',handler);
+    dispatchEvent(new Event('sample'));
+    removeEventListener('sample',handler);
+    window.dispatchEvent(new Event('sample'));
+    return [calls,addEventListener===EventTarget.prototype.addEventListener, addEventListener.length,
+      Object.getPrototypeOf(HTMLVideoElement)===HTMLMediaElement,Object.getPrototypeOf(HTMLElement)===Element,
+      Object.getPrototypeOf(Element)===Node,Object.getPrototypeOf(Node)===EventTarget,
+      new EventTarget() instanceof Element,Array.length,TextTrack.length,TextTrackCueList.length,TextTrackList.length];
+  })()`)).toEqual([1,true,2,true,true,true,true,false,1,0,0,0]);
+  expect(await evaluate(`(() => {
+    const s=document.createElement('div').style;
+    s.webkitBoxOrient='none';
+    const invalid=s.cssText;
+    const flex=['none','1','auto'].map(value=>{s.webkitFlex=value;return s.cssText;});
+    s.setProperty('flex-grow','2','important');
+    return [invalid,flex,s.cssText.includes('flex-grow: 2 !important')];
+  })()`)).toEqual(['',['flex: 0 0 auto;','flex: 1 1 0%;','flex: 1 1 auto;'],true]);
+});
