@@ -3109,3 +3109,52 @@ test('element reflection and common event handlers work on live page objects',as
       new InputEvent('input',{isComposing:true}).isComposing, CSSRule.CHARSET_RULE,CSSRule.prototype.MARGIN_RULE];
   })()`)).toEqual([1,1,120,80,'true',null,'rtl',true,true,true,true,true,3,1,1,0,0,0,0,7,.5,20,true,true,2,9]);
 });
+
+test('parser writes insert at the current script and replacement documents accept HTML',async()=>{
+  await load('<body><script>document.write("<b>");document.write("first</b>");document.writeln("<i>second</i>");</script><p>end</p></body>');
+  expect(await evaluate("Array.from(document.body.children,e=>e.tagName)")).toEqual(['SCRIPT','B','I','P']);
+  expect(await evaluate("document.querySelector('b').textContent")).toBe('first');
+  expect(await evaluate(`document.open();document.write('<p i');document.write('d="new">rep');const original=document.querySelector('#new');document.write('lacement</p>');document.close();[document.body.textContent,document.readyState,original===document.body.firstChild]`)).toEqual(['replacement','complete',true]);
+});
+
+test('live file and link collections, table mutations and nonmodal dialog dismissal',async()=>{
+  await load('<a name="named"></a><table></table><dialog><button>OK</button></dialog>');
+  expect(await evaluate(`(() => {
+    const a=document.querySelector('a'), links=a.relList, embeds=document.embeds, anchors=document.anchors;
+    links.add('noopener');a.removeAttribute('name');document.body.append(document.createElement('embed'));
+    const table=document.querySelector('table'),body=table.createTBody(),row=body.insertRow(),cell=row.insertCell();
+    table.createCaption().textContent='title';cell.textContent='data';row.deleteCell(0);
+    const d=document.querySelector('dialog');d.show();d.oncancel=e=>e.preventDefault();d.requestClose();
+    const kept=d.hasAttribute('open');d.oncancel=null;d.requestClose('ok');
+    return [links===a.relList,a.getAttribute('rel'),anchors.length,embeds===document.plugins,embeds.length,
+      table.caption.textContent,row.cells.length,kept,d.hasAttribute('open'),d.returnValue];
+  })()`)).toEqual([true,'noopener',0,true,1,'title',0,true,false,'ok']);
+});
+
+test('modal dialog paints above z-indexed siblings, blocks outside focus and closes on Escape',async()=>{
+  await load('<button id="outside">open</button><div style="position:fixed;inset:0;z-index:999;background:red"></div><section style="position:relative;z-index:-1"><dialog style="left:10px;top:10px;width:100px;height:60px;background:blue"><button id="inside">ok</button></dialog></section>');
+  await evaluate("outside.focus();window.d=document.querySelector('dialog');d.showModal();outside.focus()");
+  expect(await evaluate("[document.activeElement.id,document.elementFromPoint(40,50)?.closest('dialog')===d]")).toEqual(['inside',true]);
+  await renderer.call('press','Escape');
+  expect(await evaluate("[d.hasAttribute('open'),document.activeElement.id]")).toEqual([false,'outside']);
+});
+
+test('written script runs once in the page realm and inserts before following content',async()=>{
+  await load('<body></body>');
+  expect(await evaluate(`(() => {
+    window.calls=0;document.open();
+    document.write('<scr');
+    document.write('ipt>calls++;document.write("<em>nested</em>")</script><strong>after</strong>');
+    document.close();
+    return [calls,document.body.textContent.endsWith('nestedafter'),HTMLScriptElement.supports('module')];
+  })()`)).toEqual([1,true,true]);
+});
+
+test('editing hints and iframe fullscreen reflect content attributes',async()=>{
+  await load('<input inputmode="NUMERIC" enterkeyhint="Go"><iframe></iframe>');
+  expect(await evaluate(`(() => {
+    const input=document.querySelector('input'), frame=document.querySelector('iframe');
+    frame.allowFullscreen=true;
+    return [input.inputMode,input.enterKeyHint,frame.hasAttribute('allowfullscreen')];
+  })()`)).toEqual(['numeric','go',true]);
+});

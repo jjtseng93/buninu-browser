@@ -223,12 +223,21 @@ export default class HTMLParser {
 			};
 		}
 
+		this.appendMarkup(html);
+		return this.rootNode;
+	}
+
+	/** Continue a document write with the same open elements and document structure.
+	 * The caller retains incomplete markup tokens until the next write. */
+	public appendMarkup(html: string): void {
+		const markupRegExp = this.markupRegExp!;
+		markupRegExp.lastIndex = 0;
 		let match: RegExpExecArray | null;
 		let lastIndex = 0;
 
 		html = String(html);
 
-		while ((match = this.markupRegExp.exec(html))) {
+		while ((match = markupRegExp.exec(html))) {
 			switch (this.readState) {
 				case MarkupReadStateEnum.any:
 					// Plain text between tags.
@@ -243,26 +252,26 @@ export default class HTMLParser {
 						// Start tag.
 						this.nextElement = this.getStartTagElement(match[1]);
 
-						this.startTagIndex = this.markupRegExp.lastIndex;
+						this.startTagIndex = markupRegExp.lastIndex;
 						this.readState = MarkupReadStateEnum.startTag;
 					} else if (match[2]) {
 						// End tag.
 						this.parseEndTag(match[2]);
 					} else if (match[3]) {
 						// Comment.
-						this.startTagIndex = this.markupRegExp.lastIndex;
+						this.startTagIndex = markupRegExp.lastIndex;
 						this.readState = MarkupReadStateEnum.comment;
 					} else if (match[5] !== undefined) {
 						// Document type.
-						this.startTagIndex = this.markupRegExp.lastIndex;
+						this.startTagIndex = markupRegExp.lastIndex;
 						this.readState = MarkupReadStateEnum.documentType;
 					} else if (match[6]) {
 						// Processing instruction.
-						this.startTagIndex = this.markupRegExp.lastIndex;
+						this.startTagIndex = markupRegExp.lastIndex;
 						this.readState = MarkupReadStateEnum.processingInstruction;
 					} else {
 						// Plain text between tags, including the matched tag as it is not a valid start or end tag.
-						this.parsePlainText(html.substring(lastIndex, this.markupRegExp.lastIndex));
+						this.parsePlainText(html.substring(lastIndex, markupRegExp.lastIndex));
 					}
 
 					break;
@@ -276,7 +285,7 @@ export default class HTMLParser {
 						if (this.nextElement) {
 							const attributeString = html.substring(
 								this.startTagIndex,
-								match[2] ? this.markupRegExp.lastIndex - 1 : match.index
+								match[2] ? markupRegExp.lastIndex - 1 : match.index
 							);
 							const isSelfClosed = !!match[7];
 
@@ -294,7 +303,7 @@ export default class HTMLParser {
 						this.parseComment(html.substring(this.startTagIndex, match.index));
 					} else if (match[3]) {
 						// The "--" can be part of the end tag (e.g. "<!-->").
-						this.markupRegExp.lastIndex -= 2;
+						markupRegExp.lastIndex -= 2;
 					}
 					break;
 				case MarkupReadStateEnum.documentType:
@@ -331,14 +340,14 @@ export default class HTMLParser {
 				HTMLElementConfig[(<Element>this.currentNode)[PropertySymbol.localName]]?.contentModel === HTMLElementConfigContentModelEnum.rcdata) {
 				const tag = (<Element>this.currentNode)[PropertySymbol.localName];
 				const end = new RegExp('</' + tag + '(?=[\\t\\n\\f\\r />])[^>]*>', 'gi');
-				end.lastIndex = this.markupRegExp.lastIndex;
+				end.lastIndex = markupRegExp.lastIndex;
 				const closing = end.exec(html);
-				const text = html.slice(this.markupRegExp.lastIndex, closing?.index ?? html.length);
+				const text = html.slice(markupRegExp.lastIndex, closing?.index ?? html.length);
 				this.parseRawTextElementContent(tag, text);
-				this.markupRegExp.lastIndex = closing ? end.lastIndex : html.length;
+				markupRegExp.lastIndex = closing ? end.lastIndex : html.length;
 			}
 
-			lastIndex = this.markupRegExp.lastIndex;
+			lastIndex = markupRegExp.lastIndex;
 		}
 
 		// Plain text after tags.
@@ -347,7 +356,6 @@ export default class HTMLParser {
 			this.parsePlainText(html.substring(lastIndex));
 		}
 
-		return this.rootNode;
 	}
 
 	/**
