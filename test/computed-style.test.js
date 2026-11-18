@@ -1039,3 +1039,18 @@ test("u, ins, s, strike and del take their UA text decoration, which author styl
     expect(styles.get(document.getElementById("bu")).fontWeight).toBe(700);
   } finally { window.happyDOM.close(); }
 });
+
+test("a custom element's public attributes cannot hide content attributes from CSS", () => {
+  const {document, window} = parseHTMLDocument('<x-panel data-mode="open"><x-action hidden>Less</x-action><x-action>More</x-action></x-panel>');
+  try {
+    const [panel,less,more] = document.querySelectorAll('x-panel,x-action');
+    for (const element of [panel,less,more]) Object.defineProperty(element,'attributes',{value:[]});
+    const css='x-action{display:inline-flex}[data-mode] x-action[hidden]{display:none!important}';
+    const engine=new StyleEngine();
+    engine.compute(document,[css]);
+    expect([engine.get(less).display,engine.get(more).display]).toEqual(['none','inline-flex']);
+    less.removeAttribute('hidden');more.setAttribute('hidden','');
+    engine.compute(document,[css]);
+    expect([engine.get(less).display,engine.get(more).display]).toEqual(['inline-flex','none']);
+  } finally { window.happyDOM.abort(); }
+});
