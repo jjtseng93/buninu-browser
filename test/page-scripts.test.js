@@ -3175,3 +3175,12 @@ test('closing a written document waits for external scripts before DOMContentLoa
   for(let attempt=0;attempt<50 && !(await evaluate("events.includes('ready')"));attempt++)await Bun.sleep(20);
   expect(await evaluate("events")).toEqual(['waiting','loading','ready']);
 });
+
+test('modal backdrop responds to CSS and covers the viewport for hit testing',async()=>{
+  await load('<style>dialog::backdrop {background:green} dialog.alt::backdrop {background:blue}</style><dialog style="top:0;left:0;width:40px;height:40px">hi</dialog>');
+  await evaluate("window.d=document.querySelector('dialog');d.showModal()");
+  expect(await evaluate("document.elementFromPoint(340,270)===d")).toBe(true);
+  const before=await renderer.call('screenshot');
+  await evaluate("d.className='alt'");
+  expect(await renderer.call('screenshot')).not.toBe(before);
+});
