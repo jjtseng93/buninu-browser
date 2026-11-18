@@ -3,7 +3,7 @@ import {parseHTMLDocument} from '../lib/happy-dom/parser.js';
 import {StyleEngine} from '../lib/style/computed-style.js';
 import {RenderTreeBuilder} from '../lib/render-tree/index.js';
 import {layoutText} from '../lib/layout/text-layout.js';
-import {elementBox,elementClientBox} from '../lib/input/hit-test.js';
+import {elementBox,elementClientBox,hasFixedImageGeometry} from '../lib/input/hit-test.js';
 import {RendererHost} from '../lib/renderer/host.js';
 
 test('fragment box lookup uses the first real node even when a pseudo box paints first', () => {
@@ -17,6 +17,16 @@ test('fragment box lookup uses the first real node even when a pseudo box paints
     ]}]};
     expect(elementBox(tree, layout, element)).toBeNull();
     expect(elementClientBox(tree, layout, element).box.width).toBe(width);
+  }
+});
+
+test('image decode retains matching fixed content dimensions and reflows intrinsic sizing', () => {
+  const element = {nodeType: 1};
+  for (const [width, height, expected] of [[30, 20, true], [30, 'auto', false], ['auto', 20, false], [40, 20, false]]) {
+    const node = {id: 1, type: 'image', domNode: element, widthAttribute: 30, heightAttribute: 20, style: {width, height}};
+    const tree = Object.freeze({nodesById: new Map([[1, node]])});
+    const layout = {fragments: [{runs: [{type: 'image', nodeId: 1, width: 30, height: 20}]}]};
+    expect(hasFixedImageGeometry(tree, layout, element)).toBe(expected);
   }
 });
 

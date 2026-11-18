@@ -23,9 +23,11 @@ StyleEngine.prototype.compute=function(...args){
 const response=(url,color,width,height)=>({ok:true,status:200,url,contentType:'image/svg+xml',
   body:new TextEncoder().encode(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><path fill="${color}" d="M0 0h${width}v${height}H0z"/></svg>`)});
 const delayed=Promise.withResolvers(),started=Promise.withResolvers(),errors=[];
+const firstImage = Promise.withResolvers();
 const renderer=await createPageRenderer({verifyStyle:true,reportError:error=>errors.push(String(error)),
   fetchResource(url,kind){
     assert.equal(kind,'image');
+    if(url.endsWith('/initial.svg'))return firstImage.promise;
     if(url.endsWith('/held.svg')){started.resolve();return delayed.promise;}
     return Promise.resolve(url.endsWith('/blue.svg')?response(url,'blue',24,18):response(url,'red',16,12));
   },
@@ -101,6 +103,17 @@ try{
   await renderer.screenshot();
   assert.ok(passes.some(pass=>!pass.requested&&pass.restyled>=120),'a known image attribute cannot cover an independent unknown host mutation');
   assert.deepEqual(errors,[]);
+
+  // The document can commit its fallback layout before initial image bytes arrive.
+  await renderer.loadDocument({url:'https://image-provenance.test/initial', contentType:'text/html',
+    source:'<body style="margin:0"><img id="picture" style="display:block;width:30px;height:20px" src="/initial.svg">'});
+  await renderer.screenshot();
+  assert.deepEqual(await run(dimensions),[false,0,0,30,20]);
+  firstImage.resolve(response('https://image-provenance.test/initial.svg','blue',24,18));
+  await renderer.whenLoaded();
+  await renderer.screenshot();
+  assert.deepEqual(await run(dimensions),[true,24,18,30,20]);
+  assert.deepEqual(pixel,[0,0,255,255],'initial decode updates retained paint');
 }finally{
   delayed.resolve(response('https://image-provenance.test/held.svg','red',99,77));
   renderer.dispose();
