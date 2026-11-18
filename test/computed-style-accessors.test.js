@@ -329,3 +329,16 @@ test('drop-shadow resolves currentcolor and font lengths and rejects spread and 
     return [one.style.filter,a.filter];
   `)).toEqual(['drop-shadow(1em -2px)','drop-shadow(rgb(255, 0, 0) 12px -2px 0px)']);
 });
+
+test('inherited drop shadows resolve currentcolor locally and retain inherited distances', async () => {
+  expect(await evaluate(`
+    one.appendChild(two);
+    one.style.fontSize='10px';two.style.fontSize='30px';
+    one.style.filter='drop-shadow(1em 0) drop-shadow(blue 0 0)';
+    two.style.filter='inherit';
+    const first=b.filter;
+    two.style.color='black';
+    return [first,b.filter];
+  `)).toEqual(['drop-shadow(rgb(0, 128, 0) 10px 0px 0px) drop-shadow(rgb(0, 0, 255) 0px 0px 0px)',
+    'drop-shadow(rgb(0, 0, 0) 10px 0px 0px) drop-shadow(rgb(0, 0, 255) 0px 0px 0px)']);
+});
