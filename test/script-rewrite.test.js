@@ -125,6 +125,19 @@ test("only parsed, non-strict programs are reported as sloppy-mode code", () => 
   expect(rewriteClassicScript("x = this; function f() { return this; }").code).not.toMatch(/[^(]this[^)]/);
 });
 
+test('functions created by direct eval restore their global reads', () => {
+  // Direct-eval code reads globals through the global binding and then wraps
+  // those reads in member helpers; both layers must come off for toString.
+  // A page may evaluate a function's text again (re-defining it from its
+  // own source), so leftovers would also break the next evaluation.
+  const fn = 'function(l,P){switch(!l.value){case ![]==0:undefined;break}return P?missing:[l[P],bt]}';
+  const prepared = prepareDirectEvalSource(`K=${fn}`, ['K', 'bt'], false);
+  const code = rewriteMemberReads(rewriteConstructorReads(prepared.code).code).code;
+  expect(code).toContain('$buninu$member');
+  const start = code.indexOf('function(');
+  expect(restoreSourceText(code.slice(start, code.lastIndexOf('}') + 1))).toBe(fn);
+});
+
 test('source restoration preserves long literals and all direct-eval marker stages', () => {
   const memberSource = 'function long(value) { return "' + 'A'.repeat(4096) + '" + value.name; }';
   expect(restoreSourceText(rewriteMemberReads(memberSource).code)).toBe(memberSource);
