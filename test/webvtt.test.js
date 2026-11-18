@@ -78,3 +78,38 @@ test('enabled track loads a WebVTT resource and replaces cues after changing src
     expect(await events(2)).toEqual([[2,1,'first'],[2,1,'second']]);
   } finally {await host.close();}
 });
+
+test('default markup starts loading without script accessing a track', async () => {
+  const host = new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    const source = '<video><track default src="data:text/vtt,WEBVTT%0A%0A00:00.000%20--%3E%2000:02.000%0AHello"></video>';
+    await host.call('loadDocument',{url:'https://video.test/',contentType:'text/html',status:200,source});
+    await host.call('whenLoaded');
+    await Bun.sleep(30);
+    expect(await host.call('evaluate',`(() => {
+      const el=document.querySelector('track');
+      return [el.readyState,el.track.mode,el.track.activeCues[0]?.text];
+    })()`)).toEqual([2,'showing','Hello']);
+  } finally {await host.close();}
+});
+
+test('changing cue membership dispatches enter, exit and cuechange', async () => {
+  const host = new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('loadDocument',{url:'https://video.test/',contentType:'text/html',status:200,source:'<video></video>'});
+    await host.call('whenLoaded');
+    await host.call('evaluate',`(() => {
+      window.log=[]; window.t=document.querySelector('video').addTextTrack('metadata');
+      window.c=new VTTCue(0,2,'entry');
+      c.addEventListener('enter',()=>log.push('enter'));
+      c.addEventListener('exit',()=>log.push('exit'));
+      t.addEventListener('cuechange',()=>log.push('changed'));
+      t.addCue(c);
+    })()`);
+    expect(await host.call('evaluate','log.slice()')).toEqual(['enter','changed']);
+    await host.call('evaluate','t.removeCue(c)');
+    expect(await host.call('evaluate','log.slice()')).toEqual(['enter','changed','exit','changed']);
+  } finally {await host.close();}
+});
