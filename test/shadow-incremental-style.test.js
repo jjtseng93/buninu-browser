@@ -186,3 +186,19 @@ test('scoped global state dependencies follow parsed nested selectors and sheet 
     expect(f.engine.shadowObservesState('target')).toBeFalse();
   } finally {f.window.happyDOM.close();}
 });
+
+test('shadow sheets can introduce and remove the only generated-content rule', () => {
+  const f = fixture('.inner{color:green}');
+  try {
+    f.sheets.length = 0;
+    const inner = f.root.firstElementChild;
+    const update = sheet => {
+      f.scopes.set(f.root, [sheet]);
+      f.engine.compute(f.document, f.sheets, {}, null, null, f.scopes);
+      return f.engine.getPseudo(inner, 'after');
+    };
+    expect(update('.inner{color:green}')).toBeNull();
+    expect(update('.inner::after{content:"ready"}')).not.toBeNull();
+    expect(update('.inner{color:green}')).toBeNull();
+  } finally { f.window.happyDOM.close(); }
+});
