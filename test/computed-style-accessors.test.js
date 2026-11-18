@@ -419,3 +419,14 @@ test('invalid transition assignments preserve the previous shorthand', async () 
     return [...previous,one.style.transition,a.transitionDuration];
   `)).toEqual(['opacity 2s','2s','','0s']);
 });
+
+test('animation names preserve case and quoted commas and reject malformed lists', async () => {
+  expect(await evaluate(`
+    const initial=a.animationName;
+    one.style.animation='1s "slide, left"';
+    const fromShorthand=a.animationName;
+    one.style.webkitAnimationName='FadeIn, NONE';
+    one.style.animationName='spin, inherit';
+    return [initial,fromShorthand,one.style.animationName,a.webkitAnimationName];
+  `)).toEqual(['none','"slide, left"','FadeIn, none','FadeIn, none']);
+});
