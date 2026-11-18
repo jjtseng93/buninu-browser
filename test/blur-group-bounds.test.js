@@ -151,13 +151,16 @@ test('off-origin shadows match layers anchored at the viewport origin', async ()
   } finally { kit.LTRBRect=makeRect; renderer.dispose(); }
 });
 
-test('an SVG shadow uses a local layer inside a circular clip and keeps the raster at its edge', async () => {
+test('an SVG shadow trims straight clip edges and preserves rounded corner coverage', async () => {
   const {CanvasKit: kit} = await loadGraphics();
   const renderer = await createPageRenderer({});
   const makeRect = kit.LTRBRect;
   try {
     renderer.resize(560,360,1);
-    for (const margin of [8, 9]) {
+    for (const [width,height,radius,left,top,local] of [
+      [40,40,20,8,8,true], [40,40,20,9,9,false],
+      [80,72,12,64,20,true], [80,72,12,65,0,false],
+    ]) {
       const frames = [];
       for (const reference of [true,false]) {
         let trimmed = false;
@@ -169,13 +172,13 @@ test('an SVG shadow uses a local layer inside a circular clip and keeps the rast
           return makeRect(x,y,r,b);
         };
         await renderer.loadDocument({url:'https://shadow.test/', contentType:'text/html', source:`<style>
-          body{margin:0;background:#dcc}section{position:absolute;left:320px;top:192px;width:40px;height:40px;
-          overflow:hidden;border-radius:20px}svg{position:absolute;left:${margin}px;top:${margin}px;
+          body{margin:0;background:#dcc}section{position:absolute;left:320px;top:192px;width:${width}px;height:${height}px;
+          overflow:hidden;border-radius:${radius}px}svg{position:absolute;left:${left}px;top:${top}px;
           filter:drop-shadow(-1px 2px 1px #5558)}</style><section><svg width="24" height="24">
           <path fill="#6299" d="M 0 0 L 32 23 Q 7 36 0 17 Z"/></svg></section>`});
         await renderer.whenLoaded();
         frames.push((await renderer.screenshot({format:'rgba'})).pixels);
-        expect(trimmed).toBe(margin === 8);
+        expect(trimmed).toBe(local);
       }
       expect(Bun.deepEquals(frames[0],frames[1])).toBe(true);
     }
