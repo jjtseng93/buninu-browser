@@ -262,3 +262,18 @@ test('AudioParam modulation keeps its running input alive through weak input con
   mod.deref().stop();expect(f.pull().every(v=>v===0)).toBe(true);
  }finally{f.dispose();}
 });
+
+test('stereo buffers keep separate channels through gain, filter and partial PCM reads',()=>{
+  const f=setup(),c=f.context;
+  try {
+    const buffer=c.createBuffer(2,512,8000);
+    buffer.getChannelData(0).fill(.5);
+    const source=c.createBufferSource(), gain=c.createGain(), filter=c.createBiquadFilter();
+    source.buffer=buffer;gain.gain.value=.5;
+    source.connect(gain).connect(filter).connect(c.destination);source.start();
+    f.pull(17);
+    const pcm=f.pull(160);
+    expect(pcm.filter((_,i)=>i%2===0).some(sample=>sample>0)).toBe(true);
+    expect(pcm.filter((_,i)=>i%2===1).every(sample=>sample===0)).toBe(true);
+  } finally {f.dispose();}
+});
