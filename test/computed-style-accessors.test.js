@@ -363,3 +363,12 @@ test('isolation confines positioned descendants when enabled dynamically', async
     return [initial,a.isolation,document.elementFromPoint(12,12)===two];
   `)).toEqual([true,'isolate',true]);
 });
+
+test('image rendering inherits and tracks changes to the parent', async () => {
+  expect(await evaluate(`
+    one.append(two);one.style.imageRendering='pixelated';
+    const before=b.imageRendering;
+    one.style.imageRendering='auto';two.style.imageRendering='invalid';
+    return [before,b.imageRendering];
+  `)).toEqual(['pixelated','auto']);
+});
