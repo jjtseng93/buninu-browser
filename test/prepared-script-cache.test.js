@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { PreparedScriptCache, prepareClassicScript } from "../lib/renderer/prepared-script-cache.js";
+import { createDirectEvalPreparation, PreparedScriptCache, prepareClassicScript } from "../lib/renderer/prepared-script-cache.js";
 import { escapeSesHtmlComments, rewriteClassicScriptSource } from "../lib/renderer/script-rewrite.js";
 
 test("cached preparation preserves source semantics and does not retain evaluated globals", () => {
@@ -42,4 +42,13 @@ test("different strictness and invalid sources never share a prepared result", (
   expect(cache.prepare("'use strict'; var value = 1;").strict).toBeTrue();
   expect(cache.prepare("var value = 1;").strict).toBeFalse();
   expect(cache.prepare("var = ;").parsed).toBeFalse();
+});
+
+test("direct eval reuses rewrites only for matching binding names and strictness", () => {
+  const prepare = createDirectEvalPreparation();
+  const source = "item.value";
+  const local = prepare(source, ["item"], false);
+  expect(prepare(source, ["item"], false)).toBe(local);
+  expect(prepare(source, [], false).code).not.toBe(local.code);
+  expect(prepare(source, [], true).strict).toBeTrue();
 });
