@@ -271,3 +271,15 @@ test("a transparent glyph fill retains the independently colored stroke", () => 
     expect([text.strokeWidth,text.strokeColor]).toEqual([2,'rgba(0, 0, 255, 1)']);
   } finally { window.happyDOM.abort(); }
 });
+
+test("paint containment clips a fixed descendant to the padding box for drawing and hit testing", () => {
+  const {window,displayList} = displayListFor('<div><b></b></div>',
+    'div{contain:paint;border-radius:10px;margin-left:10px;width:30px;height:20px;border:2px solid black}b{position:fixed;left:0;top:0;width:90px;height:50px;background:red}');
+  try {
+    const fill=displayList.items.find(item=>item.op==='fillRect' && item.color==='rgba(255, 0, 0, 1)');
+    expect(fill.clipRect).toEqual({x:12,y:2,width:30,height:20});
+    expect(hitTarget(displayList,12,2,{x:0,y:0})).not.toBe(fill.nodeId);
+    expect(hitTarget(displayList,22,10,{x:0,y:0})).toBe(fill.nodeId);
+    expect(hitTarget(displayList,55,5,{x:0,y:0})).not.toBe(fill.nodeId);
+  } finally { window.happyDOM.abort(); }
+});
