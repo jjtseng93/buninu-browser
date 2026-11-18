@@ -243,6 +243,7 @@ binary and CanvasKit's upstream build configuration:
 |---|---|---|
 | HarfBuzz text shaping | `LICENSES/harfbuzz.txt` (Old MIT) | https://github.com/harfbuzz/harfbuzz |
 | ICU Unicode data and processing (binary reports ICU 74) | `LICENSES/icu.txt` (Unicode License v3) | https://github.com/unicode-org/icu |
+| ICU 76.1 locale quotation delimiter data in `lib/style/locale-quotes.js` | `LICENSES/icu.txt` (Unicode License v3) | https://github.com/unicode-org/icu |
 | FreeType fonts | `LICENSES/freetype.txt` (FreeType License) | https://gitlab.freedesktop.org/freetype/freetype |
 | libpng | `LICENSES/libpng.txt` (PNG Reference Library License) | https://github.com/pnggroup/libpng |
 | libjpeg-turbo / IJG JPEG | `LICENSES/libjpeg-turbo.txt`, `LICENSES/libjpeg-ijg.txt` (BSD-style and IJG terms) | https://github.com/libjpeg-turbo/libjpeg-turbo |

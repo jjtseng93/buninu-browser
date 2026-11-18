@@ -291,3 +291,11 @@ test("style containment inherits quote depth and isolates changes made inside", 
     expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text).join('')).toBe('ABa');
   } finally { window.happyDOM.abort(); }
 });
+
+test("automatic quote pairs follow the local content language at each nesting level", () => {
+  const {window,displayList}=displayListFor('<div lang="zh-TW"><i><b></b></i><i lang="de"><b></b></i></div>',
+    'i::before,b::before{content:open-quote}i::after,b::after{content:close-quote}');
+  try {
+    expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text).join('')).toBe('「『』」„‚‘“');
+  } finally { window.happyDOM.abort(); }
+});
