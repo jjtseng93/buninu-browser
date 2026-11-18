@@ -33,3 +33,22 @@ test('page scripts can construct and edit cues and request independent cue fragm
     })()`)).toEqual([true,4,50,'Ada','B','Hello & welcome',true]);
   } finally {await host.close();}
 });
+
+test('media track lists reflect DOM order, cue ownership, timing and mode', async () => {
+  const host = new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('loadDocument',{url:'https://video.test/',contentType:'text/html',status:200,source:'<video><track id="cc" label="中文"></video>'});
+    await host.call('whenLoaded');
+    expect(await host.call('evaluate',`(() => {
+      const video=document.querySelector('video'), list=video.textTracks, cc=list.getTrackById('cc');
+      const t=video.addTextTrack('captions','English','en'), cues=t.cues, active=t.activeCues;
+      const cue=new VTTCue(0,2,'hello'); cue.id='a'; t.addCue(cue);
+      const result=[list instanceof TextTrackList,list.length,list[0]===cc,list[1]===t,cc.label,
+        cc.cues===null,cues.getCueById('a')===cue,active[0]===cue];
+      cc.addCue(cue); cc.mode='showing';
+      document.getElementById('cc').remove();
+      return [...result,cues.length,list.length,cc.cues[0]===cue,cue.track===cc];
+    })()`)).toEqual([true,2,true,true,'中文',true,true,true,0,1,true,true]);
+  } finally {await host.close();}
+});
