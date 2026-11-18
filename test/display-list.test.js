@@ -386,3 +386,11 @@ test('round repeat preserves the background phase while resizing the selected ax
   expect(displayList.items.find(item=>item.gradient).tile).toEqual({x:36.5,y:23.5,width:25,height:30});
   window.happyDOM.abort();
 });
+
+test('space repeat distributes spare width and positions a single tile vertically', () => {
+  const {window,displayList}=displayListFor('<div></div>',
+    'div{width:70px;height:30px;background:linear-gradient(red,blue) right bottom / 20px 18px space}');
+  const layer=displayList.items.find(item=>item.gradient);
+  expect(layer).toMatchObject({tile:{x:0,y:12,width:20,height:18},gapX:5,gapY:0,repeatX:true,repeatY:false});
+  window.happyDOM.abort();
+});
