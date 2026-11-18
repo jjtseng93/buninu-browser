@@ -134,3 +134,20 @@ test('showing captions paint into the video; hidden cues remain accessible', asy
     expect(await host.call('evaluate','t.activeCues[0].text')).toBe('字幕 Hello');
   } finally {await host.close();}
 });
+
+test('indexed textTracks delivers add, mode change and removal events',async()=>{
+  const host=new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('loadDocument',{url:'https://video.test/',contentType:'text/html',status:200,source:'<video></video>'});
+    await host.call('whenLoaded');
+    await host.call('evaluate',`window.v=document.querySelector('video');window.list=v.textTracks;window.log=[];
+      list.onaddtrack=e=>log.push(e.track.label);
+      list.addEventListener('removetrack',e=>log.push('removed '+e.track.label));
+      list.onchange=()=>log.push('changed');
+      v.addTextTrack('metadata','script').mode='showing';
+      window.el=document.createElement('track');el.label='element';v.appendChild(el);el.remove()`);
+    for(let n=0;n<50 && await host.call('evaluate','log.length')<4;n++)await Bun.sleep(10);
+    expect(await host.call('evaluate','log.slice().sort()')).toEqual(['changed','element','removed element','script']);
+  } finally {await host.close();}
+});
