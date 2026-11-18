@@ -380,9 +380,9 @@ test('each background layer positions its tile in the requested origin box', () 
   window.happyDOM.abort();
 });
 
-test('round repeat adjusts each selected background axis before positioning', () => {
+test('round repeat preserves the background phase while resizing the selected axis', () => {
   const {window,displayList}=displayListFor('<div></div>',
     'div{width:100px;height:77px;background:linear-gradient(red,blue) center / 27px 30px round no-repeat}');
-  expect(displayList.items.find(item=>item.gradient).tile).toEqual({x:37.5,y:23.5,width:25,height:30});
+  expect(displayList.items.find(item=>item.gradient).tile).toEqual({x:36.5,y:23.5,width:25,height:30});
   window.happyDOM.abort();
 });
