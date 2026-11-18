@@ -233,3 +233,12 @@ test("a scroll container moves its content by its scroll offset and reports how 
   expect(displayList.scrollers.get(boxId)).toMatchObject({ bottom: 60 });
   expect(hitTarget(displayList, 5, 10, { x: 0, y: 0 })).toBe(second.nodeId);
 });
+
+test("content visibility hides block descendants and pseudo content but paints the container", () => {
+  const {window,displayList} = displayListFor('<div><b>hidden</b></div><span>shown</span>',
+    'div,span{content-visibility:hidden}div{background:red;height:20px}div::before{content:"before"}');
+  try {
+    expect(displayList.items.some(item=>item.op==='fillRect')).toBe(true);
+    expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['shown']);
+  } finally { window.happyDOM.abort(); }
+});

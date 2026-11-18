@@ -193,3 +193,16 @@ test('transform origin resolves against the current border box across CSSOM alia
     return [initial,calc,resized,kept,a.transformOrigin];
   `)).toEqual(['50px 40px','48px 0px','98px 0px','200px 80px 3px','30% 10%']);
 });
+
+test('content visibility toggles intrinsic block height and continues to cascade', async () => {
+  expect(await evaluate(`
+    one.style.cssText='display:block;width:60px';
+    one.innerHTML='<div style="height:35px"></div>';
+    const state=()=>[getComputedStyle(one).contentVisibility,one.offsetHeight];
+    const before=state();
+    one.style.contentVisibility='hidden';
+    const hidden=state();
+    one.style.contentVisibility='visible';
+    return [before,hidden,state()];
+  `)).toEqual([['visible',35],['hidden',0],['visible',35]]);
+});
