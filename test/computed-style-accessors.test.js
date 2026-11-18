@@ -401,3 +401,10 @@ test('transition-property preserves custom names and permits none only on its ow
     return [initial,list,one.style.transitionProperty,a.webkitTransitionProperty];
   `)).toEqual(['all','opacity, --Foo, Unknown','none','none']);
 });
+
+test('transition shorthand resolves substituted lists and resets omitted behavior', async () => {
+  expect(await evaluate(`
+    one.style.cssText='--times:250ms linear;transition:opacity var(--times) 1s allow-discrete, color 2s';
+    return [a.transitionProperty,a.transitionDuration,a.transitionDelay,a.transitionBehavior,a.webkitTransition];
+  `)).toEqual(['opacity, color','0.25s, 2s','1s, 0s','allow-discrete, normal','opacity 0.25s linear 1s allow-discrete, color 2s']);
+});
