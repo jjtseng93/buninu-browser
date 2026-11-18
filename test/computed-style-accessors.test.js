@@ -291,3 +291,12 @@ test('hue rotation accepts typed angle math and rejects unitless nonzero values'
     return [initial,s.filter,c.filter];
   `)).toEqual([['hue-rotate(-0.5turn)','hue-rotate(-180deg)'],'hue-rotate(calc(180deg))','hue-rotate(180deg)']);
 });
+
+test('blur computes its radius with the current font and rejects negative lengths and percentages', async () => {
+  expect(await evaluate(`
+    one.style.fontSize='20px';one.style.filter='blur(.5em)';
+    const first=a.filter;one.style.fontSize='30px';
+    one.style.filter='blur(-2px)';one.style.filter='blur(10%)';
+    return [first,a.filter,one.style.filter];
+  `)).toEqual(['blur(10px)','blur(15px)','blur(0.5em)']);
+});

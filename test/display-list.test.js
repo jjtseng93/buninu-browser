@@ -323,3 +323,14 @@ test("generated counters format each level independently of marker suffixes", ()
     expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['D/AA:xxvii','-1']);
   } finally {window.happyDOM.abort();}
 });
+
+test("blur extends paint culling bounds without enlarging pointer targets", () => {
+  const {window,displayList}=displayListFor('<div></div>',
+    'div{width:20px;height:20px;margin-left:20px;background:red;filter:blur(4px)}');
+  try {
+    const area={x:12,y:5,width:3,height:3};
+    const item=visibleItems(displayList,area).find(item=>item.op==='fillRect');
+    expect(item.bounds.x).toBe(8);
+    expect(hitTarget(displayList,13,6,{x:0,y:0})).not.toBe(item.nodeId);
+  } finally {window.happyDOM.abort();}
+});
