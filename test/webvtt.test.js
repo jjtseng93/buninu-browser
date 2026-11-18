@@ -113,3 +113,19 @@ test('changing cue membership dispatches enter, exit and cuechange', async () =>
     expect(await host.call('evaluate','log.slice()')).toEqual(['enter','changed','exit','changed']);
   } finally {await host.close();}
 });
+
+test('showing captions paint into the video; hidden cues remain accessible', async () => {
+  const host=new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('loadDocument',{url:'https://video.test/',contentType:'text/html',status:200,
+      source:'<video width="320" height="180"></video>'});
+    await host.call('whenLoaded');
+    const original=await host.call('screenshot');
+    await host.call('evaluate',`window.t=document.querySelector('video').addTextTrack('captions');t.addCue(new VTTCue(0,10,'字幕 Hello'));t.mode='showing'`);
+    expect(await host.call('screenshot')).not.toBe(original);
+    await host.call('evaluate',"t.mode='hidden'");
+    expect(await host.call('screenshot')).toBe(original);
+    expect(await host.call('evaluate','t.activeCues[0].text')).toBe('字幕 Hello');
+  } finally {await host.close();}
+});
