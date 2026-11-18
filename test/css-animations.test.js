@@ -88,3 +88,17 @@ test('animation names preserve keyword prefixes and disambiguate repeated keywor
   expect([second.name, second.timingFunction]).toEqual(['linear', 'linear']);
   expect([third.name, third.direction]).toEqual(['Reverse', 'normal']);
 });
+
+test('inline animation serializes all eight components and rejects an invalid replacement', () => {
+  const {document,window} = parseHTMLDocument('<div></div>');
+  try {
+    const style = document.querySelector('div').style;
+    style.setProperty('animation','none');
+    expect(style.cssText).toBe('animation: auto ease 0s 1 normal none running none;');
+    style.animation = '-1s fade, spin 300ms infinite';
+    const expected = 'auto ease -1s 1 normal none running fade, 300ms ease 0s infinite normal none running spin';
+    expect(style.animation).toBe(expected);
+    style.animation = 'two names';
+    expect(style.animation).toBe(expected);
+  } finally { window.happyDOM.close(); }
+});
