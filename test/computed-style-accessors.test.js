@@ -159,3 +159,23 @@ test('accent color validates declarations, inherits and resolves currentColor an
     return [inherited,kept,current,invalid,a.accentColor,CSS.supports('accent-color','none')];
   `)).toEqual(['rgb(255, 0, 0)',['blue','rgb(0, 0, 255)'],'rgb(0, 255, 0)','rgb(255, 0, 0)','auto',false]);
 });
+
+test('computed outline, flex shorthands and 3D transform properties reflect cascade changes', async () => {
+  expect(await evaluate(`
+    const s=one.style, read=()=>[a.outline,a.outlineOffset,a.flex,a.flexFlow,
+      a.webkitBackfaceVisibility,a.getPropertyValue('-webkit-transform-style')];
+    s.cssText='';
+    const initial=read();
+    const sheet=document.createElement('style');
+    sheet.textContent='#one{color:red;outline:2px dotted;outline-offset:-1px;flex:1;flex-flow:column wrap;-webkit-transform-style:preserve-3d}';
+    document.head.appendChild(sheet);
+    s.WebkitBackfaceVisibility='hidden';
+    const styled=read();
+    s.color='green';s.flexGrow='3';s.webkitTransformStyle='flat';
+    return [initial,styled,read(),s.getPropertyValue('backface-visibility')];
+  `)).toEqual([
+    ['rgb(0, 0, 0) none 3px','0px','0 1 auto','row nowrap','visible','flat'],
+    ['rgb(255, 0, 0) dotted 2px','-1px','1 1 0%','column wrap','hidden','preserve-3d'],
+    ['rgb(0, 128, 0) dotted 2px','-1px','3 1 0%','column wrap','hidden','flat'],'hidden',
+  ]);
+});
