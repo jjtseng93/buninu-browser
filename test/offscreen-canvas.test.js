@@ -86,3 +86,30 @@ test('convertToBlob returns a decodable PNG snapshot',async()=>{
     expect(result).toEqual(['image/png',0,0,255,255]);
   } finally {await host.close();}
 });
+
+test('worker takes exclusive control and paints the original placeholder',async()=>{
+  const host=new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('loadDocument',{url:'https://canvas.test/',contentType:'text/html',status:200,source:'<canvas width="3" height="2"></canvas>'});
+    await host.call('whenLoaded');
+    expect(await host.call('evaluate',`(() => {
+      const el=document.querySelector('canvas'),off=el.transferControlToOffscreen();
+      const source="onmessage=e=>{const c=e.data.canvas,x=c.getContext('2d');x.fillStyle='lime';x.fillRect(0,0,c.width,c.height);postMessage(e.data.copy===c)}";
+      const w=new Worker(URL.createObjectURL(new Blob([source],{type:'text/javascript'})));
+      w.onmessage=e=>{window.delivered=e.data;w.terminate()};
+      let error;try{w.postMessage({bad:()=>{},canvas:off},[off])}catch(e){error=e.name}
+      const before=off.width;
+      w.postMessage({canvas:off,copy:off},[off]);
+      return [error,before,off.width];
+    })()`)).toEqual(['DataCloneError',3,0]);
+    for(let i=0;i<60;i++){
+      if(await host.call('evaluate','window.delivered===true'))break;
+      await Bun.sleep(10);
+    }
+    expect(await host.call('evaluate',`(() => {
+      const x=document.createElement('canvas').getContext('2d');x.drawImage(document.querySelector('canvas'),0,0);
+      return [...x.getImageData(2,1,1,1).data];
+    })()`)).toEqual([0,255,0,255]);
+  } finally {await host.close();}
+});
