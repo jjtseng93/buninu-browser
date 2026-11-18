@@ -3056,8 +3056,8 @@ test('video playback enters a subtitle, pauses on exit, and reactivates it after
   await load('<video src="/long-video.mp4" width="160" height="120"></video>');
   await evaluate(`window.v=document.querySelector('video');window.t=v.addTextTrack('subtitles');
     window.c=new VTTCue(.3,1.3,'subtitle');window.events=[];
-    c.pauseOnExit=true;c.addEventListener('enter',()=>events.push('enter'));
-    c.addEventListener('exit',()=>events.push('exit'));
+    c.pauseOnExit=true;c.onenter=()=>events.push('enter');
+    c.onexit=()=>events.push('exit');
     t.mode='showing';t.addCue(c);void v.play()`);
   expect(await waitFor("v.paused && events.includes('exit')",6000)).toBe(true);
   expect(await evaluate('[events.slice(),t.activeCues.length]')).toEqual([['enter','exit'],0]);
