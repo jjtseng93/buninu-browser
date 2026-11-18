@@ -5,7 +5,10 @@ import { LayoutEngine } from '../../lib/layout/text-layout.js';
 const original = LayoutEngine.prototype.layout;
 let layouts = 0;
 LayoutEngine.prototype.layout = function(...args) { layouts++; return original.apply(this, args); };
-const renderer = await createPageRenderer({});
+let paintLists = 0;
+const renderer = await createPageRenderer({trace(message) {
+  if (message === 'building display list') paintLists++;
+}});
 const { CanvasKit: kit } = await loadGraphics();
 const geometry = `Array.from(document.querySelectorAll('[data-check]'), e => {
   const r=e.getBoundingClientRect(); return [e.id,r.x,r.y,r.width,r.height];
@@ -66,6 +69,23 @@ try {
     assert.deepEqual(await renderer.evaluate(geometry), retainedGeometry, `${label}: geometry`);
     assert.deepEqual(await pixels(), retainedPixels, `${label}: pixels`);
   }
+  const beforeRects = paintLists;
+  const widths = await renderer.evaluate(`(() => {
+    const box = document.getElementById('box'), widths = [];
+    for (let w = 80; w < 92; w++) {
+      box.style.width = w + 'px';
+      widths.push(box.getBoundingClientRect().width);
+    }
+    return widths;
+  })()`);
+  assert.deepEqual(widths, Array.from({length:12}, (_, i) => 80+i));
+  assert.ok(paintLists-beforeRects <= 1, 'ordinary rect reads coalesce deferred paint lists');
+  const scaled = await renderer.evaluate(`(() => {
+    const box = document.getElementById('box');
+    box.parentElement.style.transform = 'scale(2)';
+    return box.getBoundingClientRect().width;
+  })()`);
+  assert.equal(scaled, 182, 'ancestor transform participates after deferred reads');
 } finally {
   renderer.dispose();
   LayoutEngine.prototype.layout = original;
