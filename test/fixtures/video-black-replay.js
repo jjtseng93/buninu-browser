@@ -105,6 +105,15 @@ for (const alpha of [255,127]) {
     // The page background makes both rasters opaque, even for an alpha video;
     // owned surface storage now avoids readPixels for all of these passes.
     assert.equal(readbacks-beforeReads,0);compare('warm');
+    await repaint('contain a wide video inside a taller box', "document.querySelector('video').style.height='122px'");
+    const contained = candidate.tile.videoLayer.rect;
+    assert.deepEqual(contained, {x:15,y:38,width:200,height:113});
+    const pixel = (tile,x,y) => Array.from(tile.pixels.subarray((y*tile.pixelWidth+x)*4,(y*tile.pixelWidth+x)*4+4));
+    assert.deepEqual(pixel(reference.tile,90,30),[0,0,0,255],'letterbox in ordinary paint');
+    assert.deepEqual(pixel(candidate.tile,90,30),[0,0,0,255],'letterbox during playback');
+    await repaint('explicit fill', "document.querySelector('video').style.objectFit='fill'");
+    assert.equal(candidate.tile.videoLayer.rect.height,153);
+    await repaint('restore video', "document.querySelector('video').style.cssText=''");
     if (alpha === 255) {
       const plain = candidate.tile.pixels.slice();
       for (const expression of [
