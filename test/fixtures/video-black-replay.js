@@ -33,9 +33,9 @@ function framePixels(alpha) {
   return pixels;
 }
 async function makeClient(alpha) {
-  const client = {messages:[],errors:[],tile:null,frame:null};
+  const client = {messages:[],errors:[],traces:[],tile:null,frame:null};
   let allocation = 0;
-  client.renderer = await createPageRenderer({renderMinInterval:1000,
+  client.renderer = await createPageRenderer({trace:m=>client.traces.push(m),renderMinInterval:1000,
     allocateFramePixels(bytes) {
       const offset = [0, 4, 1][allocation++ % 3];
       const storage = new Uint8Array(new SharedArrayBuffer(offset + bytes + 3));
@@ -105,6 +105,27 @@ for (const alpha of [255,127]) {
     // The page background makes both rasters opaque, even for an alpha video;
     // owned surface storage now avoids readPixels for all of these passes.
     assert.equal(readbacks-beforeReads,0);compare('warm');
+    if (alpha === 255) {
+      const plain = candidate.tile.pixels.slice();
+      for (const expression of [
+        "window.track = document.querySelector('video').addTextTrack('captions'); window.cue = new VTTCue(0,99,'First caption'); cue.snapToLines=false; cue.line=60; track.mode='showing'; track.addCue(cue)",
+        "cue.text='Second caption'",
+        "track.mode='hidden'",
+      ]) {
+        await reference.renderer.evaluate(expression);
+        await reference.renderer.screenshot({format:'rgba'});
+        const beforeCue = candidate.traces.length;
+        await candidate.renderer.evaluate(expression);
+        await candidate.renderer.screenshot({format:'rgba'});
+        const hidden = expression.includes("'hidden'");
+        const operations = candidate.traces.slice(beforeCue);
+        assert.ok(operations.some(s=>s.includes('composed video captions from retained page layers')));
+        assert.ok(!operations.some(s=>s.includes('restyle and relayout') || s.includes('paint damage')));
+        const expected = compositeVideo(reference.tile,candidate.frame).pixels;
+        assert.ok(candidate.tile.pixels.every((v,i)=>Math.abs(v-expected[i])<=2),'caption under foreground agrees with ordinary raster');
+        assert.equal(candidate.tile.pixels.every((v,i)=>v===plain[i]),hidden);
+      }
+    }
     const oldTile = candidate.tile, oldPixels = oldTile.pixels.slice(), oldBase = oldTile.videoLayer.base.slice(), oldMask = oldTile.videoLayer.mask.slice();
     const raw = await candidate.renderer.screenshot({format:'rgba'});
     assert.deepEqual(raw.pixels,captureViewport(candidate.tile,0,0,320,220).pixels);
@@ -126,6 +147,10 @@ for (const alpha of [255,127]) {
       ['shadow',"document.getElementById('shadow').style.boxShadow='-8px 3px 20px #000b'"],
     ]) await repaint(label,expression);
     assert.deepEqual(oldTile.pixels,oldPixels);assert.deepEqual(oldTile.videoLayer.base,oldBase);assert.deepEqual(oldTile.videoLayer.mask,oldMask);
+    await mutate("document.getElementById('wrap').style.opacity='1';document.getElementById('wrap').style.transform='none'");
+    for (const client of clients) await layer(client);
+    seed(candidate,alpha);
+    await repaint('warm restored presentation', "document.getElementById('marker').style.background='purple'");
     // A writer's odd serial must leave the previous coherent native/frame pair.
     const message = candidate.messages.findLast(message=>message.type==='video-open');
     Atomics.store(new Int32Array(message.shared,0,4),0,3);
