@@ -425,6 +425,25 @@ test("upgrading declarative custom elements initializes observed properties befo
   ]));
 });
 
+test("custom element connection callbacks retain their registered methods", async () => {
+  await load('<main></main>');
+  const result=await evaluate(`JSON.stringify((()=>{
+    const events=[];
+    class Item extends HTMLElement {
+      get connectedCallback(){events.push('read connect');return function(){events.push('connect '+this.id)}}
+      get disconnectedCallback(){events.push('read disconnect');return function(){events.push('disconnect '+this.id)}}
+    }
+    customElements.define('registered-item',Item);
+    const item=document.createElement('registered-item');
+    item.id='a';
+    Object.defineProperty(item,'connectedCallback',{value(){events.push('unexpected instance method')}});
+    Object.defineProperty(Item.prototype,'disconnectedCallback',{value(){events.push('unexpected prototype method')}});
+    document.body.appendChild(item);item.remove();
+    return events;
+  })())`);
+  expect(JSON.parse(result)).toEqual(['read connect','read disconnect','connect a','disconnect a']);
+});
+
 test("upgrade reactions keep initial values and constructor mutations in callback order", async () => {
   await load('<mutable-label count="1"></mutable-label><failed-label count="1"></failed-label>');
   expect(await evaluate(`JSON.stringify((()=>{
