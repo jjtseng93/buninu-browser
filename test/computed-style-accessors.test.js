@@ -505,3 +505,18 @@ test('mask-image shares image list parsing across CSSOM spellings', async () => 
     'linear-gradient(black, transparent), url("https://example.test/mask.png")',
     'linear-gradient(black, transparent), url("https://example.test/mask.png")','none','none',false]);
 });
+
+test('a mask image confines descendant stacking until removed', async () => {
+  expect(await evaluate(`
+    one.style.cssText='';
+    two.style.cssText='position:relative;width:40px;height:40px';
+    const child=document.createElement('span');
+    child.style.cssText='position:absolute;z-index:100;width:40px;height:40px';
+    one.append(child);
+    const initial=document.elementFromPoint(12,12)===child;
+    one.style.webkitMaskImage='linear-gradient(black,black)';
+    const masked=document.elementFromPoint(12,12)===two;
+    one.style.maskImage='none';
+    return [initial,masked,document.elementFromPoint(12,12)===child];
+  `)).toEqual([true,true,true]);
+});
