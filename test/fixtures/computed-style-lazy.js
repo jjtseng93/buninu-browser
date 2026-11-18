@@ -84,6 +84,20 @@ try {
   })()`);
   assert.deepEqual(styles, { layouts:0,first:["rgb(255, 0, 0)","block","0"],
     last:["rgb(0, 0, 255)","block","19"],hidden:["none"] });
+  assert.deepEqual(await renderer.evaluate(`(() => {
+    const box = document.getElementById('box'), style = getComputedStyle(box);
+    box.style.overflow = 'hidden auto';
+    const before = __serializationCalls();
+    const values = [style.display, style.getPropertyValue('OVERFLOW'), style.position];
+    box.style.overflow = 'scroll';
+    values.push(style.overflow);
+    const parent = box.parentNode;
+    box.remove();
+    values.push(style.display, style.overflow);
+    parent.appendChild(box);
+    values.push(style.display, __serializationCalls() - before);
+    return values;
+  })()`), ['block', 'hidden auto', 'static', 'scroll', '', '', 'block', 0]);
   const padding = await renderer.evaluate(`(() => {
     const box=document.getElementById('box'),child=document.getElementById('child'),start=__layoutCalls();
     box.style.width='310px';box.style.padding='2px 3px 4px 5px';
