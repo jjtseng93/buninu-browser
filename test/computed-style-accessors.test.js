@@ -391,3 +391,13 @@ test('transition timing lists compute independently and reject invalid replaceme
     return [one.style.transitionDuration,a.transitionDuration,a.webkitTransitionDelay,a.transitionTimingFunction,a.transitionBehavior];
   `)).toEqual(['250ms, 2s','0.25s, 2s','-0.125s','steps(2)','allow-discrete, normal']);
 });
+
+test('transition-property preserves custom names and permits none only on its own', async () => {
+  expect(await evaluate(`
+    const initial=a.transitionProperty;
+    one.style.webkitTransitionProperty='OPACITY, --Foo, Unknown';
+    one.style.transitionProperty='none, opacity';one.style.transitionProperty='default';
+    const list=a.transitionProperty;one.style.transitionProperty='NONE';
+    return [initial,list,one.style.transitionProperty,a.webkitTransitionProperty];
+  `)).toEqual(['all','opacity, --Foo, Unknown','none','none']);
+});
