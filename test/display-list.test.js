@@ -345,3 +345,11 @@ test('paint backdrop filters before the element background within its rounded bo
   expect(displayList.items[index+1]).toMatchObject({op:'fillRect',nodeId:item.nodeId});
   window.happyDOM.abort();
 });
+
+test('isolation encloses the blend layer for a descendant', () => {
+  const {window, displayList} = displayListFor('<div><b>Text</b></div>',
+    'div{isolation:isolate}b{mix-blend-mode:color-dodge}');
+  const text = displayList.items.find(item => item.op === 'drawText');
+  expect(text.filters.map(group => [group.isolated,group.blend])).toEqual([[true,undefined],[false,'ColorDodge']]);
+  window.happyDOM.abort();
+});
