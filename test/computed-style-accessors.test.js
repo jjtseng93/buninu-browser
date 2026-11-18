@@ -504,8 +504,8 @@ test('mask-image shares image list parsing across CSSOM spellings', async () => 
     one.style.setProperty('-webkit-mask-image','var(--layer)');
     return [layers,inherited,b.maskImage,a.backgroundImage,CSS.supports('mask-image','bogus')];
   `)).toEqual([
-    'linear-gradient(black, transparent), url("https://example.test/mask.png")',
-    'linear-gradient(black, transparent), url("https://example.test/mask.png")','none','none',false]);
+    'linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0)), url("https://example.test/mask.png")',
+    'linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0)), url("https://example.test/mask.png")','none','none',false]);
 });
 
 test('a mask image confines descendant stacking until removed', async () => {
@@ -579,4 +579,13 @@ test('resolved mask shorthand repeats or truncates lists to match the image coun
     one.style.cssText='mask-size:cover,contain';
     return [initial,...repeated,a.getPropertyValue('mask'),a.maskSize];
   `)).toEqual(['none','0% 0% / cover, 0% 0% / cover','cover, cover','0% 0% / cover','cover']);
+});
+
+test('computed image lists resolve gradient stop colors without changing inline declarations', async () => {
+  expect(await evaluate(`
+    one.style.backgroundImage='linear-gradient(to right, currentcolor 10%, transparent)';
+    one.style.maskImage='linear-gradient(black, #0f0 80%)';
+    return [a.backgroundImage,a.maskImage,one.style.maskImage];
+  `)).toEqual(['linear-gradient(to right, rgb(255, 0, 0) 10%, rgba(0, 0, 0, 0))',
+    'linear-gradient(rgb(0, 0, 0), rgb(0, 255, 0) 80%)','linear-gradient(black, #0f0 80%)']);
 });
