@@ -334,3 +334,13 @@ test("blur extends paint culling bounds without enlarging pointer targets", () =
     expect(hitTarget(displayList,13,6,{x:0,y:0})).not.toBe(item.nodeId);
   } finally {window.happyDOM.abort();}
 });
+
+test('paint backdrop filters before the element background within its rounded border box', () => {
+  const {window, displayList} = displayListFor('<div></div>',
+    'div{width:50px;height:50px;border-radius:8px;background:red;backdrop-filter:blur(2px) invert(1)}');
+  const index = displayList.items.findIndex(item => item.op === 'backdropFilter');
+  const item = displayList.items[index];
+  expect(item).toMatchObject({radii:{x:8,y:8},operations:[{name:'blur',amount:2},{name:'invert',amount:1}]});
+  expect(displayList.items[index+1]).toMatchObject({op:'fillRect',nodeId:item.nodeId});
+  window.happyDOM.abort();
+});
