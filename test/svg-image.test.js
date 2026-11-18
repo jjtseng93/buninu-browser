@@ -49,3 +49,11 @@ test('symbol use establishes percentage geometry and group opacity',()=>{
  const r=image('<defs><symbol id="s" viewBox="0 0 10 10" opacity=".5"><rect width="50%" height="100%" fill="red"/><rect width="50%" height="100%" fill="red"/></symbol></defs><use href="#s" x="20" width="20" height="20"/>');
  try{expect(pixel(r,22,5)).toEqual([255,0,0,128]);expect(pixel(r,32,5)[3]).toBe(0);}finally{r.image.delete();}
 });
+
+test('invisible nested group preserves the shared opacity layer of visible siblings',()=>{
+ const r=image('<g opacity=".5"><rect width="20" height="20" fill="red"/><g opacity="0"><rect width="40" height="20" fill="blue"/></g><rect x="10" width="20" height="20" fill="red"/></g>');
+ try {
+   expect(pixel(r,15,5)).toEqual([255,0,0,128]);
+   expect(pixel(r,35,5)[3]).toBe(0);
+ } finally {r.image.delete();}
+});
