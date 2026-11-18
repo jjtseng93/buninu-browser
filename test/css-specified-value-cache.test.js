@@ -68,6 +68,19 @@ test('specified grammar caches bound retained history and skip oversized inputs 
   expect(calls).toBe(520);
 });
 
+test('FIFO eviction shares one limit across properties and pending modes',()=>{
+  let calls=0;
+  const normalize=cacheSpecifiedValue((_name,input)=>{calls++;return input;});
+  for(let i=0;i<512;i++) normalize('p'+i,'x',i%2===0);
+  normalize('p0','y'); // Evicts the only entry of this same property.
+  normalize('p0','y');
+  normalize('p1','x',false);
+  expect(calls).toBe(513);
+  normalize('p0','x');
+  normalize('p1','x',false);
+  expect(calls).toBe(515);
+});
+
 test('cached specified values keep invalid, pending and relative values distinct from computed values',()=>{
   const cases=[
     [normalizeTableValue,'border-spacing','0','0px'],
