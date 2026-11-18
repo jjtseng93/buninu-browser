@@ -23,3 +23,20 @@ for (const [name, html, selector, change] of cases) {
     expect(element.matches(selector)).toBe([...document.querySelectorAll(selector)].includes(element));
   });
 }
+
+test("compound selector groups return one static result per descendant in tree order", () => {
+  const document = new Window().document;
+  const root = document.createElement("article");
+  root.className = "match";
+  const shadow = root.attachShadow({mode:"open"});
+  shadow.innerHTML = '<i class="match"></i>';
+  root.innerHTML = '<section><b class="match"></b></section><a href="/"></a>';
+  const selector = "a[href], .match, b";
+  const snapshot = root.querySelectorAll(selector);
+  expect([...snapshot].map(el => el.localName)).toEqual(["b", "a"]);
+  expect([...shadow.querySelectorAll(selector)]).toEqual([shadow.firstElementChild]);
+  root.lastElementChild.removeAttribute("href");
+  root.prepend(document.createElement("b"));
+  expect([...root.querySelectorAll(selector)]).toEqual([root.firstElementChild, snapshot[0]]);
+  expect(snapshot.length).toBe(2);
+});

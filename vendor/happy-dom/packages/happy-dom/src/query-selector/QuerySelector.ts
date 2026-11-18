@@ -132,8 +132,6 @@ export default class QuerySelector {
 		);
 		const items: Element[] = [];
 		const nodeList = new NodeList<Element>(PropertySymbol.illegalConstructor, items);
-		const matchesMap: Map<string, Element> = new Map();
-		const matchedPositions: string[] = [];
 		const cachedItem = {
 			result: new WeakRef(nodeList)
 		};
@@ -147,6 +145,31 @@ export default class QuerySelector {
 			}
 		}
 
+		// Independent compound selectors need one document-order walk. A node
+		// matching several groups still contributes only one result and dependency.
+		if (groups.length && groups.every(group => group.length === 1 &&
+			group[0].combinator === SelectorCombinatorEnum.none && !group[0].pseudos)) {
+			if (node[PropertySymbol.nodeType] !== NodeTypeEnum.documentNode) {
+				this.affectsCache(<Element | DocumentFragment>node, cachedItem);
+			}
+			const pending = node[PropertySymbol.elementArray].slice().reverse();
+			while (pending.length) {
+				const child = pending.pop()!;
+				this.affectsCache(child, cachedItem);
+				for (const [selectorItem] of groups) {
+					if (selectorItem.match(scope, child)) {
+						items.push(child);
+						break;
+					}
+				}
+				const children = child[PropertySymbol.elementArray];
+				for (let index = children.length - 1; index >= 0; index--) pending.push(children[index]);
+			}
+			return nodeList;
+		}
+
+		const matchesMap: Map<string, Element> = new Map();
+		const matchedPositions: string[] = [];
 		for (const selectorItems of groups) {
 			const rootElement =
 				node[PropertySymbol.nodeType] === NodeTypeEnum.elementNode ||
