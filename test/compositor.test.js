@@ -114,6 +114,15 @@ test("video continues presenting while page JavaScript blocks, then freezes on p
     expect(crop).toBe(Buffer.from(await encodeImage(await Bun.file(raw.path).bytes(), 3, 2)).toString("base64"));
     expect(await busy).toBe(true);
     await host.call("evaluate", "document.getElementById('v').pause()");
+    // Inside the paused video, both the viewport-first crop and the
+    // resampled crop must encode the same pixels as the raw transport.
+    for (const scale of [1, 2]) {
+      const clip = {x: 9, y: 11, width: 17, height: 13, scale};
+      const raw = JSON.parse(await host.composite("screenshot", {format: "rgba", clip}));
+      const png = await host.composite("screenshot", {format: "png", clip});
+      expect(png).toBe(Buffer.from(await encodeImage(await Bun.file(raw.path).bytes(),
+        clip.width * scale, clip.height * scale)).toString("base64"));
+    }
     const paused = await host.composite("screenshot");
     await Bun.sleep(350);
     expect(await host.composite("screenshot")).toBe(paused);
