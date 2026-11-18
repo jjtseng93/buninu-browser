@@ -758,7 +758,16 @@ it to `buninu-browser.log` in the working directory, or set
 
 - page errors and page `console` output;
 - per-phase load timings;
+- classic script preparation, including `[script-cache] hit` or `miss`, source bytes, and milliseconds;
 - renderer crashes and explicitly enabled watchdog kills.
+
+The default SES renderer reuses prepared HTTP(S) classic scripts of at least
+64 KiB across browser runs. The controller hashes the fetched bytes and the
+rewrite version with SHA-256. Each entry stores the rewritten code and its
+parse flags. Responses with `Cache-Control: no-store` skip the disk cache.
+To clear it, remove the `buninu-browser/scripts` directory under
+`$XDG_CACHE_HOME` (default `~/.cache`), `~/Library/Caches` on macOS, or
+`%LOCALAPPDATA%` on Windows. The cache retains up to 256 MiB.
 
 Renderer and video-worker startup have no deadline. Document navigation also
 waits until completion, failure, or explicit close. The browser does not enable
