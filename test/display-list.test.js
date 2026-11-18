@@ -363,3 +363,12 @@ test('background blend modes repeat from the topmost image and isolate only back
   expect(displayList.items.find(item => item.op === 'border').filters).toBeUndefined();
   window.happyDOM.abort();
 });
+
+test('gradient background auto dimensions use the positioning area independently', () => {
+  const {window,displayList}=displayListFor('<div></div>',
+    'div{width:100px;height:50px;background:linear-gradient(red,blue) center / 20px auto no-repeat}');
+  const layer=displayList.items.find(item=>item.gradient);
+  expect(layer.tile).toEqual({x:40,y:0,width:20,height:50});
+  expect(layer.bounds).toEqual(layer.tile);
+  window.happyDOM.abort();
+});
