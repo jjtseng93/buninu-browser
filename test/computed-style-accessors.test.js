@@ -601,3 +601,35 @@ test('computed CSS image URLs follow the base URL and retain local fragments', a
   `)).toEqual(['url("#part"), url("../a b.png")','url("#part"), url("https://example.test/a%20b.png")',
     'url("https://example.test/dir/r.png")','url("https://another.test/r.png")']);
 });
+
+test('legacy CSSOM names expose inline and computed accessors through both IDL spellings', async () => {
+  expect(await evaluate(`
+    const names='Transform Appearance UserSelect Filter BoxShadow Transition Animation Mask MaskImage MaskSize MaskRepeat MaskPosition Flex TextSizeAdjust BorderRadius BackgroundClip TextFillColor TextStroke FontSmoothing TapHighlightColor LineClamp BoxOrient'.split(' ');
+    const missing=[];
+    for(const name of names) for(const prefix of ['webkit','Webkit']) {
+      const key=prefix+name;
+      if(!(key in one.style) || !(key in a)) missing.push(key);
+    }
+    for(const key of 'userSelect cssFloat appearance mask maskImage contain contentVisibility accentColor backdropFilter textSizeAdjust'.split(' '))
+      if(typeof a[key]!=='string') missing.push(key);
+    one.style.cssText='';
+    one.style.webkitTransform='none';
+    const transform=one.style.cssText;
+    one.style.cssText='';
+    one.style.contentVisibility='none';
+    one.style.accentColor='none';
+    const invalid=one.style.cssText;
+    one.style.WebkitAnimation='none';
+    return [missing,transform,invalid,one.style.cssText];
+  `)).toEqual([[],'transform: none;','','animation: auto ease 0s 1 normal none running none;']);
+});
+
+test('computed animation shorthand matches animation-name list length', async () => {
+  expect(await evaluate(`
+    const initial=a.animation;
+    one.style.animation='2s linear fade';
+    const specified=a.WebkitAnimation;
+    one.style.cssText='animation-name:a,b;animation-delay:1s';
+    return [initial,specified,a.webkitAnimation];
+  `)).toEqual(['none','2s linear fade','0s 1s a, 0s 1s b']);
+});
