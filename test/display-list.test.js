@@ -253,3 +253,12 @@ test("appearance none suppresses the built-in checkmark and select arrow", () =>
     expect(text.join('')).not.toContain('▾');
   } finally { window.happyDOM.abort(); }
 });
+
+test("text fill inherits independently of color and currentColor uses the descendant color", () => {
+  const {window,displayList} = displayListFor('<div><b>A</b><i>B</i></div>',
+    'div{-webkit-text-fill-color:red}b,i{color:blue}i{-webkit-text-fill-color:currentColor}');
+  try {
+    expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.color))
+      .toEqual(['rgba(255, 0, 0, 1)','rgba(0, 0, 255, 1)']);
+  } finally { window.happyDOM.abort(); }
+});

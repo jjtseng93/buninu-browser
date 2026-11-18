@@ -218,3 +218,13 @@ test('appearance alias suppresses a checkbox face while preserving custom sizing
     return [initial,style.appearance,style.webkitAppearance,style.borderTopWidth,box.offsetWidth,box.checked,getComputedStyle(one).appearance];
   `)).toEqual(['auto','none','none','0px',20,true,'none']);
 });
+
+test('prefixed text fill exposes its inherited color through CSSOM', async () => {
+  expect(await evaluate(`
+    one.style.webkitTextFillColor='red';
+    one.style.webkitTextFillColor='23px';
+    const child=document.createElement('b');one.appendChild(child);child.style.color='blue';
+    const s=getComputedStyle(child);
+    return [one.style.getPropertyValue('-webkit-text-fill-color'),s.webkitTextFillColor,s.getPropertyValue('-webkit-text-fill-color'),s.color];
+  `)).toEqual(['red','rgb(255, 0, 0)','rgb(255, 0, 0)','rgb(0, 0, 255)']);
+});
