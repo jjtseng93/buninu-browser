@@ -520,3 +520,12 @@ test('a mask image confines descendant stacking until removed', async () => {
     return [initial,masked,document.elementFromPoint(12,12)===child];
   `)).toEqual([true,true,true]);
 });
+
+test('mask-position resolves each layer against its own axes and font', async () => {
+  expect(await evaluate(`
+    one.style.fontSize='10px';
+    one.style.WebkitMaskPosition='right 1em bottom 2px, center';
+    one.style.maskPosition='top top';
+    return [a.maskPosition,a.backgroundPosition,CSS.supports('mask-position','bottom right')];
+  `)).toEqual(['calc(100% - 10px) calc(100% - 2px), 50% 50%','0% 0%',true]);
+});
