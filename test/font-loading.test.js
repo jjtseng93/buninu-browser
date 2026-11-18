@@ -87,6 +87,8 @@ test("font indexes preserve subset order, case-insensitive families, and changed
     const capitalsAlias = fonts.resolve("INDEXED", 400, "normal", 65)[0];
     const cjkAlias = fonts.resolve("Indexed", 400, "normal", 0x4e2d)[0];
     expect(new Set([latinAlias, capitalsAlias, cjkAlias]).size).toBe(3);
+    expect(fonts.isRangedAlias(cjkAlias)).toBe(true);
+    expect(fonts.isRangedAlias(builtinTypefaces[0].family)).toBe(false);
     expect(fonts.resolve("iNdExEd", 400, "normal", 65)).toEqual([capitalsAlias, latinAlias]);
     expect(fonts.resolve("indexed")).toEqual([cjkAlias, capitalsAlias, latinAlias]);
 
