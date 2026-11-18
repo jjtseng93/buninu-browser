@@ -117,3 +117,36 @@ test('a repeated clipped fill reuses its blur while new colors start cold', asyn
     expect(Bun.deepEquals(changed, cold)).toBe(false);
   } finally { renderer.dispose(); }
 });
+
+test('off-origin shadows match layers anchored at the viewport origin', async () => {
+  const {CanvasKit: kit} = await loadGraphics();
+  const renderer = await createPageRenderer({});
+  const makeRect = kit.LTRBRect;
+  let reference = false, clips = 0;
+  kit.LTRBRect = (l,t,r,b) => {
+    if (l > 0 && t > 0 && l % 64 === 0 && t % 64 === 0) {
+      clips++;
+      if (reference) return makeRect(0,0,r,b);
+    }
+    return makeRect(l,t,r,b);
+  };
+  try {
+    for (const scale of [1,1.25,2]) {
+      renderer.resize(600,350,scale);
+      const source = `<style>body{margin:0;background:#eca}section{position:absolute;left:327.4px;top:175.8px;
+        width:83px;height:95px;overflow:hidden}i,svg{filter:drop-shadow(-2.5px 4.5px 1px #0009)}
+        i{display:block;width:67.5px;height:5.7px;background:red}
+        p{margin:0;mask-image:linear-gradient(90deg,#000,transparent)}</style>
+        <section><i></i><svg width="70" height="50"><circle cx="36" cy="23" r="24"/></svg><p>masked text</p></section>`;
+      const frames=[];
+      for (reference of [true,false]) {
+        clips=0;
+        await renderer.loadDocument({url:'https://shadow.test/',contentType:'text/html',source});
+        await renderer.whenLoaded();
+        frames.push((await renderer.screenshot({format:'rgba'})).pixels);
+        expect(clips).toBeGreaterThan(0);
+      }
+      expect(Bun.deepEquals(frames[0],frames[1])).toBe(true);
+    }
+  } finally { kit.LTRBRect=makeRect; renderer.dispose(); }
+});
