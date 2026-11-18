@@ -274,3 +274,11 @@ test('counter declarations preserve case, supply default integers and reject inv
     return [s.counterReset,c.counterReset,c.counterIncrement,c.counterSet];
   `)).toEqual(['Chapter 0 item -3','Chapter 0 item -3','Chapter 1','item 0']);
 });
+
+test('filter percentages compute to factors and invalid replacements preserve the chain', async () => {
+  expect(await evaluate(`
+    one.style.webkitFilter='brightness(50%) opacity(150%) invert()';
+    one.style.filter='contrast(-1)';
+    return [one.style.filter,getComputedStyle(one).webkitFilter];
+  `)).toEqual(['brightness(50%) opacity(100%) invert()','brightness(0.5) opacity(1) invert(1)']);
+});
