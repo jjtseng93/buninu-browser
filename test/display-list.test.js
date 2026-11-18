@@ -403,3 +403,12 @@ test('background color uses the last layer clip while the top gradient keeps its
     {x:4,y:4,width:56,height:56},{x:12,y:12,width:40,height:40}]);
   window.happyDOM.abort();
 });
+
+test('background image raster bounds remain local when the element is transformed', () => {
+  const list = backgroundList('<div></div>',
+    'div{width:40px;height:40px;transform:scale(2);transform-origin:0 0;background:url(tile.png) no-repeat center / 12px 12px}',
+    {'tile.png':{width:8,height:8,image:{}}});
+  const item = list.items.find(item => item.op === 'drawBackgroundImage');
+  expect(item.paintRect).toEqual({x:14,y:14,width:12,height:12});
+  expect(item.bounds).toEqual({x:28,y:28,width:24,height:24});
+});
