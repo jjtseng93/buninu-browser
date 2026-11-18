@@ -1,5 +1,5 @@
 import {test, expect} from 'bun:test';
-import {errorEventInterface, exceptionMessage} from '../lib/renderer/error-reporting.js';
+import {diagnosticError, errorEventInterface, exceptionMessage} from '../lib/renderer/error-reporting.js';
 import {RendererHost} from '../lib/renderer/host.js';
 
 const errors = {TypeError:class PageTypeError extends TypeError {}};
@@ -282,3 +282,11 @@ test('SES error defaults retain standard data descriptors and native exception n
     expect(await renderer.call('evaluate',"new TypeError().name")).toBe('TypeError');
   } finally {await renderer.close();}
 },30000);
+
+test('renderer diagnostics include Error frames only in verbose output', () => {
+  const error = new TypeError('missing element');
+  expect(diagnosticError(error, false)).toBe('TypeError: missing element');
+  expect(diagnosticError(error, true)).toContain('error-reporting.test.js');
+  Object.defineProperty(error, 'stack', {get() { throw new Error('unexpected stack read'); }});
+  expect(diagnosticError(error, true)).toBe('TypeError: missing element');
+});
