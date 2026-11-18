@@ -296,3 +296,24 @@ test('PannerNode renders source direction and listener movement into stereo PCM'
     expect([...f.pull().slice(0,2)]).toEqual([0,0]);
   } finally {f.dispose();}
 });
+
+test('HRTF keeps the delayed, filtered far-ear impulse across an audio block boundary',()=>{
+  for(const direction of [-1,1]){
+    const f=setup(),c=f.context;
+    try {
+      const p=new f.api.PannerNode(c,{panningModel:'HRTF',positionX:direction});
+      const impulse=c.createBuffer(1,128,8000);
+      impulse.getChannelData(0)[127]=.5;
+      const src=c.createBufferSource();
+      src.buffer=impulse;src.connect(p).connect(c.destination);src.start();
+      const first=f.pull(),second=f.pull(),near=direction>0?1:0,far=1-near;
+      expect(first[254+near]).toBeGreaterThan(10000);
+      expect(first[254+far]).toBe(0);
+      const farSamples=second.filter((_,i)=>i%2===far);
+      expect(farSamples.findIndex(x=>x!==0)).toBe(4);
+      expect(Math.max(...farSamples)).toBeLessThan(first[254+near]);
+      expect(farSamples.filter(x=>x>0).length).toBeGreaterThan(2);
+      expect([...f.pull()].every(x=>x===0)).toBe(true);
+    } finally {f.dispose();}
+  }
+});
