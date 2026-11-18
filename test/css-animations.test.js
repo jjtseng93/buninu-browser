@@ -81,3 +81,10 @@ test('transform interpolation preserves percentage translations and underlying e
   t.setTime(1000);expect(t.animation.sample(t.element,t.style).transform.x).toEqual({unit:'%',value:100});
  }finally{t.animation.dispose()}
 });
+
+test('animation names preserve keyword prefixes and disambiguate repeated keywords', () => {
+  const [first, second, third] = animationShorthand('1s easeAway, 2s linear linear, 3s NORMAL Reverse');
+  expect([first.name, first.timingFunction]).toEqual(['easeAway', 'ease']);
+  expect([second.name, second.timingFunction]).toEqual(['linear', 'linear']);
+  expect([third.name, third.direction]).toEqual(['Reverse', 'normal']);
+});
