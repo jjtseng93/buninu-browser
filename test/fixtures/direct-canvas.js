@@ -47,6 +47,12 @@ try{
  traces.length=0;await r.evaluate("c.style.transform='translate(0px,0px)'");
  assert.deepEqual(await pixels(),highDpi,'high-DPI direct pixels match Skia');
  r.resize(64,48,1);await r.evaluate("c.width=64;c.height=48;c.style.cssText=''");
+ await r.evaluate("var glass=document.createElement('div');glass.style.cssText='position:absolute;left:0;top:0;width:20px;height:20px;backdrop-filter:invert(1)';document.body.append(glass);ctx.fillStyle='red';ctx.fillRect(0,0,64,48)");
+ const filtered=await pixels();
+ assert.deepEqual(Array.from(filtered.slice(0,4)),[0,255,255,255],'backdrop samples the actual canvas pixels');
+ await r.evaluate("ctx.fillStyle='blue';ctx.fillRect(0,0,64,48)");
+ assert.deepEqual(Array.from((await pixels()).slice(0,4)),[255,255,0,255],'backdrop follows canvas updates');
+ await r.evaluate("glass.remove()");
  // Returning from direct pixels to Skia must repaint the retained surface in
  // full; it cannot apply damage to the surface from before the bypass.
  for(const css of ['opacity:.5','border-radius:8px']){
