@@ -372,3 +372,10 @@ test('gradient background auto dimensions use the positioning area independently
   expect(layer.bounds).toEqual(layer.tile);
   window.happyDOM.abort();
 });
+
+test('each background layer positions its tile in the requested origin box', () => {
+  const {window,displayList}=displayListFor('<div></div>',
+    'div{width:50px;height:40px;border:3px solid transparent;padding:6px 8px;background-image:linear-gradient(red,red),linear-gradient(blue,blue),linear-gradient(green,green);background-origin:content-box,padding-box,border-box;background-size:10px 12px;background-repeat:no-repeat}');
+  expect(displayList.items.filter(item=>item.gradient).map(item=>[item.tile.x,item.tile.y])).toEqual([[0,0],[3,3],[11,9]]);
+  window.happyDOM.abort();
+});
