@@ -98,6 +98,17 @@ try {
     values.push(style.display, __serializationCalls() - before);
     return values;
   })()`), ['block', 'hidden auto', 'static', 'scroll', '', '', 'block', 0]);
+  const margins = await renderer.evaluate(`(() => {
+    const box=document.getElementById('box'), start=__layoutCalls();
+    box.style.margin='2px 3px 4px 5px';
+    const fixed=[savedStyle.margin,savedStyle.marginRight,savedStyle.marginInlineStart];
+    const fixedLayouts=__layoutCalls()-start;
+    box.style.marginRight='10%';
+    const percent=savedStyle.marginRight;
+    box.style.margin='0px';
+    return {fixed,fixedLayouts,percent,layouts:__layoutCalls()-start};
+  })()`);
+  assert.deepEqual(margins,{fixed:['2px 3px 4px 5px','3px','5px'],fixedLayouts:0,percent:'40px',layouts:1});
   const padding = await renderer.evaluate(`(() => {
     const box=document.getElementById('box'),child=document.getElementById('child'),start=__layoutCalls();
     box.style.width='310px';box.style.padding='2px 3px 4px 5px';
