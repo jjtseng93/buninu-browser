@@ -51,7 +51,7 @@ test('delay, repeat, pause/resume, cancellation and missing definitions',()=>{
 test('cascade retains shorthand and longhand timing with vendor aliases',()=>{
  const {document,window}=parseHTMLDocument('<div id=a style="animation-delay:2s; -webkit-animation:grow 1s linear; animation-duration:3s"></div>');
  try{const engine=new StyleEngine().compute(document);const style=engine.get(document.getElementById('a'));
- expect(style.cssAnimations[0].delay).toBe('0s');expect(style.cssAnimationLonghands).toEqual({duration:['3s']});
+ expect(style.cssAnimationLonghands).toMatchObject({delay:['0s'],duration:['3s'],name:['grow']});
  }finally{window.happyDOM.close();}
 });
 

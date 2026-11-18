@@ -430,3 +430,13 @@ test('animation names preserve case and quoted commas and reject malformed lists
     return [initial,fromShorthand,one.style.animationName,a.webkitAnimationName];
   `)).toEqual(['none','"slide, left"','FadeIn, none','FadeIn, none']);
 });
+
+test('animation shorthand participates in the cascade per longhand after substitution', async () => {
+  expect(await evaluate(`
+    const sheet=document.createElement('style');
+    sheet.textContent='#one { animation-delay:3s!important; animation:fade 2s linear; } #two { animation:var(--motion)!important; --motion:slide 4s; }';
+    document.head.appendChild(sheet);
+    two.style.animationDuration='8s';
+    return [a.animationName,a.animationDelay,b.animationName,b.animationDuration];
+  `)).toEqual(['fade','3s','slide','4s']);
+});
