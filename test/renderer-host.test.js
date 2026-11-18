@@ -1,4 +1,5 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, spyOn, test } from "bun:test";
+import { PulseClient } from "../lib/audio/pulse-client.js";
 import { RendererHost } from "../lib/renderer/host.js";
 
 const entry = new URL("./fixtures/fake-renderer.js", import.meta.url).pathname;
@@ -131,4 +132,24 @@ test("explicit close prevents queued calls and captures from restarting the rend
   await expect(renderer.start()).rejects.toThrow("Renderer is closed");
   await expect(renderer.composite("screenshot", { format: "bgra" })).rejects.toThrow("Renderer is closed");
   expect(renderer.pid).toBeNull();
+});
+
+test("a busy renderer gets one pending audio clock sample while PCM requests keep flowing", async () => {
+  let callbacks;
+  const connect = spyOn(PulseClient, "connect").mockResolvedValue({
+    openPlayback(options) { callbacks = options; return {close() {}}; },
+    close() {},
+  });
+  const renderer = host();
+  try {
+    await renderer.call("openAudio");
+    for (let seconds = 1; seconds <= 60; seconds++) callbacks.onTiming({seconds});
+    callbacks.onRequest(4096);
+    expect(await renderer.call("takeAudio", true)).toEqual([["timing", 1], ["request", 4096]]);
+    callbacks.onTiming({seconds:61});
+    expect(await renderer.call("takeAudio", true)).toEqual([["timing", 61]]);
+  } finally {
+    renderer.close();
+    connect.mockRestore();
+  }
 });

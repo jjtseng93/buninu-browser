@@ -1,5 +1,12 @@
 // A scripted renderer for RendererHost tests. Behaviour is chosen per call.
+const audioEvents = [];
+let openAudioCall;
 process.on("message", async (message) => {
+  if (message?.type === "audio-event") {
+    if (message.event === "ready") process.send({type:"result", id:openAudioCall, result:true});
+    else audioEvents.push([message.event, message.seconds ?? message.bytes]);
+    return;
+  }
   if (message?.type === "fetch-result") {
     process.send({ type: "result", id: globalThis.pendingCall, result: message.error ? { error: message.error } : { status: message.result.status, bytes: message.result.body.byteLength } });
     return;
@@ -7,6 +14,12 @@ process.on("message", async (message) => {
   if (message?.type !== "call") return;
   const [argument] = message.params;
   switch (message.method) {
+    case "openAudio":
+      openAudioCall = message.id;
+      return process.send({type:"audio-open", id:1, rate:48000, channels:2});
+    case "takeAudio":
+      if (argument) process.send({type:"audio-timing-received", id:1});
+      return process.send({type:"result", id:message.id, result:audioEvents.splice(0)});
     case "slow":
       await Bun.sleep(200);
       return process.send({ type: "result", id: message.id, result: "completed" });
