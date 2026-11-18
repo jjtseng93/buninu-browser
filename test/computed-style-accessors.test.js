@@ -382,3 +382,12 @@ test('text size adjustment aliases share the inherited desktop value', async () 
     one.style.textSizeAdjust='calc(-5%)';return [first,second,b.textSizeAdjust];
   `)).toEqual([['none','100%'],['calc(100%)','100%'],'0%']);
 });
+
+test('transition timing lists compute independently and reject invalid replacements', async () => {
+  expect(await evaluate(`
+    one.style.webkitTransitionDuration='250ms, 2s';one.style.transitionDuration='auto';
+    one.style.transitionDelay='-125ms';one.style.transitionTimingFunction='steps(2,end)';
+    one.style.transitionBehavior='allow-discrete, normal';
+    return [one.style.transitionDuration,a.transitionDuration,a.webkitTransitionDelay,a.transitionTimingFunction,a.transitionBehavior];
+  `)).toEqual(['250ms, 2s','0.25s, 2s','-0.125s','steps(2)','allow-discrete, normal']);
+});
