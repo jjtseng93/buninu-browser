@@ -475,3 +475,17 @@ test('mask-size aliases share layer sizing and resolve lengths independently of 
       CSS.supports('-webkit-mask-size','contain, 50% auto')];
   `)).toEqual(['2em 25%, cover','40px 25%, cover','auto','40px 25%, cover','auto',true]);
 });
+
+test('mask repeat validates layer pairs and resolves variables independently of background repeat', async () => {
+  expect(await evaluate(`
+    one.append(two);
+    one.style.webkitMaskRepeat='ROUND space, no-repeat no-repeat';
+    one.style.maskRepeat='repeat-x space';
+    const declared=one.style.maskRepeat;
+    two.style.maskRepeat='inherit';
+    const inherited=b.webkitMaskRepeat;
+    one.style.setProperty('--tile','repeat-y');
+    one.style.setProperty('-webkit-mask-repeat','var(--tile), space');
+    return [declared,inherited,b.maskRepeat,a.backgroundRepeat,CSS.supports('mask-repeat','space,,repeat')];
+  `)).toEqual(['round space, no-repeat','round space, no-repeat','repeat-y, space','repeat',false]);
+});
