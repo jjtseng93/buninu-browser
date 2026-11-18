@@ -80,6 +80,17 @@ try {
   })()`);
   assert.deepEqual(widths, Array.from({length:12}, (_, i) => 80+i));
   assert.ok(paintLists-beforeRects <= 1, 'ordinary rect reads coalesce deferred paint lists');
+  const beforeComputed = paintLists;
+  const computedWidths = await renderer.evaluate(`(() => {
+    const box = document.getElementById('box'), widths = [];
+    for (let w = 80; w < 92; w++) {
+      box.style.width = w + 'px';
+      widths.push(getComputedStyle(box).width);
+    }
+    return widths;
+  })()`);
+  assert.deepEqual(computedWidths, widths.map(w => w + 'px'));
+  assert.ok(paintLists-beforeComputed <= 1, 'computed widths coalesce deferred paint lists');
   const scaled = await renderer.evaluate(`(() => {
     const box = document.getElementById('box');
     box.parentElement.style.transform = 'scale(2)';
