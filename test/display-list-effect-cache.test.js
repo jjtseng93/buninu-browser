@@ -7,7 +7,7 @@ import {parseHTMLDocument} from '../lib/happy-dom/parser.js';
 import {StyleEngine} from '../lib/style/computed-style.js';
 import {RenderTreeBuilder} from '../lib/render-tree/index.js';
 import {LayoutEngine} from '../lib/layout/text-layout.js';
-import {buildDisplayList, hitTarget} from '../lib/paint/display-list.js';
+import {buildDisplayList, hitTarget, scrollExtentFor} from '../lib/paint/display-list.js';
 
 // Run the complete paint pipeline with its former node/kind cache keys as an
 // oracle. Only this lookup changes; clip, transform and stacking calculations
@@ -54,6 +54,23 @@ function compare({tree, layout}, scrollOffsetOf = null) {
   }
   return actual;
 }
+
+test('deferred scroll geometry agrees with painted overflow for nested containers', () => {
+  const f = fixture(`<div id="outer" style="position:relative;overflow:auto;width:120px;height:60px;padding:8px">
+    <div id="inner" style="overflow:auto;width:100px;height:40px">
+      <span style="visibility:hidden">wrapped text spanning several lines</span>
+      <img width="170" height="35"><div style="position:absolute;left:155px;top:70px">absolute</div>
+    </div><div style="position:fixed;left:500px">fixed</div>
+    <div id="empty" style="overflow:auto"></div></div>`);
+  try {
+    const {layout, tree} = f.build();
+    const list = buildDisplayList(layout, tree);
+    for (const id of ['outer', 'inner', 'empty']) {
+      const node = [...tree.nodesById.values()].find(n => n.domNode === f.document.getElementById(id));
+      expect(scrollExtentFor(layout, tree, node)).toEqual(list.scrollers.get(node.id) ?? null);
+    }
+  } finally { f.window.happyDOM.close(); }
+});
 
 test('multiple text nodes share their ordinary owner effects without changing paint or hit output', () => {
   const f = fixture('<main id="scroll" style="width:180px;height:60px;overflow:auto;transform:translate(-7px,3px)"><div id="owner" style="height:180px;background:red;opacity:.7;transform:scale(.9);transform-origin:0 0"></div></main>');
