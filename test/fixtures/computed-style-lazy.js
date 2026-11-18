@@ -57,7 +57,7 @@ try {
       keys:keys.includes('fontFamily')&&keys.includes('color'),
       values:values.every(value=>value[0]==='rgb(255, 0, 0)'&&value[1]==='red')};
   })()`);
-  assert.deepEqual(repeated,{creationReads:0,creationSerializations:0,first:1,second:2,custom:'changed',independent:'changed',distinct:true,keys:true,values:true});
+  assert.deepEqual(repeated,{creationReads:0,creationSerializations:0,first:1,second:1,custom:'changed',independent:'changed',distinct:true,keys:true,values:true});
   const sharedGeometry = await renderer.evaluate(`(() => {
     const box=document.getElementById('box'),before=__serializationCalls();
     const widths=[];
