@@ -185,3 +185,13 @@ test('column-reverse preserves the sign of child transform translations',()=>{
  '#root{display:flex;flex-direction:column-reverse;width:40px;height:100px} #a,#b{height:20px} #a{transform:translateY(-30px)}');
  try{expect(f.rect('#a').top).toBe(50);expect(f.rect('#b').top).toBe(60)}finally{f.done()}
 });
+
+test("a row stretches its player and positions controls using the constrained height", () => {
+  const {rect, done} = flex('<div id="stage"><div id="player"><div id="controls"></div></div></div>',
+    '#stage { display:flex; width:352px; height:198px; min-height:240px; max-height:232px } ' +
+    '#player { flex:1; position:relative } #controls { position:absolute; bottom:0; height:20px; width:100% }');
+  expect(rect("#stage").height).toBe(240);
+  expect(rect("#player").height).toBe(240);
+  expect(rect("#controls").top).toBe(220);
+  done();
+});
