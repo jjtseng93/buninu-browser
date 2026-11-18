@@ -21,6 +21,23 @@ test("cached preparation preserves source semantics and does not retain evaluate
   expect(Object.isFrozen(prepared)).toBeTrue();
 });
 
+test("import method escapes match final-source preparation across hoisting and lexical contexts", () => {
+  for (const source of [
+    'function make() { return { import(x) { return x } }; }',
+    'class A { static import() { return import("./module.js"); } }',
+    'if (false) { class Local {import(){}} }',
+    'const { import: name } = { import() {} };',
+    'const object = { "import": 1, import() {}, get value() { return this.import; } };',
+    'const text = "import("; const re = /import/; const tpl = `import`; class A { import() {} }',
+    'const text = "<!--"; class A { import() {} }',
+  ]) {
+    const classic = rewriteClassicScriptSource(source);
+    expect(prepareClassicScript(source)).toEqual({
+      code: escapeSesHtmlComments(classic.code), parsed: classic.parsed, strict: classic.strict,
+    });
+  }
+});
+
 test("preparation retains a bounded working set and never keeps oversized sources", () => {
   const calls = [];
   const cache = new PreparedScriptCache({ maxBytes: 40, maxEntries: 2, prepare(source) {
