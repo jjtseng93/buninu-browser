@@ -155,6 +155,16 @@ try {
   assert.deepEqual(await renderer.evaluate("[imageStyle.width,imageStyle.height]"),["2px","3px"]);
   await renderer.evaluate("document.getElementById('delayed').remove();savedStyle.color");
   assert.deepEqual([...(await renderer.screenshot({format:"rgba"})).pixels.slice(-4)],[11,22,33,255]);
+  const beforeDetached = layouts;
+  await renderer.evaluate("window.detachedImage=new Image();detachedImage.src='/detached.png';document.body.offsetWidth");
+  const decodeDeadline = Date.now() + 3000;
+  while (!(await renderer.evaluate("detachedImage.naturalWidth"))) {
+    assert.ok(Date.now() < decodeDeadline, "detached image should finish decoding");
+    await Bun.sleep(5);
+  }
+  await renderer.evaluate("document.body.offsetWidth");
+  assert.equal(layouts, beforeDetached, "detached decode cannot change document layout");
+  assert.deepEqual(await renderer.evaluate("document.body.appendChild(detachedImage);[detachedImage.offsetWidth,detachedImage.offsetHeight]"), [2,3]);
 } finally {
   renderer.dispose();
   delete globalThis.__layoutCalls;
