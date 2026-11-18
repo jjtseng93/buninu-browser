@@ -489,3 +489,19 @@ test('mask repeat validates layer pairs and resolves variables independently of 
     return [declared,inherited,b.maskRepeat,a.backgroundRepeat,CSS.supports('mask-repeat','space,,repeat')];
   `)).toEqual(['round space, no-repeat','round space, no-repeat','repeat-y, space','repeat',false]);
 });
+
+test('mask-image shares image list parsing across CSSOM spellings', async () => {
+  expect(await evaluate(`
+    one.append(two);
+    one.style.webkitMaskImage='linear-gradient(black, transparent), url(https://example.test/mask.png)';
+    one.style.maskImage='none,,none';
+    const layers=a.maskImage;
+    two.style.maskImage='inherit';
+    const inherited=b.WebkitMaskImage;
+    one.style.setProperty('--layer','none');
+    one.style.setProperty('-webkit-mask-image','var(--layer)');
+    return [layers,inherited,b.maskImage,a.backgroundImage,CSS.supports('mask-image','bogus')];
+  `)).toEqual([
+    'linear-gradient(black, transparent), url("https://example.test/mask.png")',
+    'linear-gradient(black, transparent), url("https://example.test/mask.png")','none','none',false]);
+});
