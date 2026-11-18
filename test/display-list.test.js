@@ -307,3 +307,11 @@ test("generated counters isolate descendant changes within style containment", (
     expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['6','7','7']);
   } finally {window.happyDOM.abort();}
 });
+
+test("counters() joins nested levels while sibling resets replace the same level", () => {
+  const {window,displayList}=displayListFor('<section><b></b></section><section><b></b></section><em></em>',
+    'body{counter-reset:n 7}section{counter-reset:n 2}b{counter-reset:n 3}b::before,em::before{content:counters(n,".")}');
+  try {
+    expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['7.2.3','7.2.3','7.2']);
+  } finally {window.happyDOM.abort();}
+});
