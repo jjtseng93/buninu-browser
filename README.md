@@ -732,6 +732,19 @@ Restart the browser after changing it. The setting also applies to iframe
 renderers, and only its validated numeric value is forwarded to the renderer
 process; the ordinary renderer does not inherit the host environment.
 
+Set `BUNINU_IDLE_PRIORITY=1` (experimental) to run `requestIdleCallback`
+callbacks that pass a `timeout` at the next task boundary, ahead of timers,
+messages and rendering, instead of waiting for an idle period. Pages that
+split long computations into timed idle slices then finish them sooner while
+the renderer is busy (for example during video playback); untimed idle
+callbacks are unchanged. A prioritized callback gets a 10 ms budget while
+its timeout is pending and zero once it expires. Repeated requests can delay
+rendering.
+
+```sh
+env BUNINU_IDLE_PRIORITY=1 bun index.js URL
+```
+
 ### Diagnostics
 
 [`test/fixtures/browser-raw-demo.html`](test/fixtures/browser-raw-demo.html)

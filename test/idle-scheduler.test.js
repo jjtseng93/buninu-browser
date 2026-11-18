@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
-import { createIdleCallbacks } from '../lib/renderer/idle-callbacks.js';
+import { createIdleCallbacks, runPriorityIdleCallbacks } from '../lib/renderer/idle-callbacks.js';
 
-function fixture() {
+function fixture(options = {}) {
   let time = 0, id = 0;
   const tasks = new Map(), errors = [];
   const clock = {
@@ -30,7 +30,7 @@ function fixture() {
       }
     },
   };
-  const idle = createIdleCallbacks({ ...clock, invoke(callback, deadline) {
+  const idle = createIdleCallbacks({ ...clock, ...options, invoke(callback, deadline) {
     try { callback(deadline); } catch (error) { errors.push(error.message); }
   } });
   return { clock, idle, tasks, errors };
@@ -245,5 +245,42 @@ test('reported callback errors leave subsequent idle work runnable', () => {
   clock.run();
   expect(errors).toEqual(['page exception']);
   expect(complete).toBe(true);
+  expect(tasks.size).toBe(0);
+});
+
+test('idle priority runs timed callbacks at the next task boundary, untimed ones still wait', () => {
+  const { clock, idle } = fixture({ priority: true });
+  const seen = [];
+  idle.request(1, () => seen.push('untimed'), 0);
+  idle.request(2, deadline => seen.push(`timed:${deadline.didTimeout}:${deadline.timeRemaining()}`), 500);
+  runPriorityIdleCallbacks();
+  expect(seen).toEqual(['timed:false:10']);
+  clock.run();
+  expect(seen).toEqual(['timed:false:10', 'untimed']);
+  idle.dispose();
+});
+
+test('without idle priority a task boundary leaves timed callbacks alone', () => {
+  const { idle } = fixture();
+  const seen = [];
+  idle.request(1, () => seen.push('timed'), 500);
+  runPriorityIdleCallbacks();
+  expect(seen).toEqual([]);
+  idle.dispose();
+});
+
+test('priority requests share one wakeup and release it on cancellation or disposal', () => {
+  const { idle, tasks, clock } = fixture({ priority: true });
+  for (let id = 1; id <= 100; id++) idle.request(id, () => {}, 500);
+  expect(tasks.size).toBe(3);
+  for (let id = 1; id <= 100; id++) idle.cancel(id);
+  expect(tasks.size).toBe(0);
+  let remaining;
+  idle.request(101, deadline => { remaining = deadline.timeRemaining(); }, 1);
+  clock.consume(5);
+  runPriorityIdleCallbacks();
+  expect(remaining).toBe(0);
+  idle.request(102, () => {}, 500);
+  idle.dispose();
   expect(tasks.size).toBe(0);
 });
