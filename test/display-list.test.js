@@ -148,6 +148,7 @@ test("visibility, opacity and overflow/clip clipping apply to descendants", () =
   expect(byText("shown")).toBeDefined();
   expect(byText("invisible")).toBeUndefined();
   expect(byText("faint").opacity).toBeCloseTo(0.25);
+  expect(byText("faint").filters.map(group => group.opacity)).toEqual([0.5, 0.5]);
   expect(byText("clipped").clipRect).toMatchObject({ width: 30, height: 20 });
   expect(byText("clipped").bounds.width).toBe(30);
   // Entirely outside the clip: not in the list at all.
