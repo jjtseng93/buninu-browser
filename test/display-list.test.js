@@ -394,3 +394,12 @@ test('space repeat distributes spare width and positions a single tile verticall
   expect(layer).toMatchObject({tile:{x:0,y:12,width:20,height:18},gapX:5,gapY:0,repeatX:true,repeatY:false});
   window.happyDOM.abort();
 });
+
+test('background color uses the last layer clip while the top gradient keeps its own', () => {
+  const {window,displayList}=displayListFor('<div></div>',
+    'div{width:40px;height:40px;border:4px solid transparent;padding:8px;background:linear-gradient(red,red),blue;background-clip:content-box,padding-box}');
+  const fills=displayList.items.filter(item=>item.op==='fillRect');
+  expect(fills.slice(-2).map(item=>item.rect)).toEqual([
+    {x:4,y:4,width:56,height:56},{x:12,y:12,width:40,height:40}]);
+  window.happyDOM.abort();
+});
