@@ -300,3 +300,12 @@ test('blur computes its radius with the current font and rejects negative length
     return [first,a.filter,one.style.filter];
   `)).toEqual(['blur(10px)','blur(15px)','blur(0.5em)']);
 });
+
+test('numeric filter math preserves specified ranges and clamps computed factors', async () => {
+  expect(await evaluate(`
+    one.style.filter='opacity(calc(150%)) brightness(calc(-2)) contrast(calc(.2 + .3))';
+    one.style.filter='opacity(calc(1px + 2px))';
+    return [one.style.filter,getComputedStyle(one).filter];
+  `)).toEqual(['opacity(calc(150%)) brightness(calc(-2)) contrast(calc(0.5))',
+    'opacity(1) brightness(0) contrast(0.5)']);
+});
