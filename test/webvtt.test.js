@@ -123,7 +123,12 @@ test('showing captions paint into the video; hidden cues remain accessible', asy
     await host.call('whenLoaded');
     const original=await host.call('screenshot');
     await host.call('evaluate',`window.t=document.querySelector('video').addTextTrack('captions');t.addCue(new VTTCue(0,10,'字幕 Hello'));t.mode='showing'`);
-    expect(await host.call('screenshot')).not.toBe(original);
+    const centered=await host.call('screenshot');
+    expect(centered).not.toBe(original);
+    await host.call('evaluate',"window.c=t.cues[0];c.position=25;c.size=40;c.snapToLines=false;c.line=10;c.align='left'");
+    expect(await host.call('screenshot')).not.toBe(centered);
+    await host.call('evaluate',"c.position='auto';c.size=100;c.line='auto';c.align='center'");
+    expect(await host.call('screenshot')).toBe(centered);
     await host.call('evaluate',"t.mode='hidden'");
     expect(await host.call('screenshot')).toBe(original);
     expect(await host.call('evaluate','t.activeCues[0].text')).toBe('字幕 Hello');
