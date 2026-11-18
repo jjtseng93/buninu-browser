@@ -262,3 +262,12 @@ test("text fill inherits independently of color and currentColor uses the descen
       .toEqual(['rgba(255, 0, 0, 1)','rgba(0, 0, 255, 1)']);
   } finally { window.happyDOM.abort(); }
 });
+
+test("a transparent glyph fill retains the independently colored stroke", () => {
+  const {window,displayList} = displayListFor('<div><b>A</b></div>',
+    'div{color:red;-webkit-text-fill-color:transparent;-webkit-text-stroke-width:2px}b{color:blue}');
+  try {
+    const text=displayList.items.find(item=>item.op==='drawText');
+    expect([text.strokeWidth,text.strokeColor]).toEqual([2,'rgba(0, 0, 255, 1)']);
+  } finally { window.happyDOM.abort(); }
+});
