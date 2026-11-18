@@ -24,6 +24,10 @@ const renderer = await createPageRenderer({
   },
   fetchResource(url) {
     fetches.push(url);
+    if (url.endsWith('/classic.js')) return Promise.resolve({
+      ok:true, url, prepared:{code:"console.log('CLASSIC_EXECUTED')", parsed:true, strict:false},
+      get body() { throw new Error('Prepared classic script read its original body'); },
+    });
     if (url.endsWith('/held.css')) return styles.promise;
     if (url.endsWith('/root.js')) return Promise.resolve(resource(url, rootSource));
     if (url.endsWith('/unused.js')) return Promise.resolve(resource(url, unusedSource));
@@ -78,6 +82,13 @@ try {
   assert.equal(fetches.filter(url => url.endsWith('/root.js')).length, 1);
   assert.deepEqual(messages, ['ROOT_EXECUTED']);
   assert.equal(renderer.title(), 'Prepared root ran');
+  assert.deepEqual(errors, []);
+  await renderer.loadDocument({
+    url:'https://module.test/classic',
+    source:'<!doctype html><script src="/classic.js"></script>',
+  });
+  await bounded(renderer.whenLoaded(), 'Prepared classic execution');
+  assert.equal(messages.at(-1), 'CLASSIC_EXECUTED');
   assert.deepEqual(errors, []);
   process.stdout.write('module preload preparation passed\n');
 } finally {
