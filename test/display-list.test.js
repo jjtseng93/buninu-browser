@@ -283,3 +283,11 @@ test("paint containment clips a fixed descendant to the padding box for drawing 
     expect(hitTarget(displayList,55,5,{x:0,y:0})).not.toBe(fill.nodeId);
   } finally { window.happyDOM.abort(); }
 });
+
+test("style containment inherits quote depth and isolates changes made inside", () => {
+  const {window,displayList}=displayListFor('<b></b><div><i></i></div><em></em>',
+    'body{quotes:"A" "a" "B" "b"}b::before,i::before{content:open-quote}em::after{content:close-quote}div{contain:style}');
+  try {
+    expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text).join('')).toBe('ABa');
+  } finally { window.happyDOM.abort(); }
+});
