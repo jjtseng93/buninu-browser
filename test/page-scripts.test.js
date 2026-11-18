@@ -3088,3 +3088,24 @@ test('DOM constructor inheritance, global event methods and CSS flex serializati
     return [invalid,flex,s.cssText.includes('flex-grow: 2 !important')];
   })()`)).toEqual(['',['flex: 0 0 auto;','flex: 1 1 0%;','flex: 1 1 auto;'],true]);
 });
+
+test('element reflection and common event handlers work on live page objects',async()=>{
+  await load('<video></video><svg></svg>');
+  expect(await evaluate(`(() => {
+    const v=document.querySelector('video'), svg=document.querySelector('svg');
+    let played=0,visibility=0;
+    v.onplay=()=>played++; document.onvisibilitychange=()=>visibility++;
+    v.dispatchEvent(new Event('play'));document.dispatchEvent(new Event('visibilitychange'));
+    v.width=120;v.setAttribute('height','80'); svg.ariaHidden=true;
+    const hidden=svg.getAttribute('aria-hidden'); svg.ariaHidden=null;
+    document.dir='rtl';
+    const pointer=new PointerEvent('pointermove',{pointerId:7,pressure:.5,tiltX:20,isPrimary:true});
+    return [played,visibility,v.width,v.height,hidden,svg.ariaHidden,document.dir,
+      document.scrollingElement===document.documentElement,Image.prototype===HTMLImageElement.prototype,
+      Object.getPrototypeOf(PointerEvent)===MouseEvent,Object.getPrototypeOf(WheelEvent)===MouseEvent,
+      Object.getPrototypeOf(XMLHttpRequest)===XMLHttpRequestEventTarget,
+      HTMLTrackElement.ERROR,new WheelEvent('wheel').DOM_DELTA_LINE,
+      AudioBuffer.length,AudioNode.length,AudioParam.length,SourceBuffer.length,Image.length, pointer.pointerId,pointer.pressure,pointer.tiltX,pointer.isPrimary,
+      new InputEvent('input',{isComposing:true}).isComposing, CSSRule.CHARSET_RULE,CSSRule.prototype.MARGIN_RULE];
+  })()`)).toEqual([1,1,120,80,'true',null,'rtl',true,true,true,true,true,3,1,1,0,0,0,0,7,.5,20,true,true,2,9]);
+});
