@@ -72,3 +72,21 @@ test("picks the renderer by the final URL after redirects and replays the viewpo
   expect(await context.title()).toBe("landed");
   expect(await context.evaluate("innerWidth")).toBe(320);
 }, 60_000);
+
+test("host JS mode gives every document a fresh renderer, so globals never carry over", async () => {
+  const hostBrowser = await createBrowser({ allowHostJs: true, spareRenderer: true });
+  try {
+    const { context } = hostBrowser;
+    await context.navigate(loopback("/one"));
+    const first = hostBrowser.rendererPid;
+    expect(await context.title()).toBe("one");
+    await context.evaluate("globalThis.leftOver = 1; Array.prototype.leftOver = 2");
+
+    await context.navigate(loopback("/two"));
+    expect(hostBrowser.rendererPid).not.toBe(first);
+    expect(await context.title()).toBe("two");
+    expect(await context.evaluate("typeof leftOver + ',' + typeof [].leftOver")).toBe("undefined,undefined");
+  } finally {
+    hostBrowser.close();
+  }
+}, 60_000);

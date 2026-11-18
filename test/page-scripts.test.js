@@ -1647,6 +1647,32 @@ test("host mode: page globals that wrap host APIs do not call themselves, and re
   }
 });
 
+test("host mode: a second document in the same renderer gets its own unforgeable window attributes", async () => {
+  const host = new RendererHost({ timeout: 20_000, args: ["--dangerously-allow-host-js"] });
+  try {
+    await host.start();
+    // The initial about:blank is replaced in the same process, on the same global.
+    await host.call("loadDocument", { url: "about:blank" });
+    await host.call("whenLoaded");
+    await host.call("loadDocument", {
+      url: "https://second.test/page",
+      source: `<!doctype html><title>second</title><script>
+        const own = (name) => Object.getOwnPropertyDescriptor(window, name);
+        document.title += [
+          location.href, window === globalThis, top === window,
+          ...["window", "document", "top", "location"].map(name => own(name).configurable),
+        ].join(",");
+      </script>`,
+      contentType: "text/html",
+      status: 200,
+    });
+    await host.call("whenLoaded");
+    expect(await host.call("title")).toBe("secondhttps://second.test/page,true,true,false,false,false,false");
+  } finally {
+    host.close();
+  }
+});
+
 test("fragment navigation updates location, fires hashchange, and lets the page scroll", async () => {
   await load(`
     <div style="height:1000px"></div><h2 id="plain">plain</h2>
