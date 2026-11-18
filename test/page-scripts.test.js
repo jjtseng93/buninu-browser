@@ -3158,3 +3158,20 @@ test('editing hints and iframe fullscreen reflect content attributes',async()=>{
     return [input.inputMode,input.enterKeyHint,frame.hasAttribute('allowfullscreen')];
   })()`)).toEqual(['numeric','go',true]);
 });
+
+test('written external classic script finishes before later markup and parser scripts',async()=>{
+  scripts.set('https://page.test/written.js', `order.push(document.querySelector('#later') ? 'early markup' : 'external');document.write('<b>inside</b>')`);
+  await load(`<body><script>window.order=[];document.write('<script src="/written.js"><\\/script><i id="later"></i>');</script><script>order.push(document.querySelector('b')?.textContent)</script></body>`);
+  expect(await evaluate("order")).toEqual(['external','inside']);
+  expect(await evaluate("document.querySelector('b').nextElementSibling.id")).toBe('later');
+});
+
+test('closing a written document waits for external scripts before DOMContentLoaded',async()=>{
+  scripts.set('https://page.test/before-ready.js',"events.push(document.readyState)");
+  await load('<body></body>');
+  await evaluate(`window.events=[];document.open();document.addEventListener('DOMContentLoaded',()=>events.push('ready'),{once:true});
+    document.write('<script src="/before-ready.js"></script><p>last</p>');document.close();
+    events.push(document.querySelector('p') ? 'parsed' : 'waiting')`);
+  for(let attempt=0;attempt<50 && !(await evaluate("events.includes('ready')"));attempt++)await Bun.sleep(20);
+  expect(await evaluate("events")).toEqual(['waiting','loading','ready']);
+});
