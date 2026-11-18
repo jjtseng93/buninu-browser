@@ -372,3 +372,13 @@ test('image rendering inherits and tracks changes to the parent', async () => {
     return [before,b.imageRendering];
   `)).toEqual(['pixelated','auto']);
 });
+
+test('text size adjustment aliases share the inherited desktop value', async () => {
+  expect(await evaluate(`
+    one.append(two);one.style.webkitTextSizeAdjust='none';
+    const first=[one.style.textSizeAdjust,b.webkitTextSizeAdjust];
+    one.style.textSizeAdjust='calc(80% + 20%)';one.style.textSizeAdjust='-3%';
+    const second=[one.style.webkitTextSizeAdjust,b.textSizeAdjust];
+    one.style.textSizeAdjust='calc(-5%)';return [first,second,b.textSizeAdjust];
+  `)).toEqual([['none','100%'],['calc(100%)','100%'],'0%']);
+});
