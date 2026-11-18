@@ -320,3 +320,12 @@ test('filter math resolves length ratios against the element font', async () => 
     return [first,a.filter];
   `)).toEqual(['brightness(2) hue-rotate(20deg)','brightness(4) hue-rotate(40deg)']);
 });
+
+test('drop-shadow resolves currentcolor and font lengths and rejects spread and inset', async () => {
+  expect(await evaluate(`
+    one.style.filter='drop-shadow(1em -2px)';
+    one.style.fontSize='12px';one.style.color='red';
+    one.style.filter='drop-shadow(0 0 0 2px)';one.style.filter='drop-shadow(inset 0 0)';
+    return [one.style.filter,a.filter];
+  `)).toEqual(['drop-shadow(1em -2px)','drop-shadow(rgb(255, 0, 0) 12px -2px 0px)']);
+});
