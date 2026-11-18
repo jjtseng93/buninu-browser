@@ -229,6 +229,7 @@ test('member adaptation preserves source, call order, computed keys, parentheses
  const samples=[
   'function f(a){return(a.x).y(a.z)}',
   'function f(a){return a /* property comment */ .\\u0062(a[/* index comment */ a.key])}',
+  'function f(a){return a.寬度 + a. /* keep */ 寬度 + a["寬度"]}',
   'function f(a){return(a,b).x}',
   'function f(a){return new (a.Ctor)(a.x)}',
   'function f(a){return a[a.key](a.x)}',
