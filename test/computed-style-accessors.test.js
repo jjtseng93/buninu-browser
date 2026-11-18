@@ -538,3 +538,16 @@ test('mask origin uses a border-box default and validates geometry boxes per lay
     return [initial,a.maskOrigin,b.maskOrigin,CSS.supports('mask-origin','no-clip')];
   `)).toEqual(['border-box','content-box, fill-box','border-box',false]);
 });
+
+test('mask shorthand expands layers after variable substitution and respects longhand priority', async () => {
+  expect(await evaluate(`
+    const sheet=document.createElement('style');
+    sheet.textContent='#one{mask-size:12px!important;--layers:linear-gradient(black,white) right / cover no-repeat padding-box no-clip luminance subtract, none;mask:var(--layers)}';
+    document.head.append(sheet);
+    const values=[a.maskSize,a.maskPosition,a.maskOrigin,a.maskClip,a.maskMode,a.maskComposite];
+    one.style.webkitMask='none';
+    one.style.mask='red';
+    return [...values,one.style.mask,a.maskMode,CSS.supports('mask','center / cover / cover')];
+  `)).toEqual(['12px auto','100% 50%, 0% 0%','padding-box, border-box','no-clip, border-box',
+    'luminance, match-source','subtract, add','none','match-source',false]);
+});
