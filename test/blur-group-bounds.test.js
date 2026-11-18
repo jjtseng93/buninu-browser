@@ -150,3 +150,32 @@ test('off-origin shadows match layers anchored at the viewport origin', async ()
     }
   } finally { kit.LTRBRect=makeRect; renderer.dispose(); }
 });
+
+test('rectangular alpha masks skip empty rows without shifting text or gradient coverage', async () => {
+  const {CanvasKit: kit} = await loadGraphics();
+  const renderer = await createPageRenderer({});
+  const makeRect = kit.LTRBRect;
+  let reference = false, calls = 0;
+  kit.LTRBRect = (l,t,r,b) => {
+    if (l === 0 && t >= 64 && t % 64 === 0) {
+      calls++;
+      if (reference) return makeRect(0,0,r,b);
+    }
+    return makeRect(l,t,r,b);
+  };
+  try {
+    for (const scale of [1,1.25,2]) {
+      renderer.resize(510,310,scale);
+      const frames=[];
+      for (reference of [true,false]) {
+        calls=0;
+        await renderer.loadDocument({url:'https://mask.test/', contentType:'text/html',source:
+          '<body style="background:#fee"><section style="overflow:hidden;position:absolute;left:70.3px;top:185.8px;width:311px;height:54.2px;mask-image:linear-gradient(35deg,#0002,#000)">Some masked text <b>another run</b></section>'});
+        await renderer.whenLoaded();
+        frames.push((await renderer.screenshot({format:'rgba'})).pixels);
+        expect(calls).toBeGreaterThan(0);
+      }
+      expect(Bun.deepEquals(frames[0],frames[1])).toBe(true);
+    }
+  } finally {kit.LTRBRect=makeRect; renderer.dispose();}
+});
