@@ -1638,6 +1638,10 @@ test("host mode: page globals that wrap host APIs do not call themselves, and re
     await host.call("whenLoaded");
     await Bun.sleep(100);
     expect(await host.call("title")).toBe("number,36,1,ok");
+    expect(await host.call("evaluate", `(() => {
+      Window.prototype.fromWindowPrototype = () => 42;
+      return Object.getPrototypeOf(window) === Window.prototype && window.fromWindowPrototype() === 42;
+    })()`)).toBe(true);
     expect(await host.call("evaluate", "document.body.dataset.frame")).toBe("number");
     const pid = host.pid;
     expect(await host.call("evaluate", "1 + 1")).toBe(2);
