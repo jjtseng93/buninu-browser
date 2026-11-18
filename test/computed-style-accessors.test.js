@@ -529,3 +529,12 @@ test('mask-position resolves each layer against its own axes and font', async ()
     return [a.maskPosition,a.backgroundPosition,CSS.supports('mask-position','bottom right')];
   `)).toEqual(['calc(100% - 10px) calc(100% - 2px), 50% 50%','0% 0%',true]);
 });
+
+test('mask origin uses a border-box default and validates geometry boxes per layer', async () => {
+  expect(await evaluate(`
+    const initial=a.maskOrigin;
+    one.style.webkitMaskOrigin='content-box, FILL-BOX';
+    one.style.maskOrigin='border-box,,padding-box';
+    return [initial,a.maskOrigin,b.maskOrigin,CSS.supports('mask-origin','no-clip')];
+  `)).toEqual(['border-box','content-box, fill-box','border-box',false]);
+});
