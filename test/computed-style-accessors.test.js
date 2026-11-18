@@ -179,3 +179,17 @@ test('computed outline, flex shorthands and 3D transform properties reflect casc
     ['rgb(0, 128, 0) dotted 2px','-1px','3 1 0%','column wrap','hidden','flat'],'hidden',
   ]);
 });
+
+test('transform origin resolves against the current border box across CSSOM aliases', async () => {
+  expect(await evaluate(`
+    const s=one.style; s.cssText='width:100px;height:80px';
+    const initial=a.transformOrigin;
+    s.webkitTransformOrigin='calc(50% - 2px) top';
+    const calc=a.getPropertyValue('-webkit-transform-origin');
+    s.width='200px';const resized=a.webkitTransformOrigin;
+    s.transformOrigin='bottom right 3px';s.transformOrigin='top 20%';
+    const kept=a.transformOrigin;
+    s.display='none';s.transformOrigin='30% 10%';
+    return [initial,calc,resized,kept,a.transformOrigin];
+  `)).toEqual(['50px 40px','48px 0px','98px 0px','200px 80px 3px','30% 10%']);
+});

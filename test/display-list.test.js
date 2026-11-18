@@ -34,6 +34,14 @@ test("rounded overflow containers clip descendant media, including transformed c
   window.happyDOM.abort();
 });
 
+test("a calculated transform origin anchors the painted clip to the border box", () => {
+  const {window, displayList} = displayListFor('<div><video></video></div>',
+    'div {width:100px;height:60px;overflow:hidden;border-radius:4px;transform:scale(2);transform-origin:calc(50% - 2px) bottom} video {width:100px;height:60px}');
+  const video = displayList.items.find(item => item.op === 'drawVideo');
+  expect(video.roundedClips[0].rect).toEqual({x:-48,y:-60,width:200,height:120});
+  window.happyDOM.abort();
+});
+
 test("paints box decorations in tree order before inline content", () => {
   const { window, displayList } = displayListFor(
     `<div class="card"><p>hi <code>x</code></p></div>`,
