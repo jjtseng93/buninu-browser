@@ -758,7 +758,7 @@ it to `buninu-browser.log` in the working directory, or set
 
 - page errors and page `console` output;
 - per-phase load timings;
-- classic script preparation, including `[script-cache] hit` or `miss`, source bytes, and milliseconds;
+- classic script preparation, including `[script-cache] hit` or `miss`, script basename, source bytes, and milliseconds;
 - renderer crashes and explicitly enabled watchdog kills.
 
 The default SES renderer reuses prepared HTTP(S) classic scripts of at least
