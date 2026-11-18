@@ -54,3 +54,8 @@ test("splits background layers and rejects unsupported values", () => {
   expect(resolveGradient("conic-gradient(red, blue)", RECT)).toBeNull();
   expect(resolveGradient("linear-gradient(90deg, notacolor, blue)", RECT)).toBeNull();
 });
+
+test("mask and background gradient stops distinguish rem from em", () => {
+  const gradient = resolveGradient("linear-gradient(to top, transparent 2rem, black 2em)", RECT, 14, 10);
+  expect(gradient.stops.map(stop => stop.offset)).toEqual([0.2, 0.28]);
+});
