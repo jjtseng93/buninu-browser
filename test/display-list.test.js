@@ -299,3 +299,11 @@ test("automatic quote pairs follow the local content language at each nesting le
     expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text).join('')).toBe('「『』」„‚‘“');
   } finally { window.happyDOM.abort(); }
 });
+
+test("generated counters isolate descendant changes within style containment", () => {
+  const {window,displayList}=displayListFor('<i></i><section><b></b></section><i></i>',
+    'body{counter-reset:chapter 5}i::before,b::before{counter-increment:chapter;content:counter(chapter)}section{contain:style}');
+  try {
+    expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['6','7','7']);
+  } finally {window.happyDOM.abort();}
+});

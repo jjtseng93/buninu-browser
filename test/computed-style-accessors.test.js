@@ -265,3 +265,12 @@ test('size containment excludes children from intrinsic sizing and preserves spe
     return [size,retained,inline,state(),box.firstChild.offsetHeight];
   `)).toEqual([['size layout paint',4,4],'size layout paint',['inline-size',4,36],['size',4,22],32]);
 });
+
+test('counter declarations preserve case, supply default integers and reject invalid replacements', async () => {
+  expect(await evaluate(`
+    const s=one.style,c=getComputedStyle(one);
+    s.counterReset='Chapter item -3';s.counterIncrement='Chapter';s.counterSet='item';
+    s.counterReset='none Chapter';s.counterIncrement='Chapter 1.5';
+    return [s.counterReset,c.counterReset,c.counterIncrement,c.counterSet];
+  `)).toEqual(['Chapter 0 item -3','Chapter 0 item -3','Chapter 1','item 0']);
+});
