@@ -68,3 +68,11 @@ test("cached discovery observes rel, sheet text, base URL and detached/reinserte
   expect(await read("document.head.append(saved)")).toBe("rgb(0, 0, 255)");
   expect(requests).toHaveLength(1);
 });
+
+test("moving a sheet into and out of nested noscript content updates its eligibility", async () => {
+  await load('<style>#target{color:red}</style><style id="moving">#target{color:blue}</style><p id="target">Text</p>');
+  expect(await read()).toBe("rgb(0, 0, 255)");
+  expect(await read(`const ns=document.createElement("noscript"), inner=document.createElement("div");
+    document.body.appendChild(ns); ns.appendChild(inner); inner.appendChild(document.getElementById("moving"))`)).toBe("rgb(255, 0, 0)");
+  expect(await read('document.body.appendChild(document.getElementById("moving"))')).toBe("rgb(0, 0, 255)");
+});
