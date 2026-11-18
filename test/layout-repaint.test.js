@@ -57,6 +57,21 @@ function expectEquivalent(f, next, retained) {
   return painted;
 }
 
+test('animated affine transforms retain geometry and update descendant hit regions', () => {
+  const f = fixture('<body><div id="a" style="position:absolute;width:90px;height:70px;transform:rotate(10deg);background:red"><span style="position:fixed;left:10px;top:5px">child</span></div></body>');
+  try {
+    let tree = f.first, layout = f.layout;
+    for (const transform of ['rotate(83deg)', 'rotate(15deg) translateX(17%)', 'rotateX(24deg) scaleY(0.7)', 'scaleX(0.8)']) {
+      f.element.style.transform = transform;
+      const next = f.builder.build(f.document, new StyleEngine().compute(f.document));
+      const retained = repaintLayout(layout, tree, next);
+      expectEquivalent(f, next, retained);
+      tree = next;
+      layout = retained;
+    }
+  } finally { f.window.happyDOM.abort(); }
+});
+
 for (const [description, content] of [
   ['block', '<div id="a" style="width:100px;height:30px;background:red">shadow</div>'],
   ['wrapped inline', '<div style="width:90px"><span id="a" style="background:red">several wrapped words</span></div>'],
