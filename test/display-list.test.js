@@ -353,3 +353,13 @@ test('isolation encloses the blend layer for a descendant', () => {
   expect(text.filters.map(group => [group.isolated,group.blend])).toEqual([[true,undefined],[false,'ColorDodge']]);
   window.happyDOM.abort();
 });
+
+test('background blend modes repeat from the topmost image and isolate only backgrounds', () => {
+  const {window, displayList} = displayListFor('<div></div>',
+    'div{width:20px;height:20px;border:1px solid;background:red;background-image:linear-gradient(red,red),linear-gradient(blue,blue),linear-gradient(green,green);background-blend-mode:screen,multiply}');
+  const layers = displayList.items.filter(item => item.gradient);
+  expect(layers.map(item => item.backgroundBlend)).toEqual(['Screen','Multiply','Screen']);
+  expect(layers.every(item => item.filters.at(-1).isolated)).toBe(true);
+  expect(displayList.items.find(item => item.op === 'border').filters).toBeUndefined();
+  window.happyDOM.abort();
+});
