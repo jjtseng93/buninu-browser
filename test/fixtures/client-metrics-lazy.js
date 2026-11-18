@@ -43,6 +43,20 @@ try {
     return [wide,hit,scrolled,narrow,window.scrollX,document.elementFromPoint(450,10)===box];
   })()`),[1300,true,700,100,0,false]);
 
+  // Read the root border and a boxless wrapper while modifying its child.
+  // The first read of the child's own width must still perform pending layout.
+  assert.deepEqual(await renderer.evaluate(`(()=>{
+    const box=document.getElementById('box'),root=document.documentElement;
+    const wrapper=document.createElement('div');
+    wrapper.style.display='contents';
+    box.before(wrapper);wrapper.append(box);
+    box.style.width='117px';root.style.borderLeft='6px solid';
+    const before=__metricCalls().layouts;
+    const borders=[root.clientLeft,root.clientTop],sizes=[wrapper.clientWidth,wrapper.clientHeight];
+    const after=__metricCalls().layouts,width=box.clientWidth;
+    return [borders,sizes,after-before,width,__metricCalls().layouts-after];
+  })()`),[[6,0],[0,0],0,117,1]);
+
   // Root border offsets remain live geometry queries; hiding the root does
   // not change its viewport dimensions, but still hides descendants.
   assert.deepEqual(await renderer.evaluate(`(()=>{
