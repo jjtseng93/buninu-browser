@@ -97,6 +97,16 @@ try {
   check(rendered[0][2] > 0 && rendered[1][2] > 0, "inline and display-contents text retain bounds");
   equal(rendered[2].slice(2), [28, 24], "SVG retains its rendered dimensions");
 
+  equal(await evaluate(`(() => {
+    const parent = document.createElement('div'), child = document.createElement('div');
+    parent.style.cssText = 'position:absolute;left:0;top:0;transform:scale(2);transform-origin:0 0';
+    child.style.cssText = 'width:10px;height:5px;transform:translate(4px,3px);opacity:0';
+    parent.append(child);document.body.append(parent);
+    const measured = rect(child);
+    parent.remove();
+    return measured;
+  })()`), [8, 6, 20, 10], "transparent nested transforms contribute geometry before paint");
+
   await evaluate(`window.resizeWidths=[];window.intersections=[];
     window.ro=new ResizeObserver(es=>resizeWidths.push(es[0].contentRect.width));ro.observe(leaf);
     window.io=new IntersectionObserver(es=>intersections.push(es[0].isIntersecting));io.observe(leaf)`);
