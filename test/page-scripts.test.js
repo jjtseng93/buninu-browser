@@ -3051,3 +3051,16 @@ test('page event and worker timestamps use coarsened independent monotonic timel
   for(const value of [...values.times,values.result.now,values.result.stamp]) expect(Math.abs(value*10-Math.round(value*10))).toBeLessThan(1e-7);
   await evaluate('worker.terminate()');
 });
+
+test('video playback enters a subtitle, pauses on exit, and reactivates it after a seek',async()=>{
+  await load('<video src="/long-video.mp4" width="160" height="120"></video>');
+  await evaluate(`window.v=document.querySelector('video');window.t=v.addTextTrack('subtitles');
+    window.c=new VTTCue(.3,1.3,'subtitle');window.events=[];
+    c.pauseOnExit=true;c.addEventListener('enter',()=>events.push('enter'));
+    c.addEventListener('exit',()=>events.push('exit'));
+    t.mode='showing';t.addCue(c);void v.play()`);
+  expect(await waitFor("v.paused && events.includes('exit')",6000)).toBe(true);
+  expect(await evaluate('[events.slice(),t.activeCues.length]')).toEqual([['enter','exit'],0]);
+  await evaluate('v.currentTime=.5');
+  expect(await waitFor("events.length===3 && t.activeCues[0]===c",3000)).toBe(true);
+},12000);
