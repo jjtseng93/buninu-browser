@@ -462,3 +462,16 @@ test('tap highlight color inherits and resolves currentcolor on each element', a
       CSS.supports('-webkit-tap-highlight-color','transparent')];
   `)).toEqual(['rgba(0, 0, 0, 0.18)','rgb(255, 0, 0)','rgb(0, 128, 0)',true]);
 });
+
+test('mask-size aliases share layer sizing and resolve lengths independently of the background', async () => {
+  expect(await evaluate(`
+    one.append(two);
+    one.style.fontSize='20px';
+    one.style.webkitMaskSize='2em 25%, cover';
+    one.style.maskSize='auto cover';
+    const initial=b.maskSize;
+    two.style.maskSize='inherit';
+    return [one.style.getPropertyValue('-webkit-mask-size'),a.maskSize,initial,b.WebkitMaskSize,a.backgroundSize,
+      CSS.supports('-webkit-mask-size','contain, 50% auto')];
+  `)).toEqual(['2em 25%, cover','40px 25%, cover','auto','40px 25%, cover','auto',true]);
+});
