@@ -470,6 +470,7 @@ test('mask-size aliases share layer sizing and resolve lengths independently of 
     one.style.webkitMaskSize='2em 25%, cover';
     one.style.maskSize='auto cover';
     const initial=b.maskSize;
+    one.style.maskImage=two.style.maskImage='none, none';
     two.style.maskSize='inherit';
     return [one.style.getPropertyValue('-webkit-mask-size'),a.maskSize,initial,b.WebkitMaskSize,a.backgroundSize,
       CSS.supports('-webkit-mask-size','contain, 50% auto')];
@@ -479,6 +480,7 @@ test('mask-size aliases share layer sizing and resolve lengths independently of 
 test('mask repeat validates layer pairs and resolves variables independently of background repeat', async () => {
   expect(await evaluate(`
     one.append(two);
+    two.style.maskImage='none, none';
     one.style.webkitMaskRepeat='ROUND space, no-repeat no-repeat';
     one.style.maskRepeat='repeat-x space';
     const declared=one.style.maskRepeat;
@@ -524,6 +526,7 @@ test('a mask image confines descendant stacking until removed', async () => {
 test('mask-position resolves each layer against its own axes and font', async () => {
   expect(await evaluate(`
     one.style.fontSize='10px';
+    one.style.maskImage='none, none';
     one.style.WebkitMaskPosition='right 1em bottom 2px, center';
     one.style.maskPosition='top top';
     return [a.maskPosition,a.backgroundPosition,CSS.supports('mask-position','bottom right')];
@@ -533,6 +536,7 @@ test('mask-position resolves each layer against its own axes and font', async ()
 test('mask origin uses a border-box default and validates geometry boxes per layer', async () => {
   expect(await evaluate(`
     const initial=a.maskOrigin;
+    one.style.maskImage='none, none';
     one.style.webkitMaskOrigin='content-box, FILL-BOX';
     one.style.maskOrigin='border-box,,padding-box';
     return [initial,a.maskOrigin,b.maskOrigin,CSS.supports('mask-origin','no-clip')];
@@ -548,7 +552,7 @@ test('mask shorthand expands layers after variable substitution and respects lon
     one.style.webkitMask='none';
     one.style.mask='red';
     return [...values,one.style.mask,a.maskMode,CSS.supports('mask','center / cover / cover')];
-  `)).toEqual(['12px auto','100% 50%, 0% 0%','padding-box, border-box','no-clip, border-box',
+  `)).toEqual(['12px auto, 12px auto','100% 50%, 0% 0%','padding-box, border-box','no-clip, border-box',
     'luminance, match-source','subtract, add','none','match-source',false]);
 });
 
@@ -565,4 +569,14 @@ test('inline mask serialization reflects longhand edits, pending substitutions a
     s.removeProperty('mask');
     return [...edited,pending,partial,s.maskImage,s.maskSize];
   `)).toEqual(['no-repeat','mask: no-repeat;','border-box','var(--layers)','','','']);
+});
+
+test('resolved mask shorthand repeats or truncates lists to match the image count', async () => {
+  expect(await evaluate(`
+    const initial=a.mask;
+    one.style.cssText='mask-image:none,none;mask-size:cover';
+    const repeated=[a.webkitMask,a.maskSize];
+    one.style.cssText='mask-size:cover,contain';
+    return [initial,...repeated,a.getPropertyValue('mask'),a.maskSize];
+  `)).toEqual(['none','0% 0% / cover, 0% 0% / cover','cover, cover','0% 0% / cover','cover']);
 });
