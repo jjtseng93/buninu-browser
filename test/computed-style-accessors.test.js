@@ -228,3 +228,25 @@ test('prefixed text fill exposes its inherited color through CSSOM', async () =>
     return [one.style.getPropertyValue('-webkit-text-fill-color'),s.webkitTextFillColor,s.getPropertyValue('-webkit-text-fill-color'),s.color];
   `)).toEqual(['red','rgb(255, 0, 0)','rgb(255, 0, 0)','rgb(0, 0, 255)']);
 });
+
+test('text stroke shorthand orders its components and resets omitted longhands', async () => {
+  expect(await evaluate(`
+    const s=one.style,c=getComputedStyle(one);
+    s.webkitTextStroke='red 2px'; const first=[s.webkitTextStroke,c.webkitTextStroke];
+    s.webkitTextStroke='blue';const second=[s.webkitTextStrokeWidth,c.webkitTextStroke];
+    s.webkitTextStroke='3px 2px';const kept=s.webkitTextStroke;
+    s.removeProperty('-webkit-text-stroke');
+    return [first,second,kept,s.webkitTextStrokeColor];
+  `)).toEqual([['2px red','2px rgb(255, 0, 0)'],['initial','0px rgb(0, 0, 255)'],'blue','']);
+});
+
+test('pending text stroke expands after substitution with longhand priority preserved', async () => {
+  expect(await evaluate(`
+    const sheet=document.createElement('style');
+    sheet.textContent='#one{--outline: medium red;-webkit-text-stroke-color:blue!important;-webkit-text-stroke:var(--outline)}';
+    document.head.appendChild(sheet);
+    const c=getComputedStyle(one), first=c.webkitTextStroke;
+    one.style.setProperty('--outline','green 4px');
+    return [first,c.webkitTextStroke];
+  `)).toEqual(['1px rgb(0, 0, 255)','4px rgb(0, 0, 255)']);
+});
