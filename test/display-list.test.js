@@ -242,3 +242,14 @@ test("content visibility hides block descendants and pseudo content but paints t
     expect(displayList.items.filter(item=>item.op==='drawText').map(item=>item.text)).toEqual(['shown']);
   } finally { window.happyDOM.abort(); }
 });
+
+test("appearance none suppresses the built-in checkmark and select arrow", () => {
+  const {window,displayList} = displayListFor('<input type="checkbox" checked><input type="checkbox" checked class="custom"><select class="custom"><option selected>One</option></select>',
+    '.custom{appearance:none;width:50px}');
+  try {
+    const text=displayList.items.filter(item=>item.op==='drawText').map(item=>item.text);
+    expect(text.filter(value=>value==='✓')).toHaveLength(1);
+    expect(text.join('')).toContain('One');
+    expect(text.join('')).not.toContain('▾');
+  } finally { window.happyDOM.abort(); }
+});

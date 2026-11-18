@@ -206,3 +206,15 @@ test('content visibility toggles intrinsic block height and continues to cascade
     return [before,hidden,state()];
   `)).toEqual([['visible',35],['hidden',0],['visible',35]]);
 });
+
+test('appearance alias suppresses a checkbox face while preserving custom sizing and checked state', async () => {
+  expect(await evaluate(`
+    const box=document.createElement('input');box.type='checkbox';box.checked=true;
+    one.appendChild(box);
+    const style=getComputedStyle(box);
+    const initial=style.appearance;
+    box.style.webkitAppearance='none';
+    box.style.width='20px';
+    return [initial,style.appearance,style.webkitAppearance,style.borderTopWidth,box.offsetWidth,box.checked,getComputedStyle(one).appearance];
+  `)).toEqual(['auto','none','none','0px',20,true,'none']);
+});
