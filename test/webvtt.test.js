@@ -52,3 +52,29 @@ test('media track lists reflect DOM order, cue ownership, timing and mode', asyn
     })()`)).toEqual([true,2,true,true,'中文',true,true,true,0,1,true,true]);
   } finally {await host.close();}
 });
+
+test('enabled track loads a WebVTT resource and replaces cues after changing src', async () => {
+  const host = new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('loadDocument',{url:'https://video.test/',contentType:'text/html',status:200,source:'<video><track></video>'});
+    await host.call('whenLoaded');
+    await host.call('evaluate',`(() => {
+      const el=document.querySelector('track'), t=el.track;
+      window.events=[];
+      el.addEventListener('load',()=>events.push([el.readyState,t.cues.length,t.cues[0].text]));
+      el.src='data:text/vtt,'+encodeURIComponent('WEBVTT\\n\\n00:00.000 --> 00:01.000\\nfirst');
+      t.mode='hidden';
+    })()`);
+    async function events(count) {
+      for (let i=0;i<50;i++) {
+        const result=await host.call('evaluate','window.events.slice()');
+        if(result.length>=count)return result;
+        await Bun.sleep(10);
+      }
+    }
+    expect(await events(1)).toEqual([[2,1,'first']]);
+    await host.call('evaluate',`document.querySelector('track').src='data:text/vtt,'+encodeURIComponent('WEBVTT\\n\\n00:01.000 --> 00:02.000\\nsecond')`);
+    expect(await events(2)).toEqual([[2,1,'first'],[2,1,'second']]);
+  } finally {await host.close();}
+});
