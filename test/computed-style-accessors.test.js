@@ -440,3 +440,14 @@ test('animation shorthand participates in the cascade per longhand after substit
     return [a.animationName,a.animationDelay,b.animationName,b.animationDuration];
   `)).toEqual(['fade','3s','slide','4s']);
 });
+
+test('prefixed font smoothing validates keywords and inherits through the cascade', async () => {
+  expect(await evaluate(`
+    one.append(two);
+    const initial=b.webkitFontSmoothing;
+    one.style.WebkitFontSmoothing='ANTIALIASED';
+    one.style.webkitFontSmoothing='invalid';
+    return [initial,one.style.getPropertyValue('-webkit-font-smoothing'),b.webkitFontSmoothing,
+      CSS.supports('-webkit-font-smoothing','subpixel-antialiased')];
+  `)).toEqual(['auto','antialiased','antialiased',true]);
+});
