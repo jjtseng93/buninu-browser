@@ -6,6 +6,20 @@ import {layoutText} from '../lib/layout/text-layout.js';
 import {elementBox,elementClientBox} from '../lib/input/hit-test.js';
 import {RendererHost} from '../lib/renderer/host.js';
 
+test('fragment box lookup uses the first real node even when a pseudo box paints first', () => {
+  const element = {nodeType: 1};
+  const pseudo = {id: 1, type: 'block', pseudo: 'before', domNode: element};
+  const node = {id: 2, type: 'image', style: {}, domNode: element};
+  const tree = Object.freeze({nodesById: new Map([[1, pseudo], [2, node]])});
+  for (const width of [20, 40]) {
+    const layout = {boxes: [{nodeId: 1, width: 80}], fragments: [{runs: [
+      {type: 'image', nodeId: 2, x: 0, y: 0, width, height: 10},
+    ]}]};
+    expect(elementBox(tree, layout, element)).toBeNull();
+    expect(elementClientBox(tree, layout, element).box.width).toBe(width);
+  }
+});
+
 test('client box lookup preserves block geometry while exposing inline replaced boxes',()=>{
   const {window,document}=parseHTMLDocument(`<!doctype html><body style="margin:0">
     <span id=inline style="border:5px solid;padding:3px">text</span>
