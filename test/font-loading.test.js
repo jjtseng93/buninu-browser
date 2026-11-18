@@ -92,7 +92,7 @@ test("font indexes preserve subset order, case-insensitive families, and changed
     expect(fonts.resolve("iNdExEd", 400, "normal", 65)).toEqual([capitalsAlias, latinAlias]);
     expect(fonts.resolve("indexed")).toEqual([cjkAlias, capitalsAlias, latinAlias]);
 
-    fonts.setFaces([cjk, capitals, latin]);
+    expect(fonts.setFaces([cjk, capitals, latin])).toBe(true);
     expect(fonts.resolve("Indexed", 400, "normal", 65)).toEqual([latinAlias, capitalsAlias]);
     fonts.setFaces([cjk]);
     expect(fonts.resolve("Indexed", 400, "normal", 65)).toEqual([]);
@@ -101,7 +101,7 @@ test("font indexes preserve subset order, case-insensitive families, and changed
     expect(fonts.hasUnicodeRanges).toBe(false);
     expect(fonts.resolve("Indexed")).toEqual([]);
     // Equivalent new descriptor objects still refer to the existing record.
-    fonts.setFaces([structuredClone(latin)]);
+    expect(fonts.setFaces([structuredClone(latin)])).toBe(true);
     expect(fonts.resolve("Indexed", 400, "normal", 65)).toEqual([latinAlias]);
     const returned = fonts.resolve("Indexed"); returned.length = 0;
     expect(fonts.resolve("Indexed")).toEqual([latinAlias]);

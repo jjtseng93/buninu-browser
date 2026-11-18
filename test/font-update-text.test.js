@@ -51,14 +51,14 @@ test('setFaces refreshes prepared indexes on add, remove and mutable descriptor 
  const requests=[];const fonts=await make(async({url})=>{requests.push(url);return {status:200,body:bytes}});
  const faces=[face('Original','https://font.test/first')];
  try {
-  fonts.setFaces(faces);fonts.updateText([run('a','Original')]);await fonts.ready();
+  expect(fonts.setFaces(faces)).toBe(false);fonts.updateText([run('a','Original')]);await fonts.ready();
   const first=fonts.resolve('Original')[0];
   faces[0].family='Renamed';faces[0].sources=[{url:'https://font.test/second'}];
-  fonts.setFaces(faces);fonts.updateText([run('a','Renamed')]);await fonts.ready();
+  expect(fonts.setFaces(faces)).toBe(true);fonts.updateText([run('a','Renamed')]);await fonts.ready();
   expect(fonts.resolve('Original')).toEqual([]);expect(fonts.resolve('Renamed')[0]).not.toBe(first);
-  faces.push(face('Added','https://font.test/third'));fonts.setFaces(faces);fonts.updateText([run('a','Added')]);await fonts.ready();
+  faces.push(face('Added','https://font.test/third'));expect(fonts.setFaces(faces)).toBe(false);fonts.updateText([run('a','Added')]);await fonts.ready();
   expect(fonts.resolve('Added')).toHaveLength(1);
-  fonts.setFaces([]);fonts.updateText([run('a','Added')]);expect(fonts.resolve('Added')).toEqual([]);
+  expect(fonts.setFaces([])).toBe(true);fonts.updateText([run('a','Added')]);expect(fonts.resolve('Added')).toEqual([]);
   expect(requests).toEqual(['https://font.test/first','https://font.test/second','https://font.test/third']);
  } finally {fonts.dispose()}
 });
