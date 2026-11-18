@@ -408,3 +408,14 @@ test('transition shorthand resolves substituted lists and resets omitted behavio
     return [a.transitionProperty,a.transitionDuration,a.transitionDelay,a.transitionBehavior,a.webkitTransition];
   `)).toEqual(['opacity, color','0.25s, 2s','1s, 0s','allow-discrete, normal','opacity 0.25s linear 1s allow-discrete, color 2s']);
 });
+
+test('invalid transition assignments preserve the previous shorthand', async () => {
+  expect(await evaluate(`
+    one.style.transition='opacity 2s';
+    one.style.webkitTransition='opacity 1s 2s 3s';
+    one.style.setProperty('transition','opacity,,color');
+    const previous=[one.style.transition,a.transitionDuration];
+    one.style.transition='';
+    return [...previous,one.style.transition,a.transitionDuration];
+  `)).toEqual(['opacity 2s','2s','','0s']);
+});
