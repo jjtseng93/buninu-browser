@@ -342,3 +342,13 @@ test('inherited drop shadows resolve currentcolor locally and retain inherited d
   `)).toEqual(['drop-shadow(rgb(0, 128, 0) 10px 0px 0px) drop-shadow(rgb(0, 0, 255) 0px 0px 0px)',
     'drop-shadow(rgb(0, 0, 0) 10px 0px 0px) drop-shadow(rgb(0, 0, 255) 0px 0px 0px)']);
 });
+
+test('backdrop filters resolve lengths and establish a containing block for fixed descendants', async () => {
+  expect(await evaluate(`
+    one.style.marginLeft='50px';one.style.fontSize='20px';
+    one.style.backdropFilter='blur(.5em) brightness(50%)';
+    one.append(two);two.style.cssText='position:fixed;left:0;top:0';
+    const offset=two.getBoundingClientRect().left;
+    return [a.backdropFilter,offset===one.getBoundingClientRect().left,offset>0];
+  `)).toEqual(['blur(10px) brightness(0.5)',true,true]);
+});
