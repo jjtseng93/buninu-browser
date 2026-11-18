@@ -551,3 +551,18 @@ test('mask shorthand expands layers after variable substitution and respects lon
   `)).toEqual(['12px auto','100% 50%, 0% 0%','padding-box, border-box','no-clip, border-box',
     'luminance, match-source','subtract, add','none','match-source',false]);
 });
+
+test('inline mask serialization reflects longhand edits, pending substitutions and removal', async () => {
+  expect(await evaluate(`
+    const s=one.style;
+    s.cssText='mask:none';
+    s.maskRepeat='no-repeat';
+    const edited=[s.webkitMask,s.cssText,s.maskOrigin];
+    s.mask='var(--layers)';
+    const pending=s.mask;
+    s.maskSize='cover';
+    const partial=s.mask;
+    s.removeProperty('mask');
+    return [...edited,pending,partial,s.maskImage,s.maskSize];
+  `)).toEqual(['no-repeat','mask: no-repeat;','border-box','var(--layers)','','','']);
+});
