@@ -38,3 +38,20 @@ test("places leading metadata in the implicit head", () => {
   expect(document.body.firstChild.tagName).toBe("H1");
   window.happyDOM.abort();
 });
+
+test("missing title lookups share invalidation records until the tree changes", async () => {
+  const { affectsCache } = await import("../vendor/happy-dom/packages/happy-dom/src/PropertySymbol.ts");
+  const { document, window } = parseHTMLDocument("<body><i></i></body>", "https://example.test/");
+  const leaf = document.body.firstChild;
+  expect(document.title).toBe("");
+  const records = leaf[affectsCache].length;
+  for (let i = 0; i < 10; i++) expect(document.title).toBe("");
+  expect(leaf[affectsCache].length).toBe(records);
+  const title = document.createElement("title");
+  title.textContent = "Updated";
+  document.head.appendChild(title);
+  expect(document.title).toBe("Updated");
+  title.remove();
+  expect(document.title).toBe("");
+  window.happyDOM.abort();
+});

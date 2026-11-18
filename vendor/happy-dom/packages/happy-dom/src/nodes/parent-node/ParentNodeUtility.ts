@@ -8,6 +8,8 @@ import HTMLCollection from '../element/HTMLCollection.js';
 import QuerySelector from '../../query-selector/QuerySelector.js';
 import type ICachedResult from '../node/ICachedResult.js';
 
+const missingTag = Symbol("missingTag");
+
 /**
  * Parent node utility.
  */
@@ -255,6 +257,7 @@ export default class ParentNodeUtility {
 		const cache = parentNode[PropertySymbol.cache].elementByTagName;
 		const cachedItem = cache.get(tagName);
 
+		if (cachedItem?.result === missingTag) return null;
 		if (cachedItem?.result) {
 			const item = cachedItem.result.deref();
 			if (item) {
@@ -265,7 +268,7 @@ export default class ParentNodeUtility {
 		const cachedResult: ICachedResult = { result: null };
 		const item = find(parentNode, cachedResult);
 
-		cachedResult.result = item ? new WeakRef(item) : { deref: () => null };
+		cachedResult.result = item ? new WeakRef(item) : missingTag;
 		cache.set(tagName, cachedResult);
 
 		return item;
