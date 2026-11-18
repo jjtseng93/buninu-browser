@@ -309,3 +309,14 @@ test('numeric filter math preserves specified ranges and clamps computed factors
   `)).toEqual(['opacity(calc(150%)) brightness(calc(-2)) contrast(calc(0.5))',
     'opacity(1) brightness(0) contrast(0.5)']);
 });
+
+test('filter math resolves length ratios against the element font', async () => {
+  expect(await evaluate(`
+    one.style.fontSize='10px';
+    one.style.filter='brightness(calc(1em / 5px)) hue-rotate(calc(1em / 5px * 10deg))';
+    const first=a.filter;
+    one.style.fontSize='20px';
+    one.style.filter='brightness(calc(1em * 5px))';
+    return [first,a.filter];
+  `)).toEqual(['brightness(2) hue-rotate(20deg)','brightness(4) hue-rotate(40deg)']);
+});
