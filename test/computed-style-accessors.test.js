@@ -24,7 +24,10 @@ test('computed declarations preserve their own property order and accessor descr
     const idl=css.map(name=>name.replace(/-([a-z])/g,(_,letter)=>letter.toUpperCase()));
     const base=['length','item','getPropertyValue','getPropertyPriority','cssText','parentRule','setProperty','removeProperty'];
     const first=[...base,...idl,'webkitLineClamp','webkitBoxOrient'];
-    const expected=[...first,...css.filter(name=>!first.includes(name))];
+    const canonical=[...first,...css.filter(name=>!first.includes(name))];
+    const aliases=Reflect.ownKeys(a).slice(canonical.length);
+    const expected=[...canonical,...aliases];
+    if (!aliases.every(name=>name==='cssFloat'||/^(?:-webkit-|[Ww]ebkit)/.test(name))) throw Error('unexpected alias');
     const descriptors=Object.getOwnPropertyDescriptors(a);
     const named=expected.slice(base.length);
     return {order:JSON.stringify(Reflect.ownKeys(a))===JSON.stringify(expected),
@@ -103,4 +106,41 @@ test('shared computed accessor functions cannot carry page data into another doc
     return {clean:[get,set].every(fn=>!Object.hasOwn(fn,'__computedCrossRealm')&&Object.isFrozen(fn)
       &&!Object.hasOwn(fn,'prototype')),value:declaration.color};
   })()`)).toEqual({clean:true,value:'rgb(0, 0, 255)'});
+});
+
+test('prefixed declarations share cascade, priority, geometry and CSSOM mutations', async () => {
+  expect(await evaluate(`
+    const s=one.style;
+    s.cssText='width:100px;-webkit-transform:scaleX(2);user-select:none;float:left';
+    const first=[s.transform,s.WebkitTransform,s.webkitTransform,one.getBoundingClientRect().width,a.cssFloat,a.userSelect];
+    s.setProperty('-webkit-transform','scaleX(3)','important');
+    const second=[s.getPropertyPriority('transform'),a.webkitTransform===a.transform,
+      a.getPropertyValue('-webkit-transform')===a.transform,one.getBoundingClientRect().width];
+    s.WebkitTransform='none';
+    const last=[s.removeProperty('-webkit-transform'),s.transform,'webkitMadeUp' in s];
+    s.webkitLineClamp='3'; s.WebkitBoxOrient='vertical';
+    return [first,second,last,[s.getPropertyValue('-webkit-line-clamp'),s.webkitBoxOrient]];
+  `)).toEqual([['scaleX(2)','scaleX(2)','scaleX(2)',200,'left','none'],
+    ['important',true,true,300],['none','',false],['3','vertical']]);
+});
+
+test('invalid content visibility leaves valid inline and parsed declarations intact', async () => {
+  expect(await evaluate(`
+    const s=one.style;
+    s.cssText='content-visibility:auto;content-visibility:none';
+    const initial=s.contentVisibility;
+    s.contentVisibility='hidden';s.setProperty('content-visibility','none');
+    const valid=s.contentVisibility;
+    s.contentVisibility='var(--mode)';
+    return [initial,valid,s.contentVisibility];
+  `)).toEqual(['auto','hidden','var(--mode)']);
+});
+
+test('stylesheet aliases affect geometry and agree with CSS feature queries', async () => {
+  expect(await evaluate(`
+    const sheet=document.createElement('style');
+    sheet.textContent='#one{-webkit-transform:scaleX(2);-webkit-user-select:none}';
+    document.head.appendChild(sheet);
+    return [one.getBoundingClientRect().width,a.userSelect,CSS.supports('-webkit-transform','scaleX(2)')];
+  `)).toEqual([200,'none',true]);
 });
