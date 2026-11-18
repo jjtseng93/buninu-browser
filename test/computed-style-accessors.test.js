@@ -352,3 +352,14 @@ test('backdrop filters resolve lengths and establish a containing block for fixe
     return [a.backdropFilter,offset===one.getBoundingClientRect().left,offset>0];
   `)).toEqual(['blur(10px) brightness(0.5)',true,true]);
 });
+
+test('isolation confines positioned descendants when enabled dynamically', async () => {
+  expect(await evaluate(`
+    one.style.cssText='';two.style.cssText='position:relative;width:40px;height:40px';
+    const child=document.createElement('span');one.appendChild(child);
+    child.style.cssText='position:absolute;z-index:100;width:40px;height:40px';
+    const initial=document.elementFromPoint(12,12)===child;
+    one.style.isolation='isolate';one.style.isolation='invalid';
+    return [initial,a.isolation,document.elementFromPoint(12,12)===two];
+  `)).toEqual([true,'isolate',true]);
+});
