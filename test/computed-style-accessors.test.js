@@ -451,3 +451,14 @@ test('prefixed font smoothing validates keywords and inherits through the cascad
       CSS.supports('-webkit-font-smoothing','subpixel-antialiased')];
   `)).toEqual(['auto','antialiased','antialiased',true]);
 });
+
+test('tap highlight color inherits and resolves currentcolor on each element', async () => {
+  expect(await evaluate(`
+    one.append(two);
+    const initial=a.webkitTapHighlightColor;
+    one.style.WebkitTapHighlightColor='currentcolor';
+    one.style.webkitTapHighlightColor='none';
+    return [initial,a.webkitTapHighlightColor,b.getPropertyValue('-webkit-tap-highlight-color'),
+      CSS.supports('-webkit-tap-highlight-color','transparent')];
+  `)).toEqual(['rgba(0, 0, 0, 0.18)','rgb(255, 0, 0)','rgb(0, 128, 0)',true]);
+});
