@@ -86,18 +86,25 @@ test('the sandbox attribute applies when the frame next navigates', async () => 
 
 test('a srcdoc fragment scrolls without replacing the document or firing load again', async () => {
   const content = `<a id="jump" href="#target">jump</a><div style="height:1200px"></div><h2 id="target">Target</h2><div style="height:400px"></div><script>
-    setTimeout(() => { document.getElementById('jump').click();
-      setTimeout(() => { parent.fragmentResult = {y:scrollY, text:document.getElementById('target').textContent}; }, 100);
-    }, 600);
+    function jumpWhenReady() {
+      if (!parent.startFragmentTest) { setTimeout(jumpWhenReady, 20); return; }
+      document.getElementById('jump').click();
+      function reportScroll() {
+        if (!scrollY) { setTimeout(reportScroll, 20); return; }
+        parent.fragmentResult = {y:scrollY, text:document.getElementById('target').textContent};
+      }
+      reportScroll();
+    }
+    jumpWhenReady();
   </script>`;
-  const host = await page('<iframe id="f" srcdoc="'+content.replaceAll('&','&amp;').replaceAll('"','&quot;')+'"></iframe>');
+  const host = await page('<iframe id="f" onload="globalThis.loads=(globalThis.loads||0)+1" srcdoc="'+content.replaceAll('&','&amp;').replaceAll('"','&quot;')+'"></iframe>');
   try {
-    expect(await until(host, `document.getElementById('f').contentDocument?.getElementById('target')?.textContent`)).toBe('Target');
-    await host.call('evaluate', `globalThis.loads=0; document.getElementById('f').addEventListener('load',()=>globalThis.loads++);`);
+    expect(await until(host, 'globalThis.loads')).toBe(1);
+    await host.call('evaluate', 'globalThis.startFragmentTest=true');
     const result = await until(host, 'globalThis.fragmentResult');
     expect(result?.text).toBe('Target');
     expect(result?.y).toBeGreaterThan(0);
-    expect(await host.call('evaluate', 'globalThis.loads')).toBe(0);
+    expect(await host.call('evaluate', 'globalThis.loads')).toBe(1);
   } finally { await host.close(); }
 }, 20000);
 
