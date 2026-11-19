@@ -20,6 +20,7 @@ try {
     [data-open] .attr-target{color:blue} [style] .style-target{opacity:.4}
     .active + section .sibling-target{color:red} .active x-host{color:green}
     main:focus-within .focus-target{color:purple}
+    main section:has(>button[style*="display: none"]){opacity:.7}
     </style><main id="outer"><section id="inner"><button id="target" class="match">target</button>
     <i class="attr-target">attribute</i><i class="style-target">style</i><input><i class="focus-target">focus</i>
     <x-host><span slot="main">slotted</span></x-host></section>${'<span>unrelated</span>'.repeat(150)}</main>
@@ -38,6 +39,11 @@ try {
   assert.equal(await run(`getComputedStyle(target).opacity`),'1');
   assert.equal(await run(`getComputedStyle(document.querySelector('.sibling-target')).color`),'rgb(0, 0, 0)');
   await renderer.screenshot();
+  passes=[];
+  assert.equal(await run(`outer.style.width='319px';getComputedStyle(inner).opacity`),'1');
+  assert.ok(passes.every(pass=>pass.restyled<15),'a child-relative :has must not restyle unrelated descendants');
+  assert.equal(await run(`target.setAttribute('style','display: none');getComputedStyle(inner).opacity`),'0.7');
+  assert.equal(await run(`target.removeAttribute('style');getComputedStyle(inner).opacity`),'1');
   // State-dependent invalidation remains conservative and visible.
   assert.equal(await run(`document.querySelector('input').focus();getComputedStyle(document.querySelector('.focus-target')).color`),'rgb(128, 0, 128)');
   await run(`document.querySelector('input').blur();globalThis.host=document.querySelector('x-host');globalThis.shadow=host.attachShadow({mode:'closed'});shadow.innerHTML='<style>:host{display:block}b{color:inherit}</style><b>shadow</b><slot name="main"></slot>'`);
