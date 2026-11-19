@@ -170,9 +170,14 @@ test('in-flight raw capture follows an origin renderer swap without exposing com
   return original.call(this,method,...params);
  };
  try{
+  // A pristine about:blank renderer can adopt the first web origin. Use it
+  // before navigating so the screenshot actually outlives its renderer.
+  await browser.context.evaluate('document.title = "old document"');
+  const oldPid=browser.rendererPid;
   const pending=browser.context.screenshot({format:'bgra'});
   await reached.promise;
   await browser.context.navigate(`http://127.0.0.1:${server.port}/`);
+  expect(browser.rendererPid).not.toBe(oldPid);
   rejectCapture(Error('compositor closed'));
   const frame=JSON.parse(await pending);const bytes=readFileSync(frame.path);
   expect(frame.format).toBe('bgra');expect([...bytes.subarray(0,4)]).toEqual([19,73,211,255]);
