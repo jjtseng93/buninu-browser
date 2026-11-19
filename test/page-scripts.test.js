@@ -130,7 +130,7 @@ beforeAll(async () => {
       const body = scripts.get(target.href);
       return body === undefined
         ? new Response("missing", { status: 404 })
-        : new Response(body, { headers: { "content-type": "text/javascript" } });
+        : new Response(await body, { headers: { "content-type": "text/javascript" } });
     },
   });
   await renderer.start();
@@ -272,6 +272,61 @@ test("classic scripts share globals, load in order and fire DOMContentLoaded the
   expect(await evaluate("order.join(',')")).toBe("inline-1,inline-2:lib:helped,module (deferred),dcl,load");
   expect(await evaluate("counter")).toBe(1);
   expect(await evaluate("document.readyState")).toBe("complete");
+});
+
+test("ready async scripts execute while deferred and earlier async scripts are fetching", async () => {
+  const blocking = Promise.withResolvers();
+  scripts.set("https://page.test/held-blocking.js", blocking.promise);
+  const slow = Promise.withResolvers();
+  const deferred = Promise.withResolvers();
+  scripts.set("https://page.test/slow-async.js", slow.promise);
+  scripts.set("https://page.test/fast-async.js", "events.push('fast')");
+  scripts.set("https://page.test/held-defer.js", deferred.promise);
+  await renderer.call("loadDocument", {url:"https://page.test/", contentType:"text/html", source:`
+    <!doctype html><body><script>var events = [];
+      document.addEventListener('DOMContentLoaded', () => events.push('dcl'));
+      addEventListener('load', () => events.push('load'));</script>
+    <script defer src="held-defer.js"></script>
+    <script async src="slow-async.js"></script>
+    <script async src="fast-async.js"></script>
+    <script src="held-blocking.js"></script>`});
+  try {
+    const waitFor = async name => {
+      for (let i = 0; i < 100; i++) {
+        if (await evaluate(`globalThis.events?.includes(${JSON.stringify(name)})`)) return;
+        await Bun.sleep(10);
+      }
+      throw Error(`did not observe ${name}`);
+    };
+    await waitFor("fast");
+    expect(await evaluate("document.readyState")).toBe("loading");
+    blocking.resolve("");
+    deferred.resolve("events.push(document.readyState)");
+    await waitFor("dcl");
+    expect(await evaluate("events.join(',')")).toBe("fast,interactive,dcl");
+  } finally {
+    blocking.resolve("");
+    deferred.resolve("");
+    slow.resolve("events.push('slow')");
+    await renderer.call("whenLoaded");
+  }
+  expect(await evaluate("events.join(',')")).toBe("fast,interactive,dcl,slow,load");
+});
+
+test("concurrent async modules wait for a shared dependency's top-level await", async () => {
+  scripts.set("https://page.test/shared-async.js", `
+    globalThis.starts++;
+    await new Promise(resolve => setTimeout(resolve, 60));
+    export const value = 42;`);
+  for (const name of ["left", "right"]) {
+    scripts.set(`https://page.test/${name}-async-module.js`, `
+      import {value} from "./shared-async.js";
+      globalThis.values.push(value);`);
+  }
+  await load(`<script>window.values = []; window.starts = 0</script>
+    <script type="module" async src="left-async-module.js"></script>
+    <script type="module" async src="right-async-module.js"></script>`);
+  expect(await evaluate("[starts, ...values]")).toEqual([1, 42, 42]);
 });
 
 test("large classic scripts prepared on the rewrite thread run in document order with the others", async () => {
