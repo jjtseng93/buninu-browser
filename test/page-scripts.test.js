@@ -2922,6 +2922,16 @@ test('decoded video dimensions invalidate retained intrinsic layout without a DO
  expect(size[2]).toBe(size[0]);expect(size[3]).toBe(size[1]);
 });
 
+test('video metadata updates intrinsic dimensions inside a fixed CSS box',async()=>{
+ await load('<video id="fixedVideo" style="width:180px;height:100px;object-fit:contain" src="/video.mp4"></video><div id="afterVideo">after</div>');
+ const geometry = '(()=>{const r=fixedVideo.getBoundingClientRect();return [r.width,r.height,afterVideo.getBoundingClientRect().top]})()';
+ const before=await evaluate(geometry);
+ expect(before.slice(0,2)).toEqual([180,100]);
+ await evaluate('fixedVideo.play().then(()=>fixedVideo.pause())');
+ expect(await evaluate('fixedVideo.videoWidth > 0 && fixedVideo.videoHeight > 0')).toBe(true);
+ expect(await evaluate(geometry)).toEqual(before);
+});
+
 test("inline style distinguishes supported CSS, ordinary expandos and present indices", async () => {
   await load('<!doctype html><div id="box"></div>');
   expect(await evaluate(`(() => {
