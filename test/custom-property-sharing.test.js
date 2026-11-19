@@ -71,3 +71,31 @@ test('large inherited custom maps preserve siblings, order and incremental remov
     expect(engine.customPropertiesOf(child)).toBe(engine.customPropertiesOf(parent));
   } finally {window.happyDOM.close();}
 });
+
+test('isolated variable changes update inherited maps and restyle consumers', () => {
+  const {window, document} = parseHTMLDocument('<main><section><b></b><i></i></section><aside><em></em></aside>'
+    + '<span></span>'.repeat(200) + '</main>');
+  const engine = new StyleEngine(), main = document.querySelector('main');
+  const sheets = ['main{--alias:var(--missing,var(--tone));--tone:red}' +
+    'b{color:var(--alias)} i::before{content:"x";color:var(--tone)}' +
+    'aside{--tone:red} em{color:var(--tone)}'];
+  try {
+    engine.compute(document,sheets);
+    for (const [name,value] of [['--tone','blue'],['--missing','green'],['--missing','']]) {
+      main.style.setProperty(name,value);
+      engine.compute(document,sheets,{},new Set(),new Set([main]));
+      const full = new StyleEngine().compute(document,sheets);
+      expect(engine.restyled).toBeLessThan(10);
+      for (const node of [main,...main.querySelectorAll('*')]) {
+        expect(engine.get(node)).toEqual(full.get(node));
+        expect(engine.customPropertiesOf(node)).toEqual(full.customPropertiesOf(node));
+        expect(engine.getPseudo(node,'before')).toEqual(full.getPseudo(node,'before'));
+      }
+    }
+    main.style.setProperty('--tone','purple');
+    const span=main.querySelector('span');
+    span.style.color='orange';
+    engine.compute(document,sheets,{},new Set(),new Set([main,span]));
+    expect(engine.get(span).color).toBe(new StyleEngine().compute(document,sheets).get(span).color);
+  } finally {window.happyDOM.close();}
+});
