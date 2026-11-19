@@ -89,6 +89,20 @@ try {
   passes=[];
   assert.equal(await run(`reviewLeft.className='a';${read}`),black);
   assert.ok(passes.every(count=>count<10),'one stale comparison must not permanently invalidate a sibling subtree');
+  // Overlapping forward and backward ranges must each reach their own
+  // boundary, including when a sibling moves between parents in the batch.
+  await load('i:nth-child(3n), i:nth-last-child(4n)', '<main>' +
+    ('<section>' + '<i></i>'.repeat(12) + '</section>').repeat(2) + '</main>');
+  assert.equal(await run(`(() => {
+    const [left, right] = document.querySelectorAll('section');
+    left.children[2].before(document.createElement('b'));
+    right.children[5].after(left.children[8]);
+    left.children[4].remove();
+    right.prepend(document.createElement('b'));
+    return [left, right].every(parent => Array.from(parent.children).every((node, i) =>
+      node.localName !== 'i' || (getComputedStyle(node).color === 'rgb(255, 0, 0)') ===
+        ((i + 1) % 3 === 0 || (parent.children.length - i) % 4 === 0)));
+  })()`), true);
   assert.deepEqual(errors,[]);
   process.stdout.write('sibling state invalidation passed\n');
 } finally {

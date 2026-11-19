@@ -547,7 +547,9 @@ export default class Node extends EventTarget {
 
 		node[PropertySymbol.clearCache]();
 
-		this[PropertySymbol.nodeArray].push(node);
+		const siblings = this[PropertySymbol.nodeArray];
+		const previousSibling = siblings[siblings.length - 1] ?? null;
+		siblings.push(node);
 
 		if (node[PropertySymbol.nodeType] === NodeTypeEnum.elementNode) {
 			this[PropertySymbol.elementArray].push(<Element>node);
@@ -566,7 +568,8 @@ export default class Node extends EventTarget {
 			new MutationRecord({
 				target: self,
 				type: MutationTypeEnum.childList,
-				addedNodes: [node]
+				addedNodes: [node],
+				previousSibling
 			})
 		);
 
@@ -715,6 +718,7 @@ export default class Node extends EventTarget {
 		newNode[PropertySymbol.clearCache]();
 
 		const index = nodeArray.indexOf(referenceNode);
+		const previousSibling = nodeArray[index - 1] ?? null;
 
 		if (newNode[PropertySymbol.nodeType] === NodeTypeEnum.elementNode) {
 			const elementArray = this[PropertySymbol.elementArray];
@@ -750,7 +754,9 @@ export default class Node extends EventTarget {
 			new MutationRecord({
 				target: self,
 				type: MutationTypeEnum.childList,
-				addedNodes: [newNode]
+				addedNodes: [newNode],
+				previousSibling,
+				nextSibling: referenceNode
 			})
 		);
 
