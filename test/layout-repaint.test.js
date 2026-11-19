@@ -57,6 +57,21 @@ function expectEquivalent(f, next, retained) {
   return painted;
 }
 
+test('changing object-fit updates the video picture within the retained box', () => {
+  const f = fixture('<body><video id="a" style="width:200px;height:100px;object-fit:fill"></video></body>');
+  try {
+    const resources = new Map([[f.element, { width: 100, height: 100 }]]);
+    const build = () => f.builder.build(f.document, new StyleEngine().compute(f.document), resources);
+    const previous = build(), layout = f.engine.layout(previous, f.options);
+    f.element.style.objectFit = 'contain';
+    const next = build();
+    const list = expectEquivalent(f, next, repaintLayout(layout, previous, next));
+    const video = list.items.find(item => item.op === 'drawVideo');
+    expect(video.rect.width).toBe(200);
+    expect(video.pictureRect).toEqual({...video.rect, x: video.rect.x + 50, width: 100});
+  } finally { f.window.happyDOM.abort(); }
+});
+
 test('animated affine transforms retain geometry and update descendant hit regions', () => {
   const f = fixture('<body><div id="a" style="position:absolute;width:90px;height:70px;transform:rotate(10deg);background:red"><span style="position:fixed;left:10px;top:5px">child</span></div></body>');
   try {
