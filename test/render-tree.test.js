@@ -166,6 +166,29 @@ test("detects whether a rebuilt tree changes layout input", async () => {
   window.happyDOM.abort();
 });
 
+test("retains placeholder text and ancestors until the label, value or style changes", async () => {
+  const { StyleEngine } = await import("../lib/style/computed-style.js");
+  const { document, window } = parseHTMLDocument('<body><div><input placeholder="Search"></div></body>');
+  try {
+    const builder = new RenderTreeBuilder(), styles = new StyleEngine().compute(document);
+    const input = document.querySelector("input");
+    const build = () => builder.build(document, styles).root;
+    const leaf = root => root.children[0].children[0].children[0];
+    const first = build();
+    expect(build()).toBe(first);
+    input.placeholder = "Filter";
+    expect(leaf(build()).text).toBe("Filter");
+    input.style.fontSize = "24px";
+    styles.compute(document);
+    const changed = leaf(build());
+    expect(changed.style.fontSize).toBe(24);
+    expect(changed.style.color).toBe(leaf(first).style.color);
+    input.value = "typed";
+    expect(leaf(build()).style).toBe(styles.get(input));
+    expect(leaf(first).text).toBe("Search");
+  } finally { window.happyDOM.abort(); }
+});
+
 test("published child arrays stay immutable for ordinary, generated and control nodes", async () => {
   const { StyleEngine } = await import("../lib/style/computed-style.js");
   const { document, window } = parseHTMLDocument(`<body><p id="label">text<br><img></p>
