@@ -28,11 +28,18 @@ try{
   outputs[0]({event:'ready'});presentation.timing(1,2);
   outputs[0]({event:'timing',seconds:2,sentSeconds:2.1});
  }
+ // An error before the first video-open starts the silent presentation later.
+ // Its initial position includes the elapsed time since the device failed.
  const anchor=await ev('v.currentTime');
+ const failedAt=Bun.nanoseconds();
  outputs[0]({event:'error',message:'connection refused'});
  await wait(()=>presentation.config?.hasAudio===false);
  assert.equal(presentation.config.audioId,null);
- assert(Math.abs(presentation.config.time-anchor)<0.03,'fallback must preserve measured position');
+ const elapsed=Number(Bun.nanoseconds()-failedAt)/1e9;
+ const bind=messages.findLast(m=>m.type==='video-bind'&&m.hasAudio===false);
+ if(bind) assert(Math.abs(bind.time-anchor)<0.03,'audio unbind must retain the measured position');
+ assert(presentation.config.time>=anchor-0.03 && presentation.config.time<=anchor+elapsed+0.03,
+   'silent presentation must start within the elapsed playback interval');
  const before=shown;
  await wait(async()=>shown>before+1&&(await ev('v.currentTime'))>anchor+0.2);
  assert.equal(await ev('v.paused'),false);
