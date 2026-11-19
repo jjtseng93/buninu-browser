@@ -216,3 +216,33 @@ test('rectangular alpha masks skip empty rows without shifting text or gradient 
     }
   } finally {kit.LTRBRect=makeRect; renderer.dispose();}
 });
+
+test('blur snapshots survive tile growth only when the output fits', async () => {
+  const events = [];
+  const renderer = await createPageRenderer({trace: message => {
+    if (message.startsWith('blur cache')) events.push(message);
+  }});
+  async function frame(target, width, background) {
+    target.resize(width, 100, 1);
+    await target.loadDocument({url:'https://blur.test/', contentType:'text/html', source:
+      `<body style="background:${background}"><section style="overflow:hidden;width:140px;height:80px"><i style="display:block;margin-left:52px;margin-top:22px;width:40px;height:30px;background:#2599;filter:blur(6px)"></i></section>`});
+    await target.whenLoaded();
+    return (await target.screenshot({format:'rgba'})).pixels;
+  }
+  try {
+    await frame(renderer, 85, '#edc');
+    await frame(renderer, 85, '#abc');
+    expect(events).toContain('blur cache miss');
+    for (const [width, background] of [[160,'#def'], [160,'#acd'], [200,'#bed'], [85,'#ace']]) {
+      events.length = 0;
+      const actual = await frame(renderer, width, background);
+      const reference = await createPageRenderer({});
+      try { expect(Bun.deepEquals(actual, await frame(reference, width, background))).toBe(true); }
+      finally { reference.dispose(); }
+      if (width === 200) {
+        expect(events).toContain('blur cache hit');
+        expect(events).not.toContain('blur cache miss');
+      }
+    }
+  } finally { renderer.dispose(); }
+});
