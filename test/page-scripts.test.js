@@ -1732,6 +1732,32 @@ test("host mode: a second document in the same renderer gets its own unforgeable
   }
 });
 
+test("host mode: engine fetches of data: URLs do not re-enter the page's fetch", async () => {
+  const host = new RendererHost({ timeout: 20_000, args: ["--dangerously-allow-host-js"] });
+  try {
+    await host.start();
+    // The page's fetch is installed on the renderer's own global object. The
+    // engine fetches data: URLs (page fetch, script src) with its own.
+    await host.call("loadDocument", {
+      url: "https://data-fetch.test/",
+      source: `<!doctype html><title>start</title>
+        <script src="data:text/javascript,window.fromScript%3D'script'"></script>
+        <script>
+          fetch('data:application/json,{"a":42}').then(r => r.json())
+            .then(j => { document.title = window.fromScript + ' ' + j.a; }, e => { document.title = 'error ' + e; });
+        </script>`,
+      contentType: "text/html",
+      status: 200,
+    });
+    await host.call("whenLoaded");
+    let title = "";
+    for (let i = 0; i < 50 && (title = await host.call("title")) === "start"; i++) await Bun.sleep(50);
+    expect(title).toBe("script 42");
+  } finally {
+    host.close();
+  }
+});
+
 test("fragment navigation updates location, fires hashchange, and lets the page scroll", async () => {
   await load(`
     <div style="height:1000px"></div><h2 id="plain">plain</h2>
