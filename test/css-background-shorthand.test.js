@@ -38,6 +38,16 @@ test('background grammar preserves layers, size slash, defaults and final color'
  }finally{f.window.happyDOM.close();}
 });
 
+test('repeated background position syntax resolves against the current font size', () => {
+  const f = fixture();
+  try {
+    f.s.cssText = 'background-position: 1em 2em; font-size: 10px';
+    expect(f.read().backgroundPositionYValues).toEqual([20]);
+    f.s.fontSize = '24px';
+    expect(f.read().backgroundPositionYValues).toEqual([48]);
+  } finally { f.window.happyDOM.close(); }
+});
+
 test('background shorthand CSSOM updates retain real software image placement and live pending sources',async()=>{
  const {loadGraphics}=await import('../lib/renderer/page-renderer.js');
  const {RendererHost}=await import('../lib/renderer/host.js');
