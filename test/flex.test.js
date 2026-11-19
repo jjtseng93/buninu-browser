@@ -32,6 +32,16 @@ function flex(html, css) {
 
 const ROOT = `#root { display:flex; width:100px; height:20px }`;
 
+test("row flex alignment measures fixed height with percentage padding and overflowing children", () => {
+  const { rect, done } = flex('<div id="root"><div id="a"><p></p></div><div id="b"></div></div>',
+    `#root { display:flex; width:200px; height:100px; align-items:end }
+     #a, #b { height:5px; padding:5% 0; border:2px solid; width:40px }
+     #a { box-sizing:content-box } p { height:150px }`);
+  expect([rect("#a").height, rect("#a").top]).toEqual([29, 71]);
+  expect([rect("#b").height, rect("#b").top]).toEqual([24, 76]);
+  done();
+});
+
 test("flex-basis auto falls back to the main size property (§7.2.3)", () => {
   const { rect, done } = flex(`<div id="root"><div id="a"></div></div>`,
     `${ROOT} #a { width:30px; height:10px; flex:0 0 auto }`);
