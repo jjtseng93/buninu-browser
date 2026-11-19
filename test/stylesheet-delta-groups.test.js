@@ -8,20 +8,21 @@ const supports = source => `@supports (display:block){${source}}`;
 function parsed(source, dimensions = viewport) {
   const counter = {order: 0};
   const rules = parseStyleSheet(source, dimensions, counter);
-  return {rules, selectorOnly: counter.selectorOnly};
+  return {rules, localCascadeOnly: counter.localCascadeOnly};
 }
 
 for (const [name, source, count] of [
   ['ordinary', '#subject{color:blue}', 1],
   ['supports', supports('#subject{color:blue}'), 1],
   ['media', '@media(min-width:700px){#subject{color:blue}}', 1],
+  ['font face with a rule', supports('@font-face{font-family:Added;src:url(added.woff2)}#child{color:blue}'), 1],
   ['nested groups', supports('@media(min-width:700px){#subject{color:blue}}'), 1],
   ['comments and strings', '/* @font-face{} */#subject::before{content:"@keyframes {}; @layer"}', 1],
   ['empty active group', supports(''), 0],
 ]) {
   test(`the stylesheet parser classifies ${name} rules during its existing parse`, () => {
     const result = parsed(source);
-    expect(result.selectorOnly).toBeTrue();
+    expect(result.localCascadeOnly).toBeTrue();
     expect(result.rules).toHaveLength(count);
   });
 }
@@ -30,15 +31,14 @@ for (const [name, source] of [
   ['layer block', '@layer added{#subject{color:blue}}'],
   ['layer statement', '@layer earlier,later;#subject{color:blue}'],
   ['property', '@property --tone{syntax:"<color>";inherits:false;initial-value:blue}'],
-  ['font-face', '@font-face{font-family:Added;src:url(added.woff2)}'],
   ['keyframes', '@keyframes added{from{opacity:0}to{opacity:1}}'],
   ['unknown block', '@unknown thing{#subject{color:blue}}'],
   ['unknown statement', '@unknown thing;'],
   ['import', '@import url(other.css);'],
 ]) {
   test(`a nested ${name} prevents selector-only delta invalidation`, () => {
-    expect(parsed(supports(source)).selectorOnly).toBeFalse();
-    expect(parsed(`@media(min-width:700px){${supports(source)}}`).selectorOnly).toBeFalse();
+    expect(parsed(supports(source)).localCascadeOnly).toBeFalse();
+    expect(parsed(`@media(min-width:700px){${supports(source)}}`).localCascadeOnly).toBeFalse();
   });
 }
 
@@ -49,7 +49,7 @@ test('unvisited inactive groups and incomplete constructs keep conservative meta
     supports('@media(min-width:999999px){@font-face{font-family:Hidden;src:url(hidden.woff)}}'),
     supports('@unknown unfinished'),
     '@supports(display:block){#subject{color:blue}',
-  ]) expect(parsed(source).selectorOnly).toBeFalse();
+  ]) expect(parsed(source).localCascadeOnly).toBeFalse();
 });
 
 function fixture() {
@@ -89,6 +89,7 @@ test('active conditional additions combine with shadow changes, including inheri
     const stable = f.engine.get(f.get('stable'));
     f.attach();
     f.sheets.push(supports(`@media(min-width:700px){
+      @font-face{font-family:Added;src:url(added.woff2)}
       #subject{--tone:blue}#child::before{content:"ADDED";color:var(--tone)}
     }`));
     f.compute();
@@ -132,7 +133,6 @@ test('nested global definitions, unknown statements and inactive groups retain t
   for (const source of [
     supports('@layer inserted{#child{color:blue}}'),
     supports('@property --tone{syntax:"<color>";inherits:false;initial-value:blue}'),
-    supports('@font-face{font-family:Added;src:url(added.woff2)}'),
     supports('@keyframes inserted{from{opacity:0}to{opacity:1}}'),
     supports('@unknown added;'),
     '@supports(width:unsupported-value){#child{color:blue}}',

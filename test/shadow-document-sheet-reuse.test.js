@@ -139,7 +139,6 @@ test('insertion and duplicate ordinary sheets retain the unchanged relative casc
 for (const [name, source] of [
   ['layer', '@layer added{#leaf{color:blue}}'],
   ['property', '@property --tone{syntax:"<color>";inherits:false;initial-value:blue}'],
-  ['font-face', '@font-face{font-family:Added;src:url(added.woff2)}'],
   ['keyframes', '@keyframes added{from{opacity:0}to{opacity:1}}'],
   ['inactive media', '@media(min-width:999999px){#leaf{width:21px}}'],
   ['unknown at-rule', '@unknown something;'],
@@ -199,5 +198,15 @@ test('large keyed additions restyle possible subjects and unkeyed additions fall
     expect(f.engine.restyled).toBeLessThan(f.check().restyled);
     f.sheets.push(f.sheets.at(-1) + '*{color:green}');
     f.compute();expect(f.engine.restyled).toBe(f.check().restyled);
+  } finally {f.window.happyDOM.close();}
+});
+
+test('adding only font faces leaves the document cascade intact', () => {
+  const f = fixture();
+  try {
+    f.sheets.push('@font-face{font-family:Added;src:url(added.woff2)}');
+    f.compute();
+    expect(f.engine.restyled).toBe(0);
+    f.check();
   } finally {f.window.happyDOM.close();}
 });
