@@ -188,11 +188,16 @@ test('same-length replacement and reordered old sheets cannot reuse unrelated sc
   }
 });
 
-test('large added rule sets retain the bounded full-cascade fallback', () => {
+test('large keyed additions restyle possible subjects and unkeyed additions fall back', () => {
   const f = fixture();
   try {
     f.attach();
     f.sheets.push(Array.from({length:301}, (_, index) => `.absent${index}{color:blue}`).join(''));
+    f.sheets[f.sheets.length - 1] += '#leaf{width:51px}#branch::before{content:"test"}';
+    f.compute();
+    expect(f.engine.get(f.get('leaf')).width).toBe(51);
+    expect(f.engine.restyled).toBeLessThan(f.check().restyled);
+    f.sheets.push(f.sheets.at(-1) + '*{color:green}');
     f.compute();expect(f.engine.restyled).toBe(f.check().restyled);
   } finally {f.window.happyDOM.close();}
 });
