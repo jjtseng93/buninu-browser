@@ -39,6 +39,8 @@ test('createElement treats colons literally and only HTML documents fold ASCII c
       if (contentType !== 'application/xml') expect(node instanceof window.HTMLUnknownElement).toBeTrue();
     }
     expect(createElement(document, '\u0130nput').localName).toBe('\u0130nput');
+    expect(elementTagName(createElement(document, 'my-ßz'))).toBe('MY-ßZ');
+    expect(elementTagName(createElementNS(document, HTML, 'ß:aZ'))).toBe('ß:AZ');
     expect(createElement(document, 'DIV') instanceof window.HTMLDivElement).toBeTrue();
   } finally {window.happyDOM.close();}
 });
