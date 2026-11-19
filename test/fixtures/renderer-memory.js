@@ -1,4 +1,5 @@
 import { strict as assert } from 'node:assert';
+import { rasterVideoMask } from '../../lib/renderer/video-mask.js';
 import '../../vendor/ses/dist/ses.mjs';
 import { createPageRenderer, loadGraphics } from '../../lib/renderer/page-renderer.js';
 
@@ -91,10 +92,19 @@ try {
     assert.ok(presentations.includes('video-open'), 'video uses the separate presentation layer');
     assert.deepEqual(errors, []);
     await renderer.screenshot();
-    // First read is the normal frame; second is the video overlay's base.
-    failAt = reads + 2;
-    assert.throws(() => renderer.resize(641, 481), /intentional readback failure/);
-    assert.equal(reads, failAt, 'the video overlay readback was exercised');
+    renderer.resize(641, 481);
+    // Owned opaque surfaces can copy pixels directly. Exercise snapshot
+    // cleanup on a CanvasKit surface that uses the mask's readPixels path.
+    const surface = kit.MakeSurface(2, 2);
+    try {
+      failAt = reads + 1;
+      assert.throws(() => rasterVideoMask({
+        kit, canvas: surface.getCanvas(), surface, width: 2, height: 2,
+        region: {x: 0, y: 0, width: 2, height: 2}, scale: 1,
+        background: kit.TRANSPARENT, paint() {},
+      }), /intentional readback failure/);
+      assert.equal(reads, failAt, 'the video mask readback was exercised');
+    } finally { surface.dispose(); }
     if (images.size !== 0) throw new Error(`failed overlay readback left ${images.size} snapshot(s) alive`);
   } finally { failAt = Infinity; renderer.dispose(); }
   assert.equal(surfaces.size, 0);
