@@ -63,6 +63,11 @@ Item {id:scene;width:400;height:200;property int taps:0
 }`});await host.call('whenLoaded');
   expect(await host.call('evaluate','thumb.mapFromItem(tile,40,22)')).toEqual({x:10,y:10});
   expect(await host.call('evaluate','thumb.mapToItem(tile,10,10)')).toEqual({x:40,y:22});
+  // Qt's point and rect overloads: a scene point handed back in, as a menu placed from mapToItem(null, ...) does.
+  expect(await host.call('evaluate','thumb.mapFromItem(tile,{x:40,y:22})')).toEqual({x:10,y:10});
+  expect(await host.call('evaluate','thumb.mapFromItem(null,thumb.mapToItem(null,7,9))')).toEqual({x:7,y:9});
+  expect(await host.call('evaluate','thumb.mapToItem(tile,10,10,5,6)')).toEqual({x:40,y:22,width:5,height:6});
+  expect(await host.call('evaluate','thumb.mapToItem(tile,{x:10,y:10,width:5,height:6})')).toEqual({x:40,y:22,width:5,height:6});
   await host.call('click',145,45);
   expect(await host.call('evaluate','root.taps')).toBe(1);
   await host.call('click',105,25);
