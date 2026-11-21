@@ -242,7 +242,7 @@ test("top-level shell exposes the parsed document through Bun.WebView", async ()
     await view.cdp("Input.dispatchMouseEvent", {
       type: "mouseWheel", x: 100, y: 100, deltaX: 0, deltaY: 25, modifiers: 8,
     });
-    expect(await view.evaluate("shiftWheel")).toEqual([true, 0, 25]);
+    expect(await view.evaluate("shiftWheel")).toEqual([true, 25, 0]);
     expect(await view.evaluate("scrollY")).toBe(0);
     await view.cdp("Input.dispatchMouseEvent", {
       type: "mouseWheel",
