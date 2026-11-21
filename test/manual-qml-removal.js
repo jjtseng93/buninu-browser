@@ -11,6 +11,7 @@ const files = [
   'lib/document-types.js',
   'lib/headless-shell.js',
   'lib/renderer/page-renderer.js',
+  'lib/renderer/page-realm.js',
   'lib/renderer/canvas-2d.js',
   'lib/render-tree/index.js',
   'lib/renderer/host.js',

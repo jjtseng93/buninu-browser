@@ -667,7 +667,7 @@ bun test/manual-qml-removal.js
 ```
 
 Existing integrations are in `lib/document-types.js`,
-`lib/renderer/page-renderer.js`, `lib/headless-shell.js`, `lib/renderer/host.js`
+`lib/renderer/page-renderer.js`, `lib/renderer/page-realm.js`, `lib/headless-shell.js`, `lib/renderer/host.js`,
 `lib/renderer/main.js`, `lib/renderer/canvas-2d.js`, `lib/render-tree/index.js`, and `frontends/wayland/index.js`. Delete the marked blocks and `lib/qml`, plus its
 tests/fixtures, to remove QML. Ordinary `let isHtml`, `let parsed`, `parsed ??=`,
 renderer acquisition callbacks and default environments remain valid without

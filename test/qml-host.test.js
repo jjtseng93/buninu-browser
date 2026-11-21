@@ -37,6 +37,29 @@ test('local QML has a fresh host process; same-directory HTML and HTTP QML stay 
     rmSync(dir, { recursive: true, force: true });
   }
 }, 30000);
+test('a QML host keeps window[id] lookups, and their Proxy, out of the global prototype chain', async () => {
+  // Bun 1.4.5's JavaScriptCore refuses to load a new module while a Proxy is in that chain, which
+  // made every cached QML component fail to load. Web pages still need the lookups.
+  const proxyInChain = `(() => { const { types } = process.getBuiltinModule('node:util'); for (let o = globalThis; o; o = Object.getPrototypeOf(o)) if (types.isProxy(o)) return true; return false; })()`;
+  const dir = mkdtempSync(join(tmpdir(), 'qml-host-chain-'));
+  await Bun.write(join(dir, 'main.qml'), 'import QtQuick\nText {id: label; text: "host"}');
+  await Bun.write(join(dir, 'plain.html'), '<title>plain</title><div id="box">named</div>');
+  const b = await createBrowser();
+  try {
+    await b.context.navigate(Bun.pathToFileURL(join(dir, 'main.qml')).href);
+    expect(await b.context.evaluate('typeof __qmlHost.read')).toBe('function');
+    expect(await b.context.evaluate(proxyInChain)).toBe(false);
+    // A module that was never loaded before still loads, as the QML cache needs.
+    await Bun.write(join(dir, 'fresh.cjs'), 'module.exports = () => 42;');
+    expect(await b.context.evaluate(`process.getBuiltinModule('node:module').createRequire(${JSON.stringify(join(dir, 'x.cjs'))})(${JSON.stringify(join(dir, 'fresh.cjs'))})()`)).toBe(42);
+    await b.context.navigate(Bun.pathToFileURL(join(dir, 'plain.html')).href);
+    expect(await b.context.evaluate('window.box && window.box.textContent')).toBe('named');
+    expect(await b.context.evaluate('typeof box')).toBe('object');
+  } finally {
+    b.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+}, 40000);
 test('real upstream Theme resolves palette, Commons typography and watches theme changes', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'qml-theme-')),
     oldHome = process.env.HOME,
