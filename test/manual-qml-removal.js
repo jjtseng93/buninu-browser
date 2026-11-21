@@ -7,6 +7,7 @@ import { join } from 'node:path';
 const source = Bun.fileURLToPath(new URL('../', import.meta.url));
 const copy = mkdtempSync(join(tmpdir(), 'browser-without-qml-'));
 const files = [
+  'index.js',
   'frontends/wayland/index.js',
   'lib/document-types.js',
   'lib/headless-shell.js',

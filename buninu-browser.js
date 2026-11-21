@@ -1,5 +1,8 @@
 #!/usr/bin/env bun
+
+// qml handle begin: record the local QML compilation cache mode
 import {configureQmlCache} from './lib/qml/cache-options.js';
+// qml handle end
 
 /**
  * Buninu Browser executable and public module entry point.
@@ -28,7 +31,11 @@ export { computeElementStyle, parseDeclarations, StyleEngine } from "./lib/style
 export { RenderTreeBuilder, renderTreeText } from "./lib/render-tree/index.js";
 
 export async function main(args = Bun.argv.slice(2)) {
+
+  // qml handle begin: record the local QML compilation cache mode
   configureQmlCache(args);
+  // qml handle end
+
   const has = (...names) => names.some((name) => args.includes(name));
   if (has("--version", "-V", "-version")) {
     console.log(`buninu-browser ${packageInfo.version}`);

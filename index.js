@@ -178,10 +178,12 @@ if (import.meta.main) {
     process.exit(0);
   }
 
+  // qml handle begin: launch the experimental Quickshell QML entry
   if (frontend.startsWith("quickshell-")) {
     const entry = join(import.meta.dir, "lib/qml/qs" + frontend.slice("quickshell-".length));
     process.exit(await run([process.execPath, entry, ...args]) ?? 1);
   }
+  // qml handle end
 
   // wayland handle begin: launch the isolated frontend
   if (frontend === "wayland") {
