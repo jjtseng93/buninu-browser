@@ -52,3 +52,37 @@ Item {
     host.close();
   }
 }, 30000);
+
+test('a TapHandler nobody asked a long press of keeps a slow release a tap', async () => {
+  const host = new RendererHost({ timeout: 20000 });
+  try {
+    await host.start();
+    await host.call('loadDocument', {
+      url: 'data:text/x-qml,longpress-listener',
+      contentType: 'text/x-qml',
+      source: `import QtQuick
+Item {
+ width:200;height:120
+ property int quietTaps:0
+ property int listenedTaps:0
+ property int longs:0
+ Rectangle {id:quiet;width:80;height:40;color:"red"
+  TapHandler {onTapped:quietTaps++}}
+ Rectangle {id:listened;x:100;width:80;height:40;color:"blue"
+  TapHandler {onTapped:listenedTaps++;onLongPressed:longs++}}
+ Text {id:status;y:60;text:quietTaps+":"+listenedTaps+":"+longs}
+}`,
+    });
+    await host.call('whenLoaded');
+    // No onLongPressed anywhere on it: however slow the release, it is a tap.
+    await hold(host, 'quiet', 1100);
+    expect(await status(host)).toBe('1:0:0');
+    // With a listener a held press is still a long press and no tap, as before.
+    await hold(host, 'listened', 1100);
+    expect(await status(host)).toBe('1:0:1');
+    await hold(host, 'listened', 50);
+    expect(await status(host)).toBe('1:1:1');
+  } finally {
+    host.close();
+  }
+}, 30000);
