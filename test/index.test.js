@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { castyCommand, chooseFrontend } from "../index.js";
+import packageInfo from "../package.json" with { type: "json" };
+import { castyCommand, castyPackage, chooseFrontend } from "../index.js";
 
 test("the first argument picks the frontend; anything else goes to casty whole", () => {
   expect(chooseFrontend(["--casty", "example.com", "--", "--mobile"])).toEqual({ frontend: "casty", args: ["example.com", "--", "--mobile"] });
@@ -18,10 +19,10 @@ test("the first argument picks the frontend; anything else goes to casty whole",
 });
 
 test("casty runs with npx when npx and bun exist, else bunx, else bun x", () => {
-  const casty = ["@drxiaozhi/casty"];
+  const casty = [castyPackage()];
   const all = (name) => `/bin/${name}`;
   expect(castyCommand(["a", "--", "--mobile"], all))
-    .toEqual(["/bin/npx", "--loglevel=error", "-p", "@drxiaozhi/casty", "--", "casty", "a", "--", "--mobile"]);
+    .toEqual(["/bin/npx", "--loglevel=error", "-p", castyPackage(), "--", "casty", "a", "--", "--mobile"]);
   // npx without bun could not run casty's `#!/usr/bin/env bun` bin.
   expect(castyCommand(["a"], (name) => name === "bun" ? null : `/bin/${name}`)).toEqual(["/bin/bunx", ...casty, "a"]);
   expect(castyCommand(["a"], (name) => name === "npx" ? null : `/bin/${name}`)).toEqual(["/bin/bunx", ...casty, "a"]);
@@ -40,4 +41,14 @@ test("explicit Quickshell backends and their help work through the package entry
     expect(output).toContain(flag);
     expect(output).toContain('-p, --path');
   }
+});
+
+test("the casty package comes from the pinned script without shell execution", () => {
+  expect(castyPackage()).toBe(packageInfo.scripts.casty.split(/\s+/)[1]);
+  expect(castyPackage()).toMatch(/^@drxiaozhi\/casty@\d+\.\d+\.\d+/);
+  expect(castyPackage("bunx @drxiaozhi/casty@9.8.7")).toBe("@drxiaozhi/casty@9.8.7");
+  expect(() => castyPackage("bunx @drxiaozhi/casty")).toThrow();
+  expect(() => castyPackage("bunx @drxiaozhi/casty@1; echo bad")).toThrow();
+  expect(() => castyPackage("bunx other@1.0.0")).toThrow();
+  expect(() => castyPackage(null)).toThrow();
 });

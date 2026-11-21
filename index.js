@@ -32,7 +32,6 @@ import packageInfo from "./package.json" with { type: "json" };
 
 export * from "./buninu-browser.js";
 
-const CASTY_PACKAGE = "@drxiaozhi/casty";
 const ENGINE = join(import.meta.dir, "buninu-browser.js");
 const RESERVED_FRONTENDS = new Set(["--gtk", "--appkit", "--qt"]);
 const INFORMATION = new Map([
@@ -61,10 +60,22 @@ export function chooseFrontend(argv) {
 }
 
 /**
+ * The casty package this release is pinned to, read from the "casty" script
+ * ("bunx @drxiaozhi/casty@VERSION"). The text is only parsed, never run by a
+ * shell, so nothing but a package name and version can come out of it.
+ */
+export function castyPackage(script = packageInfo.scripts?.casty) {
+  const match = /^bunx\s+(@drxiaozhi\/casty@[^\s;&|<>`$]+)\s*$/.exec(script ?? "");
+  if (!match) throw new Error('scripts.casty must be "bunx @drxiaozhi/casty@VERSION"');
+  return match[1];
+}
+
+/**
  * The command that runs casty: npx when npx and bun are both on PATH, else
  * bunx, else `bun x` with bun from PATH or process.argv0.
  */
 export function castyCommand(args, which = Bun.which) {
+  const CASTY_PACKAGE = castyPackage();
   const npx = which("npx");
   const bun = which("bun");
   // npx asks before installing casty (on purpose); --loglevel=error keeps npm
@@ -132,7 +143,7 @@ function printVersion() {
   console.log("Runtime:", `Bun ${Bun.version}`);
   console.log("Platform:", `${process.platform}-${process.arch}`);
   console.log("Engine:", ENGINE);
-  console.log("casty launcher:", castyCommand([]).join(" "));
+  console.log("casty launcher:", castyCommand([]).join(" "), "(pinned)");
   console.log("Frontends: casty (default), headless, win32; reserved: gtk, appkit, qt");
 }
 

@@ -69,6 +69,9 @@ frontend
 [`@drxiaozhi/casty`](https://www.npmjs.com/package/@drxiaozhi/casty)
 ([source on GitHub](https://github.com/jjtseng93/casty)).
 npx may ask for confirmation before installing a missing package.
+Each Buninu Browser release is pinned to one exact casty version, the one it was
+tested with (`scripts.casty` in `package.json`; `--version` shows it), so a new
+casty release never changes what you run until Buninu Browser itself is updated.
 
 The launcher sets `CASTY_BROWSER` to
 this package's `buninu-browser.js`

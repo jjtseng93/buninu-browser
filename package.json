@@ -33,7 +33,8 @@
     "url": "https://github.com/jjtseng93/buninu-browser/issues"
   },
   "scripts": {
-    "test": "bun test --parallel"
+    "test": "bun test --parallel",
+    "casty": "bunx @drxiaozhi/casty@1.6.4"
   },
   "license": "MIT",
   "engines": {
