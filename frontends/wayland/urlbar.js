@@ -89,7 +89,7 @@ export class WaylandUrlBar {
     if(!state)return this.context.click(x/this.zoom,(y-this.height)/this.zoom,button===272?options:{...options,button:button===273?"right":"middle"});
   }
   move(x,y,options={}){if(this.editor.dragging){this.editor.pointerMove(Math.max(1,Math.floor(x/this.cellWidth)+1));return;}if(y>=this.height||this.pageButtons)return this.context.move(x/this.zoom,(y-this.height)/this.zoom,options);}
-  scroll(dx,dy,at){if(at?.y<this.height){if(this.editor.editing){if(dy<0)this.editor.historyUp();else this.editor.historyDown();}return;}return this.context.scroll(dx/this.zoom,dy/this.zoom,at?{x:at.x/this.zoom,y:(at.y-this.height)/this.zoom}:null);}
+  scroll(dx,dy,at,options){if(at?.y<this.height){if(this.editor.editing){if(dy<0)this.editor.historyUp();else this.editor.historyDown();}return;}return this.context.scroll(dx/this.zoom,dy/this.zoom,at?{x:at.x/this.zoom,y:(at.y-this.height)/this.zoom}:null,options);}
   async command(line) {
     const {name,arg,error}=parseCommand(line);if(error){this.flash(error);return;}
     if(!WAYLAND_COMMANDS.some(c=>c.name===name)){this.flash(`${name} is not used by the Wayland frontend`);return;}

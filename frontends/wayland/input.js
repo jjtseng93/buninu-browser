@@ -83,7 +83,8 @@ export function attachInput(client,window,context,onError) {
         // to 10 Wayland axis units; restore that scale on the client side.
         // Preserve fractional movement and apply page zoom later in the toolbar.
         const delta=args[2]*10;
-        invoke('scroll',args[1]===1?delta:0,args[1]===0?delta:0,{x,y});
+        // The held keys ride along, so Shift+wheel and Ctrl+wheel reach the page as they do on a click.
+        invoke('scroll',args[1]===1?delta:0,args[1]===0?delta:0,{x,y},modifiers());
       }
     });client.request(seat,'get_pointer',pointer);}
     if((caps&2)&&!keyboard){keyboard=client.object('wl_keyboard',(name,args)=>{
