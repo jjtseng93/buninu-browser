@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { cropViewport, encodeImage, encodeImageBase64, rawFrame } from '../lib/paint/frame.js';
+import { cropViewport, encodeImage, encodeImageBase64, preferBuiltInImageCodecs, rawFrame } from '../lib/paint/frame.js';
 import { FrameCaptureCache } from '../lib/paint/frame-cache.js';
 import { appendParagraphText } from '../lib/paint/paragraph-text.js';
 
@@ -118,3 +118,13 @@ test("raw screenshots accept already composed BGRA without converting it twice",
   expect(rawFrame(pixels, 1, 1, "bgra", {inputFormat:"bgra"}).pixels).toEqual(pixels);
   expect(rawFrame(pixels, 1, 1, "rgba", {inputFormat:"bgra"}).pixels).toEqual(Uint8Array.of(1,2,3,255));
  });
+
+test('Windows is switched to the built-in image codecs, other platforms are left alone', () => {
+  // A Windows WIC that cannot decode the BMP wrapper fails every encode instead of falling back.
+  for (const [platform, backend] of [['win32', 'bun'], ['linux', 'system'], ['darwin', 'system']]) {
+    const image = { backend: 'system' };
+    preferBuiltInImageCodecs(platform, image);
+    expect(image.backend).toBe(backend);
+  }
+  expect(() => preferBuiltInImageCodecs('win32', undefined)).not.toThrow();
+});
