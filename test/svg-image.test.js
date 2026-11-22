@@ -1,5 +1,6 @@
 import {beforeAll,test,expect} from 'bun:test';
 import CanvasKitInit from '../usr/lib/canvaskit/canvaskit.js';
+import {SvgPathCache} from '../lib/renderer/svg-painter.js';
 import {decodeSvgImage} from '../lib/renderer/svg-image.js';
 import {createImageResourceLoader} from '../lib/renderer/image-resources.js';
 let kit;
@@ -56,4 +57,22 @@ test('invisible nested group preserves the shared opacity layer of visible sibli
    expect(pixel(r,15,5)).toEqual([255,0,0,128]);
    expect(pixel(r,35,5)[3]).toBe(0);
  } finally {r.image.delete();}
+});
+
+test('repainted SVG shapes keep independent fill rules and path lifetimes', () => {
+  const cache = new SvgPathCache();
+  const d = 'M0 0H10V10H0Z M2 2H8V8H2Z';
+  const first = cache.parse(kit, d);
+  let second;
+  try {
+    first.setFillType(kit.FillType.EvenOdd);
+    second = cache.parse(kit, d);
+    cache.clear();
+    expect(first.contains(5, 5)).toBe(false);
+    expect(second.contains(5, 5)).toBe(true);
+  } finally {
+    cache.clear();
+    first.delete();
+    second?.delete();
+  }
 });
