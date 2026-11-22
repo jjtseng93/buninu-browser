@@ -1054,3 +1054,12 @@ test("a custom element's public attributes cannot hide content attributes from C
     expect([engine.get(less).display,engine.get(more).display]).toEqual(['inline-flex','none']);
   } finally { window.happyDOM.abort(); }
 });
+
+test('functional pseudo-element rules do not enter the element cascade', () => {
+  const css = '::view-transition-old(card), .card {width:20px}' +
+    '::highlight(search) {color:red} ::slotted(.item) {color:blue}' +
+    '[data-label="::highlight(search)"] {width:30px}';
+  expect(parseStyleSheet(css).map(rule => rule.selector)).toEqual([
+    '.card', '::slotted(.item)', '[data-label="::highlight(search)"]',
+  ]);
+});
