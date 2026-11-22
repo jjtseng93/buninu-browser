@@ -10,13 +10,15 @@ import {LayoutEngine} from '../lib/layout/text-layout.js';
 import {buildDisplayList, hitTarget, scrollExtentFor} from '../lib/paint/display-list.js';
 
 // Run the complete paint pipeline with its former node/kind cache keys as an
-// oracle. Only this lookup changes; clip, transform and stacking calculations
+// oracle, without reusing a parent’s content effects. Clip, transform and stacking calculations
 // remain the same, including non-enumerable hit/scroll metadata.
 const moduleURL = new URL('../lib/paint/display-list.js', import.meta.url);
 const source = readFileSync(moduleURL, 'utf8');
 const sharedKey = 'const key = `${cacheKind}:${owner?.id ?? nodeId}`;';
-if (!source.includes(sharedKey)) throw new Error('The effect-cache oracle needs updating');
+const parentLookup = "const inherited = contentEffects.get(parent);";
+if (!source.includes(sharedKey) || !source.includes(parentLookup)) throw new Error('The effect-cache oracle needs updating');
 const referenceSource = source.replace(sharedKey, 'const key = `${kind}:${nodeId}`;')
+  .replace(parentLookup, "const inherited = undefined;")
   .replace(/from\s+(["'])(\.[^"']+)\1/g, (_match, _quote, specifier) =>
     `from ${JSON.stringify(new URL(specifier, moduleURL).href)}`);
 const directory = mkdtempSync(join(tmpdir(), 'buninu-effect-cache-'));
@@ -142,4 +144,15 @@ test('effect caches expire between paints and replacement geometry without mutat
     expect(third.items).not.toEqual(second.items);
     expect(JSON.stringify(first)).toBe(before);
   } finally {f.window.happyDOM.close();}
+});
+
+test('plain descendants inherit parent content effects across scroll, clip and filter boundaries', () => {
+  const f = fixture(`<main style="overflow:auto;width:120px;height:50px;transform:translate(2px,3px)">
+    <section style="opacity:.6;clip-path:inset(2px);background:red">
+      <div style="background:blue"><div id="owner" style="height:80px;background:yellow"></div></div>
+      <div style="position:fixed;left:2px;background:purple">fixed</div>
+    </section></main>`);
+  try {
+    compare(f.build(), element => element.localName === 'main' ? {x:3,y:11} : null);
+  } finally { f.window.happyDOM.close(); }
 });
