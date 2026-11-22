@@ -74,3 +74,19 @@ test('body conversion reentry cannot overwrite an inner send or use an obsolete 
  expect(requests.some(r=>r.path==='/obsolete')).toBeFalse();
  expect(await evaluate(`(()=>{const x=new XMLHttpRequest();let called=false,error;try{x.send({toString(){called=true;return 'x'}})}catch(e){error=e.name}return [called,error]})()`)).toEqual([true,'InvalidStateError']);
 });
+
+test('synchronous XHR events keep the calling promise reaction on the stack', async () => {
+  const result = await evaluate(`fetch('/echo').then(() => {
+    const xhr = new XMLHttpRequest(), events = [];
+    xhr.onreadystatechange = () => events.push('state:' + xhr.readyState);
+    xhr.onloadstart = () => events.push('start');
+    xhr.onabort = () => events.push('abort');
+    Promise.resolve().then(() => events.push('microtask'));
+    xhr.open('GET', '/slow');
+    xhr.send();
+    xhr.abort();
+    events.push('returned');
+    return Promise.resolve().then(() => events);
+  })`);
+  expect(result).toEqual(['state:1', 'start', 'state:4', 'abort', 'returned', 'microtask']);
+});
