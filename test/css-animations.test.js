@@ -22,6 +22,17 @@ test('CSS keyframes use balanced blocks, media filtering and prefix aliases',()=
  expect(animationProperty('-webkit-animation')).toBe('animation');expect(animationProperty('--MyVar')).toBe('--MyVar');
 });
 
+test('keyframe discovery skips unrelated blocks while preserving scoped definitions and cascade order', () => {
+ const css = `a {content: "@keyframes quoted"} @layer empty { p {color:red} }
+   @media (max-width:400px) { @keyframes hidden { to {opacity:0} } }
+   @layer nested { @k/**/eyframes show { from {opacity:0} } }
+   @unknown { @keyframes ignored { to {opacity:0} } }
+   @-WEBKIT-KEYFRAMES show { 75% {opacity:1} }`;
+ const frames = extractAnimationKeyframes(css, {width:800});
+ expect([...frames.keys()]).toEqual(['show']);
+ expect(frames.get('show').map(frame => frame.offset)).toEqual([.75]);
+});
+
 test('numeric animations interpolate without changing DOM declarations, and end once',()=>{
  const t=timeline();
  expect(t.animation.sample(t.element,t.style).width).toBe(10);t.flush();
