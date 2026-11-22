@@ -229,6 +229,8 @@ test('global-read rewrites preserve automatic semicolons and original function s
 
 test('member adaptation preserves source, call order, computed keys, parentheses and assignment patterns',()=>{
  const samples=[
+  'function f(a){return new a.工廠(a["/*$buninu$.*/)"].參數).結果}',
+  'function f(a){return a[a.讀取(a.x)].處理(a["name"]).default}',
   'function f(a){return(a.x).y(a.z)}',
   'function f(a){return a /* property comment */ .\\u0062(a[/* index comment */ a.key])}',
   'function f(a){return a.寬度 + a. /* keep */ 寬度 + a["寬度"]}',
