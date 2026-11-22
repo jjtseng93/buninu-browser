@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
-import { createResourceElements } from "../lib/renderer/resource-elements.js";
+import { createResourceElements, queryResourceElements } from "../lib/renderer/resource-elements.js";
 
 async function fixture(run) {
   const { window, document } = parseHTMLDocument(`<!doctype html><head>
@@ -12,6 +12,22 @@ async function fixture(run) {
   try { await run({ window, document, cache, queries }); }
   finally { cache.dispose(); await window.happyDOM.close(); }
 }
+
+test("tag snapshots preserve selector order, foreign tag matching and shadow boundaries", async () => {
+  await fixture(async ({document}) => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const root = host.attachShadow({mode:"open"});
+    root.innerHTML = "<audio></audio><div><video></video></div><audio></audio><img><track><iframe></iframe>";
+    const svgImage = document.createElementNS("http://www.w3.org/2000/svg", "IMG");
+    document.body.prepend(svgImage);
+    for (const scope of [document, root]) {
+      for (const [kind, selector] of Object.entries({media:"video, audio", images:"img", tracks:"track", frames:"iframe"})) {
+        expect(queryResourceElements(scope, kind)).toEqual(Array.from(scope.querySelectorAll(selector)));
+      }
+    }
+  });
+});
 
 test("metadata changes retain discovery while resource attributes and sheet text remain live", async () => {
   await fixture(async ({ document, cache, queries }) => {
@@ -149,7 +165,8 @@ test("ordinary subtree edits retain resource lists and image edits only rescan i
     if (delivered) await Bun.sleep(10);
     expect(cache.get("images")).toEqual([...before.images, image]);
     for (const kind of ["media", "sheets", "frames"]) expect(cache.get(kind)).toBe(before[kind]);
-    expect(queries).toEqual(["img"]);
+    expect(cache.get("images")).not.toBe(before.images);
+    expect(queries).toEqual([]);
   });
 });
 
