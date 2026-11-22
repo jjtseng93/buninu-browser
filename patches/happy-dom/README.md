@@ -46,6 +46,7 @@ done
 | `0014-scan-compound-selector-groups-once.patch` | `packages/happy-dom/src/query-selector/QuerySelector.ts` | Collect independent compound selector matches in one document-order traversal with one dependency per visited descendant. | `bun test test/happy-dom-matches.test.js test/selector-api-errors.test.js` |
 | `0015-record-insertion-siblings.patch` | `packages/happy-dom/src/nodes/node/Node.ts` | Capture the siblings at append and insertion time so structural selectors update across batched moves. | `bun test test/sibling-state-invalidation.test.js` |
 | `0016-trim-stale-selector-dependencies.patch` | `packages/happy-dom/src/query-selector/QuerySelector.ts` | Discard invalidated selector dependencies when a query revisits an element. | `bun test test/happy-dom-matches.test.js` |
+| `0017-match-type-selector-lists-by-tag.patch` | `packages/happy-dom/src/query-selector/QuerySelector.ts` | Match lists of type selectors with one tag lookup per descendant while retaining query invalidation and tree order. | `bun test test/happy-dom-matches.test.js test/resource-elements.test.js` |
 
 ### `0006` against upstream `SelectorParser.ts`
 

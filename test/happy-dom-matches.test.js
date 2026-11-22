@@ -59,3 +59,22 @@ test("repeated invalidations release obsolete selector dependencies on untouched
     expect([...snapshot]).toEqual([changing]);
   } finally { await window.happyDOM.close(); }
 });
+
+test("type selector lists preserve parsed names, tree order and immutable snapshots", async () => {
+  const window = new Window();
+  try {
+    const {document} = window;
+    const root = document.createElement("main");
+    root.innerHTML = '<svg><linearGradient></linearGradient></svg><my-tag></my-tag><video></video>';
+    document.body.append(root);
+    const selector = String.raw`VIDEO, my\2d tag, linearGradient, video`;
+    const expected = [...root.querySelectorAll("*")].filter(el => el.matches(selector));
+    expect(expected.length).toBe(3);
+    const snapshot = root.querySelectorAll(selector);
+    expect([...snapshot]).toEqual(expected);
+    root.firstElementChild.remove();
+    expect([...root.querySelectorAll(selector)]).toEqual(expected.slice(1));
+    expect([...snapshot]).toEqual(expected);
+    expect([...root.querySelectorAll("video, *")]).toEqual([...root.children]);
+  } finally { await window.happyDOM.close(); }
+});

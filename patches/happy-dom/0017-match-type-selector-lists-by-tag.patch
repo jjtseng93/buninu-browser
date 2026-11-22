@@ -1,0 +1,33 @@
+diff --git a/packages/happy-dom/src/query-selector/QuerySelector.ts b/packages/happy-dom/src/query-selector/QuerySelector.ts
+index 93a46d4..31d34d9 100644
+--- a/packages/happy-dom/src/query-selector/QuerySelector.ts
++++ b/packages/happy-dom/src/query-selector/QuerySelector.ts
+@@ -152,14 +152,24 @@ export default class QuerySelector {
+ 			if (node[PropertySymbol.nodeType] !== NodeTypeEnum.documentNode) {
+ 				this.affectsCache(<Element | DocumentFragment>node, cachedItem);
+ 			}
++			// A comma-separated list of type selectors needs one tag lookup per
++			// descendant. Use the parsed names and SelectorItem.match's casing.
++			const selectors = groups.map(group => group[0]);
++			const tags = selectors.every(item => item.tagName && !item.id && !item.classNames && !item.attributes && !item.isPseudoElement)
++				? new Set(selectors.map(item => item.tagName!)) : null;
++			const universal = tags?.has('*');
+ 			const pending = node[PropertySymbol.elementArray].slice().reverse();
+ 			while (pending.length) {
+ 				const child = pending.pop()!;
+ 				this.affectsCache(child, cachedItem);
+-				for (const [selectorItem] of groups) {
+-					if (selectorItem.match(scope, child)) {
+-						items.push(child);
+-						break;
++				if (tags) {
++					if (universal || tags.has(child[PropertySymbol.tagName]!.toUpperCase())) items.push(child);
++				} else {
++					for (const item of selectors) {
++						if (item.match(scope, child)) {
++							items.push(child);
++							break;
++						}
+ 					}
+ 				}
+ 				const children = child[PropertySymbol.elementArray];
