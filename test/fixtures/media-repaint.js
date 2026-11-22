@@ -4,7 +4,7 @@ import {createPageRenderer} from '../../lib/renderer/page-renderer.js';
 import {compositeVideo} from '../../lib/renderer/video-presentation.js';
 const sleep=Bun.sleep, report=text=>process.stdout.write(text+'\n');
 const errors=[],frames=[],messages=[];
-let seeked=0;
+let seeked=0, contentHeight=0;
 const now=Date.now;
 async function until(check,message){
   const deadline=now()+5000;
@@ -12,7 +12,7 @@ async function until(check,message){
 }
 const renderer=await createPageRenderer({
   renderMinInterval:80,
-  onFrame:frame=>frames.push(frame.tile),onVideo:message=>messages.push(message),
+  onFrame:frame=>{frames.push(frame.tile);contentHeight=frame.content.height;},onVideo:message=>messages.push(message),
   fetchResource:async url=>({ok:true,url,body:new Uint8Array([1]),contentType:'video/mp4'}),
   reportError:error=>errors.push(String(error)),
   videoDecoder:{
@@ -38,6 +38,18 @@ try{
   await until(()=>frames.length>0,'scheduled UI frame did not arrive');
   assert.ok(frames.length>0,'scheduled UI frame is still published');
   assert.ok(frames.every(tile=>pixel(tile,5,125).join(',')==='0,0,255,255'),'media ticks must not publish stale red UI before the scheduled rebuild');
+  // A growing opaque background changes the document height but covers
+  // exactly the same pixels throughout the retained prepaint tile.
+  const opened = messages.find(message=>message.type==='video-open');
+  const meta = new Int32Array(opened.shared,0,4);
+  new Uint8Array(opened.shared,16,20*12*4).fill(255);
+  Atomics.store(meta,1,20); Atomics.store(meta,2,12); Atomics.store(meta,0,2);
+  await renderer.evaluate('document.body.style.cssText="height:700px;background:#eed"');
+  await until(()=>contentHeight>=700 && frames.at(-1)?.height>=360,'video tile did not expand');
+  const retained=frames.at(-1);
+  await renderer.evaluate('document.body.style.height="900px"');
+  await until(()=>contentHeight>=900,'compositor did not receive the new scroll extent');
+  assert.equal(frames.at(-1),retained,'offscreen growth should reuse the visible video tile');
   await renderer.evaluate('document.getElementById("v").pause()');
   assert.ok(messages.some(message=>message.type==='video-stop'),'pause stops independent presentation');
   assert.equal(frames.at(-1).videoLayer,null,'paused frame returns to normal raster');

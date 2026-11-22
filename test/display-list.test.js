@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { parseHTMLDocument } from "../lib/happy-dom/parser.js";
 import { layoutText } from "../lib/layout/text-layout.js";
-import { buildDisplayList, hitTarget, visibleItems } from "../lib/paint/display-list.js";
+import { buildDisplayList, hitTarget, sameVisiblePaint, visibleItems } from "../lib/paint/display-list.js";
 import { RenderTreeBuilder } from "../lib/render-tree/index.js";
 import { StyleEngine } from "../lib/style/computed-style.js";
 
@@ -411,4 +411,30 @@ test('background image raster bounds remain local when the element is transforme
   const item = list.items.find(item => item.op === 'drawBackgroundImage');
   expect(item.paintRect).toEqual({x:14,y:14,width:12,height:12});
   expect(item.bounds).toEqual({x:28,y:28,width:24,height:24});
+});
+
+test('retained paint compares the entire device tile and its visible resources', () => {
+  const tile = {x:0, y:10, width:80, height:100, scale:1.25, pixelWidth:100, pixelHeight:125};
+  const viewport = {x:0, y:10};
+  const rect = {x:0, y:0, width:80, height:180};
+  function fill(bounds, extra) {
+    return {op:'fillRect', rect:bounds, bounds, color:'white', ...extra};
+  }
+  const a = fill(rect), b = fill({...rect, height:240});
+  const pixels = {};
+  const img = {op:'drawImage', image:0, bounds:{x:10,y:95,width:30,height:15}};
+  const before = {items:[a,img], images:[pixels]};
+  function matches(items, images=[pixels]) {
+    return sameVisiblePaint(before, {items,images}, tile, viewport, false);
+  }
+  expect(matches([b,img,fill({...rect,y:112})])).toBe(true);
+  expect(matches([b,img,fill({...rect,y:109})])).toBe(false);
+  expect(matches([b,img],[{}])).toBe(false);
+  expect(matches([fill({...rect,height:109}),img])).toBe(false);
+  expect(matches([fill(rect,{color:'red'}),img])).toBe(false);
+  expect(matches([fill(rect,{clipRect:rect}),img])).toBe(false);
+  expect(matches([fill(rect,{radii:{x:4,y:4}}),img])).toBe(false);
+  const masked = {...img, filters:[{mask:{layers:[{image:1}]}}]};
+  expect(sameVisiblePaint({items:[masked],images:[pixels,{}]}, {items:[masked],images:[pixels,{}]},
+    tile,viewport,false)).toBe(false);
 });
