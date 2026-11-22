@@ -45,6 +45,7 @@ done
 | `0013-defer-iframe-loading-to-renderer.patch` | `packages/happy-dom/src/nodes/html-iframe-element/HTMLIFrameElement.ts` | With Happy DOM's own frame loading disabled, a `srcdoc` iframe still got a Happy DOM child frame holding a second parsed copy of the document, plus a synthetic `load` beside the renderer's real one, and an iframe with `src` got a synthetic `error`. The renderer loads every frame and fires its outcome, so build no child frame and dispatch nothing. | `bun test test/qml-webengine.test.js test/iframe-srcdoc-sandbox.test.js` |
 | `0014-scan-compound-selector-groups-once.patch` | `packages/happy-dom/src/query-selector/QuerySelector.ts` | Collect independent compound selector matches in one document-order traversal with one dependency per visited descendant. | `bun test test/happy-dom-matches.test.js test/selector-api-errors.test.js` |
 | `0015-record-insertion-siblings.patch` | `packages/happy-dom/src/nodes/node/Node.ts` | Capture the siblings at append and insertion time so structural selectors update across batched moves. | `bun test test/sibling-state-invalidation.test.js` |
+| `0016-trim-stale-selector-dependencies.patch` | `packages/happy-dom/src/query-selector/QuerySelector.ts` | Discard invalidated selector dependencies when a query revisits an element. | `bun test test/happy-dom-matches.test.js` |
 
 ### `0006` against upstream `SelectorParser.ts`
 

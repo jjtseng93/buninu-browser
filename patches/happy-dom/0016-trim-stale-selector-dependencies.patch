@@ -1,0 +1,17 @@
+diff --git a/packages/happy-dom/src/query-selector/QuerySelector.ts b/packages/happy-dom/src/query-selector/QuerySelector.ts
+index ab9bf21e..93a46d4e 100644
+--- a/packages/happy-dom/src/query-selector/QuerySelector.ts
++++ b/packages/happy-dom/src/query-selector/QuerySelector.ts
+@@ -873,7 +873,11 @@ export default class QuerySelector {
+ 	 * @param cachedItem Cached item.
+ 	 */
+ 	private static affectsCache(element: Element | DocumentFragment, cachedItem: any): void {
+-		element[PropertySymbol.affectsCache].push(cachedItem);
++		const dependencies = element[PropertySymbol.affectsCache];
++		// An invalidated result can never become live again. Drop stale tail
++		// entries as this element is visited by subsequent queries.
++		while (dependencies.length && dependencies[dependencies.length - 1].result === null) dependencies.pop();
++		if (dependencies[dependencies.length - 1] !== cachedItem) dependencies.push(cachedItem);
+ 		if (
+ 			element[PropertySymbol.nodeType] === NodeTypeEnum.documentFragmentNode &&
+ 			(<any>element).host

@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { affectsCache } from "../vendor/happy-dom/packages/happy-dom/src/PropertySymbol.ts";
 import Window from "../vendor/happy-dom/packages/happy-dom/src/window/Window.ts";
 
 // Element.matches() caches its result; each case matches once, changes the
@@ -39,4 +40,22 @@ test("compound selector groups return one static result per descendant in tree o
   root.prepend(document.createElement("b"));
   expect([...root.querySelectorAll(selector)]).toEqual([root.firstElementChild, snapshot[0]]);
   expect(snapshot.length).toBe(2);
+});
+
+test("repeated invalidations release obsolete selector dependencies on untouched siblings", async () => {
+  const window = new Window();
+  try {
+    const { document } = window;
+    document.body.innerHTML = "<i></i><span></span>";
+    const [changing, sibling] = document.body.children;
+    for (let i = 0; i < 100; i++) {
+      changing.className = i % 2 ? "on" : "";
+      expect(document.querySelectorAll(".on").length).toBe(i % 2);
+    }
+    expect(sibling[affectsCache].length).toBeLessThan(10);
+    const snapshot = document.querySelectorAll(".on");
+    sibling.className = "on";
+    expect([...document.querySelectorAll(".on")]).toEqual([changing, sibling]);
+    expect([...snapshot]).toEqual([changing]);
+  } finally { await window.happyDOM.close(); }
 });
