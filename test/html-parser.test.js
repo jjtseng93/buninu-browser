@@ -55,3 +55,23 @@ test("missing title lookups share invalidation records until the tree changes", 
   expect(document.title).toBe("");
   window.happyDOM.abort();
 });
+
+test("head and body follow direct HTML children after reordering", () => {
+  const { document, window } = parseHTMLDocument("<head></head><body></body>");
+  try {
+    const { documentElement: root, head, body } = document;
+    const wrapper = document.createElement("div");
+    root.prepend(wrapper);
+    wrapper.append(document.createElement("head"), document.createElement("body"));
+    root.prepend(document.createElementNS("urn:test", "body"));
+    expect(document.head).toBe(head);
+    expect(document.body).toBe(body);
+    const frameset = document.createElement("frameset");
+    root.insertBefore(frameset, body);
+    expect(document.body).toBe(frameset);
+    root.append(frameset);
+    expect(document.body).toBe(body);
+    head.remove();
+    expect(document.head).toBeNull();
+  } finally { window.happyDOM.abort(); }
+});
