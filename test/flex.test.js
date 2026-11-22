@@ -42,6 +42,17 @@ test("row flex alignment measures fixed height with percentage padding and overf
   done();
 });
 
+test("row alignment measures percentage heights after applying max then min", () => {
+  const { rect, done } = flex('<div id="root"><div id="a"></div><div id="b"></div></div>',
+    `#root { display:flex; width:200px; height:100px; align-items:end }
+     #a, #b { height:80%; max-height:50%; padding:5px 0; width:40px }
+     #a { min-height:65% } #b { box-sizing:content-box }`);
+  try {
+    expect([rect("#a").height, rect("#a").top]).toEqual([65, 35]);
+    expect([rect("#b").height, rect("#b").top]).toEqual([60, 40]);
+  } finally { done(); }
+});
+
 test("flex-basis auto falls back to the main size property (§7.2.3)", () => {
   const { rect, done } = flex(`<div id="root"><div id="a"></div></div>`,
     `${ROOT} #a { width:30px; height:10px; flex:0 0 auto }`);
