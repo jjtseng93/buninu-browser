@@ -36,3 +36,25 @@ test('scrolling and mirroring a masked subtree moves its painted alpha with the 
     expect(mirrored[1][1]).toBeGreaterThan(200);
   } finally { await host.close(); }
 });
+
+test('repainting a fractional gradient mask preserves alpha as the content color changes', async () => {
+  const host = new RendererHost({timeout:20000});
+  try {
+    await host.start();
+    await host.call('resize', 200, 100, 1);
+    await host.call('loadDocument', {url:'https://mask.test/', contentType:'text/html', source:`
+      <body style="background:white"><div id="masked" style="margin:4.5px;width:120px;height:39.5px;
+        background:red;mask-image:linear-gradient(35deg, transparent, black 75%),
+        linear-gradient(90deg, black, transparent)"></div></body>`});
+    await host.call('whenLoaded');
+    const snapshot = () => host.call('screenshot', {format:'png'});
+    const red = await snapshot();
+    await host.call('evaluate', 'document.getElementById("masked").style.background="blue"');
+    const blue = await snapshot();
+    expect(blue).not.toBe(red);
+    for (const [color, expected] of [['red', red], ['blue', blue]]) {
+      await host.call('evaluate', `document.getElementById("masked").style.background="${color}"`);
+      expect(await snapshot()).toBe(expected);
+    }
+  } finally { await host.close(); }
+});
