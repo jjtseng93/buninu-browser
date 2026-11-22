@@ -26,6 +26,16 @@ test('srcdoc is the frame document, with the embedding page\'s origin', async ()
   } finally { host.close(); }
 }, 20000);
 
+test('a laid-out iframe uses its content box at startup and on subsequent resize', async () => {
+  const host = await page(`<iframe id="f" style="width:80px;height:40px"
+    srcdoc="<script>parent.initialSize = [innerWidth, innerHeight]</script>"></iframe>`);
+  try {
+    expect(await until(host, 'globalThis.initialSize')).toEqual([80, 40]);
+    await host.call('evaluate', `document.getElementById('f').style.width = '120px'`);
+    expect(await until(host, `document.getElementById('f').contentWindow.innerWidth === 120`)).toBe(true);
+  } finally { host.close(); }
+}, 20000);
+
 test('srcdoc wins over src, and changing it loads the new markup', async () => {
   const host = await page('<iframe id="f" src="https://example.test/other" srcdoc="<p id=x>one</p>"></iframe>');
   try {
