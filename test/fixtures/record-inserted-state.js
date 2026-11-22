@@ -46,6 +46,10 @@ try{
   // transitions even though insertion itself did a full subtree restyle.
   await renderer.evaluate(`document.getElementById('flag').className='flag'`);
   await compareFresh('has state restored');
+  await renderer.evaluate("document.getElementById('flag').parentElement.classList.remove('box')");
+  await compareFresh('subject loses required class');
+  await renderer.evaluate("document.getElementById('flag').parentElement.classList.add('box')");
+  await compareFresh('subject regains required class');
   await renderer.evaluate(`document.getElementById('spacer').remove();document.getElementById('left').className='trigger'`);
   await compareFresh('structural and sibling prefixes restored');
   await renderer.evaluate(`document.getElementById('left').className=''`);
