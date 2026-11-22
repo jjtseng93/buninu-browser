@@ -33,3 +33,27 @@ test('owned raster pixels follow WASM memory growth, crop stride and disposal',(
  surface.dispose();surface.dispose();
  expect(deleted).toBe(1);expect(freed).toBe(1);expect(copyRasterSurfacePixels(surface,full,{width:4,height:3})).toBe(false);
 });
+
+test('opaque readback checks every alpha in a cropped row, including the tail', () => {
+  const width = 16, height = 3;
+  const pixels = new Uint8Array(width * height * 4);
+  const kit = {
+    HEAPU8: pixels, ColorType: {}, AlphaType: {}, ColorSpace: {},
+    Malloc: () => ({byteOffset: 0}), Free() {},
+    MakeRasterDirectSurface: () => ({getCanvas: () => ({clear() {}}), delete() {}}),
+  };
+  const surface = makeRasterSurface(kit, width, height);
+  const area = {x: 2, y: 1, width: 11, height: 1};
+  const start = (area.y * width + area.x) * 4;
+  const result = new Uint8Array(area.width * 4);
+  try {
+    for (let i = 0; i < result.length; i++) pixels[start + i] = i % 4 === 3 ? 255 : i;
+    expect(copyRasterSurfacePixels(surface, result, area)).toBe(true);
+    expect(result).toEqual(pixels.slice(start, start + result.length));
+    for (let i = start + 3; i < start + result.length; i += 4) {
+      pixels[i] = 254;
+      expect(copyRasterSurfacePixels(surface, result, area)).toBe(false);
+      pixels[i] = 255;
+    }
+  } finally { surface.dispose(); }
+});
