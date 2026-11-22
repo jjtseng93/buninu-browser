@@ -372,3 +372,31 @@ test("upscaled opaque rows keep masks, alpha and fresh frame pixels in both chan
     expect(tile.pixels).toBe(base);
   }
 });
+
+test("wide repeated mask rows keep their own source row and preserve isolated pixel differences", () => {
+  const width = 139, height = 24;
+  for (const offset of [0, 1]) {
+    const plane = () => new Uint8Array(new SharedArrayBuffer(offset + width * height * 4), offset);
+    const base = plane(), mask = plane(), pixels = new Uint8Array(height * 4);
+    for (let y = 0; y < height; y++) {
+      pixels.set([y + 50, 80 - y, 90 + y, 255], y * 4);
+      for (let x = 0; x < width; x++) {
+        const i = (y * width + x) * 4;
+        base[i + 3] = 255;
+        mask.fill(255, i, i + 3);
+      }
+    }
+    // A mask-only difference fully occludes one pixel. A base-only
+    // difference mixes another pixel after several matching rows.
+    mask.fill(0, (3 * width - 1) * 4, 3 * width * 4);
+    base[13 * width * 4] = 12;
+    const tile = {pixelWidth:width, pixelHeight:height, pixels:base,
+      videoLayer:{base, mask, rect:{x:0, y:0, width, height}}};
+    const result = compositeVideo(tile, {width:1, height, pixels}).pixels;
+    const expected = new Uint8Array(base);
+    for (let i = 0; i < width * height; i++)
+      for (let channel = 0; channel < 3; channel++)
+        expected[i * 4 + channel] += pixels[Math.floor(i / width) * 4 + channel] * mask[i * 4 + channel] / 255;
+    expect(result).toEqual(expected);
+  }
+});
