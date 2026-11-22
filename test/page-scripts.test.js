@@ -1270,7 +1270,10 @@ test("page-inserted scripts run; innerHTML scripts do not; on* handlers fire", a
     const fragment = document.createDocumentFragment();
     const inFragment = document.createElement('script');
     inFragment.textContent = "log.push('fragment script ran')";
-    fragment.appendChild(inFragment);
+    const detached = document.createElement('section');
+    detached.appendChild(inFragment);
+    fragment.appendChild(detached);
+    log.push('before connecting fragment');
     document.body.appendChild(fragment);
     const blobScript = document.createElement('script');
     blobScript.src = URL.createObjectURL(new Blob(["log.push('blob script ran')"], { type: 'text/javascript' }));
@@ -1280,6 +1283,7 @@ test("page-inserted scripts run; innerHTML scripts do not; on* handlers fire", a
   expect(await evaluate("log.join(' | ')")).toBe([
     "inline ran during insertion",
     "after inline insertion",
+    "before connecting fragment",
     "fragment script ran",
     // A script inserted during loading delays the window load event.
     "blob script ran",
