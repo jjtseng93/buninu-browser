@@ -13,3 +13,27 @@ test('incremental sheet reorder and duplicates agree with a fresh cascade',()=>{
   }
  }finally{window.happyDOM.abort();}
 });
+
+test('appending sheets preserves ordinary and pseudo rules across shared selector buckets', () => {
+  const {document, window} = parseHTMLDocument('<div class="box" id="item">text</div>');
+  try {
+    const node = document.getElementById('item');
+    const engine = new StyleEngine();
+    const sheets = [];
+    for (const sheet of [
+      '.box {color:red} * {margin:1px} .box::before {content:"before"; color:red}',
+      '.box {color:blue} * {margin:2px} .box::after {content:"after"}',
+      ':is(.box,#item) {width:35px} .box::before {color:green}',
+    ]) {
+      sheets.push(sheet);
+      engine.compute(document, sheets, {}, new Set(), new Set());
+      const fresh = new StyleEngine().compute(document, [...sheets]);
+      expect(engine.get(node)).toEqual(fresh.get(node));
+      for (const pseudo of ['before', 'after']) {
+        expect(engine.getPseudo(node, pseudo)).toEqual(fresh.getPseudo(node, pseudo));
+      }
+    }
+  } finally {
+    window.happyDOM.abort();
+  }
+});
