@@ -169,3 +169,24 @@ test('allowing sandboxed fragment scrolling never enables scripts, event handler
     } finally {img.delete();}
   } finally { await host.close(); }
 }, 20000);
+
+test('revealing an iframe paints its newest hidden document even at the same size', async () => {
+  const host = await page('<iframe id="f" style="display:none;border:0;width:300px;height:150px" onload="globalThis.loads=(globalThis.loads||0)+1" srcdoc="<body style=&#34;margin:0;background:red&#34;>"></iframe>');
+  try {
+    const {CanvasKit:k} = await (await import('../lib/renderer/page-renderer.js')).loadGraphics();
+    for (const [loads, rgba] of [[1,[255,0,0,255]], [2,[0,0,255,255]]]) {
+      expect(await until(host, 'globalThis.loads === ' + loads)).toBe(true);
+      await host.call('evaluate', 'document.getElementById("f").style.display = "block"');
+      const png = await host.call('screenshot', {format:'png',clip:{x:35,y:35,width:1,height:1,scale:1}});
+      const image = k.MakeImageFromEncoded(Buffer.from(png, 'base64'));
+      try {
+        expect(Array.from(image.readPixels(0,0,{width:1,height:1,colorType:k.ColorType.RGBA_8888,
+          alphaType:k.AlphaType.Unpremul,colorSpace:k.ColorSpace.SRGB}))).toEqual(rgba);
+      } finally { image.delete(); }
+      if (loads === 1) {
+        await host.call('evaluate', `const f=document.getElementById("f");f.style.display="none";
+          f.getBoundingClientRect();f.srcdoc='<body style="margin:0;background:blue">';`);
+      }
+    }
+  } finally { await host.close(); }
+}, 20000);
