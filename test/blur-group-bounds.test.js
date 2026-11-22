@@ -249,3 +249,35 @@ test('blur snapshots survive tile growth only when the output fits', async () =>
     }
   } finally { renderer.dispose(); }
 });
+
+test('a small off-origin blur captured on its first paint matches direct rasterization', async () => {
+  const {CanvasKit: kit} = await loadGraphics();
+  const prototype = kit.Canvas.prototype;
+  const clipBounds = prototype.getDeviceClipBounds;
+  const events = [];
+  async function frame(dpr) {
+    const renderer = await createPageRenderer({trace: message => {
+      if (message.startsWith('blur cache')) events.push(message);
+    }});
+    try {
+      renderer.resize(720, 460, dpr);
+      await renderer.loadDocument({url:'https://blur.test/', contentType:'text/html', source:
+        '<body style="background:#ffc"><section style="position:absolute;left:510.3px;top:333.4px;border-radius:8px;width:45px;height:36px;overflow:hidden"><i style="display:block;margin:-4px;width:40px;height:40px;border-radius:20px;background:#2489;filter:blur(5px)"></i></section>'});
+      await renderer.whenLoaded();
+      return (await renderer.screenshot({format:'rgba'})).pixels;
+    } finally { renderer.dispose(); }
+  }
+  try {
+    for (const dpr of [1, 1.25]) {
+      // A partial device clip makes the painter decline snapshot caching.
+      prototype.getDeviceClipBounds = () => [1, 1, 8, 8];
+      events.length = 0;
+      const direct = await frame(dpr);
+      expect(events).toEqual([]);
+      prototype.getDeviceClipBounds = clipBounds;
+      const cached = await frame(dpr);
+      expect(events).toContain('blur cache miss');
+      expect(Bun.deepEquals(cached, direct)).toBe(true);
+    }
+  } finally { prototype.getDeviceClipBounds = clipBounds; }
+});
