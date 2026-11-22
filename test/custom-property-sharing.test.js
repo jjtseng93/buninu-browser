@@ -41,6 +41,18 @@ test('variable resolution keeps caller cycle tracking and does not reuse mutable
   expect(() => resolveVariables('var(--x)', variables, null)).toThrow();
 });
 
+test('repeated var expressions track only the fallback dependencies actually read', () => {
+  const expression = '"var(--quoted)" var(--primary, var(--backup)) var(--unfinished';
+  const variables = new Map([['--primary', 'red'], ['--backup', 'blue']]);
+  const first = {}, second = {};
+  expect(resolveVariables(expression, variables, undefined, first)).toBe('"var(--quoted)" red var(--unfinished');
+  expect([...first.variableReads]).toEqual(['--primary']);
+
+  variables.delete('--primary');
+  expect(resolveVariables(expression, variables, undefined, second)).toBe('"var(--quoted)" blue var(--unfinished');
+  expect([...second.variableReads]).toEqual(['--primary', '--backup']);
+});
+
 test('large inherited custom maps preserve siblings, order and incremental removal', () => {
   const {window, document} = parseHTMLDocument('<main><div id="override"><span></span></div><aside></aside></main>');
   const parent=document.querySelector('main'), child=document.querySelector('div');
