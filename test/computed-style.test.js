@@ -1063,3 +1063,18 @@ test('functional pseudo-element rules do not enter the element cascade', () => {
     '.card', '::slotted(.item)', '[data-label="::highlight(search)"]',
   ]);
 });
+
+test("shared filters resolve relative lengths and currentcolor on each element", () => {
+  const {document, window} = parseHTMLDocument('<i></i><b></b>');
+  try {
+    const styles = new StyleEngine().compute(document, [`
+      i, b { filter: blur(1em); backdrop-filter: drop-shadow(0px 0px 1px currentcolor) }
+      i { font-size: 12px; color: red } b { font-size: 24px; color: blue }
+    `]);
+    const first = styles.get(document.querySelector('i')), second = styles.get(document.querySelector('b'));
+    expect(first.filter).toBe('blur(12px)');
+    expect(second.filter).toBe('blur(24px)');
+    expect(first.backdropFilter).toContain('rgb(255, 0, 0)');
+    expect(second.backdropFilter).toContain('rgb(0, 0, 255)');
+  } finally { window.happyDOM.abort(); }
+});
