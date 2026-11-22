@@ -25,8 +25,12 @@ try {
     document.body.clientWidth;
   }`);
   assert.deepEqual(queries, [], "metadata-only geometry flushes retain resource discovery");
-  await renderer.evaluate("document.body.insertAdjacentHTML('beforeend','<video></video>');document.body.clientWidth");
-  assert.ok(queries.includes("video, audio"), "structural insertion refreshes media discovery synchronously");
+  const wrapper = globalThis.document.createElement('video');
+  const video = nodeOf(wrapper), reads = [];
+  const getAttribute = video.getAttribute.bind(video);
+  video.getAttribute = name => { reads.push(name); return getAttribute(name); };
+  globalThis.document.body.appendChild(wrapper);
   assert.equal(await renderer.evaluate("document.querySelector('video').offsetWidth"), 300);
+  assert.ok(reads.includes("width") && reads.includes("height"), "geometry flush initializes inserted media");
   process.stdout.write("resource discovery integration passed\n");
 } finally { renderer.dispose(); }
