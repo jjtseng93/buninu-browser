@@ -99,3 +99,24 @@ test('isolated variable changes update inherited maps and restyle consumers', ()
     expect(engine.get(span).color).toBe(new StyleEngine().compute(document,sheets).get(span).color);
   } finally {window.happyDOM.close();}
 });
+
+test('reusing a large inheritance map preserves the order and values of sibling overrides', () => {
+  const {window, document} = parseHTMLDocument('<main><b></b><b></b><i></i><em></em></main>');
+  try {
+    const parent = document.querySelector('main');
+    parent.style.cssText = Array.from({length: 128}, (_, i) => '--v' + i + ':0').join(';');
+    const [first, second, reordered, changed] = parent.children;
+    first.style.cssText = second.style.cssText = '--a:1;--b:2';
+    reordered.style.cssText = '--b:2;--a:1';
+    changed.style.cssText = '--a:1;--b:3';
+    const engine = new StyleEngine();
+    engine.compute(document, []);
+    const vars = element => engine.customPropertiesOf(element);
+    expect(vars(first)).toBe(vars(second));
+    expect([...vars(first).keys()].slice(-2)).toEqual(['--a', '--b']);
+    expect([...vars(reordered).keys()].slice(-2)).toEqual(['--b', '--a']);
+    expect(vars(changed).get('--b')).toBe('3');
+    expect(vars(second).get('--b')).toBe('2');
+    expect(vars(parent).has('--a')).toBe(false);
+  } finally {window.happyDOM.close();}
+});
