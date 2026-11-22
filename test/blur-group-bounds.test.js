@@ -94,10 +94,10 @@ test('a repeated clipped fill reuses its blur while new colors start cold', asyn
   const renderer = await createPageRenderer({trace(message) {
     if (message.startsWith('blur cache')) events.push(message);
   }});
-  async function frame(color, background) {
+  async function frame(color, background, left = 0) {
     events.length = 0;
     await renderer.loadDocument({url:'https://blur.test/', contentType:'text/html', source:`<style>
-      body{background:${background}}section{width:110px;height:60px;overflow:hidden;border-radius:8px}
+      body{background:${background}}section{position:relative;left:${left}px;width:110px;height:60px;overflow:hidden;border-radius:8px}
       i{display:block;margin-left:-5px;width:85px;height:45px;background:${color};border-radius:12px;filter:blur(5px)}
       </style><section><i></i></section>`});
     await renderer.whenLoaded();
@@ -105,14 +105,17 @@ test('a repeated clipped fill reuses its blur while new colors start cold', asyn
   }
   try {
     renderer.resize(210, 120, 1.5);
-    const cold = await frame('#579a', '#dea');
+    const cold = await frame('#579a', '#dea', 0.1);
     expect(events).toEqual([]);
-    await frame('#579a', '#333');
+    await frame('#579a', '#333', 0.2);
     expect(events).toContain('blur cache miss');
-    const warm = await frame('#579a', '#dea');
+    const warm = await frame('#579a', '#dea', 0.25);
     expect(events).toContain('blur cache hit');
     expect(Bun.deepEquals(warm, cold)).toBe(true);
-    const changed = await frame('#923a', '#dea');
+    const moved = await frame('#579a', '#dea', 1);
+    expect(events).toEqual([]);
+    expect(Bun.deepEquals(moved, cold)).toBe(false);
+    const changed = await frame('#923a', '#dea', 0.1);
     expect(events).toEqual([]);
     expect(Bun.deepEquals(changed, cold)).toBe(false);
   } finally { renderer.dispose(); }
