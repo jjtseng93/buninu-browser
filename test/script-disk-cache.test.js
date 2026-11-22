@@ -64,3 +64,18 @@ test("large preparations retain exact UTF-16 and share a disk budget across scri
     expect(misses).toBe(3);
   } finally { rmSync(directory, {recursive:true, force:true}); }
 });
+
+test("compact script entries preserve a leading BOM and mixed Unicode on cache hits", () => {
+  const directory = mkdtempSync(join(tmpdir(), "script-cache-"));
+  const result = {code:"\uFEFF" + "const x = '中文🐈';\n".repeat(16000), strict:true, parsed:true};
+  const bytes = new TextEncoder().encode("external script");
+  let misses = 0;
+  const prepare = () => prepareDiskCached(bytes, directory, "v", () => { misses++; return result; });
+  try {
+    prepare();
+    const entry = readFileSync(join(directory, readdirSync(directory)[0]));
+    expect(entry[0] & 8).toBe(8);
+    expect(prepare()).toEqual(result);
+    expect(misses).toBe(1);
+  } finally { rmSync(directory, {recursive:true, force:true}); }
+});
