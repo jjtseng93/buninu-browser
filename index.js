@@ -191,8 +191,11 @@ if (import.meta.main) {
   }
   // wayland handle end
 
-  const code = frontend === "headless"
-    ? await run([process.execPath, ENGINE, ...args])
-    : await run(castyCommand(frontend === "win32" ? ["--win32", ...args] : args), { ...process.env, CASTY_BROWSER: ENGINE });
-  process.exit(code ?? 1);
+  if (frontend === "headless") {
+    const { main } = await import("./buninu-browser.js");
+    process.exitCode = await main(args);
+  } else {
+    const code = await run(castyCommand(frontend === "win32" ? ["--win32", ...args] : args), { ...process.env, CASTY_BROWSER: ENGINE });
+    process.exit(code ?? 1);
+  }
 }
