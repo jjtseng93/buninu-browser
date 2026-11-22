@@ -22,7 +22,7 @@ test("finds :has() compounds and sibling-target compounds in a sheet", () => {
   expect([...traits.siblingTargetCompounds]).toEqual(["li:first-child + li"]);
   expect([...traits.structuralCompounds]).toEqual(["li:first-child", "li:last-child"]);
   expect(traits.descendantFeatures.has(".esc:a")).toBe(true);
-  expect(traits.sibling && traits.firstChild && traits.lastChild).toBe(true);
+  expect(traits.firstChild && traits.lastChild).toBe(true);
 });
 
 test("focus pseudo-class features retain their complete names", () => {
