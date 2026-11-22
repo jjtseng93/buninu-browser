@@ -18,11 +18,11 @@ test("tag snapshots preserve selector order, foreign tag matching and shadow bou
     const host = document.createElement("div");
     document.body.append(host);
     const root = host.attachShadow({mode:"open"});
-    root.innerHTML = "<audio></audio><div><video></video></div><audio></audio><img><track><iframe></iframe>";
+    root.innerHTML = "<style></style><link rel='alternate stylesheet'><link rel='preload'><audio></audio><div><video></video></div><audio></audio><img><track><iframe></iframe>";
     const svgImage = document.createElementNS("http://www.w3.org/2000/svg", "IMG");
     document.body.prepend(svgImage);
     for (const scope of [document, root]) {
-      for (const [kind, selector] of Object.entries({media:"video, audio", images:"img", tracks:"track", frames:"iframe"})) {
+      for (const [kind, selector] of Object.entries({media:"video, audio", images:"img", tracks:"track", frames:"iframe", sheets:"style, link[rel~='stylesheet']"})) {
         expect(queryResourceElements(scope, kind)).toEqual(Array.from(scope.querySelectorAll(selector)));
       }
     }
@@ -68,7 +68,7 @@ test("rel membership is refreshed synchronously without rescanning other resourc
     expect(cache.get("sheets")[1].hasAttribute("disabled")).toBe(true);
     link.removeAttribute("rel");
     expect(cache.get("sheets")).toEqual(sheets);
-    expect(queries).toEqual(["style, link[rel~='stylesheet']", "style, link[rel~='stylesheet']"]);
+    expect(queries).toEqual([]);
   });
 });
 
@@ -277,7 +277,7 @@ test('scoped sheet discovery stays cached while text and applicability remain li
     }
     await Bun.sleep(10);
     expect(cache.get('sheets',root)).toBe(sheets);
-    expect(queries).toEqual(["style, link[rel~='stylesheet']"]);
+    expect(queries).toEqual([]);
     expect(cache.get('sheets')).not.toContain(style);
   });
 });
