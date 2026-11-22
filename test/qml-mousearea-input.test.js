@@ -74,3 +74,24 @@ Item {id:scene;width:400;height:200;property int taps:0
   expect(await host.call('evaluate','root.taps')).toBe(1);
  }finally{host.close()}
 },30000);
+
+test('a rejected press bubbling from an interactive child leaves the parent hit-test style alone',async()=>{
+ const host=new RendererHost({timeout:20000});
+ try{
+  await host.start();await host.call('resize',300,160,1);
+  await host.call('loadDocument',{url:'data:text/x-qml,bubbling-press',contentType:'text/x-qml',source:`import QtQuick
+Item {id:scene;width:300;height:160;property int taps:0;property int rejected:0;onClicked:{}
+ Rectangle {id:child;width:120;height:60;TapHandler {onTapped:scene.taps++}}
+ MouseArea {anchors.fill:parent;propagateComposedEvents:true;onPressed:e=>{scene.rejected++;e.accepted=false}}
+ Component.onCompleted:globalThis.root=scene
+}`});
+  await host.call('whenLoaded');
+  expect(await host.call('evaluate','document.getElementById("scene").style.pointerEvents')).toBe('auto');
+  await host.call('evaluate',`globalThis.disabledHitTests=0;
+    new MutationObserver(records=>{
+      for(const r of records)if(/pointer-events:\\s*none/.test(r.oldValue))disabledHitTests++;
+    }).observe(document.getElementById("scene"),{attributes:true,attributeFilter:["style"],attributeOldValue:true});true`);
+  await host.call('click',40,30);
+  expect(await host.call('evaluate','[root.taps,root.rejected,disabledHitTests]')).toEqual([1,1,0]);
+ }finally{host.close()}
+},30000);
