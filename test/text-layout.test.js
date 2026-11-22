@@ -676,6 +676,15 @@ test("an out-of-flow box keeps its static position when the block around its pla
   expect(rankedLayout(retained)).toEqual(rankedLayout(clean));
 });
 
+test("nested grid measurements replay the final positions of absolute descendants", () => {
+  const items = Array.from({length: 24}, (_, i) =>
+    `<div>item ${i}<i style="position:absolute">badge</i></div>`).join("");
+  const { retained, clean } = retainedAndClean(`<body><main style="position:relative"><p id="edit">short</p>
+    <section style="display:grid;grid-template-columns:1fr"><article style="display:grid;grid-template-columns:1fr">${items}</article></section></main></body>`,
+  document => { document.getElementById("edit").textContent = "a longer paragraph that wraps onto two lines"; });
+  expect(rankedLayout(retained)).toEqual(rankedLayout(clean));
+});
+
 test("anonymous flex text items do not reuse their parent's intrinsic width", () => {
   const { document, window } = parseHTMLDocument(`<body style="margin:0"><div style="display:flex">
     <span style="display:flex"><a>hash</a>·<time>Today</time>!</span><b>History</b>
