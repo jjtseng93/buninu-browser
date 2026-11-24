@@ -319,3 +319,22 @@ test('QML host import does not query HOME and tolerates missing account metadata
   expect(await proc.exited, error).toBe(0);
   expect(JSON.parse(output)).toEqual({importCalls:0,calls:1,home:null});
 });
+
+test.skipIf(process.platform !== 'win32')('Windows QML host disposal terminates descendants too', async () => {
+  const host = createQmlHost(Bun.pathToFileURL(join(tmpdir(), 'process-tree.qml')).href);
+  let output = '';
+  const code = 'const p=Bun.spawn([process.execPath,"-e","setInterval(()=>{},1000)"],{stdin:"ignore",stdout:"ignore",stderr:"ignore"});console.log(p.pid);setInterval(()=>{},1000)';
+  const stop = host.run([process.execPath, '-e', code], () => {}, {stdout: text => output += text});
+  const alive = pid => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  let descendant;
+  try {
+    await until(() => /^\d+\s*$/.test(output));
+    descendant = Number(output.trim());
+    expect(alive(descendant)).toBe(true);
+    host.dispose();
+    await until(() => !alive(stop.processId) && !alive(descendant));
+  } finally {
+    host.dispose();
+    if (descendant && alive(descendant)) process.kill(descendant);
+  }
+});
