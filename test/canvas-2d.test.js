@@ -1,6 +1,6 @@
 import { beforeAll, expect, test } from "bun:test";
 import CanvasKitInit from "../usr/lib/canvaskit/canvaskit.js";
-import { canvasResource, canvasContext, resetCanvas, setCanvasKit, disposeDocumentCanvases } from "../lib/renderer/canvas-2d.js";
+import { canvasResource, canvasContext, takeCanvasBitmap, resetCanvas, setCanvasKit, disposeDocumentCanvases } from "../lib/renderer/canvas-2d.js";
 
 let CanvasKit;
 
@@ -985,4 +985,34 @@ test('floating point clears preserve scissor edges and masked channels', () => {
     expect(Array.from(rgba.subarray(offset,offset+4))).toEqual(expected);
   }
   expect(gl.getError()).toBe(gl.NO_ERROR);
+});
+
+test('transferring a WebGL canvas replaces the default bitmap and preserves bound framebuffer contents', () => {
+  const node=canvas(2,2), gl=canvasContext(node,'webgl2');
+  const color=() => {
+    const pixel=new Uint8Array(4);
+    gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+    return [...pixel];
+  };
+  gl.clearColor(1,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT);
+  const f=gl.createFramebuffer(), rb=gl.createRenderbuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER,f);
+  gl.bindRenderbuffer(gl.RENDERBUFFER,rb);
+  gl.renderbufferStorage(gl.RENDERBUFFER,gl.RGBA8,2,2);
+  gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.RENDERBUFFER,rb);
+  gl.clearColor(0,1,0,1);gl.clear(gl.COLOR_BUFFER_BIT);
+  const transfer=takeCanvasBitmap(node);
+  try {
+    const rgba=transfer.image.readPixels(0,0,{width:1,height:1,colorType:CanvasKit.ColorType.RGBA_8888,
+      alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB});
+    expect([...rgba]).toEqual([255,0,0,255]);
+    expect(gl.getParameter(gl.FRAMEBUFFER_BINDING)).toBe(f);
+    expect(color()).toEqual([0,255,0,255]);
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+    expect(color()).toEqual([0,0,0,0]);
+    gl.enable(gl.SCISSOR_TEST);gl.scissor(1,1,1,1);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    expect(color()).toEqual([0,0,0,0]);
+    expect(gl.getError()).toBe(gl.NO_ERROR);
+  } finally { transfer.image.delete(); }
 });
