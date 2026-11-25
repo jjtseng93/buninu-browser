@@ -124,6 +124,35 @@ test('vertex texelFetch reads the selected texel using integer division for row 
  }finally{img.delete();stage.effect.delete();}
 });
 
+test('indirect sampler arguments select the bound image and its own dimensions', async () => {
+ const {runVertices}=await import('../lib/renderer/webgl/pipeline.js');
+ const stage=compileStage(kit,`#version 300 es
+ in float pick;
+ uniform sampler2D wide;
+ uniform sampler2D tall;
+ vec4 readMap(sampler2D m){return texture(m,vec2(.75));}
+ void main(){gl_Position=pick==0.?readMap(wide):readMap(tall);}`,'vertex');
+ const images=[];
+ try{
+  expect(stage.cpuVertex).not.toBeNull();
+  const values=new Map(),samplers=[];
+  for(const [name,w,h,color] of [['wide',2,1,[1,0,0,1]],['tall',1,2,[0,1,0,1]]]){
+   const key=stage.uniforms.find(u=>u.name===name).elements[0];
+   const pixels=new Float32Array([0,0,0,1,...color]);
+   images.push(floatImage(kit,w,h,pixels));
+   values.set('_sw_size_'+key,[w,h]);
+   samplers.push({key,width:w,height:h,pixels,mag:9728});
+  }
+  const attributes=new Map([['pick',new Float32Array([0,1])]]);
+  const children=()=>images.map(image=>imageShader(kit,image));
+  const actual=runVertices(kit,stage,values,attributes,2,children,samplers);
+  expect([...actual]).toEqual([1,0,0,1,0,1,0,1]);
+  expect(actual).toEqual(runVertices(kit,{...stage,cpuVertex:null},values,attributes,2,children));
+  expect([...runVertices(kit,stage,values,attributes,2,children,samplers.slice(0,1))])
+   .toEqual([1,0,0,1,0,0,0,1]);
+ }finally{for(const image of images)image.delete();stage.effect.delete();}
+});
+
 test('vector equality and inequality reduce all components to a scalar', () => {
  const pixels=compare(`precision highp float;
  uniform vec3 a;
