@@ -519,7 +519,7 @@ test('CanvasKit discard preserves transparent and negative-alpha float outputs',
   gl.texStorage2D(gl.TEXTURE_2D,1,gl.RGBA32F,5,1);
   gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex,0);
   const vs='#version 300 es\nvoid main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}';
-  const fs='#version 300 es\nprecision highp float;out vec4 c;void main(){float x=floor(gl_FragCoord.x);const int n=2;for(int i=0;i<n;i++){if(x==0.)discard;}c=vec4(2.,-4.,1.,x==4.?1.:x==3.?0.:-1.-x);}';
+  const fs='#version 300 es\nprecision highp float;out vec4 c;void main(){float x=floor(gl_FragCoord.x);const int n=2;for(int i=0;i<n;i++){if(x==0.)discard;}c=vec4(2.,-4.,1.,x==4.?1.:x==3.?0.:-1.-x);if(x>=2.){c.r+=dFdx(gl_FragCoord.x);}}';
   const {compileStage}=await import('../lib/renderer/webgl/pipeline.js');
   const stage=compileStage(CanvasKit,fs,'fragment',true);
   try { expect(stage.cpu).toBeNull(); } finally { stage.effect.delete(); }
@@ -531,7 +531,7 @@ test('CanvasKit discard preserves transparent and negative-alpha float outputs',
   gl.linkProgram(pr);gl.useProgram(pr);
   gl.clearColor(0,1,0,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
   const pixels=new Float32Array(20);gl.readPixels(0,0,5,1,gl.RGBA,gl.FLOAT,pixels);
-  expect([...pixels]).toEqual([0,1,0,1, 2,-4,1,-2, 2,-4,1,-3, 2,-4,1,0, 2,-4,1,1]);
+  expect([...pixels]).toEqual([0,1,0,1, 2,-4,1,-2, 3,-4,1,-3, 3,-4,1,0, 3,-4,1,1]);
   expect(gl.getError()).toBe(gl.NO_ERROR);
 });
 
@@ -725,6 +725,43 @@ test('WebGL boolean arguments reach integer uniforms in fragment shaders', () =>
     gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
     expect([...pixel]).toEqual([visible ? 255 : 0, 255, 0, 255]);
   }
+});
+
+test('CanvasKit derivative helper lanes honor uniform guards and local shadowing', async () => {
+  const {compileStage}=await import('../lib/renderer/webgl/pipeline.js');
+  const gl=canvasContext(canvas(2,2),'webgl2'),pixel=new Uint8Array(4);
+  const vs='#version 300 es\nvoid main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}';
+  for(const shadow of [false,true]){
+    const fs=`#version 300 es
+      precision highp float;
+      uniform float gain;
+      out vec4 color;
+      float slope(){return dFdx(gl_FragCoord.x);}
+      void main(){
+        ${shadow?'float other=0., gain=1.;':''}
+        float y=0.; const int n=2;
+        for(int i=0;i<n;i++){y+=.125;}
+        if(gain>.5){y+=.25;y+=.25*slope();}
+        color=vec4(y,0.,0.,1.);
+      }`;
+    const stage=compileStage(CanvasKit,fs,'fragment',true);
+    try {
+      expect(stage.cpu).toBeNull();
+      expect(Boolean(stage.derivativeGuard)).toBe(!shadow);
+    } finally { stage.effect.delete(); }
+    const pr=gl.createProgram();
+    for(const [kind,source] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){
+      const sh=gl.createShader(kind);gl.shaderSource(sh,source);gl.compileShader(sh);
+      expect(gl.getShaderInfoLog(sh)).toBe('');gl.attachShader(pr,sh);
+    }
+    gl.linkProgram(pr);gl.useProgram(pr);
+    for(const gain of [1,0]){
+      gl.uniform1f(gl.getUniformLocation(pr,'gain'),gain);
+      gl.drawArrays(gl.TRIANGLES,0,3);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+      expect([...pixel]).toEqual([gain||shadow?191:64,0,0,255]);
+    }
+  }
+  expect(gl.getError()).toBe(gl.NO_ERROR);
 });
 
 test('a derivative inside a conditional material call obtains both helper operands', () => {
