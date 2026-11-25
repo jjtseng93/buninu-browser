@@ -480,6 +480,33 @@ test('WebGL2 keeps independent canvas and framebuffer read and draw selections',
   expect(gl.getError()).toBe(gl.NO_ERROR);
 });
 
+test('uploads to an attached texture take effect after earlier queued draws', () => {
+  const gl=canvasContext(canvas(2,1),'webgl2');
+  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);
+  const allocate=()=>gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,2,1,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+  allocate();
+  gl.bindFramebuffer(gl.FRAMEBUFFER,gl.createFramebuffer());
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex,0);
+  const pr=gl.createProgram();
+  for(const [kind,source] of [
+    [gl.VERTEX_SHADER,'void main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}'],
+    [gl.FRAGMENT_SHADER,'precision highp float;out vec4 c;void main(){c=vec4(1.,0.,0.,1.);}'],
+  ]){
+    const shader=gl.createShader(kind);gl.shaderSource(shader,'#version 300 es\n'+source);
+    gl.compileShader(shader);expect(gl.getShaderInfoLog(shader)).toBe('');gl.attachShader(pr,shader);
+  }
+  gl.linkProgram(pr);gl.useProgram(pr);
+  const pixels=new Uint8Array(8);
+  gl.drawArrays(gl.TRIANGLES,0,3);allocate();
+  gl.readPixels(0,0,2,1,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+  expect([...pixels]).toEqual([0,0,0,0,0,0,0,0]);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.texSubImage2D(gl.TEXTURE_2D,0,1,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,255,0,255]));
+  gl.readPixels(0,0,2,1,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+  expect([...pixels]).toEqual([255,0,0,255,0,255,0,255]);
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
+
 test('WebGL2 writes each fragment output to its selected attachment and blits to the canvas', () => {
   const gl=canvasContext(canvas(2,2),'webgl2');
   const f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);
