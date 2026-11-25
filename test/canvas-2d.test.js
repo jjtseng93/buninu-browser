@@ -447,6 +447,39 @@ test('WebGL2 framebuffer clears and reads use attachment dimensions and bottom-l
   expect(gl.getError()).toBe(gl.NO_ERROR);
 });
 
+test('WebGL2 keeps independent canvas and framebuffer read and draw selections', () => {
+  const node=canvas(1,1),gl=canvasContext(node,'webgl2'),pixel=new Uint8Array(4);
+  const read=()=>gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+  gl.clearColor(0,1,0,1);gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.drawBuffers([gl.NONE]);
+  gl.clearColor(1,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  read();
+  expect([...pixel]).toEqual([0,255,0,255]);
+  const bitmap=canvasResource(node).image;
+  expect([...bitmap.readPixels(0,0,{width:1,height:1,colorType:CanvasKit.ColorType.RGBA_8888,
+    alphaType:CanvasKit.AlphaType.Unpremul,colorSpace:CanvasKit.ColorSpace.SRGB})]).toEqual([...pixel]);
+  gl.readBuffer(gl.NONE);pixel.fill(17);read();
+  expect(gl.getError()).toBe(gl.INVALID_OPERATION);
+  expect([...pixel]).toEqual([17,17,17,17]);
+  gl.drawBuffers([gl.COLOR_ATTACHMENT0]);gl.readBuffer(gl.COLOR_ATTACHMENT0);
+  expect(gl.getError()).toBe(gl.INVALID_OPERATION);
+  const target=gl.createFramebuffer();
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,target);
+  expect(gl.getParameter(gl.DRAW_BUFFER0)).toBe(gl.COLOR_ATTACHMENT0);
+  expect(gl.getParameter(gl.READ_BUFFER)).toBe(gl.NONE);
+  gl.drawBuffers([gl.NONE,gl.COLOR_ATTACHMENT1]);
+  gl.drawBuffers([gl.COLOR_ATTACHMENT1]);expect(gl.getError()).toBe(gl.INVALID_OPERATION);
+  expect(gl.getParameter(gl.DRAW_BUFFER1)).toBe(gl.COLOR_ATTACHMENT1);
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER,target);gl.readBuffer(gl.COLOR_ATTACHMENT1);
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
+  expect(gl.getParameter(gl.DRAW_BUFFER0)).toBe(gl.NONE);
+  expect(gl.getParameter(gl.READ_BUFFER)).toBe(gl.COLOR_ATTACHMENT1);
+  gl.drawBuffers([gl.BACK]);gl.clearColor(0,0,1,1);gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER,null);gl.readBuffer(gl.BACK);read();
+  expect([...pixel]).toEqual([0,0,255,255]);
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
+
 test('WebGL2 writes each fragment output to its selected attachment and blits to the canvas', () => {
   const gl=canvasContext(canvas(2,2),'webgl2');
   const f=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,f);
