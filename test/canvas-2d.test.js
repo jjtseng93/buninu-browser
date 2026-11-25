@@ -987,6 +987,138 @@ test('floating point clears preserve scissor edges and masked channels', () => {
   expect(gl.getError()).toBe(gl.NO_ERROR);
 });
 
+test('WebGL2 multisample coverage, per-sample depth and scissored resolve', () => {
+  const gl=canvasContext(canvas(4,4),'webgl2');
+  const frame=gl.createFramebuffer(), program=gl.createProgram();
+  gl.bindFramebuffer(gl.FRAMEBUFFER,frame);
+  const attach=(point,format,samples)=>{
+    const rb=gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER,rb);
+    gl.renderbufferStorageMultisample(gl.RENDERBUFFER,samples,format,4,4);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER,point,gl.RENDERBUFFER,rb);
+  };
+  attach(gl.COLOR_ATTACHMENT0,gl.RGBA8,4);
+  attach(gl.DEPTH_ATTACHMENT,gl.DEPTH_COMPONENT16,2);
+  expect(gl.checkFramebufferStatus(gl.FRAMEBUFFER)).toBe(gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  expect(gl.getError()).toBe(0x506);
+  attach(gl.DEPTH_ATTACHMENT,gl.DEPTH_COMPONENT16,4);
+  expect(gl.getRenderbufferParameter(gl.RENDERBUFFER,gl.RENDERBUFFER_SAMPLES)).toBe(4);
+  expect(gl.getParameter(gl.SAMPLES)).toBe(4);
+  expect(gl.getParameter(gl.SAMPLE_BUFFERS)).toBe(1);
+  expect(gl.checkFramebufferStatus(gl.FRAMEBUFFER)).toBe(gl.FRAMEBUFFER_COMPLETE);
+  for(const [stage,source] of [
+    [gl.VERTEX_SHADER,'in vec3 p;void main(){gl_Position=vec4(p,1.);}'],
+    [gl.FRAGMENT_SHADER,'precision highp float;uniform vec4 color;out vec4 c;void main(){c=color;}'],
+  ]){
+    const sh=gl.createShader(stage);gl.shaderSource(sh,'#version 300 es\n'+source);
+    gl.compileShader(sh);expect(gl.getShaderInfoLog(sh)).toBe('');gl.attachShader(program,sh);
+  }
+  gl.linkProgram(program);gl.useProgram(program);
+  const loc=gl.getUniformLocation(program,'color'), attr=gl.getAttribLocation(program,'p');
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+  gl.vertexAttribPointer(attr,3,gl.FLOAT,false,0,0);gl.enableVertexAttribArray(attr);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,0,1,-1,0,-1,1,0, -1,-1,.5,3,-1,.5,-1,3,.5]),gl.STATIC_DRAW);
+  gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  gl.enable(gl.DEPTH_TEST);
+  gl.uniform4f(loc,1,0,0,1);gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.uniform4f(loc,0,0,1,1);gl.drawArrays(gl.TRIANGLES,3,3);
+  const pixels=new Uint8Array(4*4*4);
+  gl.readPixels(0,0,4,4,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+  expect(gl.getError()).toBe(gl.INVALID_OPERATION);
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
+  gl.enable(gl.SCISSOR_TEST);gl.scissor(0,0,4,3);
+  gl.blitFramebuffer(0,0,4,4,0,0,4,4,gl.COLOR_BUFFER_BIT,gl.NEAREST);
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER,null);
+  gl.readPixels(0,0,4,4,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+  for(let y=0;y<4;y++)for(let x=0;x<4;x++){
+    const at=(4*y+x)*4;
+    expect(Array.from(pixels.subarray(at,at+4))).toEqual(y===3?[0,0,0,0]:
+      x+y<3?[255,0,0,255]:x+y===3?[128,0,128,255]:[0,0,255,255]);
+  }
+  // The shared diagonal passes exactly through sample positions. Every
+  // sample belongs to one triangle: a crack or double hit changes the sum.
+  gl.disable(gl.SCISSOR_TEST);gl.disable(gl.DEPTH_TEST);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,frame);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([
+    -1.125,-1,0, 1,-1,0, 1,1.125,0,
+    -1.125,-1,0, 1,1.125,0, -1.125,1.125,0,
+  ]),gl.STATIC_DRAW);
+  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);
+  gl.uniform4f(loc,.25,0,0,.25);gl.drawArrays(gl.TRIANGLES,0,6);
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
+  gl.blitFramebuffer(0,0,4,4,0,0,4,4,gl.COLOR_BUFFER_BIT,gl.NEAREST);
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER,null);
+  gl.readPixels(0,0,4,4,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+  for(let i=0;i<pixels.length;i+=4)expect(Array.from(pixels.subarray(i,i+4))).toEqual([64,0,0,64]);
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
+
+test('multisampled CanvasKit fragments keep screen coordinates, derivatives and discard across batches', async () => {
+  const {compileStage}=await import('../lib/renderer/webgl/pipeline.js');
+  const w=33,h=34,gl=canvasContext(canvas(w,h),'webgl2');
+  const vs='#version 300 es\nvoid main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}';
+  const fs='#version 300 es\nprecision highp float;out vec4 c;void main(){vec2 p=gl_FragCoord.xy;float v=0.;const int n=2;for(int i=0;i<n;i++){v+=.5;}if(p.x<1.||p.y<1.)discard;c=vec4(p.x/64.,p.y/64.,.5*(dFdx(p.x)+dFdy(p.y)),v);}';
+  const stage=compileStage(CanvasKit,fs,'fragment',true);
+  try { expect(stage.cpu).toBeNull(); } finally { stage.effect.delete(); }
+  const pr=gl.createProgram();
+  for(const [kind,text] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){
+    const shader=gl.createShader(kind);gl.shaderSource(shader,text);gl.compileShader(shader);
+    expect(gl.getShaderInfoLog(shader)).toBe('');gl.attachShader(pr,shader);
+  }
+  gl.linkProgram(pr);gl.useProgram(pr);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,gl.createFramebuffer());
+  const rb=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,rb);
+  gl.renderbufferStorageMultisample(gl.RENDERBUFFER,4,gl.RGBA8,w,h);
+  gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.RENDERBUFFER,rb);
+  gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
+  gl.blitFramebuffer(0,0,w,h,0,0,w,h,gl.COLOR_BUFFER_BIT,gl.NEAREST);
+  gl.bindFramebuffer(gl.READ_FRAMEBUFFER,null);
+  const out=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,out);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const p=(y*w+x)*4;
+    expect([...out.subarray(p,p+4)]).toEqual(x&&y?[Math.round((x+.5)/64*255),Math.round((y+.5)/64*255),255,255]:[0,0,0,0]);
+  }
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
+
+test('multisampled draw buffers share the original depth test and resolve the selected read attachment', () => {
+  const gl=canvasContext(canvas(2,2),'webgl2'), f=gl.createFramebuffer();
+  const slots=[gl.COLOR_ATTACHMENT0,gl.COLOR_ATTACHMENT0+1];
+  gl.bindFramebuffer(gl.FRAMEBUFFER,f);
+  for(const point of [...slots,gl.DEPTH_ATTACHMENT]){
+    const rb=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,rb);
+    gl.renderbufferStorageMultisample(gl.RENDERBUFFER,3,point===gl.DEPTH_ATTACHMENT?gl.DEPTH_COMPONENT16:gl.RGBA8,2,2);
+    expect(gl.getRenderbufferParameter(gl.RENDERBUFFER,gl.RENDERBUFFER_SAMPLES)).toBe(4);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER,point,gl.RENDERBUFFER,rb);
+  }
+  gl.drawBuffers(slots);
+  const pr=gl.createProgram();
+  for(const [stage,source] of [
+    [gl.VERTEX_SHADER,'void main(){gl_Position=vec4(gl_VertexID==1?1.:-1.,gl_VertexID==2?1.:-1.,0.,1.);}'],
+    [gl.FRAGMENT_SHADER,'precision highp float;layout(location=0) out vec4 a;layout(location=1) out vec4 b;void main(){a=vec4(1.,0.,0.,1.);b=vec4(0.,1.,0.,1.);}'],
+  ]){
+    const sh=gl.createShader(stage);gl.shaderSource(sh,'#version 300 es\n'+source);
+    gl.compileShader(sh);expect(gl.getShaderInfoLog(sh)).toBe('');gl.attachShader(pr,sh);
+  }
+  gl.linkProgram(pr);gl.useProgram(pr);gl.enable(gl.DEPTH_TEST);
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
+  for(const [i,slot] of slots.entries()){
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER,f);gl.readBuffer(slot);
+    gl.blitFramebuffer(0,0,2,2,0,0,2,2,gl.COLOR_BUFFER_BIT,gl.NEAREST);
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER,null);
+    const pixels=new Uint8Array(16);gl.readPixels(0,0,2,2,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+    expect([...pixels]).toEqual(i?
+      [0,255,0,255,0,128,0,128,0,128,0,128,0,0,0,0]:
+      [255,0,0,255,128,0,0,128,128,0,0,128,0,0,0,0]);
+  }
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
+
 test('transferring a WebGL canvas replaces the default bitmap and preserves bound framebuffer contents', () => {
   const node=canvas(2,2), gl=canvasContext(node,'webgl2');
   const color=() => {
