@@ -317,3 +317,70 @@ test('HRTF keeps the delayed, filtered far-ear impulse across an audio block bou
     } finally {f.dispose();}
   }
 });
+
+test('a stereo impulse response keeps delayed taps across progressively larger FFT partitions', () => {
+  const f=setup(),c=f.context;
+  try{
+    const reverb=c.createConvolver(),ir=c.createBuffer(2,5001,c.sampleRate);
+    reverb.normalize=false;
+    const taps=[0,127,128,255,256,1028,4097,5000];
+    for(const [i,at] of taps.entries()){
+      ir.getChannelData(0)[at]=(i+1)/16;
+      ir.getChannelData(1)[at]=-(i+1)/16;
+    }
+    reverb.buffer=ir;
+    const s=c.createBufferSource();s.buffer=c.createBuffer(1,1,c.sampleRate);
+    s.buffer.getChannelData(0)[0]=1;s.connect(reverb);reverb.connect(c.destination);s.start();
+    const samples=f.pull(5120);
+    for(let i=0;i<5120;i++){
+      const tap=taps.indexOf(i),value=tap<0?0:(tap+1)/16;
+      expect(Math.abs(samples[i*2]-Math.round(value*32767))).toBeLessThanOrEqual(1);
+      expect(Math.abs(samples[i*2+1]-Math.round(-value*32768))).toBeLessThanOrEqual(1);
+    }
+  }finally{f.dispose();}
+});
+
+test('four-channel convolution preserves stereo routing across delayed partitions and ring wrap', async () => {
+  const {createConvolution}=await import('../lib/audio/convolver.js');
+  const quantum=128, responseLength=18001;
+  const taps=[0,4095,8192,12317,responseLength-1];
+  const response=Array.from({length:4},(_,ch)=>{
+    const ir=new Float32Array(responseLength);
+    for(const [i,at] of taps.entries())ir[at]=(ch+1)*(i+1)/64;
+    return ir;
+  });
+  const sources=[[0,1,-.5],[4095,.25,.75],[8193,-.5,1]];
+  const samples=Math.ceil((sources.at(-1)[0]+responseLength)/quantum)*quantum;
+  const expected=[new Float32Array(samples),new Float32Array(samples)];
+  for(const [at,left,right] of sources)for(const tap of taps){
+    expected[0][at+tap]+=left*response[0][tap]+right*response[2][tap];
+    expected[1][at+tap]+=left*response[1][tap]+right*response[3][tap];
+  }
+  const processBlock=createConvolution(response,48000,false,quantum);
+  let maxError=0;
+  for(let at=0;at<samples;at+=quantum){
+    const input=new Float32Array(quantum*2);
+    for(const [frame,left,right] of sources)if(frame>=at&&frame<at+quantum){
+      input[frame-at]=left;input[quantum+frame-at]=right;
+    }
+    const output=processBlock(input);
+    for(let ch=0;ch<2;ch++)for(let i=0;i<quantum;i++)
+      maxError=Math.max(maxError,Math.abs(output[ch*quantum+i]-expected[ch][at+i]));
+  }
+  expect(maxError).toBeLessThan(1e-6);
+});
+
+test('stereo panning and linked compression reach PCM after lookahead', () => {
+  const f=setup(),c=f.context;
+  try{
+    const source=c.createBufferSource(),pan=c.createStereoPanner(),comp=c.createDynamicsCompressor();
+    source.buffer=c.createBuffer(1,1024,c.sampleRate);source.buffer.getChannelData(0).fill(1);
+    pan.pan.value=1;comp.knee.value=0;comp.threshold.value=-12;comp.ratio.value=4;comp.attack.value=0;
+    source.connect(pan);pan.connect(comp);comp.connect(c.destination);source.start();
+    const samples=f.pull(256);
+    expect(samples[1]).toBe(0);
+    expect(comp.reduction).toBeCloseTo(-9,3);
+    expect(samples[400]).toBe(0);
+    expect(Math.abs(samples[401]-Math.round(32767*10**(-9/20)))).toBeLessThanOrEqual(1);
+  }finally{f.dispose();}
+});
