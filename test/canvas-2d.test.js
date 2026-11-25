@@ -1502,3 +1502,53 @@ test('linear volume textures filter at repeat seams after partial uploads and ke
     }
   }
 });
+
+test('WebGL2 solid rectangle batches match shaded triangles in coverage, order and blending', () => {
+  const width=16, height=16;
+  function render(expression) {
+    const gl=canvasContext(canvas(width,height),'webgl2'), program=gl.createProgram();
+    for(const [type,source] of [
+      [gl.VERTEX_SHADER,'layout(location=0) in vec2 p; layout(location=1) in vec4 col; out vec4 v; void main(){gl_Position=vec4(p,0.,1.);v=col;}'],
+      [gl.FRAGMENT_SHADER,'precision highp float; in vec4 v; out vec4 c; void main(){c='+expression+';}'],
+    ]) {
+      const shader=gl.createShader(type);
+      gl.shaderSource(shader,'#version 300 es\n'+source);gl.compileShader(shader);
+      expect(gl.getShaderInfoLog(shader)).toBe('');
+      gl.attachShader(program,shader);
+    }
+    gl.linkProgram(program);gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+    gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,24,0);
+    gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,4,gl.FLOAT,false,24,8);
+    gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.SCISSOR_TEST);gl.scissor(1,2,13,12);
+    function rect(left,bottom,right,top,color,indices=[0,1,2,2,1,3]){
+      const corners=[[left,bottom],[right,bottom],[left,top],[right,top]];
+      return indices.flatMap(i=>[...corners[i],...color]);
+    }
+    const draw=values=>{
+      gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(values),gl.STATIC_DRAW);
+      gl.drawArrays(gl.TRIANGLES,0,values.length/6);
+    };
+    const red=[1,0,0,1], green=[0,1,0,1], blue=[0,0,1,1];
+    draw([...rect(-1,-1,1,1,red),...rect(-.5,-.5,.75,.5,green,[3,0,2,0,3,1])]);
+    // One pair covers the same triangle twice. The batch must fall back.
+    draw([...rect(-.5,0,0,.5,blue),...rect(0,-1,1,1,blue,[0,1,2,0,1,2])]);
+    // An outer edge through pixel centers, followed by translucent blending.
+    draw(rect(-.6875,-.5,.3,.2,red));
+    draw(rect(-.5,-.5,.3,.2,[1,1,0,.25]));
+    const gradient=rect(-1,-1,-.5,0,green);
+    gradient[2]=1;
+    draw(gradient);
+    const pixels=new Uint8Array(width*height*4);
+    gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+    expect(gl.getError()).toBe(gl.NO_ERROR);
+    return pixels;
+  }
+  const actual=render('v');
+  expect(actual).toEqual(render('v + vec4(0.)'));
+  const pixel=(x,y)=>[...actual.subarray(4*(y*width+x),4*(y*width+x+1))];
+  expect(pixel(0,0)).toEqual([0,0,0,0]);
+  expect(pixel(2,12)).toEqual([255,0,0,255]);
+  expect(pixel(6,6)).not.toEqual([255,0,0,255]);
+});
