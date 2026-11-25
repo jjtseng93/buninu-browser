@@ -1179,3 +1179,29 @@ test('recompiling a shader preserves the executable used by a linked WebGL2 prog
   gl.linkProgram(program);
   expect(drawColor()).toEqual([0,255,0,255]);
 });
+
+test('deferred WebGL draws retain the previous packed vertex stream across bufferSubData', () => {
+  const gl=canvasContext(canvas(4,1),'webgl2'), program=gl.createProgram();
+  for(const [type,source] of [
+    [gl.VERTEX_SHADER,'in vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'],
+    [gl.FRAGMENT_SHADER,'precision highp float;uniform vec4 color;out vec4 result;void main(){result=color;}'],
+  ]){
+    const sh=gl.createShader(type);gl.shaderSource(sh,'#version 300 es\n'+source);
+    gl.compileShader(sh);gl.attachShader(program,sh);
+  }
+  gl.linkProgram(program);gl.useProgram(program);
+  const slot=gl.getAttribLocation(program,'p'), color=gl.getUniformLocation(program,'color');
+  const left=new Float32Array([-1,-1,0,-1,-1,1,-1,1,0,-1,0,1]);
+  const right=left.map((v,i)=>i%2?v:v+1);
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER,left,gl.STATIC_DRAW);
+  gl.vertexAttribPointer(slot,2,gl.FLOAT,false,0,0);gl.enableVertexAttribArray(slot);
+  gl.uniform4f(color,1,0,0,1);gl.drawArrays(gl.TRIANGLES,0,6);
+  gl.bufferSubData(gl.ARRAY_BUFFER,0,right);
+  gl.uniform4f(color,0,1,0,1);gl.drawArrays(gl.TRIANGLES,0,6);
+  gl.bufferSubData(gl.ARRAY_BUFFER,0,new Float32Array(left.length));
+  const pixels=new Uint8Array(16);
+  gl.readPixels(0,0,4,1,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+  expect([...pixels]).toEqual([255,0,0,255,255,0,0,255,0,255,0,255,0,255,0,255]);
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
