@@ -512,6 +512,29 @@ test('WebGL2 writes each fragment output to its selected attachment and blits to
   expect(gl.getError()).toBe(gl.NO_ERROR);
 });
 
+test('CanvasKit discard preserves transparent and negative-alpha float outputs', async () => {
+  const gl=canvasContext(canvas(5,1),'webgl2');
+  gl.bindFramebuffer(gl.FRAMEBUFFER,gl.createFramebuffer());
+  const tex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,tex);
+  gl.texStorage2D(gl.TEXTURE_2D,1,gl.RGBA32F,5,1);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex,0);
+  const vs='#version 300 es\nvoid main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}';
+  const fs='#version 300 es\nprecision highp float;out vec4 c;void main(){float x=floor(gl_FragCoord.x);const int n=2;for(int i=0;i<n;i++){if(x==0.)discard;}c=vec4(2.,-4.,1.,x==4.?1.:x==3.?0.:-1.-x);}';
+  const {compileStage}=await import('../lib/renderer/webgl/pipeline.js');
+  const stage=compileStage(CanvasKit,fs,'fragment',true);
+  try { expect(stage.cpu).toBeNull(); } finally { stage.effect.delete(); }
+  const pr=gl.createProgram();
+  for(const [kind,source] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){
+    const sh=gl.createShader(kind);gl.shaderSource(sh,source);gl.compileShader(sh);
+    expect(gl.getShaderInfoLog(sh)).toBe('');gl.attachShader(pr,sh);
+  }
+  gl.linkProgram(pr);gl.useProgram(pr);
+  gl.clearColor(0,1,0,1);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,3);
+  const pixels=new Float32Array(20);gl.readPixels(0,0,5,1,gl.RGBA,gl.FLOAT,pixels);
+  expect([...pixels]).toEqual([0,1,0,1, 2,-4,1,-2, 2,-4,1,-3, 2,-4,1,0, 2,-4,1,1]);
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
+
 test('WebGL2 stores dynamic uniform array reads in an unclamped float attachment', () => {
   const gl = canvasContext(canvas(2, 1), 'webgl2');
   const framebuffer = gl.createFramebuffer();
