@@ -194,3 +194,16 @@ test('conditional derivatives preserve color and discard on both sides of the br
  expect(at(6,0)).toEqual([0,0,0,0]);
  expect(at(6,6)).toEqual([32,0,0,255]);
 });
+
+test('scalar snapshots survive later writes, branches and swizzle swaps', () => {
+ const pixels=compare(`precision highp float; varying vec2 uv;
+ void main(){
+   vec2 v=uv, old=v;
+   v.yx=v.xy;
+   if(uv.x>.5)v.x=1.-v.x;
+   gl_FragColor=vec4(old.x,v.x,v.y,1.);
+ }`);
+ const at=(x,y)=>[...pixels.subarray((8*y+x)*4,(8*y+x+1)*4)];
+ expect(at(2,1)).toEqual([80,48,80,255]);
+ expect(at(6,1)).toEqual([207,207,207,255]);
+});
