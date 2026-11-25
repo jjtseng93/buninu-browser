@@ -1197,7 +1197,8 @@ test('deferred WebGL draws retain the previous packed vertex stream across buffe
   gl.bufferData(gl.ARRAY_BUFFER,left,gl.STATIC_DRAW);
   gl.vertexAttribPointer(slot,2,gl.FLOAT,false,0,0);gl.enableVertexAttribArray(slot);
   gl.uniform4f(color,1,0,0,1);gl.drawArrays(gl.TRIANGLES,0,6);
-  gl.bufferSubData(gl.ARRAY_BUFFER,0,right);
+  gl.bufferSubData(gl.ARRAY_BUFFER,0,right.subarray(0,6));
+  gl.bufferSubData(gl.ARRAY_BUFFER,6*4,right.subarray(6));
   gl.uniform4f(color,0,1,0,1);gl.drawArrays(gl.TRIANGLES,0,6);
   gl.bufferSubData(gl.ARRAY_BUFFER,0,new Float32Array(left.length));
   const pixels=new Uint8Array(16);
