@@ -1233,3 +1233,33 @@ test('single-sample CanvasKit fragments preserve earlier layers across discard a
   expect([...pixel]).toEqual([128,128,0,255]);
   expect(gl.getError()).toBe(gl.NO_ERROR);
 });
+
+test('WebGL2 buffer uploads count elements relative to the source view', () => {
+  const gl=canvasContext(canvas(2,2),'webgl2'),program=gl.createProgram();
+  for(const [type,body] of [
+    [gl.VERTEX_SHADER,'in vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'],
+    [gl.FRAGMENT_SHADER,'precision highp float;out vec4 c;void main(){c=vec4(1.,0.,0.,1.);}'],
+  ]){
+    const shader=gl.createShader(type);gl.shaderSource(shader,'#version 300 es\n'+body);
+    gl.compileShader(shader);gl.attachShader(program,shader);
+  }
+  gl.linkProgram(program);gl.useProgram(program);
+  const p=gl.getAttribLocation(program,'p'),bytes=new Uint8Array(4);
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+  gl.vertexAttribPointer(p,2,gl.FLOAT,false,0,0);gl.enableVertexAttribArray(p);
+  const vertices=new Float32Array([90,90, 80,80, -1,-1,3,-1,0,0, 70,70]).subarray(2);
+  gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW,2,6);
+  const top=new Float32Array([1,2,-1,3]);
+  gl.bufferSubData(gl.ARRAY_BUFFER,16,top,2,0);
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+  gl.bufferSubData(gl.ARRAY_BUFFER,0,top,3,2);
+  expect(gl.getError()).toBe(gl.INVALID_VALUE);
+  // A view with a non-zero byteOffset still has its own element zero.
+  const data=new DataView(top.buffer,8,8);
+  gl.bufferSubData(gl.ARRAY_BUFFER,16,data,0,8);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,bytes);
+  expect([...bytes]).toEqual([255,0,0,255]);
+  gl.bufferSubData(gl.ARRAY_BUFFER,24,new Uint8Array([1]));
+  expect(gl.getError()).toBe(gl.INVALID_VALUE);
+});
