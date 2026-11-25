@@ -1383,3 +1383,67 @@ test('WebGL2 buffer uploads count elements relative to the source view', () => {
   gl.bufferSubData(gl.ARRAY_BUFFER,24,new Uint8Array([1]));
   expect(gl.getError()).toBe(gl.INVALID_VALUE);
 });
+
+test('WebGL2 texture uploads and readbacks honor padded rows, skips and view-relative offsets', () => {
+ const gl=canvasContext(canvas(),'webgl2');
+ const texture=gl.createTexture(),f=gl.createFramebuffer();
+ gl.bindTexture(gl.TEXTURE_2D,texture);
+ const input=Uint8Array.from({length:80},(_,i)=>i+1);
+ gl.pixelStorei(gl.UNPACK_ROW_LENGTH,3);
+ gl.pixelStorei(gl.UNPACK_SKIP_ROWS,1);
+ gl.pixelStorei(gl.UNPACK_SKIP_PIXELS,1);
+ gl.pixelStorei(gl.UNPACK_ALIGNMENT,8);
+ gl.pixelStorei(gl.UNPACK_SKIP_IMAGES,99);
+ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,2,2,0,gl.RGBA,gl.UNSIGNED_BYTE,input.subarray(2),1);
+ gl.bindFramebuffer(gl.FRAMEBUFFER,f);
+ gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);
+ gl.pixelStorei(gl.PACK_ROW_LENGTH,4);
+ gl.pixelStorei(gl.PACK_SKIP_ROWS,1);
+ gl.pixelStorei(gl.PACK_SKIP_PIXELS,1);
+ const dest=new Uint8Array(52).fill(222);
+ gl.readPixels(0,0,2,2,gl.RGBA,gl.UNSIGNED_BYTE,dest.subarray(2),1);
+ const valid=gl.getError();
+ const small=new Uint8Array(46).fill(111);
+ gl.readPixels(0,0,2,2,gl.RGBA,gl.UNSIGNED_BYTE,small.subarray(2),1);
+ const short=gl.getError();
+ gl.pixelStorei(gl.PACK_ROW_LENGTH,-1);
+ expect(valid).toBe(gl.NO_ERROR);
+ const expected=new Uint8Array(52).fill(222);
+ expected.set([24,25,26,27,28,29,30,31],23);
+ expected.set([40,41,42,43,44,45,46,47],39);
+ expect(dest).toEqual(expected);
+ expect(short).toBe(gl.INVALID_OPERATION);
+ expect(small.every(n=>n===111)).toBe(true);
+ expect(gl.getError()).toBe(gl.INVALID_VALUE);
+ expect(gl.getParameter(gl.PACK_ROW_LENGTH)).toBe(4);
+});
+
+test('WebGL2 volume uploads select rows and slices from the unpack data store', () => {
+ const gl=canvasContext(canvas(2,1),'webgl2');
+ const p=gl.createProgram();
+ for(const [stage,source] of [
+  [gl.VERTEX_SHADER,'void main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}'],
+  [gl.FRAGMENT_SHADER,'precision highp float;uniform highp sampler3D vol;out vec4 c;void main(){c=texture(vol,vec3(.5,.5,gl_FragCoord.x*.5));}'],
+ ]){
+  const s=gl.createShader(stage);gl.shaderSource(s,'#version 300 es\n'+source);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));
+  gl.attachShader(p,s);
+ }
+ gl.linkProgram(p);gl.useProgram(p);
+ const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_3D,t);
+ gl.texParameteri(gl.TEXTURE_3D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
+ gl.texParameteri(gl.TEXTURE_3D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+ gl.pixelStorei(gl.UNPACK_ROW_LENGTH,3);
+ gl.pixelStorei(gl.UNPACK_IMAGE_HEIGHT,2);
+ gl.pixelStorei(gl.UNPACK_SKIP_ROWS,1);
+ gl.pixelStorei(gl.UNPACK_SKIP_PIXELS,1);
+ gl.pixelStorei(gl.UNPACK_SKIP_IMAGES,1);
+ const src=new Uint8Array(72);src.set([10,20,30,255],40);src.set([60,70,80,255],64);
+ gl.texImage3D(gl.TEXTURE_3D,0,gl.RGBA8,1,1,2,0,gl.RGBA,gl.UNSIGNED_BYTE,src);
+ src.set([91,92,93,255],40);
+ gl.texSubImage3D(gl.TEXTURE_3D,0,0,0,1,1,1,1,gl.RGBA,gl.UNSIGNED_BYTE,src,0);
+ gl.drawArrays(gl.TRIANGLES,0,3);
+ const out=new Uint8Array(8);gl.readPixels(0,0,2,1,gl.RGBA,gl.UNSIGNED_BYTE,out);
+ expect([...out]).toEqual([10,20,30,255,91,92,93,255]);
+ expect(gl.getError()).toBe(gl.NO_ERROR);
+});
