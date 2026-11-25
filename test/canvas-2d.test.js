@@ -1452,3 +1452,53 @@ test('WebGL2 volume uploads select rows and slices from the unpack data store', 
  expect([...out]).toEqual([10,20,30,255,91,92,93,255]);
  expect(gl.getError()).toBe(gl.NO_ERROR);
 });
+
+test('linear volume textures filter at repeat seams after partial uploads and keep array layers separate', () => {
+  const gl=canvasContext(canvas(),'webgl2');
+  const vs='void main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}';
+  for(const array of [false,true]){
+    const target=array?gl.TEXTURE_2D_ARRAY:gl.TEXTURE_3D;
+    const texture=gl.createTexture();
+    gl.bindTexture(target,texture);
+    gl.texParameteri(target,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    gl.texParameteri(target,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    for(const width of [3,16]){
+      // The narrow texture keeps compact slices. The wider one has guard texels.
+      const height=4,src=new Uint8Array(width*height*2*4);
+      for(let z=0;z<2;z++)for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+        const start=((z*height+y)*width+x)*4;
+        src.set([x===0?0:80,y===0?0:120,z*200,255],start);
+      }
+      gl.texImage3D(target,0,gl.RGBA8,width,height,2,0,gl.RGBA,gl.UNSIGNED_BYTE,src);
+      gl.texSubImage3D(target,0,0,0,0,1,1,1,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([200,40,24,255]));
+      for(const skia of [false,true]){
+        // A named bound keeps this shader on the CanvasKit path.
+        const count=skia?'const int n=1;':'';
+        const fs='precision highp float;uniform highp '+(array?'sampler2DArray':'sampler3D')+
+          ' img;uniform vec3 at;out vec4 c;void main(){'+count+'for(int i=0;i<'+(skia?'n':'1')+
+          ';i++){c=texture(img,at);}}';
+        const p=gl.createProgram();
+        for(const [stage,source] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){
+          const s=gl.createShader(stage);gl.shaderSource(s,'#version 300 es\n'+source);gl.compileShader(s);
+          expect(gl.getShaderInfoLog(s)).toBe('');gl.attachShader(p,s);
+        }
+        gl.linkProgram(p);gl.useProgram(p);
+        const at=gl.getUniformLocation(p,'at'),out=new Uint8Array(4);
+        function sample(x,y,z){
+          gl.uniform3f(at,x,y,z);gl.drawArrays(gl.TRIANGLES,0,3);
+          gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,out);
+          return [...out];
+        }
+        for(const axis of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(target,axis,gl.REPEAT);
+        // Each of the four corners contributes equally at the wrapped edge.
+        expect(sample(0,0,array?0:.25)).toEqual([90,70,6,255]);
+        if(!array)expect(sample(0,0,.5)).toEqual([65,65,103,255]);
+        expect(sample(-1,1,array ? .51 : .75)).toEqual([40,60,200,255]);
+        for(const axis of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(target,axis,gl.MIRRORED_REPEAT);
+        expect(sample(0,0,array ? .49 : .25)).toEqual([200,40,24,255]);
+        expect(sample(1,1,array?1:.75)).toEqual([80,120,200,255]);
+        expect(gl.getError()).toBe(gl.NO_ERROR);
+      }
+    }
+  }
+});
