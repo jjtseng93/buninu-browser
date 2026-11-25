@@ -16,12 +16,14 @@ test('binary channel handles fragmented packets, rejects oversized input and aut
  const header=Buffer.alloc(8);header.writeUInt32LE(0xffffffff,0);
  expect(()=>new PacketReader(()=>{}).push(header)).toThrow('size');
  let reply;const got=new Promise(resolve=>reply=resolve);
- const server=await listenCompositor((message,pixels)=>{server.send({id:message.id,length:pixels.length});},()=>{});
+ const server=await listenCompositor((message,pixels)=>{server.send({id:message.id,length:pixels.length},pixels.subarray(1,3));},()=>{});
  let peer;
  try{
   await expect(connectCompositor({...server.endpoint,token:'wrong'},()=>{},()=>{})).rejects.toThrow();
-  peer=await connectCompositor(server.endpoint,message=>reply(message),()=>{});
-  peer.send({id:8},new Uint8Array(1024));expect(await got).toEqual({id:8,length:1024});
+  peer=await connectCompositor(server.endpoint,(message,pixels)=>reply([message,[...pixels]]),()=>{});
+  const payload=new Uint8Array(1024);payload.set([12,34,56]);
+  peer.send({id:8},payload);
+  expect(await got).toEqual([{id:8,length:1024},[34,56]]);
  }finally{peer?.close();server.close();}
 });
 
