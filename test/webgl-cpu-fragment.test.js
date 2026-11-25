@@ -236,3 +236,19 @@ test('scalar snapshots survive later writes, branches and swizzle swaps', () => 
  expect(at(2,1)).toEqual([80,48,80,255]);
  expect(at(6,1)).toEqual([207,207,207,255]);
 });
+
+test('live shader stages share compilation only within the same stage and cache', async () => {
+ const {ShaderStageCache}=await import('../lib/renderer/webgl/stage-cache.js');
+ const cache=new ShaderStageCache(), other=new ShaderStageCache();
+ let compilations=0, deletions=0;
+ const compile=()=>{compilations++;return {effect:{delete(){deletions++;}}};};
+ const fragment=cache.get('fragment','void main(){}',compile);
+ expect(cache.get('fragment','void main(){}',compile)).toBe(fragment);
+ expect(cache.get('vertex','void main(){}',compile)).not.toBe(fragment);
+ expect(other.get('fragment','void main(){}',compile)).not.toBe(fragment);
+ expect(compilations).toBe(3);
+ cache.dispose();cache.dispose();
+ expect(deletions).toBe(2);
+ other.dispose();
+ expect(deletions).toBe(3);
+});

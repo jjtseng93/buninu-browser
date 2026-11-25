@@ -1148,3 +1148,34 @@ test('transferring a WebGL canvas replaces the default bitmap and preserves boun
     expect(gl.getError()).toBe(gl.NO_ERROR);
   } finally { transfer.image.delete(); }
 });
+
+test('recompiling a shader preserves the executable used by a linked WebGL2 program', () => {
+  const gl = canvasContext(canvas(1,1), 'webgl2');
+  const program = gl.createProgram();
+  const vertex = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertex, '#version 300 es\nvoid main(){gl_Position=vec4(gl_VertexID==1?3.:-1.,gl_VertexID==2?3.:-1.,0.,1.);}');
+  gl.compileShader(vertex);
+  gl.attachShader(program, vertex);
+  const fragment = gl.createShader(gl.FRAGMENT_SHADER);
+  // Two outputs exercise the CanvasKit executable held by the linked program.
+  const compileColor = color => {
+    gl.shaderSource(fragment, '#version 300 es\nprecision highp float; layout(location=0) out vec4 first; layout(location=1) out vec4 second; void main(){first=vec4('+color+',1.);second=first;}');
+    gl.compileShader(fragment);
+    expect(gl.getShaderInfoLog(fragment)).toBe('');
+  };
+  const drawColor = () => {
+    const pixel = new Uint8Array(4);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+    gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+    expect(gl.getError()).toBe(gl.NO_ERROR);
+    return [...pixel];
+  };
+  compileColor('1.,0.,0.');
+  gl.attachShader(program,fragment);
+  gl.linkProgram(program);
+  gl.useProgram(program);
+  compileColor('0.,1.,0.');
+  expect(drawColor()).toEqual([255,0,0,255]);
+  gl.linkProgram(program);
+  expect(drawColor()).toEqual([0,255,0,255]);
+});
