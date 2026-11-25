@@ -775,6 +775,11 @@ test('CanvasKit derivative helper lanes honor uniform guards and local shadowing
     try {
       expect(stage.cpu).toBeNull();
       expect(Boolean(stage.derivativeGuard)).toBe(!shadow);
+      if(!shadow){
+        expect(stage.needsDerivativeLanes(new Map())).toBe(false);
+        expect(stage.needsDerivativeLanes(new Map([['gain',[.75]]]))).toBe(true);
+        expect(stage.needsDerivativeLanes(new Map([['gain',.5]]))).toBe(false);
+      }
     } finally { stage.effect.delete(); }
     const pr=gl.createProgram();
     for(const [kind,source] of [[gl.VERTEX_SHADER,vs],[gl.FRAGMENT_SHADER,fs]]){
