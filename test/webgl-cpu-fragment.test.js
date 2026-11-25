@@ -178,3 +178,19 @@ test('a numeric shader discards through a function without dropping transparent 
   expect([coverage[3],coverage[7]]).toEqual([0,1]);
  }finally{stage.effect.delete();}
 });
+
+test('conditional derivatives preserve color and discard on both sides of the branch', () => {
+ const pixels=compare(`precision highp float; varying vec2 uv;
+ void main(){
+   if(uv.x<.25) discard;
+   float c=.5;
+   if(uv.x>.5)c=dFdx(uv.x);
+   if(c<.25 && uv.y<.5)discard;
+   gl_FragColor=vec4(c,0.,0.,1.);
+ }`);
+ const at=(x,y)=>Array.from(pixels.subarray((8*y+x)*4,(8*y+x+1)*4));
+ expect(at(0,0)).toEqual([0,0,0,0]);
+ expect(at(2,0)).toEqual([128,0,0,255]);
+ expect(at(6,0)).toEqual([0,0,0,0]);
+ expect(at(6,6)).toEqual([32,0,0,255]);
+});

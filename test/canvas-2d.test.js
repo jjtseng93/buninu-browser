@@ -940,3 +940,49 @@ test('replaying a tiled WebGL draw keeps all tiles after a clear', () => {
     }
   }
 });
+
+test('blended derivative fragments keep overlapping layers and helper lanes across discard', () => {
+  const gl=canvasContext(canvas(2,2),'webgl2'),program=gl.createProgram();
+  for(const [stage,source] of [
+    [gl.VERTEX_SHADER,'in vec2 p;out float u;void main(){u=p.x;gl_Position=vec4(p,0.,1.);}'],
+    [gl.FRAGMENT_SHADER,'precision highp float;in float u;out vec4 c;void main(){if(u<0.)discard;c=vec4(.25*dFdx(u),0.,0.,.25);}'],
+  ]){
+    const shader=gl.createShader(stage);
+    gl.shaderSource(shader,'#version 300 es\n'+source);gl.compileShader(shader);
+    expect(gl.getShaderInfoLog(shader)).toBe('');
+    gl.attachShader(program,shader);
+  }
+  gl.linkProgram(program);gl.useProgram(program);
+  const triangle=[-1,-1,3,-1,-1,3];
+  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([...triangle,...triangle]),gl.STATIC_DRAW);
+  const p=gl.getAttribLocation(program,'p');
+  gl.enableVertexAttribArray(p);gl.vertexAttribPointer(p,2,gl.FLOAT,false,0,0);
+  gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);
+  gl.drawArrays(gl.TRIANGLES,0,6);
+  const pixels=new Uint8Array(16);
+  gl.readPixels(0,0,2,2,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+  expect([...pixels]).toEqual([0,0,0,0,128,0,0,128,0,0,0,0,128,0,0,128]);
+});
+
+test('floating point clears preserve scissor edges and masked channels', () => {
+  const gl=canvasContext(canvas(7,5),'webgl2'),texture=gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D,texture);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,7,5,0,gl.RGBA,gl.FLOAT,null);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,gl.createFramebuffer());
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);
+  gl.clearColor(.25,.5,.75,1);gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.SCISSOR_TEST);gl.scissor(1,1,5,3);
+  gl.clearColor(1,.75,.5,.25);gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.scissor(0,2,7,1);gl.colorMask(false,true,false,false);
+  gl.clearColor(0,.125,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+  const rgba=new Float32Array(7*5*4);
+  gl.readPixels(0,0,7,5,gl.RGBA,gl.FLOAT,rgba);
+  for(let y=0;y<5;y++)for(let x=0;x<7;x++){
+    const expected=x>=1&&x<6&&y>=1&&y<4?[1,.75,.5,.25]:[.25,.5,.75,1];
+    if(y===2)expected[1]=.125;
+    const offset=(y*7+x)*4;
+    expect(Array.from(rgba.subarray(offset,offset+4))).toEqual(expected);
+  }
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
