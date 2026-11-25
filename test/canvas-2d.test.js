@@ -1552,3 +1552,66 @@ test('WebGL2 solid rectangle batches match shaded triangles in coverage, order a
   expect(pixel(2,12)).toEqual([255,0,0,255]);
   expect(pixel(6,6)).not.toEqual([255,0,0,255]);
 });
+
+test('WebGL2 repeated textured draws match depth-always reference pixels as draw inputs change', () => {
+  const width = 300, height = 240;
+  function context(reference) {
+    const gl = canvasContext(canvas(width, height), 'webgl2', {depth: true});
+    const program = gl.createProgram();
+    for (const [type, source] of [
+      [gl.VERTEX_SHADER, 'layout(location=0) in vec2 pos; void main(){gl_Position=vec4(pos,0.,1.);}'],
+      [gl.FRAGMENT_SHADER, 'precision highp float; uniform sampler2D tex; uniform float opacity; out vec4 c; void main(){c=texture(tex,vec2(.5))*vec4(1.,1.,1.,opacity);}'],
+    ]) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, '#version 300 es\n' + source);
+      gl.compileShader(shader);
+      expect(gl.getShaderInfoLog(shader)).toBe('');
+      gl.attachShader(program, shader);
+    }
+    gl.linkProgram(program);
+    gl.useProgram(program);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(0);
+    gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([220,40,0,240]));
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    if (reference) {
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.ALWAYS);
+      gl.depthMask(false);
+    }
+    const opacity = gl.getUniformLocation(program, 'opacity');
+    return frame => {
+      gl.disable(gl.SCISSOR_TEST);
+      gl.clearColor(0, 0, frame >= 3 ? .7 : .2, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      if (frame >= 4) {
+        gl.enable(gl.SCISSOR_TEST);
+        gl.scissor(4, 3, width - 8, height - 6);
+      }
+      if (frame === 5) {
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,210,40,200]));
+      }
+      const left = frame >= 6 ? -.9 : -1;
+      const positions = [left,-1, 1,-1, left,1, left,1, 1,-1, 1,1];
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+      gl.uniform1f(opacity, frame >= 7 ? .8 : .5);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      const pixels = Buffer.alloc(width * height * 4);
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+      expect(gl.getError()).toBe(gl.NO_ERROR);
+      return pixels;
+    };
+  }
+  const cached = context(false), reference = context(true);
+  let previous;
+  for (let frame = 0; frame < 9; frame++) {
+    const pixels = cached(frame);
+    expect(pixels.equals(reference(frame))).toBe(true);
+    if (frame === 0) expect(pixels[0]).toBeGreaterThan(0);
+    if (previous) expect(pixels.equals(previous)).toBe(frame < 3 || frame === 8);
+    previous = pixels;
+  }
+});
