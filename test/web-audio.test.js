@@ -428,3 +428,18 @@ test('queued IPC and raster audio requests render each demanded stereo frame exa
     expect(output.pcm.reduce((bytes, chunk) => bytes + chunk.byteLength, 0)).toBe(total);
   } finally { f.dispose(); }
 });
+
+test('a synchronous WebGL wait services device demand before its fence completes', async () => {
+  const {watchWebAudio,unwatchWebAudio,waitWithWebAudio} = await import('../lib/renderer/web-audio-demand.js');
+  const flag=new Int32Array(new SharedArrayBuffer(4)),requests=[];
+  const id=Symbol();
+  const stream=watchWebAudio(id,request=>{
+    requests.push(request.bytes);
+    Atomics.store(flag,0,1);
+  });
+  try{
+    Atomics.store(stream.cell,0,512n);
+    expect(waitWithWebAudio(flag,0,1000)).toBe('not-equal');
+    expect(requests).toEqual([512]);
+  }finally{unwatchWebAudio(id);}
+});

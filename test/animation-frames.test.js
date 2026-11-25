@@ -80,3 +80,22 @@ frameTest('presentation follows all frame microtasks and precedes scheduling the
  frames.request(()=>frames.dispose());callback=wake;wake=null;callback();
  expect(paints).toEqual(['microtask','next']);expect(wake).toBeNull();
 });
+
+test('requests during an outstanding presentation share one wake and honor cancellation',()=>{
+  const jobs=new Map(),events=[];
+  let id=0,release;
+  const timers={schedule(fn){jobs.set(++id,fn);return id;},cancel(id){jobs.delete(id);},dispose(){jobs.clear();}};
+  const fire=()=>{const [id,fn]=jobs.entries().next().value;jobs.delete(id);fn();};
+  const frames=createAnimationFrames({now:()=>16,frameTimers:timers,checkpoint:null,invoke:f=>f(),
+    waitForPresentation(done){release=done;return true;}});
+  const cancelled=frames.request(()=>events.push(1));
+  fire();
+  frames.request(()=>events.push(2));
+  frames.cancel(cancelled);
+  expect(jobs.size).toBe(0);
+  release();fire();
+  expect(events).toEqual([2]);
+  frames.request(()=>events.push(3));
+  fire();frames.dispose();release();
+  expect(jobs.size).toBe(0);
+});
