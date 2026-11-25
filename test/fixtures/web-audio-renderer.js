@@ -27,7 +27,7 @@ try{
   })()`);
   assert.deepEqual(result,{context:true,node:true,eventTarget:true,param:true,alias:true,name:'AudioContext',native:mode==='ses',output:true,state:'running'});
   assert.equal(outputs.length,2);
-  assert.deepEqual(outputs[0].options,{rate:8000,channels:2,name:'Web Audio'});
+  assert.deepEqual(outputs[0].options,{rate:8000,channels:2,name:'Web Audio',renderDuringPaint:true});
   outputs[0].listener({event:'request',bytes:512});
   assert.ok(Math.abs(outputs[0].pcm[0][8]-8192)<=1,'real page graph produces the expected sine samples');
   assert.equal(await renderer.evaluate('c.currentTime'),.016);

@@ -384,3 +384,47 @@ test('stereo panning and linked compression reach PCM after lookahead', () => {
     expect(Math.abs(samples[401]-Math.round(32767*10**(-9/20)))).toBeLessThanOrEqual(1);
   }finally{f.dispose();}
 });
+
+test('a silent output keeps time, delivers ended, freezes on suspend and retries the device on resume',async()=>{
+  const f=setup(true),c=f.context;
+  try{
+    f.outputs[0].listener({event:'silent'});
+    await Bun.sleep(48);
+    expect(c.state).toBe('running');
+    expect(c.currentTime).toBeGreaterThan(0);
+    const source=c.createOscillator();
+    const finished=new Promise(resolve=>source.onended=resolve);
+    source.connect(c.destination);source.start();source.stop(c.currentTime+.025);
+    await finished;
+    expect(f.outputs[0].pcm).toHaveLength(0);
+    await c.suspend();
+    const frozen=c.currentTime;
+    await Bun.sleep(48);
+    expect(c.currentTime).toBe(frozen);
+    await c.resume();
+    expect(f.outputs).toHaveLength(2);
+    f.pull();
+    expect(c.currentTime).toBeGreaterThan(frozen);
+    expect(f.errors).toEqual([]);
+  }finally{f.dispose();}
+});
+
+test('queued IPC and raster audio requests render each demanded stereo frame exactly once', async () => {
+  const {WebAudioDemand} = await import('../lib/renderer/web-audio-demand.js');
+  const f = setup(true);
+  try {
+    const output = f.outputs[0];
+    const demand = new WebAudioDemand(output.listener);
+    const total = 4096 * 4;
+    Atomics.store(demand.cell, 0, BigInt(total));
+    demand.receive(Number(Atomics.load(demand.cell, 0)), true);
+    demand.receive(total / 2); // an older wakeup delivered after a draw
+    demand.receive(total);
+    for (let i = 0; i < 12; i++) demand.receive(total, true);
+    expect(output.pcm.reduce((bytes, chunk) => bytes + chunk.byteLength, 0)).toBe(total);
+    expect(f.context.currentTime).toBe(4096 / 8000);
+    await f.context.close();
+    demand.receive(total + 512, true);
+    expect(output.pcm.reduce((bytes, chunk) => bytes + chunk.byteLength, 0)).toBe(total);
+  } finally { f.dispose(); }
+});
