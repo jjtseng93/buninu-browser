@@ -268,3 +268,10 @@ test('member adaptation preserves ASI before reparsing local calls in scripts an
   expect(restoreSourceText(fn.toString())).toBe(source);
  }
 });
+
+test("computed members preserve array literal keys and bracketed comments", () => {
+  const source = "(obj) /* [ */ [ /* [ */ ['item'][0]].value";
+  const { code } = rewriteMemberReads(source);
+  expect(Function("obj", "$buninu$member", "return " + code)({item:{value:42}}, (o,k)=>o[k])).toBe(42);
+  expect(restoreSourceText(code)).toBe(source);
+});
