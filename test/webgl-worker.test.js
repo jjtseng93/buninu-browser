@@ -10,7 +10,7 @@ test('WebGL worker preserves readback, handle identity and the newest canvas bit
   setWebGLWorkerAssets(()=>({source,wasm:wasm.slice()}));
   const raster=makeRasterSurface(kit,2,2),document={},node={ownerDocument:document};
   const state={width:2,height:2,surface:raster,raster,node:new WeakRef(node)};
-  let context;
+  let context, asyncFrame;
   function pixel(){
     return [...raster.getCanvas().readPixels(0,0,{width:1,height:1,colorType:kit.ColorType.RGBA_8888,
       alphaType:kit.AlphaType.Unpremul,colorSpace:kit.ColorSpace.SRGB})];
@@ -19,7 +19,7 @@ test('WebGL worker preserves readback, handle identity and the newest canvas bit
     const sourceImage={width:1,height:1,image:{readPixels:()=>Uint8Array.of(12,34,56,255)}};
     const allowed={},tainted={};
     const resolveImage=element=>element===allowed?sourceImage:element===tainted?{...sourceImage,originClean:false}:null;
-    context=createWorkerGL(kit,state,()=>{},{canvas:node,depth:false,resolveImage},true);
+    context=createWorkerGL(kit,state,(_state,presented)=>{asyncFrame=presented;},{canvas:node,depth:false,resolveImage},true);
     expect(context.asyncPresentation).toBe(true);
     const gl=context.proxy,framebuffer=gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER,framebuffer);
@@ -41,6 +41,7 @@ test('WebGL worker preserves readback, handle identity and the newest canvas bit
     const red=waitForGLWrites(document,before);
     expect(red).toBeInstanceOf(Promise);
     await red;
+    expect(asyncFrame).toBe(true);
     expect(pixel()).toEqual([255,0,0,255]);
     const blueStart=glSubmission();
     gl.clearColor(0,0,1,1);gl.clear(gl.COLOR_BUFFER_BIT);
@@ -48,6 +49,7 @@ test('WebGL worker preserves readback, handle identity and the newest canvas bit
     await Promise.resolve();
     gl.clearColor(0,1,0,1);gl.clear(gl.COLOR_BUFFER_BIT);
     gl.finish();
+    expect(asyncFrame).toBeUndefined();
     expect(pixel()).toEqual([0,255,0,255]);
     await Bun.sleep(20);
     expect(pixel()).toEqual([0,255,0,255]);
