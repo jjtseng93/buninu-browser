@@ -1206,3 +1206,30 @@ test('deferred WebGL draws retain the previous packed vertex stream across buffe
   expect([...pixels]).toEqual([255,0,0,255,255,0,0,255,0,255,0,255,0,255,0,255]);
   expect(gl.getError()).toBe(gl.NO_ERROR);
 });
+
+test('single-sample CanvasKit fragments preserve earlier layers across discard and blending', () => {
+  const gl=canvasContext(canvas(4,4),'webgl2'),program=gl.createProgram();
+  // The loop bound takes the CanvasKit path. Each group of three vertices
+  // covers the viewport at a different depth within the same draw call.
+  const vertex='void main(){int v=gl_VertexID%3;gl_Position=vec4(v==1?3.:-1.,v==2?3.:-1.,gl_VertexID<3?.5:-.5,1.);}';
+  const fragment='precision highp float;uniform bool cut;out vec4 c;void main(){float v=0.;const int n=2;for(int i=0;i<n;i++){v+=.25;}if(gl_FragCoord.z<.5&&cut)discard;c=gl_FragCoord.z<.5?vec4(0.,v,0.,v):vec4(v,0.,0.,v);}';
+  for(const [stage,source] of [[gl.VERTEX_SHADER,vertex],[gl.FRAGMENT_SHADER,fragment]]){
+    const shader=gl.createShader(stage);gl.shaderSource(shader,'#version 300 es\n'+source);
+    gl.compileShader(shader);expect(gl.getShaderInfoLog(shader)).toBe('');
+    gl.attachShader(program,shader);
+  }
+  gl.linkProgram(program);gl.useProgram(program);
+  const cut=gl.getUniformLocation(program,'cut'), pixel=new Uint8Array(4);
+  gl.enable(gl.DEPTH_TEST);
+  gl.uniform1i(cut,1);
+  gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  gl.drawArrays(gl.TRIANGLES,0,6);
+  gl.readPixels(1,1,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+  expect([...pixel]).toEqual([128,0,0,128]);
+  gl.disable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE);
+  gl.uniform1i(cut,0);
+  gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.TRIANGLES,0,6);
+  gl.readPixels(1,1,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+  expect([...pixel]).toEqual([128,128,0,255]);
+  expect(gl.getError()).toBe(gl.NO_ERROR);
+});
