@@ -13,3 +13,6 @@ for(const mode of ['opening','playing','recreated'])test(`video continues when a
  ()=>runFixture('media-output-failure.js',mode),20000);
 test('video worker presents and seeks through the silent tail after audio drains',
  ()=>runFixture('media-short-audio.js'),20000);
+
+test('video advances when a completed media source contains only audio initialization data',
+ ()=>runFixture('media-completed-without-audio.js'),20000);
